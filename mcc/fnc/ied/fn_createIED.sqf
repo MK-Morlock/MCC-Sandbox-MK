@@ -20,7 +20,16 @@
 =================================================================================================================================================================*/
 
 //Made by Shay_Gman (c) 06.14
-private ["_pos", "_IEDJammable", "_IEDTriggerType", "_IEDAmbushGroup", "_trapdistance", "_iedside", "_dummy","_ok","_iedDir","_init","_helper","_fnc_iedHandle","_time"];
+private _pos = [];
+private _IEDJammable = true;
+private _IEDTriggerType = 0;
+private _trapdistance = 0;
+private _iedside = [];
+private _dummy = objNull;
+private _ok = [];
+private _iedDir = 0;
+private _fnc_iedHandle = {};
+private _time = 0;
 disableSerialization;
 
 if (!isServer) exitWIth {};
@@ -36,10 +45,21 @@ params [
 		["_iedside",[west],[sideLogic,"",[]]]
 	];
 
-if (isNull _fakeIed) exitWith {diag_log "MCC Sandbox Error: MCC_fnc_createIED object null "};
+if (isNull _fakeIed) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC Sandbox Error: MCC_fnc_createIED object null "}};
 
 _fnc_iedHandle = {
-	private ["_nearObjects","_dummyMarker","_armed", "_triggered","_pos","_IedExplosion","_explode","_effect","_hidden","_fakeIed","_arrayTargets","_arrayECM"];
+	private _nearObjects = [];
+	private _dummyMarker = nil;
+	private _armed = false;
+	private _triggered = false;
+	private _pos = [];
+	private _IedExplosion = {};
+	private _explode = false;
+	private _effect = "";
+	private _hidden = [];
+	private _fakeIed = objNull;
+	private _arrayTargets = false;
+	private _arrayECM = [];
 
 	params [
 		["_dummy",objNull,[objNull]],
@@ -66,29 +86,33 @@ _fnc_iedHandle = {
 		   && !(_dummy getvariable ["iedTrigered",false])} do {
 		sleep 0.4;
 
-		//if not manual detonation
 		if !(_IEDTriggerType in [2,4]) then	{
 			_pos = getPos _dummy;
-			_nearObjects = [];
-			_nearObjects = (vehicles inAreaArray [_pos,_trapdistance,_trapdistance,0,false,1]);
-			_nearObjects = +_nearObjects + (allUnits inAreaArray [_pos,_trapdistance,_trapdistance,0,false,1]);
-			_arrayTargets = _nearObjects select {(speed _x > 5) && (side _x in _iedside)};
-
-			_arrayECM = _pos nearObjects (missionNamespace getVariable ["MCC_iedJammeDistance",80]);
-			_arrayECM = _arrayECM select {(_x getvariable ["MCC_ECM",false])};
-
-			{
-				if (isEngineOn _x) then {
-					[["a3\missions_f_beta\data\sounds\firing_drills\drill_start.wss", _x]] remoteExec ["playSound3D", _x];
+			if (count (_pos nearEntities [["CAManBase","LandVehicle","Air","Ship"], 500]) == 0) then {
+				sleep 2.6;
+			} else {
+				private _jamDist = missionNamespace getVariable ["MCC_iedJammeDistance",80];
+				_nearObjects = _pos nearEntities [["CAManBase","LandVehicle","Air","Ship"], _trapdistance + 5];
+				_arrayTargets = (_nearObjects inAreaArray [_pos,_trapdistance,_trapdistance,0,false,1]) select {(speed _x > 5) && (side _x in _iedside)};
+				_arrayECM = [];
+				if ((count _arrayTargets > 0) || {count (_pos nearEntities [["LandVehicle","Air","Ship"], _jamDist]) > 0}) then {
+					_arrayECM = _pos nearObjects _jamDist;
+					_arrayECM = _arrayECM select {(_x getvariable ["MCC_ECM",false])};
 				};
-			} forEach _arrayECM;
 
-			if (count _arrayTargets > 0) then {
-				if (!_IEDJammable) then {
-					_dummy setvariable ["iedTrigered",true,true]
-				} else {
-					if (count _arrayECM <= 0) then {
-						_dummy setvariable ["iedTrigered",true,true];
+				{
+					if (isEngineOn _x) then {
+						[["a3\missions_f_beta\data\sounds\firing_drills\drill_start.wss", _x]] remoteExec ["playSound3D", _x];
+					};
+				} forEach _arrayECM;
+
+				if (count _arrayTargets > 0) then {
+					if (!_IEDJammable) then {
+						_dummy setvariable ["iedTrigered",true,true]
+					} else {
+						if (count _arrayECM <= 0) then {
+							_dummy setvariable ["iedTrigered",true,true];
+						};
 					};
 				};
 			};
@@ -161,7 +185,7 @@ _fnc_iedHandle = {
 			_effect attachto [_fakeIed,[0,0,0]];
 			_effect spawn
 			{
-				sleep 180 + random 360;
+				sleep (180 + random 360);
 				while {!isnull (attachedTo _this)} do {detach _this};
 				_nearObjects =  (getpos _this) nearObjects 3;
 				{
@@ -218,10 +242,9 @@ _dummy attachto [_fakeIed,[0,0,0]];
 
 [_fakeIed, _dummy] spawn
 {
-	private ["_fakeIedS"];
-	_fakeIedS 	= _this select 0;
+	private _fakeIedS = _this select 0;
 	_dummy 		= _this select 1;
-	waituntil {!alive _fakeIedS || isnull _fakeIedS};
+	waituntil {sleep 1; !alive _fakeIedS || isnull _fakeIedS};
 	sleep 1;
 	deletevehicle _dummy;
 };
@@ -235,7 +258,7 @@ _dummy setvariable ["iedAmbush", false, true];
 _dummy setvariable ["MCC_IEDtype", "ied", true];
 
 //Create helper
-[[_dummy,"Hold %1 to disarm"], "MCC_fnc_createHelper", false] call BIS_fnc_MP;
+[_dummy,"Hold %1 to disarm"] remoteExec ["MCC_fnc_createHelper", 2, false];
 
 //If it is radio IED
 if (_IEDTriggerType == 1) then {
@@ -249,7 +272,7 @@ _fakeIed setvariable ["realIed", _dummy ,true];
 //Sync it with pre-sync IED
 if (str (_fakeIed getVariable ["syncedObject", [0,0,0]]) != "[0,0,0]") then
 {
-	[[getpos _fakeIed , (_fakeIed getVariable ["syncedObject", [0,0,0]])],"MCC_fnc_iedSync",false,false] call BIS_fnc_MP;
+	[getpos _fakeIed , (_fakeIed getVariable ["syncedObject", [0,0,0]])] remoteExec ["MCC_fnc_iedSync", 2, false];
 };
 
 //Spawn the IED script

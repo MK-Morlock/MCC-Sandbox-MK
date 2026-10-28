@@ -5,7 +5,16 @@
 #define MCC_CONVOY_CAR5 54
 #define MCC_CONVOY_HVT 55
 #define MCC_CONVOY_HVTCAR 56
-private ["_convoy_wp1","_point1","_convoy_wp2","_point2","_convoy_wp3","_point3","_convoy_wp4","_point4","_convoy_wp5","_point5"];
+private _convoy_wp1 = "";
+private _point1 = [];
+private _convoy_wp2 = "";
+private _point2 = [];
+private _convoy_wp3 = "";
+private _point3 = [];
+private _convoy_wp4 = "";
+private _point4 = [];
+private _convoy_wp5 = "";
+private _point5 = [];
 if !mcc_isloading then {
 	if (mcc_missionmaker == (name player)) then {
 		deletemarkerlocal "marker1";	//delete precious markers
@@ -13,6 +22,7 @@ if !mcc_isloading then {
 		deletemarkerlocal "marker3";
 		deletemarkerlocal "marker4";
 		deletemarkerlocal "marker5";
+		MCC_convoyPlacing = true;
 
 		convoy_car1 = [(U_GEN_CAR select (lbCurSel MCC_CONVOY_CAR1)) select 1];	//first lets read the cars
 		convoy_car2 = [(U_GEN_CAR select (lbCurSel MCC_CONVOY_CAR2)) select 1];
@@ -42,7 +52,8 @@ if !mcc_isloading then {
 		click = true;
 		onMapSingleClick """";" ;
 
-		waitUntil {(click)};
+		waitUntil {click || !(missionNamespace getVariable ['MCC_convoyPlacing', false])};
+		if !(missionNamespace getVariable ['MCC_convoyPlacing', false]) exitWith {};	//Reset / Remove pressed: stop placing
 		click = false;
 		_convoy_wp1 = createMarkerLocal ["marker1",point1];
 		_convoy_wp1 setMarkerTypeLocal "mil_dot";
@@ -64,7 +75,8 @@ if !mcc_isloading then {
 		click = true;
 		onMapSingleClick """";" ;
 
-		waitUntil {(click)};
+		waitUntil {click || !(missionNamespace getVariable ['MCC_convoyPlacing', false])};
+		if !(missionNamespace getVariable ['MCC_convoyPlacing', false]) exitWith {};	//Reset / Remove pressed: stop placing
 		click = false;
 		_convoy_wp2 = createMarkerLocal ["marker2",point2];
 		_convoy_wp2 setMarkerTypeLocal "mil_dot";
@@ -86,7 +98,8 @@ if !mcc_isloading then {
 		click = true;
 		onMapSingleClick """";" ;
 
-		waitUntil {(click)};
+		waitUntil {click || !(missionNamespace getVariable ['MCC_convoyPlacing', false])};
+		if !(missionNamespace getVariable ['MCC_convoyPlacing', false]) exitWith {};	//Reset / Remove pressed: stop placing
 		click = false;
 		_convoy_wp3 = createMarkerLocal ["marker3",point3];
 		_convoy_wp3 setMarkerTypeLocal "mil_dot";
@@ -108,7 +121,8 @@ if !mcc_isloading then {
 		click = true;
 		onMapSingleClick """";" ;
 
-		waitUntil {(click)};
+		waitUntil {click || !(missionNamespace getVariable ['MCC_convoyPlacing', false])};
+		if !(missionNamespace getVariable ['MCC_convoyPlacing', false]) exitWith {};	//Reset / Remove pressed: stop placing
 		click = false;
 		_convoy_wp4 = createMarkerLocal ["marker4",point4];
 		_convoy_wp4 setMarkerTypeLocal "mil_dot";
@@ -130,7 +144,8 @@ if !mcc_isloading then {
 		click = true;
 		onMapSingleClick """";" ;
 
-		waitUntil {(click)};
+		waitUntil {click || !(missionNamespace getVariable ['MCC_convoyPlacing', false])};
+		if !(missionNamespace getVariable ['MCC_convoyPlacing', false]) exitWith {};	//Reset / Remove pressed: stop placing
 		click = false;
 		_convoy_wp5 = createMarkerLocal ["marker5",point5];
 		_convoy_wp5 setMarkerTypeLocal "mil_dot";
@@ -146,6 +161,7 @@ if !mcc_isloading then {
 					<t color='#33CC00'>Waypoints done: 5</t><br/>
 					<t color='#FF0000'>Waypoints to go: 0</t><br/>--------------------------<br/>"];
 
+		MCC_convoyPlacing = false;
 		if (MCC_capture_state) then {
 			hint "Convoy captured";
 			MCC_capture_var = MCC_capture_var + FORMAT ["
@@ -154,7 +170,7 @@ if !mcc_isloading then {
 									point4 =%9;
 									point5 =%10;
 									vip = %12;
-									[[%1 select 0, %2 select 0, %3 select 0, %4 select 0, %5 select 0,%6, %7, %11 select 0,%12 select 0, %13 select 0],""MCC_fnc_placeConvoy"",false,false] spawn BIS_fnc_MP;
+									[%1 select 0, %2 select 0, %3 select 0, %4 select 0, %5 select 0,%6, %7, %11 select 0,%12 select 0, %13 select 0] remoteExec [""MCC_fnc_placeConvoy"", 2, false];
 								    "
 								  , convoy_car1
 								  , convoy_car2
@@ -172,14 +188,14 @@ if !mcc_isloading then {
 								  ];
 		} else {
 			hint "Convoy placed";
-			[[convoy_car1 select 0, convoy_car2 select 0, convoy_car3 select 0, convoy_car4 select 0, convoy_car5 select 0,_point1, _point2,[mcc_sidename] select 0, vip select 0, vipCar select 0],"MCC_fnc_placeConvoy",false,false] spawn BIS_fnc_MP;
+			[convoy_car1 select 0, convoy_car2 select 0, convoy_car3 select 0, convoy_car4 select 0, convoy_car5 select 0,_point1, _point2,[mcc_sidename] select 0, vip select 0, vipCar select 0] remoteExec ["MCC_fnc_placeConvoy", 2, false];
 			mcc_safe = mcc_safe + FORMAT ["
 									point2 =%7;
 									point3 =%8;
 									point4 =%9;
 									point5 =%10;
 									vip = %12;
-									[[%1 select 0, %2 select 0, %3 select 0, %4 select 0, %5 select 0,%6, %7, %11 select 0,%12 select 0, %13 select 0],""MCC_fnc_placeConvoy"",false,false] spawn BIS_fnc_MP;
+									[%1 select 0, %2 select 0, %3 select 0, %4 select 0, %5 select 0,%6, %7, %11 select 0,%12 select 0, %13 select 0] remoteExec [""MCC_fnc_placeConvoy"", 2, false];
 								    sleep 1;
 								  "
 								  , convoy_car1

@@ -1,9 +1,8 @@
 //==================================================================MCC_fnc_inidbSet======================================================================================
 // Sets variable with custom value on a specific player
 //==============================================================================================================================================================================
-private ["_id","_value"];
-_value 		= _this select 0;
-_id			= _this select 1;
+
+params ["_value", "_id"];
 
 if (getPlayerUID player == _id) then {
 	player setVariable ["MCC_readValue",_value];

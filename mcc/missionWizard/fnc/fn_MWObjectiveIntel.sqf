@@ -6,15 +6,28 @@
 //_faction = enemy Faction
 // Return - nothing
 //===============================================================================================================================================================*/
-private ["_objPos","_isCQB","_side","_faction","_preciseMarkers","_objType","_spawnPos","_time","_sidePlayer","_object","_dummyObject","_spawndir","_unitsArray","_group","_init","_range","_selectedBuilding","_building","_buildingPos","_isDownloadIntel","_taskType","_foundBuilding"];
+private _objType = "";
+private _spawnPos = [];
+private _time = 0;
+private _object = objNull;
+private _dummyObject = "";
+private _init = "";
+private _range = 0;
+private _selectedBuilding = [];
+private _building = objNull;
+private _buildingPos = nil;
+private _taskType = "";
+private _foundBuilding = false;
 
-_objPos = _this select 0;
-_isCQB = _this select 1;
-_side = _this select 2;
-_faction = _this select 3;
-_preciseMarkers = _this select 4;
-_sidePlayer =  param [5, west,[sideLogic,""]];
-_isDownloadIntel = param [6,false,[false]];
+params [
+	["_objPos", [0,0,0], [[]]],
+	["_isCQB", false, [false]],
+	["_side", sideUnknown, [sideUnknown]],
+	["_faction", "", [""]],
+	["_preciseMarkers", false, [false]],
+	["_sidePlayer", west, [sideLogic,""]],
+	["_isDownloadIntel", false, [false]]
+];
 _taskType = if (_isDownloadIntel) then {"downloadIntel"} else {"pick_intel"};
 _foundBuilding = false;
 
@@ -50,20 +63,25 @@ if (!(isnil "_buildingPos") &&
 	_time = time;
 	_spawnPos	= _building buildingPos (floor random _buildingPos);
 
-	//No other unit in the spawn position?
-	while {((count (nearestObjects [_spawnPos, ["Man"], 1])) > 0)} do {
+	while {((count (nearestObjects [_spawnPos, ["Man"], 1])) > 0) && {time < _time + 5}} do {
 		_spawnPos	= _building buildingPos (floor random _buildingPos);
 		sleep 0.1;
 	};
 
-	_foundBuilding = true;
+	if ((count (nearestObjects [_spawnPos, ["Man"], 1])) > 0) then {
+		["WARN", "fn_MWObjectiveIntel", "no free building position for the intel near %1 - placed at the objective instead", [mapGridPosition _objPos]] call MCC_fnc_log;
+		_spawnPos = _objPos;
+	} else {
+		_foundBuilding = true;
+	};
 };
 
 
 if (_isDownloadIntel) then {
 	_object = _objType createvehicle _spawnPos;
 	if !(_foundBuilding) then {
-		_spawnPos = _spawnPos findEmptyPosition [2,40,_objType];
+		private _e = _spawnPos findEmptyPosition [2,40,_objType];
+		if (count _e > 0) then {_spawnPos = _e};
 	};
 
 	_object setPos _spawnPos;
@@ -77,7 +95,8 @@ if (_isDownloadIntel) then {
 	{_x addCuratorEditableObjects [[_dummyObject],false]} forEach allCurators;
 
 	if !(_foundBuilding) then {
-		_spawnPos = _spawnPos findEmptyPosition [2,40,"Land_WoodenTable_small_F"];
+		private _e = _spawnPos findEmptyPosition [2,40,"Land_WoodenTable_small_F"];
+		if (count _e > 0) then {_spawnPos = _e};
 	};
 
 	_dummyObject setPos _spawnPos;
@@ -88,9 +107,11 @@ if (_isDownloadIntel) then {
 	_object enablesimulation false;
 };
 
+missionNamespace setVariable ["MCC_MWObjectiveItems", ((missionNamespace getVariable ["MCC_MWObjectiveItems", []]) select {!isNull _x}) + ([_object, _dummyObject] select {_x isEqualType objNull && {!isNull _x}})];
+
 //Pick Item
 _init = '_this call MCC_fnc_pickItem';
-[[netID _object,_object], _init] remoteExec ["MCC_fnc_setVehicleInit",0];
+[[netID _object,_object], _init] remoteExec ["MCC_fnc_setVehicleInit",0,_object];
 
 {_x addCuratorEditableObjects [[_object],false]} forEach allCurators;
 

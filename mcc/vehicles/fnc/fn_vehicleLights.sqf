@@ -14,7 +14,7 @@ params [
 	["_entity",objNull,[objNull]],
 	["_mode",0,[0]]
 ];
-private ["_lights"];
+private _lights = false;
 
 if (isNull _entity || !local _entity) exitWith {};
 

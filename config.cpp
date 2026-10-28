@@ -1,17 +1,19 @@
 #include "BIS_AddonInfo.hpp"
+enableDebugConsole = 1;
 class CfgPatches
 {
 
 	class mcc_sandbox
 	{
-		units[] = {"mcc_sandbox_module","mcc_sandbox_moduleSF","mcc_sandbox_moduleRestrictedZone","MCC_Module_AAS","mcc_Module_createZones","MCC_Module_settingsMechanics","MCC_Module_settings","MCC_Module_settingsMedicSystem","MCC_Module_settingsRS","MCC_Module_createIntel","MCC_Module_GAIARespawns","MCC_Module_RTSBuildings","MCC_Module_addValor","MCC_Module_settingsMissionWizard","MCC_Module_AI_assignToZone"};
+		units[] = {"mcc_sandbox_module","mcc_sandbox_moduleSF","mcc_sandbox_moduleRestrictedZone","MCC_Module_AAS","mcc_Module_createZones","MCC_Module_settingsMechanics","MCC_Module_settings","MCC_Module_settingsRS","MCC_Module_createIntel","MCC_Module_addValor","MCC_Module_settingsMissionWizard","MCC_Module_AI_assignToZone","MCC_Module_settingsMedicSystem","MCC_Module_setResources","MCC_Module_createArmedCivilian","mcc_sandbox_moduleGAIASettings","MCC_Module_settingsRadio","MCC_Module_createEvac","MCC_Module_captureZone","MCC_module_vehicleRespawn","MCC_Module_createIED","mcc_sandbox_moduleILS","MCC_Module_campaignInit","mcc_sandbox_moduleStartLocations","MCC_Module_inGameUI","mcc_sandbox_moduleUndercover","mcc_sandbox_modulevehicleSpawner"};
 		weapons[] = {};
 		requiredVersion = 1.00;
 		requiredAddons[] = {"A3_Modules_F",
 								"A3_Data_F_Tank_Loadorder",
 					            "cba_ui",
 					            "cba_xeh",
-					            "cba_jr"
+					            "cba_jr",
+					            "3DEN"
 					        };
 		author = "shay_gman";
 		name = "MCC Sandbox";
@@ -21,7 +23,7 @@ class CfgPatches
 
 	class mcc_sandbox_curatorExp
 	{
-		units[] = {"MCC_Module_Base","MCC_Module_addUnitsToZeusCurator","MCC_Module_ambientCiviliansCurator","MCC_Module_MCCCASCurator","MCC_Module_createEvacCurator","MCC_Module_createIEDCurator","MCC_Module_createArmedCivilianCurator","MCC_Module_nightEffectsCurator","MCC_Module_lockDoorsCurator","MCC_Module_atmosphereCurator","MCC_Module_warZoneCurator","MCC_Module_garrisonBuildingsCurator","MCC_Module_damagePartCurator","MCC_Module_vehicleSpawnerCurator","MCC_Module_campaignInitCurator","MCC_Module_setResourcesCurator","MCC_Module_underCoverCurator","MCC_Module_settingsInGameUICurator","MCC_Module_settingsMedicSystemCurator","MCC_Module_settingsCurator","MCC_Module_settingsMechanicsCurator","MCC_Module_settingsRSCurator","MCC_Module_ambientBirdsCurator","MCC_module_ambientFireCurator","MCC_module_survivalSpawnCratesCurator","MCC_Module_settingsGAIACurator","MCC_Module_createIntelCurator","MCC_Module_LHDSpawnCurator","MCC_Module_LHDSpawnMenuCurator","MCC_Module_GAIARespawnsCurator","MCC_Module_RTSBuildingsCurator","MCC_Module_PylonsChange","MCC_Module_CapturePointCurator","MCC_Module_medicSetStateCurator","MCC_Module_createShopCurator","‏‏MCC_Module_addValorCurator","MCC_ModuleObjective_FCurator","MCC_ammoBox","MCC_crateAmmo","MCC_crateSupply","MCC_crateFuel","MCC_Module_cargoLoad","MCC_Module_AI_assignToZone","MCC_Module_ambientCiviliansCuratorDenied","MCC_Module_AASSpawnAI"};
+		units[] = {"MCC_Module_Base","MCC_Module_addUnitsToZeusCurator","MCC_Module_ambientCiviliansCurator","MCC_Module_MCCCASCurator","MCC_Module_createEvacCurator","MCC_Module_createIEDCurator","MCC_Module_createArmedCivilianCurator","MCC_Module_nightEffectsCurator","MCC_Module_lockDoorsCurator","MCC_Module_atmosphereCurator","MCC_Module_warZoneCurator","MCC_Module_garrisonBuildingsCurator","MCC_Module_damagePartCurator","MCC_Module_vehicleSpawnerCurator","MCC_Module_campaignInitCurator","MCC_Module_setResourcesCurator","MCC_Module_underCoverCurator","MCC_Module_settingsInGameUICurator","MCC_Module_settingsCurator","MCC_Module_settingsMechanicsCurator","MCC_Module_settingsRSCurator","MCC_Module_ambientBirdsCurator","MCC_Module_settingsGAIACurator","MCC_Module_createIntelCurator","MCC_Module_LHDSpawnCurator","MCC_Module_LHDSpawnMenuCurator","MCC_Module_GAIARespawnsCurator","MCC_Module_RTSBuildingsCurator","MCC_Module_PylonsChange","MCC_Module_CapturePointCurator","MCC_Module_createShopCurator","MCC_Module_addValorCurator","MCC_ModuleObjective_FCurator","MCC_ammoBox","MCC_crateAmmo","MCC_crateSupply","MCC_crateFuel","MCC_Module_cargoLoad","MCC_Module_AI_assignToZone","MCC_Module_ambientCiviliansCuratorDenied","MCC_Module_AASSpawnAI","MCC_Module_settingsMedicSystemCurator","MCC_Module_medicSetStateCurator","MCC_module_ambientFireCurator","MCC_module_survivalSpawnCratesCurator","MCC_module_extinguishFiresCurator","MCC_Module_deleteMissionCurator"};
 		weapons[] = {};
 		requiredVersion = 1.00;
 		author = "shay_gman";
@@ -40,24 +42,40 @@ class CfgMods
 		actionName = "Website";
 		tooltip = "MCC Sandbox";
 		overview = "Mission Control Center is a powerful game mode that let the ArmA player complete freedom as a mission maker. <br />With MCC you can build complected missions the way you wanted in few minutes and save them as a mission file or in your profile to share with friends. <br />MCC have a dynamic AI system that called GAIA that gives AI more human like tactics while they flank, support and use CAS or artillery.  MCC holds unique mission generator so if you can just push in some variables and MCC will generate a complete random mission set to your play-style and the amount of players and objectives needed. MCC holds much more as unique: IED, CAS, Evac Helicopters aproch, air drops, 3D editor, persistence database for players levels and achievements and many many more.";
-		picture = "mcc_sandbox_mod\data\mod.paa";
-		logo = "mcc_sandbox_mod\data\mod.paa";
-		logoOver = "mcc_sandbox_mod\data\mod.paa";
-		logoSmall = "mcc_sandbox_mod\data\mod.paa";
+		picture = "\mcc_sandbox_mod\data\mod.paa";
+		logo = "\mcc_sandbox_mod\data\mod.paa";
+		logoOver = "\mcc_sandbox_mod\data\mod.paa";
+		logoSmall = "\mcc_sandbox_mod\data\mod.paa";
 	};
 };
 
 //CBA
 class Extended_PreInit_EventHandlers {
     class MCC_PretInits {
-         init = call compile preprocessFileLineNumbers "mcc_sandbox_mod\XEH_preInit.sqf";
+         init = "call compile preprocessFileLineNumbers '\mcc_sandbox_mod\XEH_preInit.sqf'";
     };
 };
 
 class Extended_PostInit_EventHandlers {
 	class MCC_PostInits {
-        //init = call compile preprocessFileLineNumbers "mcc_sandbox_mod\XEH_preInit.sqf";
+        //init = "call compile preprocessFileLineNumbers '\mcc_sandbox_mod\XEH_preInit.sqf'";
     };
+};
+
+// Diagnostic: writes to the RPT which mod owns the text behind the main-menu "Error Missing ]" ([1.0.0] 23.09.2014)
+class Extended_PreStart_EventHandlers {
+	class MCC_versionScan {
+		init = "['config'] call compile preprocessFileLineNumbers '\mcc_sandbox_mod\XEH_versionScan.sqf'";
+	};
+	class MCC_textureCheck {
+		init = "call compile preprocessFileLineNumbers '\mcc_sandbox_mod\XEH_textureCheck.sqf'";
+	};
+};
+
+class Extended_DisplayLoad_EventHandlers {
+	class RscDisplayMain {
+		MCC_versionScan = "['menu', _this select 0] spawn compile preprocessFileLineNumbers '\mcc_sandbox_mod\XEH_versionScan.sqf'";
+	};
 };
 
 class CfgScriptPaths {
@@ -327,7 +345,7 @@ class CfgMissions
 		class MCC_Template_Chernarus_Winter
 		{
 			briefingName = "(MCC) Template";
-			directory = "mcc_sandbox_mod\sampleMissions\class MCC_Template.Chernarus_Winter";
+			directory = "mcc_sandbox_mod\sampleMissions\MCC_Template.Chernarus_Winter";
 		};
 
 		class MCC_TEMPLATE_fallujah
@@ -423,3 +441,5 @@ class CfgMissions
 };
 
 #include "\mcc_sandbox_mod\definesMod.hpp"
+
+#include "\mcc_sandbox_mod\mcc\cfg\eden\attributes.hpp"

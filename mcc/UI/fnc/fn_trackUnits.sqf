@@ -2,8 +2,13 @@
 //Track units on the given map display
 // Example: [] call MCC_fnc_trackUnits;
 //==============================================================================================================================================================================
-private ["_map","_leader","_markerColor","_mapsize","_group","_texture","_unit"];
-_map = _this select 0;
+private "_leader";
+private "_markerColor";
+private _mapsize = 0;
+private "_group";
+private _texture = "";
+private "_unit";
+params ["_map"];
 
 {
 	_group = _x;
@@ -39,17 +44,17 @@ _map = _this select 0;
 
 
 
-			if (!isnil "MCC_3D_CAM") then
+			if (!isnil "MCC_3D_CAM" && {missionNamespace getVariable ["MCC_3D_GUI", true]}) then
 			{
 				if((MCC_3D_CAM distance vehicle _unit)<1000) then
 				{
-					private ["_size"];
+					private "_size";
 					_bbr = boundingBoxReal vehicle _unit;
 					_p1 = _bbr select 0;
 					_p2 = _bbr select 1;
 					_maxHeight = abs ((_p2 select 2) - (_p1 select 2));
 
-					_size =if ((1.5 - ((MCC_3D_CAM distance vehicle _unit)*0.001)) < 0) then {0} else {(1.5 - ((MCC_3D_CAM distance vehicle _unit)*0.001))};
+					_size = (0.7 - ((MCC_3D_CAM distance vehicle _unit) * 0.0005)) max 0;
 
 					if (_size > 0) then
 					{
@@ -67,7 +72,7 @@ _map = _this select 0;
 							drawLine3D [
 								[(getpos vehicle _unit) select 0, (getpos vehicle _unit) select 1, ((getpos vehicle _unit) select 2) + _maxHeight],
 								[(getpos vehicle (leader _group)) select 0, (getpos vehicle(leader _group)) select 1, ((getpos vehicle (leader _group)) select 2) + _maxHeight],
-								[0,0,1,1]
+								[0.3,0.5,1,0.45]
 							];
 						};
 					};

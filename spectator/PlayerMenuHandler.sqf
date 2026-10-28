@@ -1,4 +1,10 @@
-private ["_Source", "_debugPlayer", "_cName", "_cCamera", "_idx", "_found", "_role", "_name", "_ccName", "_disp", "_mode", "_KEGs_target"];
+private _cName = 0;
+private _cCamera = 0;
+private _idx = 0;
+private _found = false;
+private _role = "";
+private _name = "";
+private _KEGs_target = objNull;
 
 _cName = 55004;
 _cCamera = 55002;

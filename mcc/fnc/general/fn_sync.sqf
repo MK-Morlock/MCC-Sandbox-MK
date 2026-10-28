@@ -4,7 +4,9 @@
 // Params:
 // 	NONE
 //==============================================================================================================================================================================
-private ["_ok","_briefings","_logics"];
+private _ok = [];
+private _briefings = [];
+private "_logics";
 
 /*
 //No need to sync weather with server anymore

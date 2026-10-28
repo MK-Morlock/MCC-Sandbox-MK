@@ -1,9 +1,18 @@
-private ["_disp","_comboBox","_index","_displayname","_array","_class","_pic","_sideID","_startLoad","_isHeli","_cargoBoxesType","_maxCounter","_className","_maxLoad"];
+private "_comboBox";
+private _displayname = [];
+private "_array";
+private _class = "";
+private "_sideID";
+private _startLoad = false;
+private "_isHeli";
+private "_maxCounter";
+private "_className";
+private _maxLoad = 0;
 disableSerialization;
 
 waituntil {dialog};
 
-_disp = _this select 0;
+params ["_disp"];
 uiNamespace setVariable ["MCC_LOGISTICS_LOAD_TRUCK", _disp];
 uiNamespace setVariable ["MCC_loadTruckC1", _disp displayCtrl 0];
 

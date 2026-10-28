@@ -8,9 +8,8 @@
 // <OUT>
 //		nothing
 //===========================================================================================================================================================================	
-private["_pos","_npc"];	
-_npc = _this select 0;
-_pos = _this select 1;	
+	
+params ["_npc", "_pos"];	
 
 sleep 0.5;
 if (!alive _npc || _npc != vehicle _npc || !(_npc iskindof "Man")) exitwith{};

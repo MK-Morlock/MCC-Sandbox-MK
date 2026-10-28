@@ -2,7 +2,11 @@
 // Sets gear to role
 // Example: [_currentWeapon], "MCC_fnc_addItem", true, false] spawn BIS_fnc_MP;
 //========================================================================================================================================================================
-private ["_currentWeapon","_mag","_index","_array","_unit"];
+private _currentWeapon = [];
+private _mag = "";
+private _index = nil;
+private _array = [];
+private "_unit";
 _currentWeapon = param [0,[0,"",0],[[]]];
 _unit = param [1,player];
 

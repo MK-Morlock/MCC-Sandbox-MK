@@ -89,7 +89,7 @@ class MCC_hud {
 					idc = 22;
 					style = 0x02;
 					sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-					colorText[] = {1,1,1,1};
+					colorText[] = {0.88,0.89,0.90,1};
 					x = 0.15 * safezoneW;
 					y = 0 * safezoneH;
 					w = 0.1 * safezoneW;

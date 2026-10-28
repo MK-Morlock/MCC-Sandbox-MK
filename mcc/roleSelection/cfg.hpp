@@ -1,6 +1,5 @@
 #include "dialogs\cp_dialogs.hpp"
-#include "dialogs\gearPanel.hpp"
-#include "dialogs\respawnPanel.hpp"
+#include "dialogs\roleDialogVariants.hpp"
 
 //Kits
 class MCC_loadouts

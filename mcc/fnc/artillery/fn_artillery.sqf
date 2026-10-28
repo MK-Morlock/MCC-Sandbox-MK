@@ -1,6 +1,6 @@
 //===================================================================MCC_fnc_artillery======================================================================================
 // Create an artillery shell above the location
-// Example:[[_pos, shelltype, shellspread, nshell,simulate],"MCC_fnc_artillery",true,false] spawn BIS_fnc_MP;
+// Example:[_pos, shelltype, shellspread, nshell,simulate] remoteExec ["MCC_fnc_artillery", true, false];
 // Params:
 // 	_pos: array, position
 // 	shelltype: string, vehicleClass ["GrenadeHand","Sh_120_HE","Cluster_120mm_AMOS","Mo_cluster_AP","Mine_120mm_AMOS_range","Sh_120mm_AMOS_LG","Sh_82mm_AMOS","Fire_82mm_AMOS","Smoke_120mm_AMOS_White","Smoke_82mm_AMOS_White","G_40mm_SmokeGreen","G_40mm_SmokeRed","F_40mm_White""F_40mm_Green","F_40mm_Red"];
@@ -9,13 +9,11 @@
 //	simulate: number, shell simulation 0-DPICM, 1- bomb, 2 - flare, 3 - laser guided
 //==============================================================================================================================================================================
 
-private ["_sound", "_pos", "_shelltype", "_shellspread", "_nshell","_lasertargets","_nul","_x","_simulate","_delay"];
-_pos					 = _this select 0;
-_shelltype 			     = _this select 1;
-_shellspread			 = _this select 2;
-_nshell 				 = _this select 3;
-_simulate				 = _this select 4;
-_delay					 = _this select 5;
+private _sound = false;
+private _lasertargets = [];
+private _nul = [];
+private _x = objNull;
+params ["_pos", "_shelltype", "_shellspread", "_nshell", "_simulate", "_delay"];
 
 _sound = true;
 

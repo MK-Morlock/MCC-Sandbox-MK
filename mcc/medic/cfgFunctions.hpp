@@ -18,5 +18,6 @@ class medic
 	class setUnconscious {description = "Set AI unit unconscious from 3den or Curator";};
 	class AIHeal {description = "Handles AI heal - for internal use, move AI to another unit and heal it";};
 	class initMedicXEH {};
+	class medicEnableXEH {};
 	class wakeUp {};
 };

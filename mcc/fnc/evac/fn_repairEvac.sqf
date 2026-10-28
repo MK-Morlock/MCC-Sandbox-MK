@@ -4,9 +4,8 @@
 // 	_vehicle: OBJECT
 // 	_onlyAI: BOOLEAN - only repair AI vehicle
 //==============================================================================================================================================================================
-private ["_vehicle","_onlyAI"];
-_vehicle = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
-_onlyAI = [_this, 1, false, [false]] call BIS_fnc_param;
+private _vehicle = _this param [0, objNull, [objNull]];
+private _onlyAI = _this param [1, false, [false]];
 
 if (isNull _vehicle) exitWith {};
 if (_onlyAI && isPlayer driver _vehicle) exitWith {};

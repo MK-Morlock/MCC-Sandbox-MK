@@ -1,7 +1,9 @@
 //==================================================================MCC_fnc_roleClicked =================================================================================
 // Handle clicking on a role
 //=====================================================================================================================================================================
-private ["_role","_level","_array","_ctrl"];
+private _role = "";
+private _array = [];
+private _ctrl = controlNull;
 disableSerialization;
 _role = param [1,"",[""]];
 _parentIdc = param [2,0,[0]];
@@ -37,7 +39,19 @@ MCC_fnc_RSbuildGearButtons = {
 	/* ==================================   MCC_fnc_RSbuildGearButtons ===============================
 	//	Builds buttons for setting gear
 	============================================================================================================================*/
-	private ["_buttonCtrlGroup","_idc","_space","_xPos","_yPos","_hight","_ctrlPos","_array","_data","_toolTip","_pic","_ctrl","_parentIdc"];
+	private _buttonCtrlGroup = controlNull;
+	private _idc = 0;
+	private "_space";
+	private _xPos = 0;
+	private "_yPos";
+	private "_hight";
+	private _ctrlPos = controlNull;
+	private _array = [];
+	private "_data";
+	private "_toolTip";
+	private "_pic";
+	private _ctrl = controlNull;
+	private _parentIdc = 0;
 	disableSerialization;
 	_disp = ctrlParent (_this select 0);
 	_idc = param [1,10000,[0]];

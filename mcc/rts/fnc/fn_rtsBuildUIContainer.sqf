@@ -4,9 +4,25 @@
 //     	_ctrl: CONTROL
 //		_res: resources Needed
 //========================================================================================================================================================================
-private ["_ctrl","_obj","_consType","_constLevel","_availableActions","_disp","_action","_pic","_res","_req","_elec","_cnd","_online","_elecOn","_constType","_fnc","_cfg","_vars"];
+private "_obj";
+private _consType = "";
+private _constLevel = 0;
+private _availableActions = [];
+private "_disp";
+private "_action";
+private _pic = "";
+private _res = [];
+private _req = [];
+private _elec = 0;
+private _cnd = "";
+private _online = false;
+private "_elecOn";
+private _constType = "";
+private _fnc = "";
+private _cfg = configNull;
+private _vars = [];
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _disp = ctrlParent _ctrl;
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
@@ -37,7 +53,7 @@ _elec = getNumber (_cfg >> _constType >> "needelectricity");
 for "_i" from 0 to 11 do {
 	if (count _availableActions <= _i) then {_availableActions set [_i,""]};
 };
-_availableActions set [11,"MCC_rts_rtsBuildUIContainerBack"];
+_availableActions set [11, ["MCC_rts_rtsBuildUIContainerBack", "MCC_rts_rtsFortUIContainerBack"] select (toLower _var2 == "fortifications")];	//Exit Build Menu / Exit Fortifications Menu
 
 //Populate actions
 _cfg = if (isClass(missionconfigFile >> _var3)) then {(missionconfigFile >> _var3)} else {(configFile >> _var3)};
@@ -61,7 +77,7 @@ for "_i" from 9101 to 9112 do
 		_vars = getArray (_cfg >> _action >> "variables");
 
 		_ctrl ctrlShow true;
-		_ctrl ctrlSetText _pic;
+		_ctrl ctrlSetText ([_pic] call MCC_fnc_rtsWidePic);
 		missionNamespace setVariable [format ["MCC_ctrlData_%1", ctrlIDC _ctrl],_action];
 
 		//Now let see if we enable the contorl
@@ -90,11 +106,11 @@ for "_i" from 9101 to 9112 do
 
 		if (_available && _online) then
 		{
-			_ctrl ctrlSetTextColor [1, 1, 1, 1];
+			_ctrl ctrlSetTextColor ([_action, 1] call MCC_fnc_rtsTileColor);
 		}
 		else
 		{
-			_ctrl ctrlSetTextColor [1, 1, 1, 0.4];
+			_ctrl ctrlSetTextColor ([_action, 0.4] call MCC_fnc_rtsTileColor);
 		};
 
 		//remove
@@ -112,5 +128,4 @@ for "_i" from 9101 to 9112 do
 		_ctrl ctrlShow false;
 	};
 };
-
-
+[] call MCC_fnc_rtsUISync;

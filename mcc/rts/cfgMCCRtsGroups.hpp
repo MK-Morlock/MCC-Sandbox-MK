@@ -154,6 +154,22 @@ class MCC_rts_rtsBuildUIContainerBack
 	#endif
 
 	displayName = "Exit";
+	descriptionShort = "Exit Build Menu";
+	condition = "";
+	requiredBuildings[] = {};
+	needelectricity = 0;
+	actionFNC = "MCC_fnc_rtsBuildUIContainerBack";
+	resources[] = {};
+};
+class MCC_rts_rtsFortUIContainerBack
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\back.paa";
+	#else
+	picture = "mcc\rts\data\back.paa";
+	#endif
+
+	displayName = "Exit";
 	descriptionShort = "Exit Fortifications Menu";
 	condition = "";
 	requiredBuildings[] = {};

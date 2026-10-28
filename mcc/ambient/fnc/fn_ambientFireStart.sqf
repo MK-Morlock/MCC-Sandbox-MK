@@ -29,6 +29,10 @@ if (typeName _pos == typeName objNull) then {
 
 if (_pos isEqualTo [0,0,0]) exitWith {};
 
+// Stop if ambient fire is switched off, or fires were extinguished after this spread step was scheduled
+if !(missionNamespace getVariable ["MCC_ambientFireSettingIndex", true]) exitWith {};
+private _fireEpoch = missionNamespace getVariable ["MCC_ambientFireEpoch", 0];
+
 //Find fire direction and distance
 _fireDir = windDir;
 _fireDistance = (windStr max 0.1) * 100;
@@ -45,6 +49,8 @@ if (_baseFire) then {
 //Start the fire
 for "_i" from (_fireDir - 45) to (_fireDir + 45) step 15 do  {
 
+	if (_fireEpoch != (missionNamespace getVariable ["MCC_ambientFireEpoch", 0])) exitWith {};
+
 	//Don't over use it
 	if ({typeOf _x in [FIRE_OBJECTSMALL,FIRE_OBJECTBIG]} count (_pos nearObjects 50) > MAX_FIRES) exitWith {};
 	[_pos,_fireDistance,_i] spawn MCC_fnc_ambientFirePropagation;
@@ -53,5 +59,5 @@ for "_i" from (_fireDir - 45) to (_fireDir + 45) step 15 do  {
 		[_pos,_fireDistance,_i] spawn MCC_fnc_ambientFirePropagation;
 	};
 	*/
-	sleep 12 + floor (((random 30) - _fireDistance) max 5);
+	sleep (12 + floor (((random 30) - _fireDistance) max 5));
 };

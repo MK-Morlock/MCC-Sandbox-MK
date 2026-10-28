@@ -1,9 +1,18 @@
-private ["_pos", "_units", "_spawn","_away","_plane","_pilot","_pilot1","_pilot2","_group","_count","_dropPos","_UMUnit", "_jumpers", "_i",
-		"_light","_isHalo","_flightHight","_unitsArray","_unit","_init"];
-_pos 		= _this select 0;
-_units 		= _this select 1;
-_UMUnit		= _this select 2;
-_isHalo		= _this select 3; 
+private _spawn = [];
+private _away = [];
+private _plane = objNull;
+private _pilot = objNull;
+private _pilot1 = objNull;
+private _pilot2 = objNull;
+private _group = grpNull;
+private _count = 0;
+private _dropPos = [];
+private "_light";
+private _flightHight = 0;
+private _unitsArray = [];
+private "_unit";
+private _init = "";
+params ["_pos", "_units", "_UMUnit", "_isHalo"]; 
 _flightHight = if (_isHalo) then {4000} else {400};
 
 _spawn =[(_this select 4 select 0),_this select 4 select 1,(_this select 4 select 2) + _flightHight];
@@ -25,7 +34,7 @@ _pilot2 assignAsCargo _plane;
 _pilot2 MoveInCargo _plane;
 _plane setpos _spawn;
 _init =  format ["_this setBehaviour 'CARELESS';_this flyInHeight %1;",_flightHight];
-[[[netid _plane,_plane], _init], "MCC_fnc_setVehicleInit", true, false] spawn BIS_fnc_MP;
+[[netid _plane,_plane], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, false];
 
 //Set plane variables
 _plane setVariable ["MCCJumperNumber",-1,true];																		//Number of unit to jump		
@@ -61,7 +70,7 @@ _count = 0;
 for [{_x=0},{_x < count _unitsArray},{_x=_x+1}] do {
 		_unit = _unitsArray select _x;
 		_init = format[" if (local _this) then {[%1,_this,%2,%3] execVM ""\mcc_sandbox_mod\mcc\general_scripts\unitManage\paraStart.sqf"";}",_planeName,_count,_pos];
-		[[[netid _unit,_unit], _init], "MCC_fnc_setVehicleInit", true, false] spawn BIS_fnc_MP;
+		[[netid _unit,_unit], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, false];
 		_count = _count + 1;
 	};
 	
@@ -69,9 +78,8 @@ for [{_x=0},{_x < count _unitsArray},{_x=_x+1}] do {
 _plane move _dropPos;
 [_plane, _flightHight] spawn
 	{
-	private ["_plane", "_flightHight"];
-	_plane = _this select 0;
-	_flightHight = _this select 1;
+	private _plane = _this select 0;
+	private _flightHight = _this select 1;
 	while {alive _plane} do {_plane flyInHeight _flightHight;_plane forceSpeed 300;};
 	};
 
@@ -83,10 +91,10 @@ sleep 6;
 _plane animate ["ramp_top",1];
 _plane animate ["ramp_bottom",0.7];
 
-//sleep 10 + (random 10);
+//sleep (10 + (random 10));
 
-_light setLightColor [0,1,0];					////start the jump, Turn the light green
-_light setLightAmbient [0,0.5,0]; 
+if (!isNil "_light") then {_light setLightColor [0,1,0]};					////start the jump, Turn the light green
+if (!isNil "_light") then {_light setLightAmbient [0,0.5,0]}; 
 sleep 4; 
 
 _plane setVariable ["MCCJumperNumber",0,true];
@@ -101,4 +109,4 @@ deletevehicle _pilot;
 deletevehicle _pilot1;
 deletevehicle _pilot2;
 deletevehicle _plane;
-deletevehicle _light;
+if (!isNil "_light") then {deletevehicle _light};

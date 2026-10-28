@@ -27,7 +27,7 @@
 //-----------------------------------------------------------------------------
 // Main dialog
 //-----------------------------------------------------------------------------
-class MCC_playerConsole2 {
+class MCCDLG_NAME {
   idd = mcc_playerConsole2_IDD;
   movingEnable = 1;
   onLoad = __EVAL("[] execVM '"+MCCPATH+"mcc\dialogs\mcc_playerConsole2_init.sqf'");
@@ -56,7 +56,9 @@ class MCC_playerConsole2 {
   mcc_consoleF5,
   mcc_consoleF6,
   MCC_ConsoleExitButton,
-  MCC_ConsoleUAVCamera,
+  MCC_ConsoleUAVCamBtn0,
+  MCC_ConsoleUAVCamBtn1,
+  MCC_ConsoleUAVCamBtn2,
   MCC_ConsoleUAVFlightHight,
   MCC_ConsoleUAVFlightHightText,
   MCC_ConsoleUAVFeedTargetPic,
@@ -71,11 +73,13 @@ class MCC_playerConsole2 {
   MCC_ConsoleCompassS,
   MCC_ConsoleCompassW,
   MCC_mapConsole,
-  MCC_ConsoleACMap
+  MCC_ConsoleACMap,
+  MCC_ConsoleUAVPilot,
+  MCC_ConsoleUAVGunner
   };
 
  //========================================= Background========================================
-	class mcc_ConsolePic: MCC_RscPicture	{idc = -1;text = __EVAL(MCCPATH +"data\console.paa");
+	class mcc_ConsolePic: MCC_RscPicture	{idc = -1;text = __EVAL(MCCPATH +"data\mk_cc_ca.paa");
 		x = -0.0446875 * safezoneW + safezoneX;
 		y = 0.0939094 * safezoneH + safezoneY;
 		w = 1.00406 * safezoneW;
@@ -90,7 +94,7 @@ class MCC_playerConsole2 {
 		h = 0.0700156 * safezoneH;
 	};
 //============================================Buttons==========================================
-class mcc_consoleF1: MCC_RscButton
+class mcc_consoleF1: MCC_RscButtonConsoleKey	//invisible key over the tablet picture, as in the main commander console
 {
 	idc = -1;
 	x = 0.310937 * safezoneW + safezoneX;
@@ -101,29 +105,29 @@ class mcc_consoleF1: MCC_RscButton
 	onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\console\conoleSwitchMenu.sqf'");
 	tooltip = "Main Menu";
 };
-class mcc_consoleF2: MCC_RscButton
+class mcc_consoleF2: MCC_RscButtonConsoleKey	//invisible key over the tablet picture, as in the main commander console
 {
-	idc = -1;
+	idc = 9196;
 	x = 0.339583 * safezoneW + safezoneX;
 	y = 0.829871 * safezoneH + safezoneY;
 	w = 0.0229167 * safezoneW;
 	h = 0.0329871 * safezoneH;
 	text = "F2";
-	onButtonClick = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\console\conoleSwitchMenu.sqf'");
+	onButtonClick = "[2] spawn MCC_fnc_consoleFKey";
 	tooltip = "UAV Control";
 };
-class mcc_consoleF3: MCC_RscButton
+class mcc_consoleF3: MCC_RscButtonConsoleKey	//invisible key over the tablet picture, as in the main commander console
 {
-	idc = -1;
+	idc = 9197;
 	x = 0.368229 * safezoneW + safezoneX;
 	y = 0.829871 * safezoneH + safezoneY;
 	w = 0.0229167 * safezoneW;
 	h = 0.0329871 * safezoneH;
 	text = "F3";
-	onButtonClick = __EVAL("[3] execVM '"+MCCPATH+"mcc\general_scripts\console\conoleSwitchMenu.sqf'");
+	onButtonClick = "[3] spawn MCC_fnc_consoleFKey";
 	tooltip = "AC-130 Control";
 };
-class mcc_consoleF4: MCC_RscButton
+class mcc_consoleF4: MCC_RscButtonConsoleKey	//invisible key over the tablet picture, as in the main commander console
 {
 	idc = -1;
 	x = 0.396875 * safezoneW + safezoneX;
@@ -134,7 +138,7 @@ class mcc_consoleF4: MCC_RscButton
 	tooltip = "Forward observer artillery's interface";
 	onButtonClick = __EVAL("[0,0,0,[1]] execVM '"+MCCPATH+"mcc\general_scripts\console\conoleOpenMenu.sqf'");
 };
-class mcc_consoleF5: MCC_RscButton
+class mcc_consoleF5: MCC_RscButtonConsoleKey	//invisible key over the tablet picture, as in the main commander console
 {
 	idc = -1;
 	x = 0.425521 * safezoneW + safezoneX;
@@ -145,7 +149,7 @@ class mcc_consoleF5: MCC_RscButton
 	tooltip = "Open RTS interface";
 	onButtonClick ="while {dialog} do {closeDialog 0}; createDialog 'MCC_LOGISTICS_BASE_BUILD'";
 };
-class mcc_consoleF6: MCC_RscButton
+class mcc_consoleF6: MCC_RscButtonConsoleKey	//invisible key over the tablet picture, as in the main commander console
 {
 	idc = -1;
 	x = 0.454167 * safezoneW + safezoneX;
@@ -156,7 +160,7 @@ class mcc_consoleF6: MCC_RscButton
 	tooltip = "Fleet Management";
 	onButtonClick ="while {dialog} do {closeDialog 0}; [0,0,0] spawn MCC_fnc_LHDspawnMenuInit";
 };
-class MCC_ConsoleExitButton: MCC_RscButton
+class MCC_ConsoleExitButton: MCC_RscButtonConsoleKey
 {
 		idc = -1;
 		text = "";
@@ -171,14 +175,14 @@ class MCC_ConsoleExitButton: MCC_RscButton
 		colorBackgroundActive[] = {0,0,0,0};
 		colorDisabled[] = {0,0,0,0};
 		colorBackgroundDisabled[] = {0,0,0,0};
-		tooltip = "Close the conosle";
+		tooltip = "Close the console";
 		onButtonClick = "closedialog 0;";
 };
 	//=============================UAV========================================================
 	class MCC_ConsoleUAVFeed: MCC_RscPicture
 	{
 		idc = MCC_CONSOLE_UAVPIP;
-		text = "#(argb,512,512,1)r2t(rendertarget9,1.0);";
+		text = "";	//set by the script once the camera exists: asked for before a camera was bound to it, the first view stayed black
 		x = 0.219271 * safezoneW + safezoneX;
 		y = 0.225107 * safezoneH + safezoneY;
 		w = 0.561458 * safezoneW;
@@ -214,6 +218,10 @@ class MCC_ConsoleExitButton: MCC_RscButton
 		h = 0.472816 * safezoneH;
 	};
 	class MCC_ConsoleUAVFeedFake: MCC_RscListBox {
+		//invisible mouse area over the video feed: no background (the themed list colour covered the feed, 95% dark)
+		colorBackground[] = {0,0,0,0};
+		colorSelectBackground[] = {0,0,0,0};
+		colorSelectBackground2[] = {0,0,0,0};
 		idc = -1;
 		x = 0.219271 * safezoneW + safezoneX;
 		y = 0.225107 * safezoneH + safezoneY;
@@ -223,21 +231,38 @@ class MCC_ConsoleExitButton: MCC_RscButton
 		onMouseZChanged = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\console\UAVmousez.sqf'");
 		onMouseMoving = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\console\UAVmouseMoving.sqf'");
 	};
-	class MCC_ConsoleUAVCamera: MCC_RscToolbox
+	//(was a switch bar; now rounded buttons like the MCC console)
+	class MCC_ConsoleUAVCamBtn0: MCCBTN_R
 	{
-		idc = -1;
-		onToolBoxSelChanged = __EVAL("_this execVM '"+MCCPATH+"mcc\general_scripts\console\uav_camView.sqf'");
-		strings[] = {"Regular","N/V","Thermal"};
-		rows = 1;
-		columns = 3;
-		values[] = {0,1,2};
-		x = 0.219271 * safezoneW + safezoneX;
+		idc = 9170;
+		text = "Regular";
+		onButtonClick = "[controlNull, 0] execVM ((missionNamespace getVariable ['MCC_path','\mcc_sandbox_mod\']) + 'mcc\general_scripts\console\uav_camView.sqf'); [findDisplay 5000, 9170, 0] call MCC_fnc_consoleModeButtons";
+		x = 0.2193 * safezoneW + safezoneX;
 		y = 0.708919 * safezoneH + safezoneY;
-		w = 0.131771 * safezoneW;
+		w = 0.0426 * safezoneW;
 		h = 0.0329871 * safezoneH;
-		tooltip = "Change UAV camera mod";
-		sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 	};
+	class MCC_ConsoleUAVCamBtn1: MCCBTN_R
+	{
+		idc = 9171;
+		text = "N/V";
+		onButtonClick = "[controlNull, 1] execVM ((missionNamespace getVariable ['MCC_path','\mcc_sandbox_mod\']) + 'mcc\general_scripts\console\uav_camView.sqf'); [findDisplay 5000, 9170, 1] call MCC_fnc_consoleModeButtons";
+		x = 0.2639 * safezoneW + safezoneX;
+		y = 0.708919 * safezoneH + safezoneY;
+		w = 0.0426 * safezoneW;
+		h = 0.0329871 * safezoneH;
+	};
+	class MCC_ConsoleUAVCamBtn2: MCCBTN_R
+	{
+		idc = 9172;
+		text = "Thermal";
+		onButtonClick = "[controlNull, 2] execVM ((missionNamespace getVariable ['MCC_path','\mcc_sandbox_mod\']) + 'mcc\general_scripts\console\uav_camView.sqf'); [findDisplay 5000, 9170, 2] call MCC_fnc_consoleModeButtons";
+		x = 0.3085 * safezoneW + safezoneX;
+		y = 0.708919 * safezoneH + safezoneY;
+		w = 0.0426 * safezoneW;
+		h = 0.0329871 * safezoneH;
+	};
+
 	class MCC_ConsoleUAVFlightHight: MCC_RscSlider
 	{
 		idc = MCC_CONSOLEUAVFLIGHTHIGHT;
@@ -260,7 +285,7 @@ class MCC_ConsoleExitButton: MCC_RscButton
 	};
 
 	/*
-	class MCC_ConsoleUAVTakeControl: MCC_RscButton
+	class MCC_ConsoleUAVTakeControl: MCCBTN_R
 	{
 		idc = MCC_CONSOLEUAVTAKECONTROL;
 		onButtonClick = __EVAL("[0] execVM '"+MCCPATH+"mcc\general_scripts\console\consoleTakeControl.sqf'");
@@ -270,7 +295,6 @@ class MCC_ConsoleExitButton: MCC_RscButton
 		y = 0.708919 * safezoneH + safezoneY;
 		w = 0.07 * safezoneW;
 		h = 0.0329871 * safezoneH;
-		sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 	};
 	*/
 
@@ -297,7 +321,7 @@ class MCC_ConsoleExitButton: MCC_RscButton
 	{
 		idc =MCC_CONSOLE_TIME_TEXT;
 		style = MCCST_MULTI;
-		x = 0.6 * safezoneW + safezoneX;
+		x = 0.690 * safezoneW + safezoneX;
 		y = 0.236103 * safezoneH + safezoneY;
 		w = 0.12 * safezoneW;
 		h = 0.239828 * safezoneH;
@@ -356,14 +380,12 @@ class MCC_ConsoleExitButton: MCC_RscButton
 	class MCC_mapConsole : MCC_RscMapControl {
 		idc = MCC_MINIMAP;
 		moving = true;
-		colorBackground[] = { 1, 1, 1, 1};
-		colorText[] = { 1, 1, 1, 0};
 		x = 0.788749 * safezoneW + safezoneX;
 		y = 0.212936 * safezoneH + safezoneY;
 		w = 0.01 * safezoneW;
 		h = 0.01 * safezoneH;
 	};
-	class MCC_ConsoleACMap: MCC_RscButton
+	class MCC_ConsoleACMap: MCCBTN_R
 	{
 		idc = MCC_CONSOLE_AC_MAP;
 		x = 0.6 * safezoneW + safezoneX;
@@ -372,6 +394,25 @@ class MCC_ConsoleExitButton: MCC_RscButton
 		h = 0.0329871 * safezoneH;
 		text = "Open Map";
 		onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\console\conoleMap.sqf'");
-		sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+	};
+	class MCC_ConsoleUAVPilot: MCCBTN_R
+	{
+		idc = 9188;
+		text = "Pilot";
+		x = 0.675 * safezoneW + safezoneX;
+		y = 0.708919 * safezoneH + safezoneY;
+		w = 0.05 * safezoneW;
+		h = 0.0329871 * safezoneH;
+		onButtonClick = "['pilot'] execVM ((missionNamespace getVariable ['MCC_path', '\mcc_sandbox_mod\']) + 'mcc\general_scripts\console\consoleTakeControl.sqf')";
+	};
+	class MCC_ConsoleUAVGunner: MCCBTN_R
+	{
+		idc = 9189;
+		text = "Gunner";
+		x = 0.729 * safezoneW + safezoneX;
+		y = 0.708919 * safezoneH + safezoneY;
+		w = 0.05 * safezoneW;
+		h = 0.0329871 * safezoneH;
+		onButtonClick = "['gunner'] execVM ((missionNamespace getVariable ['MCC_path', '\mcc_sandbox_mod\']) + 'mcc\general_scripts\console\consoleTakeControl.sqf')";
 	};
 };

@@ -26,12 +26,42 @@
 #define MCC_MWAnimalsIDC 6023
 #define MCC_MCC_MWMusicIDC 6024
 
-private ["_playersNumber","_difficulty","_totalEnemyUnits","_isCQB","_check","_minObjectivesDistance","_maxObjectivesDistance","_enemySide","_enemyfaction","_sidePlayer","_factionPlayer","_obj1","_obj2","_obj3","_wholeMap","_armor","_vehicles","_stealth","_isIED","_isAS","_isRoadblocks","_isCiv","_weatherChange","_isSB","_preciseMarkers","_reinforcement","_artillery","_civFaction","_playMusic","_animals","_markerName","_markers"];
+private _playersNumber = 0;
+private _difficulty = 0;
+private _totalEnemyUnits = 0;
+private _isCQB = false;
+private _check = [];
+private _minObjectivesDistance = 0;
+private _maxObjectivesDistance = 0;
+private _enemySide = "";
+private _enemyfaction = nil;
+private _sidePlayer = sideUnknown;
+private _factionPlayer = "";
+private _obj1 = "";
+private _obj2 = "";
+private _obj3 = "";
+private _wholeMap = [];
+private _armor = [];
+private _vehicles = [];
+private _stealth = [];
+private _isIED = [];
+private _isAS = false;
+private _isRoadblocks = false;
+private _isCiv = false;
+private _weatherChange = 0;
+private _isSB = false;
+private _preciseMarkers = false;
+private _reinforcement = 0;
+private _artillery = 0;
+private _civFaction = "";
+private _playMusic = 0;
+private _animals = false;
+private _markers = [];
 
 //MCC_MWAnimalsIndex MCC_MWBattleGroundIndex MCC_MWMusicIndex
 if (isnil "MCC_MWisGenerating") then {MCC_MWisGenerating = false};
 MCC_mcc_screen = 2;
-if (MCC_MWisGenerating) exitWith {systemchat "MCC is now generating a mission please try again later"};
+if (MCC_MWisGenerating) exitWith {systemchat "MCC is already generating a mission. Please try again later."};
 MCC_MWisGenerating = true;
 
 //Get params
@@ -91,7 +121,9 @@ _obj3 				= MCC_MWMissionType select (lbCurSel MCC_MWObjective3IDC);
 //Player depends parmas
 _sidePlayer 		= side player;
 _factionPlayer 		= faction player;
-_enemySide			= mcc_sidename;
+//The Mission Generator's own enemy faction (not the console faction, which is the player's side for supports)
+private _mwFaction = call MCC_fnc_MWEnemyFaction;
+_enemySide			= if (_mwFaction != "") then {["EAST", "WEST", "GUER", "CIV"] select ([_mwFaction] call MCC_fnc_factionSide)} else {mcc_sidename};
 _totalEnemyUnits 	= if ((_playersNumber * _difficulty)>10) then {(_playersNumber * _difficulty)} else {20};
 
 _minObjectivesDistance 	= if (_isCQB) then {100} else {200};
@@ -110,16 +142,21 @@ if (typeName _enemySide == "STRING") then
 };
 
 //What faction are we fighiting?
-_enemyfaction = getText (configFile >> "CfgVehicles" >> (U_GEN_SOLDIER select 0 select 1) >> "faction");
-if (isnil "_enemyfaction") exitWith
+// (the old check was "isnil" on a getText result, which is never nil - an empty faction errored on "select 0" instead)
+_enemyfaction = "";
+if (_mwFaction != "") then {_enemyfaction = _mwFaction};
+if (_enemyfaction == "" && {(missionNamespace getVariable ["U_GEN_SOLDIER",[]]) isEqualType []} && {count U_GEN_SOLDIER > 0}) then {
+	_enemyfaction = getText (configFile >> "CfgVehicles" >> ((U_GEN_SOLDIER select 0) param [1,""]) >> "faction");
+};
+if (_enemyfaction == "") exitWith
 {
-	diag_log "MCC MW: Faction is empty";
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC MW: Faction is empty"};
 	MCC_MWisGenerating = false;
 	["MCC: Mission Wizard Error: Faction doesn't have any units in it"] spawn MCC_fnc_halt;
 };
 
 //Build the faction's unitsArrays and send it to the server.
-_check = [] call MCC_fnc_MWCreateUnitsArray;
+_check = [_enemyfaction, _enemySide] call MCC_fnc_MWCreateUnitsArray;
 waituntil {_check};
 
 //Send user custom groups to the server
@@ -136,25 +173,27 @@ publicVariableServer "mcc_zone_markposition";
 publicVariableServer "mcc_zone_marker_X";
 publicVariableServer "mcc_zone_marker_Y";
 
-if (MCC_debug) then {systemchat format ["Total enemy's units: %1", _totalEnemyUnits]};
-diag_log format ["MCC Mission Wizard total enemy Count = %1", _totalEnemyUnits];
+if (MCC_debug) then {systemchat format ["Total enemy units: %1", _totalEnemyUnits]};
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC Mission Wizard total enemy Count = %1", _totalEnemyUnits]};
 
 //------------------------------------------------------------- Here we go  Create loading text----------------------------------------------------------------
 while {dialog} do {closedialog 0; sleep 0.2};
 [] spawn
 	{
-		private ["_string","_footer"];
+		private _string = "";
+		private _footer = [];
+		private _yPos = safezoneY + 0.22 * safezoneH;
 		while {missionNamespace getVariable ["MCC_MWisGenerating",false]} do
 		{
 			for [{_x=1},{_x<=10},{_x=_x+1}]  do //Create progress bar
 			{
 				_footer = [_x,10] call MCC_fnc_countDownLine;
 				//add header
-				_string = "<t color='#E2EEE0' size='0.85' shadow='0' align='center'>" + "Building A Mission <br/>Please Wait" + "</t><br/><br/>";
+				_string = "<t color='#E2EEE0' size='0.85' shadow='0' align='center'>" + "Building A Mission <br/>Please Wait" + "</t><br/>";
 				//add _footer
 				_string = _string + "<t color='#E2EEE0' size='0.85' shadow='0' align='center'>" + _footer + "</t>";
 				sleep 0.1;
-				[_string,0,0.2,0.5,0,0,4] spawn BIS_fnc_dynamicText;
+				[_string,0,_yPos,0.5,0,0,4] spawn BIS_fnc_dynamicText;
 			};
 		};
 	};

@@ -8,7 +8,7 @@
 								];									
 			};
 */
-[[2, {
+[2, {
 		if ((count MCC_lastSpawn)>0) then
 		{
 			if (typeName (MCC_lastSpawn select ((count MCC_lastSpawn)-1)) == "ARRAY") then
@@ -23,7 +23,7 @@
 			
 			MCC_lastSpawn resize ((count MCC_lastSpawn)-1); 
 		};
-	}] , "MCC_fnc_globalExecute", true, false] call BIS_fnc_MP;
+	}] remoteExec ["MCC_fnc_globalExecute", 0, false];
 	
  
  

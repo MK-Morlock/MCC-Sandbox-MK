@@ -7,8 +7,12 @@
 //<OUT>
 //	_nearhouses ARRAY of objects - good houses found
 //=================================================================================================================================================================*/
-private ["_pos","_module","_object","_house","_resualt","_unit"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private "_pos";
+private _module = objNull;
+private _object = objNull;
+private _resualt = [];
+private "_unit";
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 //Not curator exit

@@ -1,5 +1,19 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params","_ctrl","_pressed","_posX","_posY","_shift","_ctrlKey","_alt","_marker","_markerPos","_markerDir","_spawn","_away","_ammount","_dir","_nearObjects"];
+private _ctrl = controlNull;
+private _pressed = 0;
+private _posX = 0;
+private _posY = 0;
+private _shift = false;
+private _ctrlKey = false;
+private _alt = false;
+private _marker = nil;
+private _markerPos = [];
+private _markerDir = 0;
+private _spawn = [];
+private _away = [];
+private _ammount = 0;
+private _dir = 0;
+private _nearObjects = [];
 
 #define MCCDELETEBRUSH 1030
 #define MCCZONENUMBER 1023
@@ -8,7 +22,7 @@ private ["_params","_ctrl","_pressed","_posX","_posY","_shift","_ctrlKey","_alt"
 
 disableSerialization;
 
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _pressed = _params select 1;
@@ -20,7 +34,11 @@ _alt = _params select 6;
 MCC_XYmap = [_posX,_posY];
 
 if (mcc_missionmaker != (name player)) exitWith {};
+private _clickT0 = diag_tickTime; private _mct = missionNamespace getVariable ["MCC_mapClickTime", -100]; if ((_clickT0 - _mct) < 2) then {_clickT0 = _mct};
+private _clickHit = false;
 
+if (_pressed == 1 && {missionNamespace getVariable ["MCCMK_lineDrawing", false]}) exitWith {MCCMK_lineCancel = true};
+if (_pressed == 1 && {missionNamespace getVariable ["MCC_evacSpawnPending", false]}) exitWith {onMapSingleClick ""; MCC_evacSpawnPending = false; hint "Evac spawn cancelled"};
 MCC_GroupGenMouseButtonDown = true;	//Mouse state
 MCC_GroupGenMouseButtonUp = false;
 
@@ -60,11 +78,19 @@ if ((_pressed == 0) && _alt)  exitWith {
 
 //Select zone
 if (_pressed == 0) then {
-	private ["_nearZone","_selectedPos","_newZone","_comboBox","_distance","_marker","_nearMarker","_markerName","_isIcon"];
+	private _nearZone = false;
+	private _selectedPos = [];
+	private _newZone = 0;
+	private _comboBox = controlNull;
+	private _distance = controlNull;
+	private _marker = nil;
+	private _nearMarker = false;
+	private _markerName = "";
+	private _isIcon = 0;
 	_selectedPos = _ctrl ctrlmapscreentoworld MCC_XYmap;
 	_nearZone 	= false;
 	_nearMarker	= false;
-	_distance = (ctrlMapScale ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl MCC_MINIMAP)) * 400;
+	_distance = (ctrlMapScale _ctrl) * 400;
 
 	//Are we near a zone marker
 	{
@@ -87,13 +113,17 @@ if (_pressed == 0) then {
 	if ((_nearZone || _nearMarker) && !(missionNameSpace getVariable ["MCC_artilleryEnabled",false]) && !(missionNameSpace getVariable ["MCC_spawnEnabled",false]) && !MCC_ConsoleRuler && !MCC_doubleClicked && !MCC_zone_drawing && !MCC_CASrequestMarker && !MCC_brush_drawing && !MCC_drawTriggers
 		&& !MCC_drawMinefield && !MCC_delete_drawing && !MCC_ambushPlacing && !MCC_UMParadropRequestMarker) exitWith
 	{
-			private ["_size","_pos","_center","_width","_hight"];
+			_clickHit = true;
+			private _size = [];
+			private _pos = [];
+			private _center = [];
+			private _width = 0;
+			private _hight = 0;
 			if (_nearZone) then
 			{
 				//Change the combobox indicatior
 				MCC_zone_index = _newZone -1;
-				_comboBox = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl MCCZONENUMBER);
-				_comboBox lbSetCurSel MCC_zone_index;
+				["select", _newZone] call MCC_fnc_zoneList;
 
 				sleep 0.3;
 
@@ -168,7 +198,7 @@ if ((missionNameSpace getVariable ["MCC_artilleryEnabled",false]) &&  _pressed =
 	{
 		hint "Artillery captured.";
 		MCC_capture_var = MCC_capture_var + FORMAT ["
-		[[%1, '%2', %3, %4, %5, %6],'MCC_fnc_artillery',true,false] spawn BIS_fnc_MP;
+		[%1, '%2', %3, %4, %5, %6] remoteExec ['MCC_fnc_artillery', 0, false];
 		"
 		,_ctrl ctrlMapScreenToWorld [_posX,_posY]
 		,shelltype
@@ -195,7 +225,7 @@ if ((missionNameSpace getVariable ["MCC_spawnEnabled",false]) &&  _pressed == 0)
 	{
 		hint "Spawned Captured";
 		MCC_capture_var = MCC_capture_var + FORMAT ["
-								[[%1 , %2, %3, %4, %5],'MCC_fnc_groupSpawn',false,false] spawn BIS_fnc_MP;
+								[%1 , %2, %3, %4, %5] remoteExec ['MCC_fnc_groupSpawn', 2, false];
 								"
 								, _ctrl ctrlMapScreenToWorld [_posX,_posY]
 								, MCC_groupBroadcast
@@ -208,7 +238,10 @@ if ((missionNameSpace getVariable ["MCC_spawnEnabled",false]) &&  _pressed == 0)
 	{
 		hint "Spawned";
 
-		[[_ctrl ctrlMapScreenToWorld [_posX,_posY], MCC_groupBroadcast, mcc_hc, mcc_sidename, MCC_isEmpty,missionNamespace getVariable ["mcc_caching",false]],"MCC_fnc_groupSpawn",false,false] spawn BIS_fnc_MP;
+		private _groupsBefore = +allGroups;
+		[_ctrl ctrlMapScreenToWorld [_posX,_posY], MCC_groupBroadcast, mcc_hc, mcc_sidename, MCC_isEmpty,missionNamespace getVariable ["mcc_caching",false], missionNamespace getVariable ["mcc_spawnbehavior", ""], missionNamespace getVariable ["MCC_spawnCommandable", false]] remoteExec ["MCC_fnc_groupSpawn", 2, false];
+		//Select what was spawned in the unit list (Groups / Units) so it is on the camera at once
+		if !(MCC_isEmpty) then {[_ctrl ctrlMapScreenToWorld [_posX,_posY], (lbCurSel ((uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull]) displayCtrl 3012)) == 1, _groupsBefore] spawn MCC_fnc_umAutoSelect};
 	};
 	sleep 0.5;
 	deleteMarkerLocal "mcc_spawnMarker";
@@ -238,80 +271,129 @@ if (_shift && _pressed!=1) then
  //CAS Request
 if (MCC_CASrequestMarker && _pressed==0) then
 {
-	private ["_marker","_markerPos","_markerDir","_spawn","_away","_ammount"];
+	private _marker = nil;
+	private _markerPos = [];
+	private _markerDir = 0;
+	private _spawn = [];
+	private _away = [];
+	private _ammount = 0;
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the arrow
-	_marker = [MCC_pointA,MCC_pointA,1,"mil_arrow",20,"ColorRed",300] call MCC_fnc_drawArrow;	//Drow it first
+	private _k0 = if (MCC_spawnkind isEqualType []) then {MCC_spawnkind param [0, ""]} else {MCC_spawnkind}; private _kind = if (_k0 isEqualType "") then {toLower _k0} else {""};
+	private _p0 = if (MCC_planeType isEqualType []) then {MCC_planeType param [0, ""]} else {MCC_planeType}; private _isDrop = (if (_p0 isEqualType "") then {toLower _p0} else {""}) in ["west","east","guer","civ","logic"];
+	private _w = if (_isDrop) then {8} else {[10, 5] select (_kind == "cruise missile")};
+	private _lm = [["strike", "supply"] select _isDrop, MCC_pointA, MCC_pointA, [], _w] call MCCMK_fnc_supportLine;
+	MCCMK_lineCancel = false;
+	MCCMK_lineDrawing = true;
 	sleep 0.25;
 
-	while {MCC_GroupGenMouseButtonDown} do {														//While mouse pressed
-		deleteMarkerLocal _marker;
-		_marker = [MCC_pointA, MCCGroupGenDispPosXY,1,"mil_arrow",20,"ColorRed",300] call MCC_fnc_drawArrow;
+	while {MCC_GroupGenMouseButtonDown} do {
+		_lm = [["strike", "supply"] select _isDrop, MCC_pointA, MCCGroupGenDispPosXY, _lm, _w] call MCCMK_fnc_supportLine;
 		sleep 0.25;
 	};
+	MCCMK_lineDrawing = false;
+	if (missionNamespace getVariable ["MCCMK_lineCancel", false]) exitWith {
+		MCCMK_lineCancel = false;
+		{deleteMarkerLocal _x} forEach _lm;
+		MCC_CASrequestMarker = false;
+		hint "Line cancelled.";
+	};
 
-	// set plane spawn and away position
-	_markerPos 	= getmarkerpos _marker;
-	_markerDir 	= markerDir _marker;
+	private _len = (MCC_pointA distance2D MCCGroupGenDispPosXY) min 300;
+	_markerDir 	= MCC_pointA getDir MCCGroupGenDispPosXY;
+	_markerPos 	= MCC_pointA getPos [[_len, 0] select _isDrop, _markerDir];
 	_spawn 		= [_markerPos,2000,(_markerDir -180)] call BIS_fnc_relpos;
 	_away 		= [_markerPos,2000,_markerDir] call BIS_fnc_relpos;
-	_ammount	=  floor (((getMarkerSize _marker) select 1)/50) + 1; 		//Ammount of drop min 0 max 6
+	_ammount	=  floor ((_len / 2)/50) + 1;
+	if (!_isDrop) then {{deleteMarkerLocal _x} forEach _lm; _lm = [[_markerPos, _kind == "cruise missile"] call MCCMK_fnc_strikeMarker]};
 
 	if (MCC_capture_state) then {
 		hint "Air support captured.";
 		MCC_capture_var=MCC_capture_var + FORMAT ['
-			[[%1, %2 , %3, %4, %5, %6],"MCC_fnc_airDrop",false,false] spawn BIS_fnc_MP;
+			[%1, %2 , %3, %4, %5, %6] remoteExec ["MCC_fnc_airDrop", 2, false];
 			'
 			,_ammount
 			,MCC_spawnkind
-			,getmarkerpos _marker
+			,_markerPos
 			,MCC_planeType
 			,_spawn
 			,_away];
 	} else {
-		hint "Air support incomming.";
-		[_ammount, MCC_spawnkind , getmarkerpos _marker, MCC_planeType, _spawn,_away,(missionNamespace getVariable ["MCC_airdropIsParachute",0])] spawn MCC_fnc_airDrop;
+		[MCC_spawnkind] call MCC_fnc_supportHint;
+		MCC_cruiseFromCommander = false;
+		[_ammount, MCC_spawnkind , _markerPos, MCC_planeType, _spawn,_away,(missionNamespace getVariable ["MCC_airdropIsParachute",0])] spawn MCC_fnc_airDrop;
 	};
 
 	MCC_CASrequestMarker = false;			//Wait and delete the marker
 	sleep 40;
-	deletemarkerlocal _marker;
+	{deleteMarkerLocal _x} forEach _lm;
 };
 
 //UM Paradrop Request
+if (MCC_UMParadropRequestMarker && _pressed==0 && {isNil "MCC_selectedUnits" || {count (MCC_selectedUnits select {!isNull _x}) == 0}}) exitWith {
+	MCC_UMParadropRequestMarker = false;
+	hint "No group or unit selected.\nSelect one or more groups or units in the list first.";
+};
+
 if (MCC_UMParadropRequestMarker && _pressed==0) then
 {
-	private ["_marker","_markerPos","_markerDir","_spawn","_away","_ammount"];
+	private _marker = nil;
+	private _markerPos = [];
+	private _markerDir = 0;
+	private _spawn = [];
+	private _away = [];
+	private _ammount = 0;
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the arrow
-	_marker = [MCC_pointA,MCC_pointA,1,"mil_arrow",20,"ColorRed",300] call MCC_fnc_drawArrow;	//Drow it first
+	private _pm = ["para", "pods", "drop"] param [MCC_UMparadropIsHalo, "drop"];
+	private _nT = 1;
+	if (MCC_UMparadropIsHalo == 1) then {
+		private _men = 0;
+		{_men = _men + (if (_x isEqualType grpNull) then {count units _x} else {1})} forEach (MCC_selectedUnits select {!isNull _x});
+		private _ld = ["MCC_podBench", "allCargo"] call MCC_fnc_crewCount;
+		if (_ld <= 0) then {_ld = 8};
+		_nT = (ceil (_men / _ld)) max 1;
+	};
+	private _lm = [_pm, MCC_pointA, MCC_pointA, [], _nT] call MCCMK_fnc_supportLine;
+	MCCMK_lineCancel = false;
+	MCCMK_lineDrawing = true;
 	sleep 0.25;
 
-	while {MCC_GroupGenMouseButtonDown} do
-	{														//While mouse pressed
-		deleteMarkerLocal _marker;
-		_marker = [MCC_pointA, MCCGroupGenDispPosXY,1,"mil_arrow",20,"ColorRed",300] call MCC_fnc_drawArrow;
+	while {MCC_GroupGenMouseButtonDown} do {
+		_lm = [_pm, MCC_pointA, MCCGroupGenDispPosXY, _lm, _nT] call MCCMK_fnc_supportLine;
 		sleep 0.25;
 	};
+	MCCMK_lineDrawing = false;
+	if (missionNamespace getVariable ["MCCMK_lineCancel", false]) exitWith {
+		MCCMK_lineCancel = false;
+		{deleteMarkerLocal _x} forEach _lm;
+		MCC_UMParadropRequestMarker = false;
+		hint "Line cancelled.";
+	};
 
-	// set plane spawn and away position
-	_markerPos 	= getmarkerpos _marker;
-	_markerDir 	= markerDir _marker;
+	private _len = (MCC_pointA distance2D MCCGroupGenDispPosXY) min 5000;
+	_markerDir 	= MCC_pointA getDir MCCGroupGenDispPosXY;
+	_markerPos 	= MCC_pointA getPos [_len / 2, _markerDir];
 	_spawn 		= [_markerPos,2000,(_markerDir -180)] call BIS_fnc_relpos;
 	_away 		= [_markerPos,2000,_markerDir] call BIS_fnc_relpos;
 
 	//[getmarkerpos _marker, MCC_selectedUnits, MCC_UMUnit, MCC_UMparadropIsHalo,_spawn,_away] execVM "mcc\fnc\general\fn_realParadrop.sqf";
 
-	[[getmarkerpos _marker, MCC_selectedUnits, MCC_UMUnit, MCC_UMparadropIsHalo,_spawn,_away], "MCC_fnc_realParadrop", false] spawn BIS_fnc_MP;
+	//Pass the line actually drawn (start and end), not the middle of the arrow marker: the drop follows the line,
+	//HALO drops over the start point (where you clicked)
+	[[+MCC_pointA, +(missionNamespace getVariable ["MCC_pointB", MCC_pointA])], MCC_selectedUnits, MCC_UMUnit, MCC_UMparadropIsHalo,_spawn,_away, [missionNamespace getVariable ["MCCMK_pdAirPara", ""], missionNamespace getVariable ["MCCMK_pdAirHalo", ""], missionNamespace getVariable ["MCCMK_pdHeight", 300], missionNamespace getVariable ["MCCMK_pdOpenPara", [0, 100]], missionNamespace getVariable ["MCCMK_pdOpenHalo", [0, 150]]]] remoteExec ["MCC_fnc_realParadrop", 2, false];
 
 	MCC_UMParadropRequestMarker = false;			//Wait and delete the marker
 	sleep 40;
-	deletemarkerlocal _marker;
+	{deleteMarkerLocal _x} forEach _lm;
 };
 
 
 //Zone drawing
 if (MCC_zone_drawing && _pressed==0) then
 {
-	private private ["_marker","_size","_pos","_null"];
+	private "_marker";
+private _size = [];
+private _pos = [];
+private _null = [];
 	MCC_Marker_dir = 0;
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the arrow
 	_marker = [MCC_pointA,MCC_pointA,1,"RECTANGLE","ColorYellow","SOLID"] call MCC_fnc_drawBox;	//Drow it first
@@ -334,7 +416,9 @@ if (MCC_zone_drawing && _pressed==0) then
  //Brush Drawing
 if (MCC_brush_drawing && _pressed==0) then
 {
-	private ["_marker","_size","_pos"];
+	private _marker = nil;
+	private _size = [];
+	private _pos = [];
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the arrow
 	_marker = [MCC_pointA,MCC_pointA,1,Mshape,Mcolor,Mbrush] call MCC_fnc_drawBox;	//Drow it first
 	sleep 0.1;
@@ -356,7 +440,9 @@ if (MCC_brush_drawing && _pressed==0) then
 //Triggerd drawing
 if (MCC_drawTriggers && _pressed==0) then
 {
-	private ["_marker","_size","_pos"];
+	private _marker = [];
+	private _size = [];
+	private _pos = [];
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the arrow
 	_marker = [MCC_pointA,MCC_pointA,1,Mshape,Mcolor,Mtype] call MCC_fnc_drawBox;	//Drow it first
 	sleep 0.1;
@@ -378,7 +464,9 @@ if (MCC_drawTriggers && _pressed==0) then
  //Minefield drawing
 if (MCC_drawMinefield && _pressed==0) then
 {
-	private ["_marker","_size","_pos"];
+	private _marker = [];
+	private _size = [];
+	private _pos = [];
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the arrow
 	_marker = [MCC_pointA,MCC_pointA,1,Mshape,Mcolor,Mtype] call MCC_fnc_drawBox;	//Drow it first
 	sleep 0.1;
@@ -399,7 +487,10 @@ if (MCC_drawMinefield && _pressed==0) then
  //Delete Drawing
 if (MCC_delete_drawing && _pressed==0) then
 {
-	private ["_marker","_size","_pos","_type"];
+	private _marker = [];
+	private _size = [];
+	private _pos = [];
+	private _type = 0;
 	_type	= lbCurSel MCCDELETEBRUSH;
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the box
 	_marker = [MCC_pointA,MCC_pointA,1,"ELLIPSE","colorRed","SOLID"] call MCC_fnc_drawBox;	//Drow it first
@@ -437,12 +528,13 @@ if (_pressed==0 && (missionNameSpace getVariable ["MCC_DrawLine",false] )) exitW
 	while {MCC_GroupGenMouseButtonDown} do
 		{														//While mouse pressed
 			deleteMarkerLocal _marker;
-			_marker = [MCC_pointA, MCCGroupGenDispPosXY,1,"mil_arrow",10,"ColorRed",1000] call MCC_fnc_drawArrow;
+			_marker = [MCC_pointA, MCCGroupGenDispPosXY,1,"mil_arrow",10,"ColorRed",3000] call MCC_fnc_drawArrow;
 			sleep 0.05;
 		};
 
 	sleep 0.01;
-	deletemarkerLocal _marker;
+	//Front Lines keeps the line on the map until the attack side is clicked
+	if (missionNamespace getVariable ["MCC_FLKeepLine", false]) then {MCC_FLLineMarker = _marker} else {deletemarkerLocal _marker};
 
 	MCC_DrawLine = false;
 
@@ -463,8 +555,25 @@ if (_pressed==0
     && !MCC_UMParadropRequestMarker && !(missionNameSpace getVariable ["MCC_DrawLine",false])
     && !_shift) then
 {
-	private ["_marker","_markersize","_markerpos","_null","_markerposX","_markerposY","_markersize","_markersizeX","_markersizeY",
-				 "_borderXleft","_borderXright","_borderYdown","_borderYtop","_group","_groupX","_groupY","_leader","_icon","_groupControl"];
+	private _marker = [];
+	private _markersize = [];
+	private _markerpos = [];
+	private _null = scriptNull;
+	private _markerposX = 0;
+	private _markerposY = 0;
+	private _markersize = [];
+	private _markersizeX = 0;
+	private _markersizeY = 0;
+	private _borderXleft = 0;
+	private _borderXright = 0;
+	private _borderYdown = 0;
+	private _borderYtop = 0;
+	private _group = grpNull;
+	private _groupX = 0;
+	private _groupY = 0;
+	private _leader = objNull;
+	private _icon = 0;
+	private _groupControl = nil;
 
 	//Close WP dialog and hints
 	ctrlShow [510,false];
@@ -496,14 +605,37 @@ if (_pressed==0
 	_borderYdown = _markerposY - _markersizeY;
 	_borderYtop = _markerposY + _markersizeY;
 	if (isnil "MCC_GroupGenGroupSelected") then {MCC_GroupGenGroupSelected=[]};
-	if (_markersizeX < 10 || _markersizeY<10) exitWith {};
+	if (_markersizeX < 10 || _markersizeY<10) exitWith {
+		if (_clickHit || _ctrlKey || _alt) exitWith {};
+		sleep 0.35;
+		if ((missionNamespace getVariable ["MCC_groupIconClickTime", -1]) >= (_clickT0 - 0.05)) exitWith {};
+		if ((missionNamespace getVariable ["MCC_mapDblClickTime", -1]) >= _clickT0) exitWith {};
+		if (MCC_doubleClicked || {MCC_GroupGenMouseButtonDown}) exitWith {};
+		private _d = uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull];
+		if (isNull _d) exitWith {};
+		{_x removeGroupIcon (_x getVariable ["MCCgroupIconDataSelected", -1])} forEach MCC_GroupGenGroupSelected;
+		MCC_GroupGenGroupSelected = [];
+		MCC_selectedUnits = [];
+		MCC_ConsoleGroupFocused = grpNull;
+		UMName = objNull;
+		deleteMarkerLocal "currentUnitSelected";
+		MCC_umFeedToken = (missionNamespace getVariable ["MCC_umFeedToken", 0]) + 1;
+		if (!isNil "MCC_PIPcam" && {!isNull MCC_PIPcam}) then {
+			MCC_PIPcam cameraEffect ["TERMINATE", "BACK"];
+			camDestroy MCC_PIPcam;
+		};
+		MCC_pipState = [];
+		(_d displayCtrl 3070) ctrlSetText "";
+		[] call MCC_fnc_groupGenUMRefresh;
+		["INFO", "mouseDown.sqf", "map click on empty space: selection and camera cleared", []] call MCC_fnc_log;
+	};
 	{_x removeGroupIcon (_x getvariable "MCCgroupIconDataSelected")} foreach MCC_GroupGenGroupSelected;
 
 	MCC_GroupGenGroupSelected = [];
 	{
 		_groupControl = nil;
 		_leader = (leader _x);
-		if ((side _leader in MCC_groupGenGroupStatus) && alive _leader && count (units _x)>0) then
+		if ((["shows", _leader] call MCC_fnc_consoleFilter) && alive _leader && count (units _x)>0) then
 		{
 			_group = _x;
 

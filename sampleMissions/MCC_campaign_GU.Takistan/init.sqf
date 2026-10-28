@@ -88,13 +88,13 @@ if (!isDedicated && hasInterface) then {
 	if (profileNamespace getVariable ["MCC_FCtutorialPR",true]) then {
 		_answer = ["<img size='10' img image='\mcc_sandbox_mod\mcc\helpers\data\PRmap.paa' align='center'/>
 					<br/>This is Capture The Island (CTI) Where you start with almost zero resources and you have to fight your way to capture the island.
-					<br/>Each time there will be a <t color='#FF6A32'>main mission</t> and the commander can assign <t color='#FF6A32'>secondary mission</t> from time to time.
-					<br/>Completing this missions will award your side <t color='#FF6A32'>resources and personal valor</t> but also draw the attention of the oposite faction.
-					<br/>Resources can be used by the commander to <t color='#FF6A32'>build new structures or purchase new vehicles</t>.
-					<br/>Personal valor can be used to <t color='#FF6A32'>purchase vehicles from workshops</t>.
-					<br/>The mission have a <t color='#FF6A32'>persistent data base</t> so your earned XP will follow you even when you leave.
+					<br/>Each time there will be a <t color='#C48214'>main mission</t> and the commander can assign <t color='#C48214'>secondary mission</t> from time to time.
+					<br/>Completing this missions will award your side <t color='#C48214'>resources and personal valor</t> but also draw the attention of the oposite faction.
+					<br/>Resources can be used by the commander to <t color='#C48214'>build new structures or purchase new vehicles</t>.
+					<br/>Personal valor can be used to <t color='#C48214'>purchase vehicles from workshops</t>.
+					<br/>The mission have a <t color='#C48214'>persistent data base</t> so your earned XP will follow you even when you leave.
 					<br />Squad commanders can build FOB and other players can use the trucks utilize logistics to build the FOB or other battlefield emplacements
-					<br/>You can assign yourself as a side commander or a squad leader by pressing on the <t color='#FF6A32'>Squad Dialog</t> button.
+					<br/>You can assign yourself as a side commander or a squad leader by pressing on the <t color='#C48214'>Squad Dialog</t> button.
 					<br/><br/>Do you want to show this message in the future?","Mission","No","Yes"] call BIS_fnc_guiMessage;
 
 		waituntil {!isnil "_answer" && !dialog};
@@ -106,9 +106,9 @@ if (!isDedicated && hasInterface) then {
 	if (profileNamespace getVariable ["MCC_FCtutorialPRKeys",true]) then {
 
 		_answer = ["<img size='8.7' img image='\mcc_sandbox_mod\mcc\helpers\data\PRkeyboardLayout.paa' />
-					<br/>Press <t color='#FF6A32'>Interact</t> button to interact with objects or units (medic other, changing kits, vehicles options, logistics exc).
-					<br/><br/>Press <t color='#FF6A32'>Interact Self</t> button to interact with yourself (spot enemy, medic self, construct fortifications exc).
-					<br/><br/>Press <t color='#FF6A32'>Squad Dialog</t> button to open the Squad Dialog.
+					<br/>Press <t color='#C48214'>Interact</t> button to interact with objects or units (medic other, changing kits, vehicles options, logistics exc).
+					<br/><br/>Press <t color='#C48214'>Interact Self</t> button to interact with yourself (spot enemy, medic self, construct fortifications exc).
+					<br/><br/>Press <t color='#C48214'>Squad Dialog</t> button to open the Squad Dialog.
 					<br/><br/>Do you want to show this message in the future?","Keyboard Layout","No","Yes"] call BIS_fnc_guiMessage;
 
 		waituntil {!isnil "_answer" && !dialog};

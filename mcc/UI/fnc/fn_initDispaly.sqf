@@ -1,16 +1,36 @@
 //==================================================================MCC_fnc_initDispaly===============================================================================================
 //Handle displayes from MCC's curator
 //==================================================================================================================================================================================
-private ["_mode","_params","_class","_display","_ctrlGroup","_ctrlTitle","_h","_ctrlTitlePos","_ctrlGroupPos","_ctrlBackground","_ctrlContent","_ctrlButtonOK",
-         "_ctrlButtonCancel","_ctrlButtonCustom","_ctrlBackgroundPos","_ctrlTitlePos","_ctrlContentPos","_ctrlButtonCancelPos","_ctrlButtonOKPos","_ctrlButtonCustomPos",
-		 "_ctrlTitleOffsetY","_ctrlContentOffsetY","_posY","_avtiveControls","_cfgControl","_idc","_control","_controlPos","_posH","_ctrlMap","_ctrlCuratorMap","_fncFile","_classNames"]; 
+private "_display";
+private _ctrlTitle = controlNull;
+private "_ctrlTitlePos";
+private _ctrlBackground = controlNull;
+private _ctrlContent = controlNull;
+private _ctrlButtonOK = controlNull;
+private _ctrlButtonCancel = controlNull;
+private _ctrlButtonCustom = controlNull;
+private "_ctrlBackgroundPos";
+private "_ctrlTitlePos";
+private "_ctrlContentPos";
+private "_ctrlButtonCancelPos";
+private "_ctrlButtonOKPos";
+private "_ctrlButtonCustomPos";
+private "_ctrlTitleOffsetY";
+private "_ctrlContentOffsetY";
+private "_posY";
+private _avtiveControls = configNull;
+private "_cfgControl";
+private _idc = 0;
+private _control = controlNull;
+private "_controlPos";
+private "_posH";
+private _ctrlMap = controlNull;
+private _ctrlCuratorMap = controlNull;
 
 #define IDC_OK	1
 #define IDC_CANCEL 2
 
-_mode = _this select 0;
-_params = _this select 1;
-_class = _this select 2;
+params ["_mode", "_params", "_class"];
 
 MCC_curatorOkButtonPressed = false; 
 
@@ -113,7 +133,15 @@ switch _mode do
 		//---Hnadle the display Close the display when entity is altered
 		[_display, _class] spawn 
 		{
-			private ["_display","_ctrlButtonOK","_comboBox","_index","_sides","_sectors","_class","_target","_defaultOwner"];
+			private "_display";
+			private _ctrlButtonOK = controlNull;
+			private _comboBox = controlNull;
+			private "_index";
+			private _sides = [];
+			private _sectors = [];
+			private "_class";
+			private _target = objNull;
+			private _defaultOwner = false;
 			disableserialization;
 			_display 		= _this select 0;
 			_class			= _this select 1; 

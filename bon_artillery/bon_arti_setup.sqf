@@ -22,7 +22,13 @@
 #define BON_ARTY_MISSIONTYPE 999921
 disableSerialization;
 
-private ['_splashpos','_artitype','_artispread_value','_artispread',"_req_cannonsVirtuall","_req_cannonsReal","_isCommander"];
+private "_splashpos";
+private _artitype = controlNull;
+private "_artispread_value";
+private "_artispread";
+private _req_cannonsVirtuall = [];
+private _req_cannonsReal = [];
+private _isCommander = false;
 
 _requestor = player;
 _dlg = findDisplay BON_ARTY_DIALOG;
@@ -75,13 +81,21 @@ else
 	_splashpos = _requestor modelToWorld _modelpos;
 };
 
+//MCC: centre the artillery map on the strike point, so you can watch it land
+if (!isNull _dlg && {!isNull (_dlg displayCtrl 9120)}) then {
+	(_dlg displayCtrl 9120) ctrlMapAnimAdd [0.5, ctrlMapScale (_dlg displayCtrl 9120), _splashpos];
+	ctrlMapAnimCommit (_dlg displayCtrl 9120);
+};
+
 // We reserve the cannons we want to have fired,
 // and set the cannonspecific data.
 _listbox = _dlg displayCtrl BON_ARTY_CANNONLIST;
 
 
 //Check if we are giving command to the same type of artillery pieces
-private ["_acceptable","_typeOfCannon","_data"];
+private _acceptable = false;
+private "_typeOfCannon";
+private "_data";
 _acceptable = true;
 _typeOfCannon = _listbox lbData ((lbSelection _listbox) select 0);
 

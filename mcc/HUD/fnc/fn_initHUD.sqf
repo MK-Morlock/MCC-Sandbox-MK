@@ -18,7 +18,17 @@
     //Name Tags
     MCC_fnc_NameTagsEVH = {
         if ((missionNamespace getvariable ["MCC_nameTags",false]) || (missionNamespace getvariable ["MCC_medicShowWounded",false])) then {
-            private ["_color","_textSize","_pic","_direct","_pos","_units","_leader","_alpha","_radius","_aimedAt","_captiveSideId"];
+            private _color = [];
+            private _textSize = 0;
+            private "_pic";
+            private _direct = false;
+            private "_pos";
+            private _units = objNull;
+            private "_leader";
+            private "_alpha";
+            private _radius = 0;
+            private _aimedAt = objNull;
+            private "_captiveSideId";
             _radius = 30;
             _direct = missionNamespace getVariable ["MCC_NameTags_direct",true];
 
@@ -98,7 +108,12 @@
 
            //Show vehicle crew
            if (player != vehicle player && (missionNamespace getvariable ["MCC_nameTags",false])) then {
-                private ["_nameVehicle","_driver","_gunner","_commander","_emptyPos","_string"];
+                private _nameVehicle = "";
+                private _driver = "";
+                private _gunner = "";
+                private _commander = "";
+                private "_emptyPos";
+                private _string = "";
                 _nameVehicle    = getText (configFile >> "CfgVehicles" >> (typeOf vehicle player) >> "displayName");
                 _pic            = getText (configFile >> "cfgVehicles" >> (typeOf vehicle player) >> "picture");
                 _driver         = if (alive (driver vehicle player)) then {name (driver vehicle player)} else {"Empty"};

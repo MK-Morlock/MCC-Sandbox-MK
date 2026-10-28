@@ -7,9 +7,12 @@
 //<OUT>
 //	Nothing
 //===========================================================================================================================================================================
-private ["_carArray", "_spawnCenters","_car","_carSpawnDistance"];
-_spawnCenters =  [_this, 0, [], [[]]] call BIS_fnc_param;
-_carSpawnDistance = [_this, 1, 250, [250]] call BIS_fnc_param;
+private _carArray = [];
+private _spawnCenters = [];
+private "_car";
+private _carSpawnDistance = 0;
+_spawnCenters =  _this param [0, [], [[]]];
+_carSpawnDistance = _this param [1, 250, [250]];
 
 _carArray = missionNamespace getVariable ["MCC_ambientCars",[]];
 {

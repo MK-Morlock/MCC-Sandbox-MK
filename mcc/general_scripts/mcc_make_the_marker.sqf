@@ -1,4 +1,7 @@
-private ["_marker","_nul","_markerlabel","_zones"];
+private _marker = "";
+private _nul = [];
+private _markerlabel = "";
+private _zones = [];
 
 
 MCC_Marker_type = "RECTANGLE";

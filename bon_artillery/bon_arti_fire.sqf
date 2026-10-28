@@ -1,18 +1,17 @@
 //by Bon_Inf*
 if(not isServer) exitWith{};
 
-private ["_lasertarget"];
+private "_lasertarget";
 
-_requestor = _this select 0;
-_side = _this select 1;
+params ["_requestor", "_side"];
 
 _cannons_to_fire = _requestor getVariable "requesting_cannons";
 _cannons_available = _cannons_to_fire;
-diag_log format["Cannon to fire: %1, Cannon avilable: %2",_cannons_to_fire, _cannons_available];	//debug
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format["Cannon to fire: %1, Cannon available: %2",_cannons_to_fire, _cannons_available]};	//debug
 
 {//foreach _cannons_to_fire
 	_available = MCC_server getVariable format["Arti_%2_Cannon%1_available",_x,_side];
-	diag_log format["Acailable cannon: %1",_available];	//debug
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format["Available cannon: %1",_available]};	//debug
 	if(_available) then
 	{
 		_cannonsetup = _requestor getVariable format["Arti_%2_Cannon%1",_x,_side];
@@ -20,22 +19,21 @@ diag_log format["Cannon to fire: %1, Cannon avilable: %2",_cannons_to_fire, _can
 
 		[_x,_cannonsetup,_requestor,BON_salvo] spawn
 		{
-			private ["_cannon","_splashpos","_firedelay","_artitype","_nrshells","_spread","_salvo"];
-			_cannon = _this select 0;
-			_splashpos = (_this select 1) select 0;
-			_firedelay = (_this select 1) select 1;
-			_artitype = (_this select 1) select 2;
-			_nrshells = (_this select 1) select 3;
-			_spread = (_this select 1) select 4;
-			_salvo = _this select 3;
+			private _cannon = _this select 0;
+			private _splashpos = (_this select 1) select 0;
+			private _firedelay = (_this select 1) select 1;
+			private _artitype = (_this select 1) select 2;
+			private _nrshells = (_this select 1) select 3;
+			private _spread = (_this select 1) select 4;
+			private _salvo = _this select 3;
 
 			_requestor = _this select 2;
 			_side = side _requestor;
 			_requestor setVariable [format["Arti_%2_Cannon%1",_cannon,_side],nil,true];
 			_requestor setVariable [format["Arti_%2_Cannon%1summary",_cannon,_side],nil,true];
 			_shellsleft = MCC_server getVariable format["Arti_%1_shellsleft",_side];
-			diag_log format["Cannon: %1,_splashpos: %2, _firedelay: %3, _artitype: %4, _nrshells: %5, _spread: %6, _requestor: %7, _shellsleft: %8",_cannon,_splashpos,_firedelay,_artitype,
-							_nrshells,_spread,_requestor,_shellsleft];	//debug
+			if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format["Cannon: %1,_splashpos: %2, _firedelay: %3, _artitype: %4, _nrshells: %5, _spread: %6, _requestor: %7, _shellsleft: %8",_cannon,_splashpos,_firedelay,_artitype,
+							_nrshells,_spread,_requestor,_shellsleft]};	//debug
 			MCC_server setVariable [format["Arti_%1_shellsleft",_side],_shellsleft - _nrshells, true];
 
 			sleep (5 + (random 5) + _firedelay);
@@ -44,9 +42,9 @@ diag_log format["Cannon to fire: %1, Cannon avilable: %2",_cannons_to_fire, _can
 				{
 					MCC_bonFire = false;
 					publicVariable "MCC_bonFire";
-					[[[netid _requestor,_requestor], "shoutS5"], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+					[[netid _requestor,_requestor], "shoutS5"] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 					sleep 2;
-					[[[netid _requestor,_requestor], "shoutO5"], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+					[[netid _requestor,_requestor], "shoutO5"] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 				};
 
 			//MCC stuff
@@ -63,9 +61,9 @@ diag_log format["Cannon to fire: %1, Cannon avilable: %2",_cannons_to_fire, _can
 				{
 					MCC_bonSplash = false;
 					publicVariable "MCC_bonSplash";
-					[[[netid _requestor,_requestor], "splashS6"], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+					[[netid _requestor,_requestor], "splashS6"] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 					sleep 2;
-					[[[netid _requestor,_requestor], "splashO6"], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+					[[netid _requestor,_requestor], "splashO6"] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 				};
 
 				_lasertarget = _requestor call arti_func_getLaser;

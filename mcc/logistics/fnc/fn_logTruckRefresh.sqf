@@ -14,7 +14,14 @@
 #define MCC_loadTruckOutpot2 (uiNamespace getVariable "MCC_loadTruckOutpot2")
 #define MCC_loadTruckOutpot3 (uiNamespace getVariable "MCC_loadTruckOutpot3")
 
-private ["_loadedCrates","_loadedCratesIDC","_ctrl","_displayname","_truck","_isHeli","_startLoad","_pos"];
+private _loadedCrates = [];
+private _loadedCratesIDC = [];
+private "_ctrl";
+private _displayname = "";
+private "_truck";
+private _isHeli = false;
+private _startLoad = false;
+private "_pos";
 disableSerialization;
 _isHeli = param [0,false,[false]];
 _truck = vehicle player;

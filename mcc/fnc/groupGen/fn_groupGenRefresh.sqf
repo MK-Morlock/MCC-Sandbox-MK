@@ -2,7 +2,28 @@
 // Refresh the group gen markers
 // Example:[] call MCC_fnc_groupGenRefresh
 //==============================================================================================================================================================================
-private ["_markerSupport","_markerAutonomous","_markerNaval","_markerRecon","_side","_unitsCount","_markerType","_markerColor","_leader","_markerInf","_markerMech","_markerArmor","_markerAir","_icon","_wpArray","_behaviour","_unitsSize","_unitsSizeMarker","_IsGaiaControlled","_players","_groupIconVisible","_groupIconSelectable"];
+private _markerSupport = "";
+private _markerAutonomous = "";
+private _markerNaval = "";
+private _markerRecon = "";
+private _side = sideUnknown;
+private _unitsCount = [];
+private _markerType = nil;
+private _markerColor = [];
+private _leader = objNull;
+private _markerInf = "";
+private _markerMech = "";
+private _markerArmor = "";
+private _markerAir = "";
+private _icon = nil;
+private _wpArray = [];
+private _behaviour = "";
+private _unitsSize = 0;
+private _unitsSizeMarker = "";
+private _IsGaiaControlled = "";
+private _players = false;
+private _groupIconVisible = false;
+private _groupIconSelectable = false;
 #define groupGen_IDD 2994
 
 //Group info while clicked
@@ -14,6 +35,7 @@ private _groupIconHandle = addMissionEventHandler ["GroupIconClick", {
 									"_shift", "_control", "_alt"
 								];
 
+								MCC_groupIconClickTime = diag_tickTime;
 								[_group,_mouseButton,[_posX,_posY],_shift,_control,_alt] execVm format ["%1mcc\general_scripts\groupGen\ClickGroupIcon.sqf",MCC_path];
 							}];
 
@@ -38,7 +60,8 @@ MCC_fnc_mapDrawWP =
 	} foreach (missionNamespace getVariable ["MCC_GGIcons",[]]);
 
 	{
-		if !(isNil "_x") then {
+		// skip malformed entries (e.g. a start point that was never set) instead of erroring every frame
+		if (!(isNil "_x") && {(_x isEqualType []) && {count _x >= 3} && {((_x select 0) isEqualType []) && {count (_x select 0) >= 2} && {(_x select 0) isEqualTypeAll 0}}}) then {
 			_map drawLine _x;
 		};
 	} foreach (missionNamespace getVariable ["MCC_GGLines",[]]);
@@ -65,13 +88,12 @@ MCC_fnc_mapDrawWP =
 		{
 			if ((markerType _x != "") && ((markerPos _x distance MCC_3D_CAM) < 1000)) then
 			{
-				private "_color";
+				private _color = [];
 
 				_texture = gettext (configfile >> "CfgMarkers" >> markerType _x >> "icon");
 				_pos = getMarkerpos _x;
 				_pos set [2,10];
-				private ["_size"];
-				_size =if ((1.5 - ((MCC_3D_CAM distance _pos)*0.001)) < 0) then {0} else {(1.5 - ((MCC_3D_CAM distance _pos)*0.001))};
+				private _size = if ((1.5 - ((MCC_3D_CAM distance _pos)*0.001)) < 0) then {0} else {(1.5 - ((MCC_3D_CAM distance _pos)*0.001))};
 				_color = switch (tolower (markerColor _x)) do
 							{
 								case "default": {[1,1,1,1]};
@@ -120,11 +142,11 @@ MCC_fnc_mapDrawWP =
 _handler = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 9000) ctrladdeventhandler ["draw","_this call MCC_fnc_mapDrawWP;"];
 
 //Draw WP
+MCC_UMListSig = [];
 while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupGenRefreshTerminate} do {
 
-	private ["_tempArray1","_tempArray2"];
-	_tempArray1 = [];
-	_tempArray2 = [];
+	private _tempArray1 = [];
+	private _tempArray2 = [];
 
 	{
 		_leader = (leader _x);
@@ -132,15 +154,20 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 		_wpArray = waypoints (group _leader);
 		_behaviour = behaviour _leader;
 		_players = if ("players" in MCC_groupGenGroupStatus && (count MCC_groupGenGroupStatus == 1)) then {alive _leader && isPlayer _leader} else {alive _leader};
+		//Civilians that joined a side (suicide bombers, armed civilians) are listed under Civ, not under that side
+		private _lside = if (getNumber (configFile >> "CfgVehicles" >> typeOf _leader >> "side") == 3 && {_leader isKindOf "CAManBase"}) then {civilian} else {side _leader};
+		if (!isNil {(group _leader) getVariable "MCC_dropFor"}) then {_lside = (group _leader) getVariable ["MCC_dropFor", side group _leader]};
 
 		//Draw loop
-		if (((side _leader in MCC_groupGenGroupStatus) || ("players" in MCC_groupGenGroupStatus && (count MCC_groupGenGroupStatus == 1))) && _players && !(_leader iskindof "Logic")) then
+		if (alive _leader && {!(_leader iskindof "Logic")} && {["shows", _leader] call MCC_fnc_consoleFilter}) then
 		{
 			//Draw WP
 			if (count _wpArray > 0) then
 			{
-				private ["_wp","_wPos","_wType"];
-				MCC_lastPos = nil;
+				private _wp = [];
+				private _wPos = [];
+				private _wType = "";
+				private _lastPos = nil;
 				_texture = gettext (configfile >> "CfgMarkers" >> "waypoint" >> "icon");
 				for [{_i= currentWaypoint (group _leader)},{_i < count _wpArray},{_i=_i+1}] do 	//Draw the current WP
 				{
@@ -150,17 +177,17 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 						_wType = waypointType _wp;
 						_tempArray1 set [count _tempArray1, [_texture,[0,0,1,1],_wPos,24,24,0,_wType,0,0.04,"PuristaBold","center"]];
 
-						if (isnil "MCC_lastPos" || _i== currentWaypoint (group _leader) ) then {MCC_lastPos = getpos _leader};
+						if (isNil "_lastPos" || _i== currentWaypoint (group _leader) ) then {_lastPos = getpos _leader};
 
-						_tempArray2 set [count _tempArray2, [[MCC_lastPos select 0, MCC_lastPos select 1],_wPos,[0,0,1,1]]];
+						_tempArray2 set [count _tempArray2, [[_lastPos select 0, _lastPos select 1],_wPos,[0,0,1,1]]];
 
-						MCC_lastPos = _wPos;
+						_lastPos = _wPos;
 					};
 				};
 			};
 
 			//Draw group markers
-			switch (side _leader) do
+			switch (_lside) do
 			{
 				case east: //East
 					{
@@ -218,7 +245,7 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 					};
 			};
 
-			if (isPlayer _leader) then {_markerColor = [0,0.5,1,1]};
+			if (isPlayer _leader) then {_markerColor = switch (_side) do {case east: {[1,0.5,0.5,1]}; case resistance: {[0.5,1,0.5,1]}; case civilian: {[1,1,1,1]}; default {[0,0.5,1,1]}}};
 			_IsGaiaControlled = if ((count(_x getVariable  ["GAIA_zone_intend",[]])>1)) then {"(G) "} else
 				{
 					if (_x getVariable  ["MCC_canbecontrolled",false]) then {"(P) "} else {""};
@@ -228,7 +255,7 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 			if ((_x getVariable ["MCC_GAIA_RESPAWN",0]) > 0) then {_IsGaiaControlled = _IsGaiaControlled + "(R-" + (str (_x getVariable ["MCC_GAIA_RESPAWN",0])) + ") ";};
 
 			_x setGroupIconParams [_markerColor,format ["%1%2",_IsGaiaControlled,(groupID _x)],1,true];
-			_unitsCount = [group _leader] call MCC_fnc_countGroupHC;
+			_unitsCount = [group _leader] call MCC_fnc_countGroupHC; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 			_unitsSize = 0;
 			_markerType = _markerInf;
 			if (_unitsCount select 0 > 0) then {_markerType = _markerInf; _unitsSize = _unitsSize + (1*(_unitsCount select 0))};
@@ -242,7 +269,7 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 
 			if (isnil "_markerType") then
 			{
-				_unitsCount = [group _leader] call MCC_fnc_countGroup;
+				_unitsCount = [group _leader] call MCC_fnc_countGroup; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 				if (_unitsCount select 0 > 0) then {_markerType = _markerInf; _unitsSize = _unitsSize + (1*(_unitsCount select 0))};
 				if (_unitsCount select 1 > 0) then {_markerType = _markerMech; _unitsSize = _unitsSize + (3*(_unitsCount select 1))};
 				if (_unitsCount select 2 > 0) then {_markerType = _markerArmor; _unitsSize = _unitsSize + (3*(_unitsCount select 2))};
@@ -258,9 +285,18 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 			_icon = (_x getvariable "MCCgroupIconData");
 			if (!isnil "_icon") then {_x removeGroupIcon _icon};
 
-			if !(_leader in (assignedCargo vehicle _leader)) then
+			//No icon for a group riding as passengers in someone else's vehicle (the driver's group has the icon). A group whose
+			//leader is a passenger but which also drives the vehicle, or whose vehicle has no driver (e.g. the convoy HVT group),
+			//gets its icon: without one it could not be selected / deleted on the map.
+			private _veh = vehicle _leader;
+			if (!(_leader in (assignedCargo _veh)) || {isNull (driver _veh)} || {(group (driver _veh)) == _x}) then
 			{
-				_icon = _x addGroupIcon [_markerType,[0,0]];
+				private _iconType = _markerType;
+				if (_behaviour == "COMBAT" && {_side != civilian}) then {
+					private _c = format [["MCC_%1_combat", "MCC_%1_combatP"] select (isPlayer _leader), _markerType];
+					if (isClass (configFile >> "CfgGroupIcons" >> _c)) then {_iconType = _c};
+				};
+				_icon = _x addGroupIcon [_iconType,[0,0]];
 				_x setGroupIconParams [_markerColor,format ["%1%2",_IsGaiaControlled,(groupID _x)],1,true];
 				_x setvariable ["MCCgroupIconData",_icon,false];
 
@@ -272,9 +308,8 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 
 				if (! isnil "_groupStatus") then 					//Draw group status
 				{
-					private ["_time","_status"];
-					_time 		= _groupStatus select 1;
-					_status 	= _groupStatus select 0;
+					private _time = _groupStatus select 1;
+					private _status = _groupStatus select 0;
 
 					if (abs (time - _time) < 180) then
 						{
@@ -295,9 +330,10 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 		};
 	} foreach allgroups;
 
-	//Draw IEDs
+	//Draw IEDs. Armed civilians and suicide bombers are civilians: shown only with Civ (or All) selected, like the
+	//civilian groups - they showed with West / East / Guer as well
 	{
-		if (_x getVariable ["armed",false]) then
+		if ((_x getVariable ["armed",false]) && {!((_x getVariable ["iedMarkerName", ""]) in ["Armed Civilian", "Suicide Bomber"]) || {civilian in MCC_groupGenGroupStatus}}) then
 		{
 			_texture =	if (_x getVariable ["isAmbush",false]) then
 						{
@@ -322,8 +358,33 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 	MCC_GGIcons = _tempArray1;
 	MCC_GGLines = _tempArray2;
 
-	//Refresh UM list
-	[] call MCC_fnc_groupGenUMRefresh;
+	//Units / Groups mode, side filter) - it was rebuilt every 0.5 s. Spawning, deaths, joins and side / mode changes
+	//all change this summary; mode switch and auto-select still rebuild it directly.
+	private _picked = +(missionNamespace getVariable ["MCC_GroupGenGroupSelected", []]);
+	private _umSig = [missionNamespace getVariable ["MCC_UMUnit", 0], +(missionNamespace getVariable ["MCC_groupGenGroupStatus", []]), allGroups apply {[_x, {alive _x} count (units _x)]}, _picked];
+	if (!(_umSig isEqualTo (missionNamespace getVariable ["MCC_UMListSig", []])) && {!(missionNamespace getVariable ["MCC_UMFocus", false])}) then {
+		private _pickedChanged = !(_picked isEqualTo ((missionNamespace getVariable ["MCC_UMListSig", [0,0,0,[]]]) param [3, []]));
+		MCC_UMListSig = _umSig;
+		if (_pickedChanged && {count _picked > 0}) then {
+			private _sel = if ((missionNamespace getVariable ["MCC_UMUnit", 0]) == 0) then {
+				private _u = []; {_u append ((units _x) select {alive _x})} forEach _picked; _u
+			} else {_picked};
+			MCC_selectedUnits = _sel;
+		};
+		[] call MCC_fnc_groupGenUMRefresh;
+		if (_pickedChanged && {count _picked > 0}) then {
+			private _l = (uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull]) displayCtrl 3069;
+			private _sel = missionNamespace getVariable ["MCC_selectedUnits", []];
+			if (!isNull _l && {count _sel > 0}) then {
+				private _names = if ((missionNamespace getVariable ["MCC_UMUnit", 0]) == 0) then {missionNamespace getVariable ["MCC_UMunitsNames", []]} else {missionNamespace getVariable ["UMgroupNames", []]};
+				private _row = _names find (_sel select 0);
+				if (_row >= 0) then {
+					_l lbSetCurSel _row;
+					{private _r = _names find _x; if (_r >= 0) then {_l lbSetSelected [_r, true]}} forEach _sel;
+				};
+			};
+		};
+	};
 
 	sleep .5;
 };

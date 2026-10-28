@@ -222,11 +222,11 @@ class MCC_rts_orderStanceUp
 
 	displayName = "Stand Up";
 	descriptionShort = "Order group units to stand";
-	condition = "alive _target && stance _target == 'PRONE';";
+	condition = "alive _target && toUpper (unitPos _target) != 'UP';";
 	dontShowDisabled = 0;
 	requiredBuildings[] = {};
 	needelectricity = 0;
-	actionFNC = "{if (count (missionNameSpace getVariable ['MCC_ConsoleGroupSelected',[]]) <=0) exitWith {}; {_x setUnitPos 'AUTO'} foreach units (MCC_ConsoleGroupSelected select 0); 0 spawn {sleep 1; [] call MCC_fnc_rtsBuildUIContainerBack}}";
+	actionFNC = "{if (count (missionNameSpace getVariable ['MCC_ConsoleGroupSelected',[]]) <=0) exitWith {}; {_x setUnitPos 'UP'} foreach units (MCC_ConsoleGroupSelected select 0); 0 spawn {sleep 1; [] call MCC_fnc_rtsBuildUIContainerBack}}";
 	resources[] = {};
 };
 
@@ -240,7 +240,7 @@ class MCC_rts_orderStanceDown
 
 	displayName = "Prone";
 	descriptionShort = "Order group units to prone";
-	condition = "alive _target && stance _target != 'PRONE';";
+	condition = "alive _target && toUpper (unitPos _target) != 'DOWN';";
 	dontShowDisabled = 0;
 	requiredBuildings[] = {};
 	needelectricity = 0;

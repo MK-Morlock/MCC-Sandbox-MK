@@ -21,7 +21,9 @@
 //Validate parameter count
 if ((count _this) < 4) exitWith {debugLog "Log: [spawnVehicle] Function requires at least 4 parameters!"; []};
 
-private ["_grp", "_side", "_newGrp"];
+private _grp = grpNull;
+private _side = sideUnknown;
+private _newGrp = false;
 
 _this params [
 	["_pos",[0,0,0],[[]]],
@@ -52,7 +54,9 @@ if ((typeName _azi) != (typeName 0)) exitWith {debugLog "Log: [spawnVehicle] Azi
 if ((typeName _type) != (typeName "")) exitWith {debugLog "Log: [spawnVehicle] Type (2) must be a String!"; []};
 if ((typeName _grp) != (typeName grpNull)) exitWith {debugLog "Log: [spawnVehicle] Group (3) must be a Group!"; []};
 
-private ["_sim", "_veh", "_crew"];
+private _sim = "";
+private _veh = objNull;
+private _crew = [];
 _sim = getText(configFile >> "CfgVehicles" >> _type >> "simulation");
 
 switch (tolower _sim) do {
@@ -96,7 +100,7 @@ _grp addVehicle _veh;
 //If this is a new group, select a leader.
 if (_newGrp) then
 {
-	_grp selectLeader (commander _veh);
+	_grp selectLeader (effectiveCommander _veh);
 };
 
 //If we pick random animation

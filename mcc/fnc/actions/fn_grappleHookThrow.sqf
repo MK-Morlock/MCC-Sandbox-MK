@@ -2,8 +2,12 @@
 //Throw a grapple hook
 // Example: [_ammo] call MCC_fnc_grappleHookThrow;
 //===========================================================================================================================================================================	
-private ["_ammo","_impactPos","_unit","_startPos","_rope","_ammoType","_endpos"];
-_unit 		= _this select 0;
+private "_ammo";
+private "_impactPos";
+private _startPos = "";
+private "_rope";
+private "_ammoType";
+params ["_unit"];
 _ammoType 	= _this select 5;
 _ammo 		= _this select 6;
 

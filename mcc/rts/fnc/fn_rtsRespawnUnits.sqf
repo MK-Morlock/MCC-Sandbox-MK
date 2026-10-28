@@ -7,9 +7,17 @@
 #define	PARACHUTE	"NonSteerable_Parachute_F"
 #define	SOUNDJET	"BattlefieldJet1"
 
-private ["_ctrl","_res","_target","_unitsArray","_groupCfg","_groupArray","_unitClass","_parents","_ehID","_unit"];
+private _res = [];
+private "_target";
+private _unitsArray = [];
+private _groupCfg = "";
+private _groupArray = [];
+private "_unitClass";
+private _parents = [];
+private "_ehID";
+private _unit = objNull;
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _res = param [1, [], [[]]];
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
@@ -52,7 +60,7 @@ if (count _unitsArray > 0) then {
 		_ehID = _unit addMPEventHandler ["mpkilled", {
 												_unit = name (_this select 0);
 												_killer = name (_this select 1);
-												[["MCCNotificationBad",["Unit Down",format ["%1 was killed by %2",_unit,_killer],""]], "bis_fnc_showNotification", _sidePlayer, false] spawn BIS_fnc_MP;
+												["MCCNotificationBad",["Unit Down",format ["%1 was killed by %2",_unit,_killer],""]] remoteExec ["bis_fnc_showNotification", _sidePlayer, false];
 											  }];
 		{_x addCuratorEditableObjects [[_unit],true]} forEach allCurators;
 		_unit setVariable ["MCC_isRTSunit",true,true];

@@ -16,7 +16,18 @@
 #define ANCHOR_ITEM "Land_TreeBin_F"
 #define	MCC_FOB_BaseItem	"Land_TBox_F"
 
-private ["_conType","_available","_errorMessegeIndex","_errorMesseges","_check","_respawPositions","_error","_dir","_pos","_vehicleType","_const","_success"];
+private _conType = "";
+private _available = false;
+private _errorMessegeIndex = 0;
+private _errorMesseges = [];
+private _check = {};
+private _respawPositions = [];
+private "_error";
+private "_dir";
+private _pos = [];
+private "_vehicleType";
+private _const = objNull;
+private "_success";
 
 _conType = param [0,"",[""]];
 _pos = param [1,[0,0,0],[[]]];
@@ -33,7 +44,7 @@ if (_conType in ["wall","bunker"]) then {
 						format ["Can't order to build deployables further then %1m from the player",REQUIRE_SQL_CONSTRUCT_DISTANCE],
 						"Can't build on water",
 						format ["Can't build more then %1 fortifications around one FOB",MAX_WALLS],
-						format ["Deployables can be build in a maximum distance of %1m from an FOB",REQUIRE_CONSTRUCT_FOB_MIN_DISTANCE],
+						format ["Deployables can be built within %1 m of a FOB",REQUIRE_CONSTRUCT_FOB_MIN_DISTANCE],
 						format ["Only one construction can be built at the same time in %1 meters radius",REQUIRE_CONSTRUCT_CONSTRUCT_DISTANCE]
                     ];
 
@@ -58,7 +69,7 @@ if (_conType in ["wall","bunker"]) then {
 						format ["Can't order to build deployables further then %1m from the player",REQUIRE_SQL_CONSTRUCT_DISTANCE],
 						"Can't build on water",
 						format ["FOB must be build in a minimum distance of %1m from another FOB or HQ",REQUIRE_FOB_FOB_MIN_DISTANCE],
-						format ["Deployables must be build in a maximum distance of %1m from an FOB",REQUIRE_CONSTRUCT_FOB_MIN_DISTANCE],
+						format ["Deployables must be built within %1 m of a FOB",REQUIRE_CONSTRUCT_FOB_MIN_DISTANCE],
 						format ["Only one construction can be built at the same time in %1 meters radius",REQUIRE_CONSTRUCT_CONSTRUCT_DISTANCE]
                     ];
 
@@ -95,7 +106,9 @@ if (_available) then {
 	if (isNil "MCC_initConstract_bunker") then {MCC_initConstract_bunker = ["B_officer_F","O_officer_F","I_officer_F","C_Nikos"]};
 
 	//If we want precise placing
-	private ["_action","_startPos","_playerSideID"];
+	private "_action";
+	private "_startPos";
+	private "_playerSideID";
 
 	_startPos = getPos player;
 	_playerSideID = (playerSide call BIS_fnc_sideID) min 3;
@@ -136,7 +149,7 @@ if (_available) then {
 	}, [MCC_FOB_object]] call BIS_fnc_addStackedEventHandler;
 
 	// Add secondary hold fire and place object to the action
-	_action =  player addAction ["Place Constuct", {missionNamespace setVariable ["MCC_FOB_object_position",[getPosASL MCC_FOB_object, getDir MCC_FOB_object]]; [publicVariableServer "MCC_FOB_object_position"]}, "", 0, false, true, "DefaultAction", "true"];
+	_action =  player addAction ["Place Construction", {missionNamespace setVariable ["MCC_FOB_object_position",[getPosASL MCC_FOB_object, getDir MCC_FOB_object]]; [publicVariableServer "MCC_FOB_object_position"]}, "", 0, false, true, "DefaultAction", "true"];
 
 	waitUntil {!alive player || (player getvariable ["MCC_medicUnconscious",false]) || player distance _startPos > 10 || (count ((missionNamespace getVariable ["MCC_FOB_object_position",[]]) select 0) > 0)};
 
@@ -173,15 +186,13 @@ if (_available) then {
 		_const setPosASL _pos;
 		_const setVariable ["MCC_CONST_FORT",true, true];
 	} else {
-		[[_conType, _pos, playerside, str _dir] ,"MCC_fnc_construction", false,false] call BIS_fnc_MP;
+		[_conType, _pos, playerside, str _dir] remoteExec ["MCC_fnc_construction", 2, false];
 	};
 
 	//broadcast
 	player globalRadio "SentAssemble";
-	[[player,(if (side player == west) then {format["mp_groundsupport_01_slingloadrequested_BHQ_%1",floor random 3]} else {format["mp_groundsupport_01_slingloadrequested_IHQ_%1",floor random 3]})] ,"MCC_fnc_radioSupport", playerside,false] call BIS_fnc_MP;
+	[player,(if (side player == west) then {format["mp_groundsupport_01_slingloadrequested_BHQ_%1",floor random 3]} else {format["mp_groundsupport_01_slingloadrequested_IHQ_%1",floor random 3]})] remoteExec ["MCC_fnc_radioSupport", playerside, false];
 } else {
-	private ["_str"];
-	_str = "<t size='1' t font = 'puristaLight' color='#FFFFFF'>" + _error + "</t>";
-	[_str,0,0.2,5,1,0.0] spawn bis_fnc_dynamictext;
+	[_error, 5] spawn MCC_fnc_rsMessage;
 	player globalRadio "SentCommandFailed";
 };

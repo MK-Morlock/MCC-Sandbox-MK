@@ -1,6 +1,4 @@
-private['_handled'];
-
-_handled = false;
+private _handled = false;
 _button = _this select 1;
 
 if(_button in actionKeys "showMap" || _button in actionKeys "hideMap") then{

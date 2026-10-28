@@ -12,12 +12,18 @@
 // Return - nothing
 //Made by Shay_Gman (c) 09.10
 //========================================================================================================================================================================================
-private ["_pos", "_spawnName", "_side","_group","_iedMarkerName","_groupDir","_init","_isSpotter","_spotterArray","_spotter","_spotterClass","_targetSide"];
+private _group = grpNull;
+private _iedMarkerName = "";
+private _groupDir = 0;
+private _init = "";
+private _isSpotter = 0;
+private _spotterArray = [];
+private _spotter = objNull;
+private _spotterClass = "";
+private _targetSide = sideUnknown;
 disableSerialization;
 
-_pos 			= _this select 0;
-_spawnName 		= _this select 1;
-_side 			= _this select 2;
+params ["_pos", "_spawnName", "_side"];
 _iedMarkerName 	= _this select 3 select 0;
 _groupDir 		= _this select 4;
 _pointB 		= _this select 5;
@@ -113,5 +119,5 @@ _init = format [";_this setVariable ['isIED',true,true];[_this,'%1',%2,%3,%4,'%5
 				 ,_targetSide
 				 ];
 
-[[[netid (leader _group), leader _group], _init], "MCC_fnc_setVehicleInit", false, false] spawn BIS_fnc_MP;
+[[netid (leader _group), leader _group], _init] remoteExec ["MCC_fnc_setVehicleInit", 2, false];
 (leader _group)

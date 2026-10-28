@@ -8,7 +8,13 @@
 	 <out>
 	 	array - all buildings found in the radius sorted by distance from the center and their building positions in array [[BUILDING1,[POS1,POS2,POS3]],[BUILDING2,[POS1,POS2,POS3]]]
 //=======================================================================================================================================================================*/
-private ["_objPos","_radius","_buildingsArray","_building","_buildingPos","_buildingsArraySorted","_foundBuildings"];
+private _objPos = [];
+private _radius = 0;
+private _buildingsArray = nil;
+private _building = objNull;
+private _buildingPos = 0;
+private _buildingsArraySorted = [];
+private _foundBuildings = [];
 
 _objPos = param [0,[0,0,0],[[],objNull]];
 _radius = param [1,200,[0]];
@@ -25,6 +31,7 @@ if (typeName _objPos == typeName objNull) then {
 while {count _foundBuildings == 0} do
 {
 	_buildingsArray	= nearestObjects  [_objPos,["House","Ruins","Church","FuelStation","Strategic"],_radius];	//Let's find the buildings in the area
+	_buildingsArray = _buildingsArray select {!isObjectHidden _x};
 	_radius = _radius + 50; 	//increase by 50 meters in nothing is found.
 
 

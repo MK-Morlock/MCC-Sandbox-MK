@@ -18,7 +18,12 @@
 //==================================================================================================================================================================================*/
 IF (!isServer) exitWith {};
 
-private ["_player","_tempArray","_waitTime","_position","_gear","_stats"];
+private "_player";
+private _tempArray = [];
+private _waitTime = 0;
+private _position = false;
+private _gear = false;
+private _stats = false;
 
 _waitTime = param [0, 10, []];
 _position = param [1, false, [false]];
@@ -31,7 +36,8 @@ if (missionNamespace getVariable ["MCC_fnc_savePlayerIsrunning",false]) exitWith
 missionNamespace setVariable ["MCC_fnc_savePlayerIsrunning",true];
 
 addMissionEventHandler ["HandleDisconnect",{
-	private ["_tempArray","_player"];
+	private _tempArray = [];
+	private "_player";
 	_player = _this select 0;
 
 	//Position

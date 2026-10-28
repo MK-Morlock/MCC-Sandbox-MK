@@ -2,10 +2,17 @@
 //Note to be used outside MCC
 //==============================================================================================================================================================================
 //Made by Shay_Gman (c) 09.10
-private ["_pointA", "_pointB", "_nearObjectsA", "_nearObjectsB","_triggerA","_triggerB","_loop","_syncedPos","_savedObject","_triggerAPos","_triggerBPos"];
+private _nearObjectsA = [];
+private _nearObjectsB = [];
+private _triggerA = objNull;
+private _triggerB = objNull;
+private _loop = false;
+private _syncedPos = [];
+private _savedObject = nil;
+private _triggerAPos = [];
+private _triggerBPos = [];
 
-_pointA 		= _this select 0;
-_pointB 		= _this select 1;
+params ["_pointA", "_pointB"];
 _loop 			= true;
 
 if (mcc_isloading) then {waitUntil {! mcc_isloading}};

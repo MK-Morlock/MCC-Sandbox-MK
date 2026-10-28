@@ -1,14 +1,17 @@
 //===================================================================MCC_fnc_evacSpawn======================================================================================
 // Spawn a vehicle with crew and gunners, mark it as an evac vehicle
-// Example:[[vehicleClass, position],"MCC_fnc_evacSpawn",true,false] spawn BIS_fnc_MP;
+// Example:[vehicleClass, position] remoteExec ["MCC_fnc_evacSpawn", true, false];
 // Params:
 // 	vehicleClass: string, vehicleClass to spawn
 // 	position: array, spawn position
 //==============================================================================================================================================================================
-private ["_heliType","_pos", "_evac_p_type","_side","_evac","_campaignEvac","_dir"];
+private _evac_p_type = "";
+private _side = configNull;
+private _evac = objNull;
+private _campaignEvac = false;
+private _dir = 0;
 
-_heliType 	= _this select 0; 	//Type of heli
-_pos 		= _this select 1;
+params ["_heliType", "_pos"];
 _campaignEvac = param [2, false, [false]];
 _dir	= param [3,0,[0]];
 
@@ -16,7 +19,9 @@ _dir	= param [3,0,[0]];
 waitUntil {time >0};
 
 _evac_p_type = getText (configFile >> "CfgVehicles" >> _heliType >> "crew");
-_side =  (getNumber (configFile >> "CfgVehicles" >> _heliType >> "side")) call BIS_fnc_sideType;
+_side = param [4, sideUnknown, [sideUnknown, 0]];
+if (_side isEqualType 0) then {_side = _side call BIS_fnc_sideType};
+if (_side isEqualTo sideUnknown) then {_side = (getNumber (configFile >> "CfgVehicles" >> _heliType >> "side")) call BIS_fnc_sideType};
 
 _evac = _heliType createVehicle [_pos select 0, _pos select 1, 500]; 				//spawn heli
 if (surfaceIsWater _pos) then {

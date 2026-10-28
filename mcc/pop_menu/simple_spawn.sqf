@@ -1,17 +1,12 @@
-private ["_pos", "_dir","_class","_type","_faction","_unitspawned","_dummy","_notEmpty","_init","_name","_dummyGroup","_loc","_vehicleClass","_tempInit"];
-_pos 	 = _this select 0;
-_dir 	 = _this select 1;
-_class	 = _this select 2;
-_type	 = _this select 3;
-_faction = _this select 4;
-_notEmpty	 = _this select 5;
-_init	 = _this select 6;
-_name	 = _this select 7;
-_loc	 = _this select 8;
+private _unitspawned = grpNull;
+private _dummy = nil;
+private _vehicleClass = "";
+private "_tempInit";
+params ["_pos", "_dir", "_class", "_type", "_faction", "_notEmpty", "_init", "_name", "_loc", ["_align", false, [false]], ["_beh", "hold", [""]], ["_cmd", false, [false]]];
 
 if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_loc == 1) ) ) then
 {
-	diag_log format ["%1 - spawning 3D Editor object [%2]", time, _class];
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["%1 - spawning 3D Editor object [%2]", time, _class]};
 
 	switch (_type) do		//Which type do we want
 			{
@@ -24,7 +19,7 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					sleep 0.01;
 
 					_tempInit = _init;
-					if (!MCC_align3D) then
+					if (!_align) then
 					{
 						_dummy setpos _pos;
 						_tempInit= _tempInit +	FORMAT [";_this setpos %1;",_pos];
@@ -45,9 +40,9 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 
 					if (_name != "") then
 					{
-						[[[netid _dummy,_dummy], _name], "MCC_fnc_setVehicleName", true, true] spawn BIS_fnc_MP;
+						[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 					};
-					[[[netid _dummy,_dummy], _init, false], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
+					[[netid _dummy,_dummy], _init, false] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
 
 					//Curator
 					{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -62,7 +57,7 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					sleep 0.01;
 
 					_tempInit = _init;
-					if (!MCC_align3D) then
+					if (!_align) then
 					{
 						_dummy setpos _pos;
 						_tempInit= _tempInit +	FORMAT [";_this setpos %1;",_pos];
@@ -73,9 +68,9 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					_unitspawned setformdir _dir;
 					if (_name != "") then
 					{
-						[[[netid _dummy,_dummy], _name], "MCC_fnc_setVehicleName", true, true] spawn BIS_fnc_MP;
+						[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 					};
-					[[[netid _dummy,_dummy], _init, false], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
+					[[netid _dummy,_dummy], _init, false] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
 
 					//Curator
 					{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -85,13 +80,15 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 				{
 					if (_notEmpty) then
 					{
-						private ["_side","_veh","_crew"];
+						private _side = configNull;
+						private _veh = objNull;
+						private _crew = [];
 						_side = (((getNumber (configFile >> "CfgVehicles" >> _class >> "side")) call BIS_fnc_sideType));
 
-						if (!isnil "Object3D") then {waitUntil {_pos distance Object3D > 15}};
 						_veh = createvehicle [_class,_pos,[],0,"none"];
 						_veh setpos _pos;
 						_veh setdir _dir;
+						if (_align) then {_veh setVectorUp (surfaceNormal _pos)};
 						_grp = createGroup _side;
 
 						//If autonomous
@@ -114,11 +111,11 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 
 						if (_name != "") then
 						{
-							[[[netid (_dummy select 0),(_dummy select 0)], _name], "MCC_fnc_setVehicleName", true, true] spawn BIS_fnc_MP;
+							[[netid (_dummy select 0),(_dummy select 0)], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 						};
 
 						_tempInit = _init +	FORMAT [";group _this setFormDir %1;",_dir];
-						if (!MCC_align3D) then
+						if (!_align) then
 						{
 							(_dummy select 0) setpos _pos;
 							_tempInit= _tempInit +	FORMAT [";_this setpos %1;",_pos];
@@ -127,21 +124,21 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 						(_dummy select 0) setVariable ["vehicleinit", _tempInit, true];
 
 
-						[[[netid (_dummy select 0),(_dummy select 0)], _init], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
+						[[netid (_dummy select 0),(_dummy select 0)], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
 
 						//Curator
 						{_x addCuratorEditableObjects [[(_dummy select 0)],true]} forEach allCurators;
 					}
 					else
 					{
-						if (!isnil "Object3D") then {waitUntil {_pos distance Object3D > 15}};
 						_dummy = _class createvehicle _pos;
 						_dummy setpos _pos;
 						_dummy setdir _dir;
+						if (_align) then {_dummy setVectorUp (surfaceNormal _pos)};
 						sleep 0.01;
 
 						_tempInit = _init;
-						if (!MCC_align3D) then
+						if (!_align) then
 						{
 							_dummy setpos _pos;
 							_tempInit= _tempInit +	FORMAT [";_this setpos %1;",_pos];
@@ -151,9 +148,9 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 
 						if (_name != "") then
 						{
-							[[[netid _dummy,_dummy], _name], "MCC_fnc_setVehicleName", true, true] spawn BIS_fnc_MP;
+							[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 						};
-						[[[netid _dummy,_dummy], _init], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
+						[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
 
 						//Curator
 						{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -165,10 +162,11 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					_dummy = _class createvehicle _pos;
 					_dummy setpos _pos;
 					_dummy setdir _dir;
+					if (_align) then {_dummy setVectorUp (surfaceNormal _pos)};
 					sleep 0.01;
 
 					_tempInit = _init;
-					if (!MCC_align3D) then
+					if (!_align) then
 					{
 						_dummy setpos _pos;
 						_tempInit= _tempInit +	FORMAT [";_this setpos %1;",_pos];
@@ -178,9 +176,9 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 
 					if (_name != "") then
 					{
-						[[[netid _dummy,_dummy], _name], "MCC_fnc_setVehicleName", true, true] spawn BIS_fnc_MP;
+						[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 					};
-					[[[netid _dummy,_dummy], _init], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
+					[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
 
 					//Curator
 					{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -194,9 +192,9 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					sleep 0.01;
 					if (_name != "") then
 					{
-						[[[netid _dummy,_dummy], _name], "MCC_fnc_setVehicleName", true, true] spawn BIS_fnc_MP;
+						[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 					};
-					[[[netid _dummy,_dummy], _init], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
+					[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
 
 					//Curator
 					{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -209,6 +207,10 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 			};
 	if (!isnil "_dummy") then
 	{
+		private _placeGrp = grpNull;
+		if (_type == "MAN" && {!isNil "_unitspawned"} && {_unitspawned isEqualType grpNull}) then {_placeGrp = _unitspawned};
+		if (_type == "VEHICLE" && {_notEmpty} && {!isNil "_grp"} && {_grp isEqualType grpNull}) then {_placeGrp = _grp};
+		if (!isNull _placeGrp) then {[_placeGrp, _beh, _cmd] call MCC_fnc_applyPlaceBehaviour};
 		MCC_lastSpawn set [count MCC_lastSpawn,_dummy];
 		publicVariable "MCC_lastSpawn";
 	};

@@ -16,24 +16,24 @@ class MCC_Module_AI_assignToZone : MCC_Module_Base
 		{
 			displayName = "Behavior";
 			typeName = "NUMBER";
-			property = "behavior";
+			property = "MCC_Module_AI_assignToZone_behavior";
 
 			class values
 			{
 				class aggressive
 				{
-					name = "aggressive";
+					name = "Aggressive";
 					value = 0;
 					default = 1;
 				};
 				class defensive
 				{
-					name = "defensive";
+					name = "Defensive";
 					value = 1;
 				};
 				class fortify
 				{
-					name = "fortify";
+					name = "Fortify";
 					value = 2;
 				};
 			};

@@ -1,4 +1,6 @@
-private ["_key","_x","_text"];
+private "_key";
+private "_x";
+private _text = "";
 disableSerialization;
 //Show key Binds
 for [{_x=8415},{_x<=8421},{_x=_x+1}]  do {

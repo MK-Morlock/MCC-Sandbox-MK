@@ -3,10 +3,19 @@
 // Example: [_group1] call MCC_fnc_countGroup;
 // _group1 = group, the group name
 //===========================================================================================================================================================================	
-private ["_group","_infantryCount","_vehicleCount","_tankCount","_airCount","_shipCount","_tempVehicles","_vehiclePic",
-		 "_pic","_tankPic","_airPic","_boatPic"];
+private _infantryCount = 0;
+private _vehicleCount = 0;
+private _tankCount = 0;
+private _airCount = 0;
+private _shipCount = 0;
+private _tempVehicles = [];
+private _vehiclePic = [];
+private _pic = "";
+private _tankPic = [];
+private _airPic = [];
+private _boatPic = [];
 
-_group 			= _this select 0; 
+params ["_group"]; 
 _infantryCount 	= 0;
 _vehicleCount	= 0;
 _tankCount		= 0;

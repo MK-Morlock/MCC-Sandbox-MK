@@ -1,7 +1,9 @@
-private ["_disp","_comboBox","_activeSides","_idc","_sidePlayer"];
+private _activeSides = [];
+private _idc = 0;
+private "_sidePlayer";
 disableSerialization;
 
-_disp = _this select 0;
+params ["_disp"];
 uiNamespace setVariable ["CP_RESPAWNPANEL_IDD", _disp];
 uiNamespace setVariable ["CP_ticketsWestText", _disp displayCtrl 1];
 uiNamespace setVariable ["CP_ticketsEastText", _disp displayCtrl 2];
@@ -85,8 +87,7 @@ MCC_CPMap_mouseMoving =
 
 MCC_CPMap_mouseUp =
 {
-	private ["_selected"];
-	_selected = missionNameSpace getVariable ["MCCSpawnPosSelected",[]];
+	private _selected = missionNameSpace getVariable ["MCCSpawnPosSelected",[]];
 	//Not a valid start location
 
 	if (typeName _selected == "ARRAY") exitWith {};
@@ -97,7 +98,9 @@ MCC_CPMap_mouseUp =
 
 MCC_fnc_CPMapOpen_draw =
 {
-	private ["_spawnArray","_textureAnimPhase","_color"];
+	private "_spawnArray";
+	private _textureAnimPhase = 0;
+	private _color = [];
 	_map = _this select 0;
 	_display = ctrlparent _map;
 	_time = diag_ticktime;
@@ -176,13 +179,13 @@ _map ctrladdeventhandler ["mouseholding","_this call MCC_CPMap_mouseMoving;"];
 _map ctrladdeventhandler ["MouseButtonUp","_this call MCC_CPMap_mouseUp;"];
 
 //Find relevent spawn points
-missionNamespace setVariable ["MCCActiveSpawnPosArray",[player] call BIS_fnc_getRespawnPositions];
+missionNamespace setVariable ["MCCActiveSpawnPosArray",[player] call MCC_fnc_respawnObjects];
 
 //Set side flag
 CP_flag ctrlSetText (missionNamespace getVariable [format ["CP_flag%1", _sidePlayer],""]);
 
 //Mission Name
-CP_missionName ctrlSetText missionName;
+CP_missionName ctrlSetText (if (briefingName != "") then {briefingName} else {missionName regexReplace ["%20", " "]});
 
 //Sets sides Tickets
 _activeSides = [] call MCC_fnc_getActiveSides;
@@ -220,7 +223,16 @@ if (missionNamespace getvariable ["CP_activated",false]) then {
 
 //Refresh
 [] spawn {
-	private ["_comboBox","_idc","_activeSides","_array","_disp","_ctrlGroup","_createGroupButton","_groupCtrls","_groupNames","_oldCommander","_commander","_pos"];
+	private _idc = 0;
+	private _activeSides = [];
+	private "_array";
+	private "_disp";
+	private _ctrlGroup = controlNull;
+	private _createGroupButton = {};
+	private _groupNames = [];
+	private _oldCommander = "";
+	private "_commander";
+	private "_pos";
 	disableSerialization;
 
 	_createGroupButton = {
@@ -237,10 +249,9 @@ if (missionNamespace getvariable ["CP_activated",false]) then {
 		_ctrl ctrlCommit 0;
 
 		//Join
-		_ctrl = _disp ctrlCreate ["RscButton",_idc+400,_buttonCtrlGroup];
-		_ctrl ctrlSetPosition [0.113*safezoneW, 0.003* safezoneH, 0.025 * safezoneW, _hight*0.8];
+		_ctrl = _disp ctrlCreate [(["MCC_RscButtonRoundSmall", "MCC_RscButtonRoundSmall3D"] select (profileNamespace getVariable ["MCC_consoleButtons", false])),_idc+400,_buttonCtrlGroup];	//rounded MCC button
+		_ctrl ctrlSetPosition [0.113*safezoneW, (_hight - 0.0219914 * safezoneH) / 2, 0.025 * safezoneW, 0.0219914 * safezoneH];
 		_ctrl ctrlsetText "Join";
-		_ctrl ctrlSetBackgroundColor [0,0,0,0.9];
 		_ctrl ctrlAddEventHandler ["MouseButtonClick",format ["['%1','%2',%3] spawn MCC_fnc_RSSquadJoin",netId _group, _groupName, _idc-500]];
 		_ctrl ctrlCommit 0;
 
@@ -273,8 +284,8 @@ if (missionNamespace getvariable ["CP_activated",false]) then {
 	if (!isNull ( missionNamespace getVariable ["CP_activeSpawn",objNull])) then {
 		_pos = position (missionNamespace getVariable ["CP_activeSpawn",objNull]);
 	} else {
-		if (count ([player] call BIS_fnc_getRespawnPositions)>0) then {
-			_pos = (position (([player] call BIS_fnc_getRespawnPositions) select (count ([player] call BIS_fnc_getRespawnPositions)-1)));
+		if (count ([player] call MCC_fnc_respawnObjects)>0) then {
+			_pos = (position (([player] call MCC_fnc_respawnObjects) select (count ([player] call MCC_fnc_respawnObjects)-1)));
 		};
 	};
 	CP_deployPanelMiniMap ctrlmapAnimAdd [0, 0.1, _pos];
@@ -287,7 +298,7 @@ if (missionNamespace getvariable ["CP_activated",false]) then {
 
 	while {dialog && (missionNamespace getVariable ["CP_respawnPanelOpen",false])} do {
 
-		missionNamespace setVariable ["MCCActiveSpawnPosArray",[player] call BIS_fnc_getRespawnPositions];
+		missionNamespace setVariable ["MCCActiveSpawnPosArray",[player] call MCC_fnc_respawnObjects];
 
 		//Load available resources
 		_array = call compile format ["MCC_res%1",playerside];
@@ -316,6 +327,7 @@ if (missionNamespace getvariable ["CP_activated",false]) then {
 		*/
 
 		//Time
+		//Mission time left (set by the mission with estimatedTimeLeft), 00:00:00 without a time limit - as in the original MCC
 		_t = if ((estimatedEndServerTime - serverTime)>0) then {[estimatedEndServerTime - serverTime] call MCC_fnc_time} else {"00:00:00"};
 		ctrlSetText [1919,_t];
 
@@ -331,7 +343,15 @@ if (missionNamespace getvariable ["CP_activated",false]) then {
 
 
 		//Groups
-		private ["_groups","_group","_xPos","_yPos","_space","_ctrl","_groupName","_ctrlUnits","_buttonCtrlGroup"];
+		private "_groups";
+		private "_group";
+		private _xPos = 0;
+		private _yPos = 0;
+		private "_space";
+		private _ctrl = controlNull;
+		private "_groupName";
+		private "_ctrlUnits";
+		private "_buttonCtrlGroup";
 		if (str (side player) == "ENEMY") then {player addrating (abs (rating player))};
 		_groups	 = switch (player getVariable ["CP_side", playerside]) do {
 						case west:			{CP_westGroups};

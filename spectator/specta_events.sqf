@@ -1,9 +1,8 @@
 // "for Spectating Script";
 // "Handles events such as keyboard keypresses";
-// "by Kegetys <kegetys [ät] dnainternet.net>";
+// "by Kegetys <kegetys [ï¿½t] dnainternet.net>";
 
-_type = _this select 0;
-_param = _this select 1;
+params ["_type", "_param"];
 
 _cCamera = 55002;
 _cTarget = 55003;
@@ -25,7 +24,14 @@ _UI = [_cCamera, _cTarget, _cName, KEGs_cLBCameras, KEGs_cLBTargets, _cCamerasBG
 
 KEGs_fnc_camMove2 = 
 {
-	private ["_coef","_zCoef","_dX","_dY","_dZ","_pos","_dir","_camPos"];
+	private _coef = 0;
+	private _zCoef = 0;
+	private "_dX";
+	private "_dY";
+	private "_dZ";
+	private "_pos";
+	private "_dir";
+	private _camPos = [];
 
 	if (KEGs_cameraNames select KEGs_cameraIdx == "Free") then
 	{
@@ -298,7 +304,7 @@ switch (_type) do
 				else
 				{
 					KEGSTagsScript = [] spawn KEGs_fnc_showUnitLocator;
-					lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTags, [1, 0.5, 0, 1]];
+					lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTags, [0.77, 0.51, 0.08, 1]];
 					KEGs_trackMarkerHandler = (findDisplay 55001 displayCtrl 55013) ctrladdeventhandler ["draw","_this call KEGS_fnc_trackUnits;"];
 				};
 			};
@@ -313,7 +319,7 @@ switch (_type) do
 					else
 					{
 						KEGSTagsStatScript = [] spawn KEGs_fnc_showCombatMode;
-						lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTagsStat, [1, 0.5, 0, 1]];
+						lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTagsStat, [0.77, 0.51, 0.08, 1]];
 					};
 			};
 			

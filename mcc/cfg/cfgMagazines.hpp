@@ -494,3 +494,4 @@ class MCC_battery : MCC_magazine
 	count = 1;
 	mass = 1;
 };
+*/

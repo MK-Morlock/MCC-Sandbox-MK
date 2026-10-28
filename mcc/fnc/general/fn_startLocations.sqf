@@ -4,7 +4,15 @@
   <IN>	Nothing
   <OUT>	Nothing
 =================================================================================================================================================================*/
-private ["_playerSideNr","_safePos","_null","_side","_startLocationName","_teleportAtStart","_helo","_cpActivated","_respawnDialog","_markerName","_pos","_respawnName","_starLoc","_openDialog"];
+private _playerSideNr = [];
+private _null = [];
+private _startLocationName = "";
+private _cpActivated = false;
+private _respawnDialog = false;
+private _markerName = "";
+private "_pos";
+private _respawnName = "";
+private _openDialog = {};
 
 if (!local player || missionNameSpace getVariable ["MCC_startLocationsRuning", false]) exitWith {};
 
@@ -13,9 +21,9 @@ waituntil {alive player && !(IsNull (findDisplay 46))};
 _playerSideNr =  [playerSide] call BIS_fnc_sideID;
 missionNameSpace setVariable ["MCC_startLocationsRuning", true];
 
-while {count ([player] call BIS_fnc_getRespawnPositions) < 1} do {sleep 1};
+while {count ([player] call MCC_fnc_respawnObjects) < 1} do {sleep 1};
 
-_startLocations = [player] call BIS_fnc_getRespawnPositions;
+_startLocations = [player] call MCC_fnc_respawnObjects;
 
 missionNameSpace setVariable ["MCC_startLocationsRuning", false];
 
@@ -39,8 +47,8 @@ if (!_cpActivated && _respawnDialog) then {
 		playerDeploy = false;
 		sleep 0.1;
 
-		_ok = createDialog "CP_RESPAWNPANEL";
-		if !(_ok) exitWith { hint "createDialog failed"; diag_log  "CP: create respawn Dialog failed";};
+		_ok = createDialog ("CP_RESPAWNPANEL" call MCC_fnc_dialogName);
+		if !(_ok) exitWith { hint "createDialog failed"; if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log  "CP: create respawn Dialog failed"};};
 
 		waituntil {playerDeploy};
 		closedialog 0;
@@ -86,7 +94,19 @@ switch (_playerSideNr) do {
     };
 };
 
-_pos = missionNamespace getVariable [_startLocationName,position player];
+// Only mark a start / base respawn when MCC actually has a start location for this side.
+// This used to fall back to "position player" and (re)create a local RESPAWN_<SIDE> marker there every time the player
+// respawned. The Respawn EH fires while the new unit is still at the death position (e.g. before the BI respawn menu
+// moves it), so the menu and BASE respawn got a "respawn_west" position where the player had died. It also deleted the
+// missions own respawn_<side> marker (locally) and replaced it.
+_pos = missionNamespace getVariable [_startLocationName, []];
+if !(_pos isEqualType [] && {count _pos >= 2} && {!(_pos isEqualTo [0,0,0])}) exitWith {
+	if (missionNamespace getVariable [format ["MCC_ownRespawnMarker_%1", _respawnName], false]) then {
+		deleteMarkerLocal _respawnName;
+		missionNamespace setVariable [format ["MCC_ownRespawnMarker_%1", _respawnName], false];
+	};
+	if (!isnil _markerName) then {deleteMarkerLocal _markerName};
+};
 
 if (!isnil _markerName) then {deleteMarkerLocal _markerName};
 missionNamespace setVariable [_markerName,createMarkerLocal [_markerName, _pos]];
@@ -94,11 +114,12 @@ _markerName setMarkerShapeLocal "ICON";
 _markerName setMarkerTypeLocal  "mil_start";
 _markerName setMarkerColorLocal "ColorGreen";
 
-//create the respawn locations
-
-if (str getMarkerPos _respawnName != "[0,0,0]") then {deleteMarkerLocal _respawnName};
-//missionNamespace setVariable [_respawnName,createMarkerLocal [_respawnName, _pos]];
-createMarkerLocal [_respawnName, _pos];
-_respawnName setMarkerShapeLocal "ICON";
-_respawnName setMarkerTypeLocal  "mil_objective";
-_respawnName setMarkerColorLocal "ColorRed";
+//create the respawn location at the start location - unless the mission has its own respawn_<side> marker
+if ((getMarkerPos _respawnName) isEqualTo [0,0,0] || {missionNamespace getVariable [format ["MCC_ownRespawnMarker_%1", _respawnName], false]}) then {
+	deleteMarkerLocal _respawnName;
+	createMarkerLocal [_respawnName, _pos];
+	_respawnName setMarkerShapeLocal "ICON";
+	_respawnName setMarkerTypeLocal  "mil_objective";
+	_respawnName setMarkerColorLocal "ColorRed";
+	missionNamespace setVariable [format ["MCC_ownRespawnMarker_%1", _respawnName], true];
+};

@@ -4,7 +4,15 @@
 #define MCC_TASKS_ICON 30581
 
 disableSerialization;
-private ["_actionID", "_dlg", "_stringName", "_stringDescription", "_taskState", "_comboBox","_taskID","_taskType","_mccTasks"];
+private _actionID = 0;
+private "_dlg";
+private _stringName = controlNull;
+private _stringDescription = controlNull;
+private "_taskState";
+private _comboBox = controlNull;
+private "_taskID";
+private _taskType = "";
+private _mccTasks = [];
 _actionID = param [0,-1,[0]];
 _dlg = (uiNamespace getVariable "MCC_groupGen_Dialog");
 
@@ -66,7 +74,7 @@ switch (true) do {
 		stringDescription = _mccTasks select (lbCurSel MCC_TASKS_LIST) select 2;
 		typ = _actionID;
 
-		hint "Left click on the map to set a WP for this Task";
+		hint "Left-click on the map to set a waypoint for this task";
 
 		if (MCC_capture_state) then {
 			onMapSingleClick " 	hint 'Wp captured.';
@@ -127,16 +135,16 @@ switch (true) do {
 		if (MCC_capture_state) then
 		{
 			MCC_capture_var = MCC_capture_var + FORMAT ['
-							[["everyonewon"], "BIS_fnc_endMissionServer", false, false] spawn BIS_fnc_MP;
+							["everyonewon"] remoteExec ["BIS_fnc_endMissionServer", 2, false];
 							'
 							];
 		} else {
-			private "_answer";
-			_answer = ["<t font='TahomaB'>Are you sure you want to end the mission?</t>","End Mission - Succeeded",nil,true] call BIS_fnc_guiMessage;
+			private _answer = nil;
+			_answer = ["<t size='0.8' align='center'>Are you sure you want to end the mission?</t>","End Mission - Succeeded",nil,true,true] call MCC_fnc_messageBox;
 			waituntil {!isnil "_answer"};
 
 			if (_answer) then {
-				[["everyonewon"], "BIS_fnc_endMissionServer", false, false] spawn BIS_fnc_MP;
+				["everyonewon"] remoteExec ["BIS_fnc_endMissionServer", 2, false];
 			};
 		};
 	};
@@ -146,16 +154,16 @@ switch (true) do {
 	{
 		if (MCC_capture_state) then {
 			MCC_capture_var = MCC_capture_var + FORMAT ['
-								[["everyonelost"], "BIS_fnc_endMissionServer", false, false] spawn BIS_fnc_MP;
+								["everyonelost"] remoteExec ["BIS_fnc_endMissionServer", 2, false];
 								'
 								];
 		} else {
-			private "_answer";
-			_answer = ["<t font='TahomaB'>Are you sure you want to end the mission?</t>","End Mission - Fail",nil,true] call BIS_fnc_guiMessage;
+			private _answer = nil;
+			_answer = ["<t size='0.8' align='center'>Are you sure you want to end the mission?</t>","End Mission - Failed",nil,true,true] call MCC_fnc_messageBox;
 			waituntil {!isnil "_answer"};
 
 			if (_answer) then {
-				[["everyonelost"], "BIS_fnc_endMissionServer", false, false] spawn BIS_fnc_MP;
+				["everyonelost"] remoteExec ["BIS_fnc_endMissionServer", 2, false];
 			};
 		};
 	};

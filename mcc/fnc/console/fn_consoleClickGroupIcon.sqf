@@ -15,15 +15,28 @@
 #define MCC_CONSOLEINFOTEXT 9150
 #define MCC_CONSOLEINFOLIVEFEED 9151
 #define MCC_CONSOLEINFOUAVCONTROL 9162
-private ["_mccdialog","_group","_button","_posX","_posY","_shift","_ctrl","_alt","_html","_info","_rank","_icon","_groupControl","_groupSize","_properCfg","_lineCounter","_rtsMenuOpen"];
+private _mccdialog = controlNull;
+private "_posX";
+private "_posY";
+private "_shift";
+private "_ctrl";
+private "_alt";
+private _html = "";
+private _info = [];
+private _rank = [];
+private "_icon";
+private _groupControl = nil;
+private _groupSize = "";
+private _properCfg = 0;
+private _lineCounter = 0;
+private "_rtsMenuOpen";
 disableSerialization;
 
 if (MCC_Console1Open) then {_mccdialog = findDisplay mcc_playerConsole_IDD};
 if (MCC_Console2Open) then {_mccdialog = findDisplay mcc_playerConsole2_IDD};
 if (MCC_Console3Open) then {_mccdialog = findDisplay mcc_playerConsole3_IDD};
 
-_group = _this select 0;
-_button = _this select 1;
+params ["_group", "_button"];
 _posX = (_this select 2) select 0;
 _posY = (_this select 2) select 1;
 _shift = _this select 3;
@@ -184,7 +197,8 @@ if (_button == 1) then {
 		};
 	};
 
-	private ["_UIFactor","_ctrl","_displayname"];
+	private "_UIFactor";
+	private _ctrl = controlNull;
 
 	_UIFactor = (0.02 * _lineCounter)* safezoneH;
 
@@ -212,7 +226,7 @@ if (_button == 1) then {
 	{
 		_ctrl = _mccdialog displayctrl MCC_CONSOLEINFOLIVEFEED;
 		_ctrl ctrlShow true;
-		_ctrl ctrlSetPosition [_posX + (0.005 * safezoneW), _posY + (_UIFactor + (0.05 * safezoneH)),0.06 * safezoneW,0.03 * safezoneH];
+		_ctrl ctrlSetPosition [_posX + (0.005 * safezoneW), _posY + (_UIFactor + (0.055 * safezoneH)),0.045 * safezoneW,0.0219914 * safezoneH];	//small button, text centred
 		_ctrl ctrlCommit 0;
 		//ctrlsetFocus _ctrl;
 	};
@@ -224,7 +238,7 @@ if (_button == 1) then {
 		MCC_ConolseUAV disableAI "AUTOTARGET";
 		_ctrl = _mccdialog displayctrl MCC_CONSOLEINFOUAVCONTROL;
 		_ctrl ctrlShow true;
-		_ctrl ctrlSetPosition [_posX + (0.07 * safezoneW), _posY + (_UIFactor + (0.05 * safezoneH)),0.07 * safezoneW,0.03 * safezoneH];
+		_ctrl ctrlSetPosition [_posX + (0.055 * safezoneW), _posY + (_UIFactor + (0.0485 * safezoneH)),0.07 * safezoneW,0.0329871 * safezoneH];	//standard height: text centred
 		_ctrl ctrlCommit 0;
 		//ctrlsetFocus _ctrl;
 	};

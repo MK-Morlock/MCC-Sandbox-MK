@@ -6,6 +6,8 @@ class MCC_Module_createIntel : Module_F
 	scope = 2;
 	isGlobal = 0;
 
+	// Attribute "property" names must be unique across Eden. They were plain "text", "marker", "delete"... which other
+	// attributes also use, so the intel text reset to "Text" on reload (GitHub #64). The module variables keep their names.
 	class Attributes : AttributesBase
 	{
 		class shared : Combo
@@ -13,7 +15,7 @@ class MCC_Module_createIntel : Module_F
 			displayName = "Shared With";
 			description = "Who will get the intel notification";
 			typeName = "NUMBER";
-			property = "shared";
+			property = "MCC_createIntel_shared";
 
 			class values
 			{
@@ -41,7 +43,7 @@ class MCC_Module_createIntel : Module_F
 			displayName = "Intel's Tittle";
 			typeName = "STRING";
 			defaultValue = """Tittle""";
-			property = "tittle";
+			property = "MCC_createIntel_tittle";
 		};
 
 		class text : Edit
@@ -49,7 +51,7 @@ class MCC_Module_createIntel : Module_F
 			displayName = "Intel's Text";
 			typeName = "STRING";
 			defaultValue = """Text""";
-			property = "text";
+			property = "MCC_createIntel_text";
 		};
 
 		class marker : Edit
@@ -57,7 +59,7 @@ class MCC_Module_createIntel : Module_F
 			displayName = "Marker Name";
 			typeName = "STRING";
 			defaultValue = """Marker""";
-			property = "marker";
+			property = "MCC_createIntel_marker";
 		};
 
 		class delete : Checkbox
@@ -65,7 +67,7 @@ class MCC_Module_createIntel : Module_F
 			displayName = "Delete Object After";
 			description = "Should the object be deleted after using it";
 			typeName = "BOOL";
-			property = "delete";
+			property = "MCC_createIntel_delete";
 		};
 
 		class ModuleDescription: ModuleDescription{};
@@ -73,7 +75,7 @@ class MCC_Module_createIntel : Module_F
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Sync it with any object or unit to create an intel. Players can interact with it and  get info";
+		description = "Sync it with any object or unit to create an intel. Players can interact with it and get info";
 		sync[] = {"Anything"};
 
 		class Anything

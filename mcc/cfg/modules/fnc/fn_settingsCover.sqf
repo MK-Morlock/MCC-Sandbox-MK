@@ -3,7 +3,8 @@
 // Example: [] call MCC_fnc_settingsCover;
 // _group1 = group, the group name
 //==============================================================================================================================================================
-private ["_module","_var"];
+private _module = objNull;
+private _var = 0;
 
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {deleteVehicle _module};
@@ -63,7 +64,8 @@ if (typeName (_module getVariable ["cover",true]) == typeName 0) exitWith {
 
 	//Disable Fatigue
 	MCC_disableFatigue = ((_module getvariable ["fatigue",0])==1);
-	player enableFatigue !(missionNamespace getVariable ["MCC_disableFatigue",false]);
+	player enableStamina !(missionNamespace getVariable ["MCC_disableFatigue",false]);
+	["INFO", "fn_settingsCover", "Mechanics module: stamina %1", [["ON","OFF"] select MCC_disableFatigue]] call MCC_fnc_log;
 
 	//Breaching Ammo
 	MCC_breacingAmmo = call compile (_module getvariable ["breachingAmmo","[]"]);
@@ -124,6 +126,6 @@ publicvariable "MCC_surviveModAllowSearch";
           ];
 
 //Fatigue
-{player enableFatigue !(missionNamespace getVariable ["MCC_disableFatigue",false])} remoteExec ["bis_fnc_call", 0];
+{player enableStamina !(missionNamespace getVariable ["MCC_disableFatigue",false])} remoteExec ["bis_fnc_call", 0];
 
 deleteVehicle _module;

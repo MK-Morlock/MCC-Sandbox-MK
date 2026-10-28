@@ -205,10 +205,10 @@ class HW_RscListBox {
 		color[] = {1, 1, 1, 0.6};
 		colorActive[] = {1, 1, 1, 1};
 		colorDisabled[] = {1, 1, 1, 0.3};
-		thumb = "\ca\ui\data\ui_scrollbar_thumb_ca.paa";
-		arrowFull = "\ca\ui\data\ui_arrow_top_active_ca.paa";
-		arrowEmpty = "\ca\ui\data\ui_arrow_top_ca.paa";
-		border = "\ca\ui\data\ui_border_scroll_ca.paa";
+		thumb = "\A3\ui_f\data\gui\cfg\scrollbar\thumb_ca.paa";
+		arrowFull = "\A3\ui_f\data\gui\cfg\scrollbar\arrowFull_ca.paa";
+		arrowEmpty = "\A3\ui_f\data\gui\cfg\scrollbar\arrowEmpty_ca.paa";
+		border = "\A3\ui_f\data\gui\cfg\scrollbar\border_ca.paa";
 	};
 };
 
@@ -228,10 +228,10 @@ class HW_RscGUIListBox : HW_RscListBox {
 		color[] = {1, 1, 1, 0.6};
 		colorActive[] = {1, 1, 1, 1};
 		colorDisabled[] = {1, 1, 1, 0.3};
-		thumb = "\ca\ui\data\igui_scrollbar_thumb_ca.paa";
-		arrowFull = "\ca\ui\data\igui_arrow_top_active_ca.paa";
-		arrowEmpty = "\ca\ui\data\igui_arrow_top_ca.paa";
-		border = "\ca\ui\data\igui_border_scroll_ca.paa";
+		thumb = "\A3\ui_f\data\gui\cfg\scrollbar\thumb_ca.paa";
+		arrowFull = "\A3\ui_f\data\gui\cfg\scrollbar\arrowFull_ca.paa";
+		arrowEmpty = "\A3\ui_f\data\gui\cfg\scrollbar\arrowEmpty_ca.paa";
+		border = "\A3\ui_f\data\gui\cfg\scrollbar\border_ca.paa";
 	};
 };
 
@@ -248,18 +248,18 @@ class HW_RscComboBox : HW_RscText {
 		soundSelect[] = {"", 0.0, 1};
 		soundExpand[] = {"", 0.0, 1};
 		soundCollapse[] = {"", 0.0, 1};
-		arrowEmpty = "\ca\ui\data\ui_arrow_combo_ca.paa";
-		arrowFull = "\ca\ui\data\ui_arrow_combo_active_ca.paa";
+		arrowEmpty = "\A3\ui_f\data\GUI\RscCommon\RscCombo\arrow_combo_ca.paa";
+		arrowFull = "\A3\ui_f\data\GUI\RscCommon\RscCombo\arrow_combo_active_ca.paa";
 		maxHistoryDelay = 1;
 		class ScrollBar
 		{
 			color[] = {1, 1, 1, 0.6};
 			colorActive[] = {1, 1, 1, 1};
 			colorDisabled[] = {1, 1, 1, 0.3};
-			thumb = "\ca\ui\data\ui_scrollbar_thumb_ca.paa";
-			arrowFull = "\ca\ui\data\ui_arrow_top_active_ca.paa";
-			arrowEmpty = "\ca\ui\data\ui_arrow_top_ca.paa";
-			border = "\ca\ui\data\ui_border_scroll_ca.paa";
+			thumb = "\A3\ui_f\data\gui\cfg\scrollbar\thumb_ca.paa";
+			arrowFull = "\A3\ui_f\data\gui\cfg\scrollbar\arrowFull_ca.paa";
+			arrowEmpty = "\A3\ui_f\data\gui\cfg\scrollbar\arrowEmpty_ca.paa";
+			border = "\A3\ui_f\data\gui\cfg\scrollbar\border_ca.paa";
 		};
 	};
 
@@ -299,22 +299,22 @@ class HW_RscShortcutButton {
 		right = 0.005;
 		bottom = 0.005;
 	};
-	animTextureNormal = "\ca\ui\data\ui_button_normal_ca.paa";
-	animTextureDisabled = "\ca\ui\data\ui_button_disabled_ca.paa";
-	animTextureOver = "\ca\ui\data\ui_button_over_ca.paa";
-	animTextureFocused = "\ca\ui\data\ui_button_focus_ca.01.paa";
-	animTexturePressed = "\ca\ui\data\ui_button_down_ca.paa";
-	animTextureDefault = "\ca\ui\data\ui_button_default_ca.paa";
+	animTextureNormal = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\normal_ca.paa";
+	animTextureDisabled = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\normal_ca.paa";
+	animTextureOver = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\over_ca.paa";
+	animTextureFocused = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\focus_ca.paa";
+	animTexturePressed = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\down_ca.paa";
+	animTextureDefault = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\normal_ca.paa";
 	textureNoShortcut = "";
 	period = 0.4;
 	font = "Zeppelin32";
 	size = 0.03521;
 	sizeEx = 0.03521;
 	text = "";
-	soundEnter[] = {"\ca\ui\data\sound\mouse2", 0.09, 1};
-	soundPush[] = {"\ca\ui\data\sound\new1", 0.09, 1};
-	soundClick[] = {"\ca\ui\data\sound\mouse3", 0.07, 1};
-	soundEscape[] = {"\ca\ui\data\sound\mouse1", 0.09, 1};
+	soundEnter[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundEnter", 0.09, 1};
+	soundPush[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundPush", 0.09, 1};
+	soundClick[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundClick", 0.09, 1};
+	soundEscape[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundEscape", 0.09, 1};
 	action = "";
 	
 	class Attributes {
@@ -361,13 +361,13 @@ class HW_RscGUIShortcutButton : HW_RscShortcutButton {
 		right = 0.002;
 		bottom = 0.016;
 	};
-	animTextureNormal = "\ca\ui\data\igui_button_normal_ca.paa";
-	animTextureDisabled = "\ca\ui\data\igui_button_disabled_ca.paa";
-	animTextureOver = "\ca\ui\data\igui_button_over_ca.paa";
-	animTextureFocused = "\ca\ui\data\igui_button_focus_ca.paa";
-	animTexturePressed = "\ca\ui\data\igui_button_down_ca.paa";
-	animTextureDefault = "\ca\ui\data\igui_button_normal_ca.paa";
-	animTextureNoShortcut = "\ca\ui\data\igui_button_normal_ca.paa";
+	animTextureNormal = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\normal_ca.paa";
+	animTextureDisabled = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\normal_ca.paa";
+	animTextureOver = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\over_ca.paa";
+	animTextureFocused = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\focus_ca.paa";
+	animTexturePressed = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\down_ca.paa";
+	animTextureDefault = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\normal_ca.paa";
+	animTextureNoShortcut = "\A3\ui_f\data\GUI\RscCommon\RscShortcutButton\normal_ca.paa";
 	
 	class Attributes {
 		font = "Zeppelin32";

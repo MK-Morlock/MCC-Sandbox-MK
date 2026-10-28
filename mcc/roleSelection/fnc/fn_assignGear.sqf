@@ -4,8 +4,9 @@
 //roleNumber: 0-officer, 1-AR, 2-Rifleman, 3-AT, 4-medic, 5-marksman, 6- specialist, 7- crewman, 8-pilot
 // Gear: 0- select, 1-gear, 2-uniform
 //======================================================================================================================================================================
-private ["_role","_muzzles","_wepItems","_currentWeapon"];
-_role = _this select 0;
+private "_wepItems";
+private "_currentWeapon";
+params ["_role"];
 
 //Remove weapons/items/goggles
 removeAllWeapons player;
@@ -120,3 +121,4 @@ if (!isnil "_currentWeapon") then {
 //Select Primary weapon
 player selectweapon primaryweapon player;
 player switchmove "AidlPercMstpSlowWrflDnon_G03";
+*/

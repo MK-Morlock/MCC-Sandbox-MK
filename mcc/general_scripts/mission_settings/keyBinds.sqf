@@ -8,7 +8,10 @@
 #define MCC_keyBindsGroupsButtonIDC 8418
 #define MCC_keyBindsMCCinteractionIDC 8419
 
-private ["_type","_keyDown","_ctrl","_display"];
+private "_type";
+private _keyDown = {};
+private "_ctrl";
+private "_display";
 disableSerialization;
 
 _type = _this select 1;
@@ -16,7 +19,16 @@ _type = _this select 1;
 if (_type ==7) exitWith {MCC_cover = false; ctrlEnable [8499,false]};
 MCC_functionName_keyDown =
 {
-    private ["_text","_textKey", "_ctrl", "_dikCode", "_shift", "_ctrlKey", "_alt","_keyVarable","_ctrlType","_array"];
+    private _text = "";
+    private "_textKey";
+    private "_ctrl";
+    private "_dikCode";
+    private "_shift";
+    private "_ctrlKey";
+    private "_alt";
+    private "_keyVarable";
+    private "_ctrlType";
+    private _array = [];
 	_keyVarable  = _this select 0;
 	_ctrlType	 = _this select 1;
 

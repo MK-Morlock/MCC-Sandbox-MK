@@ -1,11 +1,25 @@
 //==================================================================MCC_fnc_ppEffects===============================================================================================
 // Create effects to all players
-//Example:[[_effect, _jip],"MCC_fnc_ppEffects",true,false] call BIS_fnc_MP;
+//Example:[_effect, _jip] remoteExec ["MCC_fnc_ppEffects", true, false];
 //	<IN>
 // 		_effect =  effectType, String: "sandstorm", "bf"
 // 		_jip=	Boolean, is it a JIP player or not (JIP player will not change weather as sync function already does that)
 //==================================================================================================================================================================================
-private ["_effect","_effects","_handle","_colorParams","_grainParams","_parray","_jip","_dust","_ash","_news","_radialParams","_mist","_leaves","_fog","_wind"];
+private _effect = "";
+private _effects = [];
+private _handle = objNull;
+private _colorParams = [];
+private _grainParams = [];
+private _parray = [];
+private _jip = false;
+private _dust = false;
+private _ash = false;
+private _news = false;
+private _radialParams = [];
+private _mist = false;
+private _leaves = false;
+private _fog = false;
+private _wind = false;
 _effect = param [0,"",[]];
 _jip	= param [1,false,[false]];
 _radialParams = [];
@@ -463,7 +477,7 @@ if (_fog) then {
 if (_ash) then {
 	//--- Ash
 	[_effect,_parray] spawn {
-		private ["_snow1"];
+		private _snow1 = "";
 		_effect = _this select 0;
 		_parray = _this select 1;
 

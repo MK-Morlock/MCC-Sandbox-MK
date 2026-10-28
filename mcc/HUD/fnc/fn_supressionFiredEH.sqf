@@ -13,7 +13,11 @@ params [
         "_magazine",
         "_projectile"
     ];
-private ["_cfg","_hit","_distance","_projectiles","_dirTo"];
+private _cfg = configNull;
+private _hit = 0;
+private "_distance";
+private _projectiles = [];
+private _dirTo = [];
 
 if (isNull _projectile) then {
      _projectile = nearestObject [_unit, _ammo];

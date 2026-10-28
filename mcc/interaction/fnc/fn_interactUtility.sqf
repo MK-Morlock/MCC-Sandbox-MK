@@ -2,9 +2,11 @@
 // Interaction with utility object
 // Example: [_object] spawn MCC_fnc_interactUtility;
 //============================================================================================================================================================================
-private ["_object","_array","_ok","_ctrl","_class","_displayname","_pic","_index","_item","_cfg","_objectClass"];
+private _array = [];
+private _cfg = configNull;
+private "_objectClass";
 disableSerialization;
-_object 	= _this select 0;
+params ["_object"];
 if (vehicle player != player) exitWith {};
 
 if ((missionNamespace getVariable ["MCC_interactionKey_holding",false]) && !(_object getVariable ["MCC_isInteracted",false]) && (player distance  _object < 5) && !dialog) exitWith {

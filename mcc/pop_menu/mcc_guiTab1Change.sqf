@@ -6,10 +6,15 @@
 #define SPAWNBRANCH 1003
 #define SPAWNCLASS 1004
 
-private ["_group", "_type", "_comboBox", "_mccdialog", "_groupArray","_displayname","_index","_task"];
+private _type = 0;
+private _comboBox = controlNull;
+private _mccdialog = controlNull;
+private _groupArray = [];
+private _displayname = "";
+private _index = 0;
 disableSerialization;
 
-_task =_this select 0;
+params ["_task"];
 _mccdialog = findDisplay MCC_SANDBOX_IDD;	
 
 if ((_task ==0) && (MCC_faction_index != lbCurSel FACTIONCOMBO)) then					//Change Faction
@@ -18,6 +23,7 @@ if ((_task ==0) && (MCC_faction_index != lbCurSel FACTIONCOMBO)) then					//Chan
 	mcc_faction = (U_FACTIONS select (lbCurSel FACTIONCOMBO)) select 2;
 	MCC_faction_index = lbCurSel FACTIONCOMBO;
 	[] call mcc_fnc_faction_choice;
+	if (!isNull (findDisplay 2994)) then {isNil {["sync"] call MCC_fnc_spawnLists}};
 };
 	
 if ((_task ==1)&& (MCC_type_index != lbCurSel SPAWNTYPE)) then																	//Change Type
@@ -368,7 +374,7 @@ if (_task ==2) then 											//Change Branch Units
 					{
 					_comboBox = _mccdialog displayCtrl SPAWNCLASS;
 					lbClear _comboBox;
-					private "_counter";
+					private _counter = 0;
 					_counter = 0;
 						{
 							if (MCC_faction == (_x select 0)) then

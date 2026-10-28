@@ -9,7 +9,7 @@
 //_alt = boolean
 //==================================================================================================================================================================================
 #define groupGen_IDD 2994
-#define MCC_GroupGenInfoText_IDC 9013
+#define MCC_GroupGenInfoText_IDC 9190
 #define MCC_GroupGenInfo_IDC 530
 #define MCC_GroupGenInfo_zone_IDC 5311
 #define MCC_GroupGenInfo_gaiaBehaviorCombo_IDC 5312
@@ -19,13 +19,24 @@
 #define MCC_GroupGenInfo_giveToPlayer_IDC 5316
 #define MCC_GroupGenInfo_cacheButton_IDC 5317
 
-private ["_mccdialog","_group","_button","_posX","_posY","_shift","_ctrl","_alt","_html","_info","_rank","_icon","_groupSize","_properCfg","_lineCounter"];
+private _mccdialog = controlNull;
+private _posX = 0;
+private _posY = 0;
+private _shift = false;
+private _ctrl = controlNull;
+private _alt = false;
+private _html = "";
+private _info = [];
+private _rank = [];
+private _icon = 0;
+private _groupSize = "";
+private _properCfg = 0;
+private _lineCounter = 0;
 disableSerialization;
 
 _mccdialog = findDisplay groupGen_IDD;
 
-_group = _this select 0;
-_button = _this select 1;
+params ["_group", "_button"];
 _posX = (_this select 2) select 0;
 _posY = (_this select 2) select 1;
 _shift = _this select 3;
@@ -62,7 +73,7 @@ if (_button == 1) then 											//Right click - get info
 		_rank =[leader _group,"displayNameShort"] call BIS_fnc_rankParams;
 
 		_groupSize	= gettext (configfile >> "CfgMarkers" >> ((_group getvariable "MCCgroupIconSize") select 1) >> "name");
-		_html = "<t color='#818960' size='1' shadow='1' align='center' underline='true'>" +groupID _group + " - " + toupper _groupSize +"</t><br/>";
+		_html = "<t color='#809966' size='1' shadow='1' align='center' underline='true'>" +groupID _group + " - " + toupper _groupSize +"</t><br/>";
 
 		_info = [_group] call MCC_fnc_countGroupHC;
 		if (_info select 0 == 0 && _info select 1 == 0 && _info select 2 == 0 && _info select 3 == 0 && _info select 4 == 0 && _info select 5 == 0 && _info select 6 == 0 && _info select 7 == 0) then
@@ -76,7 +87,7 @@ if (_button == 1) then 											//Right click - get info
 		_lineCounter = 0;
 
 		//Infantry
-		private "_infCount";
+		private _infCount = 0;
 		_infCount = if (_properCfg > 5) then {(_info select 0) + (_info select 5)} else {(_info select 0)};
 
 		if (_infCount > 0) then
@@ -159,7 +170,9 @@ if (_button == 1) then 											//Right click - get info
 			};
 		};
 
-		private ["_UIFactor","_ctrl","_displayname"];
+		private _UIFactor = 0;
+		private _ctrl = controlNull;
+		private _displayname = "";
 
 		_UIFactor = (0.02 * _lineCounter)* safezoneH;
 
@@ -201,20 +214,17 @@ if (_button == 1) then 											//Right click - get info
 
 		//Reveal GAIA Respawn numbers
 		_ctrl = _mccdialog displayctrl MCC_GroupGenInfo_gaiaRespawnCombo_IDC;
-		_ctrl ctrlSetPosition [(0.002 * safezoneW), _UIFactor + (0.1 * safezoneH) ,0.0458333 * safezoneW,0.0219914 * safezoneH];
+		_ctrl ctrlSetPosition [(0.002 * safezoneW), _UIFactor + (0.1 * safezoneH) ,0.163 * safezoneW,0.0219914 * safezoneH];
 		_ctrl ctrlCommit 0;
 
+		MCC_GAIARespawnFilling = true;
 		lbClear _ctrl;
 		{
-			_displayname = format ["%1",_x];
-			_ctrl lbAdd _displayname;
+			_ctrl lbAdd format ["Respawns: %1", [str _x, "unlimited"] select (_x == 999)];
 		} foreach [0,1,2,3,4,5,6,7,8,9,10,999];
-		_ctrl lbSetCurSel 0;
-
-		//Reveal GAIA Button
-		_ctrl = _mccdialog displayctrl MCC_GroupGenInfo_gaiaRespawnComboButton_IDC;
-		_ctrl ctrlSetPosition [(0.07 * safezoneW), _UIFactor + (0.1 * safezoneH) ,0.095 * safezoneW,0.0219914 * safezoneH];
-		_ctrl ctrlCommit 0;
+		private _curResp = (MCC_GroupGenGroupSelected param [0, grpNull]) getVariable ["MCC_GAIA_RESPAWN", 0];
+		_ctrl lbSetCurSel ([(_curResp min 10) max 0, 11] select (_curResp > 10));
+		MCC_GAIARespawnFilling = false;
 
 		//Reveal Player Button
 		_ctrl = _mccdialog displayctrl MCC_GroupGenInfo_giveToPlayer_IDC;

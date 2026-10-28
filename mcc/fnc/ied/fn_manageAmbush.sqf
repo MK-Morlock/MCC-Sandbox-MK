@@ -10,14 +10,11 @@
 // Return - nothing
 //Made by Shay_Gman (c) 06.14
 //========================================================================================================================================================================================
-private ["_leader","_iedMarkerName","_groupDir","_pointB","_isSpotter","_targetSide","_group","_move","_dummyAmbush","_init"]; 
+private _group = grpNull;
+private _move = "";
+private _dummyAmbush = nil;
 
-_leader			= _this select 0;
-_iedMarkerName 	= _this select 1;
-_groupDir 		= _this select 2;
-_pointB 		= _this select 3;
-_isSpotter 		= _this select 4;
-_targetSide		= _this select 5;
+params ["_leader", "_iedMarkerName", "_groupDir", "_pointB", "_isSpotter", "_targetSide"];
 
 _move			= "AWOPPERCMSTPSOPTWBINDNON_NON"; //defualt bino use when standing		
 _group			= group _leader;
@@ -60,7 +57,7 @@ if (_isSpotter > 0) then
 	{													//If it is a spotter make him use the binos for time 2 time
 		while {alive (_this select 0)} do 
 		{
-			sleep (random 60) + 15; 
+			sleep ((random 60) + 15); 
 			(_this select 0) playmove format ["%1",(_this select 1)]; 
 		};
 	};
@@ -75,7 +72,7 @@ else //If not all prone
 //Sync it with pre-sync IED
 if (str (_leader getVariable ["syncedObject", [0,0,0]]) != "[0,0,0]") then
 {
-	[[getpos _leader , (_leader getVariable ["syncedObject", [0,0,0]])],"MCC_fnc_iedSync",false,false] call BIS_fnc_MP;
+	[getpos _leader , (_leader getVariable ["syncedObject", [0,0,0]])] remoteExec ["MCC_fnc_iedSync", 2, false];
 };
 
 [_dummyAmbush,_leader,_group,_isSpotter,_pointB] spawn

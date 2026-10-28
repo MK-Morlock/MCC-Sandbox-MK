@@ -12,7 +12,15 @@
 //==============================================================================================================================================================*/
 #define    MCC_RTS_BUILDING_DUMMY_ANCHOR    "UserTexture10m_F"
 
-private ["_buildings","_playerSide","_resourceType","_returnValue","_subTotal","_type","_returnBuildings","_buildingsReturned","_subBuildings"];
+private _buildings = [];
+private "_playerSide";
+private _resourceType = "";
+private _returnValue = [];
+private _subTotal = 0;
+private "_type";
+private _returnBuildings = false;
+private _buildingsReturned = [];
+private _subBuildings = [];
 _resourceType = param [0,"",["",[]]];
 _playerSide = param [1,sideLogic,[sideLogic]];
 _returnBuildings = param [2,false,[false]];

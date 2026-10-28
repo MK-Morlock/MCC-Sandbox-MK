@@ -2,11 +2,7 @@
 // INPUT: x-coord, y-coord, direction, distance, height difference
 // OUTPUT: the vector of [x-coord,y-coord] + distance in the direction
 
-_xpos = _this select 0;
-_ypos = _this select 1;
-_dir = _this select 2;
-_dist = _this select 3;
-_height = _this select 4;
+params ["_xpos", "_ypos", "_dir", "_dist", "_height"];
 
 
 // using Pythagoras' a^2+b^2=c^2 to compensate height dispersion

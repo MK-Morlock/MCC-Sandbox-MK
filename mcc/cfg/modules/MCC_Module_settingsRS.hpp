@@ -15,7 +15,7 @@ class MCC_Module_settingsRS : Module_F
 		class rsAllWeapons
 		{
 			displayName = "All Weapons";
-			description = "Unlock all weapons and gear regarding player level";
+			description = "Unlock all weapons and gear regardless of player level";
 			typeName = "NUMBER";
 			class values
 			{
@@ -78,7 +78,7 @@ class MCC_Module_settingsRS : Module_F
 		class rsEnableRoleWeapons
 		{
 			displayName = "Limit Weapons";
-			description = "Enable penalty for picking heavy weapons not from your kit";
+			description = "Enable a penalty for picking up heavy weapons that are not from your kit";
 			typeName = "NUMBER";
 			class values
 			{
@@ -99,7 +99,7 @@ class MCC_Module_settingsRS : Module_F
 		class rsEnableDriversPilots
 		{
 			displayName = "Restrict Drivers/Pilots";
-			description = "Enable only drivers/pilots and pilot can operate tanks/helicopters";
+			description = "Only drivers can operate tanks and only pilots can fly helicopters";
 			typeName = "NUMBER";
 			class values
 			{

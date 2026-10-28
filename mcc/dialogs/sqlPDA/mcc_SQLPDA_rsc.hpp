@@ -33,8 +33,6 @@ class MCC_SQLPDA_rsc
 		class MCC_sqlpdaMap : MCC_RscMapControl {
 			idc = MCC_MINIMAP;
 			moving = true;
-			colorBackground[] = { 1, 1, 1, 1};
-			colorText[] = { 1, 1, 1, 0};
 			x = 0.139062 * safezoneW + safezoneX;
 			y = 0.533 * safezoneH + safezoneY;
 			w = 0.27 * safezoneW;
@@ -44,5 +42,13 @@ class MCC_SQLPDA_rsc
 			onMouseButtonDblClick = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\pda\mouseDblClick.sqf'");
 			onMouseMoving = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\pda\mouseMoving.sqf'");
 		};
+		class MCC_mapContour : MCC_sqlpdaMap
+		{
+			idc = 9130;
+			maxSatelliteAlpha = 0;
+			colorOutside[] = {0.718,0.794,0.900,1};
+			colorBackground[] = {0.969,0.957,0.949,1};
+		};
+
 	};
 };

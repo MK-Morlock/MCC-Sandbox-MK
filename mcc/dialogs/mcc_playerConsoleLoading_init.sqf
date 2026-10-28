@@ -1,4 +1,8 @@
-private ["_mccdialog","_message","_messageFinal","_time","_ok"];
+private _mccdialog = controlNull;
+private _message = "";
+private _messageFinal = [];
+private "_time";
+private _ok = false;
 // By: Shay_gman
 // Version: 1.1 (May 2012)
 #define mcc_playerConsole_IDD 2993
@@ -23,6 +27,6 @@ while {_time > time && dialog} do {
 };
 
 closedialog 0; 
-_ok = createDialog "MCC_playerConsole";
+_ok = createDialog ("MCC_playerConsole" call MCC_fnc_dialogName);
 
 

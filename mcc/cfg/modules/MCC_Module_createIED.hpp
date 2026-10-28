@@ -12,7 +12,7 @@ class MCC_Module_createIED : Module_F
 		{
 			displayName = "Activate Side";
 			typeName = "NUMBER";
-			property = "side";
+			property = "MCC_Module_createIED_side";
 
 			class values
 			{
@@ -44,7 +44,7 @@ class MCC_Module_createIED : Module_F
 		{
 			displayName = "Explosion Size";
 			typeName = "STRING";
-			property = "size";
+			property = "MCC_Module_createIED_size";
 
 			class values
 			{
@@ -71,7 +71,7 @@ class MCC_Module_createIED : Module_F
 		{
 			displayName = "Explosion Effect";
 			typeName = "NUMBER";
-			property = "effect";
+			property = "MCC_Module_createIED_effect";
 
 			class values
 			{
@@ -103,7 +103,7 @@ class MCC_Module_createIED : Module_F
 		{
 			displayName = "Disarm Time";
 			typeName = "NUMBER";
-			property = "disarmTime";
+			property = "MCC_Module_createIED_disarmTime";
 
 			class values
 			{
@@ -140,7 +140,7 @@ class MCC_Module_createIED : Module_F
 		{
 			displayName = "Jammable";
 			typeName = "NUMBER";
-			property = "Jammable";
+			property = "MCC_Module_createIED_Jammable";
 
 			class values
 			{
@@ -162,7 +162,7 @@ class MCC_Module_createIED : Module_F
 		{
 			displayName = "Activation Type";
 			typeName = "NUMBER";
-			property = "ActivationType";
+			property = "MCC_Module_createIED_ActivationType";
 
 			class values
 			{
@@ -199,7 +199,7 @@ class MCC_Module_createIED : Module_F
 		{
 			displayName = "Activation Distance";
 			typeName = "NUMBER";
-			property = "Distance";
+			property = "MCC_Module_createIED_Distance";
 
 			class values
 			{
@@ -242,7 +242,7 @@ class MCC_Module_createIED : Module_F
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Sync it with any vehicle or object to create an IED or with an AI to create suicide Bomber";
+		description = "Sync it with any vehicle or object to create an IED or with an AI unit to create a suicide bomber";
 		sync[] = {"Anything"};
 
 		class Anything

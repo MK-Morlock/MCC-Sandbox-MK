@@ -13,4 +13,4 @@ if(_arty_requestor != player) then{
 	publicVariable "bon_arti_registration_message";
 };
 */
-_dlg = createDialog "ArtilleryDialog";
+_dlg = createDialog ("ArtilleryDialog" call MCC_fnc_dialogName);

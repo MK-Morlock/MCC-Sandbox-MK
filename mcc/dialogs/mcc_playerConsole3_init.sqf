@@ -1,4 +1,17 @@
-private ["_mccdialog","_comboBox","_displayname","_time", "_index","_message","_messageFinal","_type","_insetionArray","_control","_data","_rad","_alt","_coords","_effectParams","_leftDownPos","_uav","_ammoLeft"];
+["start"] spawn {sleep 0.1; ["start"] call MCC_fnc_consoleCampaignTiles};	//no campaign territory overlay on the Commander Console map (once its display exists)
+private _mccdialog = controlNull;
+private "_time";
+private _message = "";
+private _messageFinal = [];
+private _control = controlNull;
+private _data = [];
+private _rad = 0;
+private _alt = 0;
+private _coords = [];
+private _effectParams = [];
+private "_leftDownPos";
+private "_uav";
+private _ammoLeft = [];
 // By: Shay_gman
 // Version: 1.1 (April 2013)
 #define mcc_playerConsole3_IDD 5010
@@ -25,6 +38,7 @@ private ["_mccdialog","_comboBox","_displayname","_time", "_index","_message","_
 
 disableSerialization;
 _mccdialog = findDisplay mcc_playerConsole3_IDD;
+_mccdialog displayAddEventHandler ["Unload", {if !(missionNamespace getVariable ["MCC_consoleTakingControl", false]) then {[] spawn {sleep 0.5; if (!dialog && {alive player}) then {[nil, nil, nil, [0]] execVM format ["%1mcc\general_scripts\console\conoleOpenMenu.sqf", MCC_path]}}}}];
 MCC_Console1Open = false;
 MCC_Console2Open = false;
 MCC_Console3Open = true;
@@ -81,7 +95,7 @@ if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]))
 			MCC_fakeAC cameraEffect ["INTERNAL", "BACK", "rendertarget8"];
 			_coords = [MCC_consoleACpos, _rad, MCC_ACAng] call BIS_fnc_relPos;
 			_coords set [2, _alt];
-			MCC_fakeACFOV = 0.8;
+			MCC_fakeACFOV = 25 / 120;
 			MCC_fakeAC camsetTarget MCC_fakeACCenter;
 			MCC_fakeAC camsetPos _coords;
 			MCC_fakeAC camsetFOV MCC_fakeACFOV;
@@ -92,7 +106,7 @@ if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]))
 			//MCC_fakeACCenter attachTo [_uav,[-400,2,-5]];
 		};
 
-		ctrlSetText [MCC_CONSOLE_AC_ZOOM_TEXT, format ["ZOOM: %1x",(10-(10*MCC_fakeACFOV))]];
+		ctrlSetText [MCC_CONSOLE_AC_ZOOM_TEXT, "WFOV"];
 		ctrlSetText [MCC_CONSOLE_AC_VISION_TEXT, MCC_ConsoleACvision];
 
 		if (typeOf _uav == "B_T_VTOL_01_armed_F") then {
@@ -113,6 +127,7 @@ if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]))
 
 		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT, ("20mm: " + str ((_ammoLeft select 0) select 1))];
 		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT2, ("40mm: " + str ((_ammoLeft select 1) select 1))];
+		[] call MCC_fnc_acAmmoRefresh;
 		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT3, ("105mm: " + str ((_ammoLeft select 2) select 1))];
 
 		//Flight Height
@@ -120,10 +135,11 @@ if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]))
 		_alt = (((getpos _uav) select 2) min 1500) max 300;
 		sliderSetPosition [MCC_CONSOLEUAVFLIGHTHIGHT, _alt];
 
+		MCC_ConsoleACCameraMod = profileNamespace getVariable ["MCC_feedVision_ac", 0];	//the mode last chosen for this feed
 		switch (MCC_ConsoleACCameraMod) do {
 			// Normal
 			case 0: {
-				_effectParams = [3,1,1,0.4,0,[0,0,0,0],[1,1,1,0],[1,1,1,1]];
+				_effectParams = [0];	//normal view: the same picture as an Arma UAV camera in its normal mode
 				MCC_ConsoleACvision = "VIDEO";
 			};
 
@@ -140,35 +156,49 @@ if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]))
 			};
 		};
 		"rendertarget8" setPiPEffect _effectParams;
+		[_mccdialog, 9175, MCC_ConsoleACCameraMod] call MCC_fnc_consoleModeButtons;	//the vision buttons show the mode in use
+		[_mccdialog, 9180, missionNamespace getVariable ["MCC_ConsoleACweaponSelected", 0]] call MCC_fnc_consoleModeButtons;
 
 		switch (MCC_ConsoleACweaponSelected) do {
 			// 20mm
 			case 0: {
-				ctrlSetText [MCC_CONSOLE_AC_TARGET, MCC_path +"data\consuleTarget1.paa"];
+				
 			};
 
 			// 40mm
 			case 1: {
-				ctrlSetText [MCC_CONSOLE_AC_TARGET, MCC_path +"data\consuleTarget2.paa"];
+				
 			};
 
 			// 105mm
 			case 2: {
-				ctrlSetText [MCC_CONSOLE_AC_TARGET, MCC_path +"data\consuleTarget3.paa"];
+				
 			};
 		};
 
 		ctrlshow [MCC_CONSOLE_AC_TARGET,true];
-		ctrlShow [MCC_CONSOLE_COMPASS_N,true];
-		ctrlShow [MCC_CONSOLE_COMPASS_E,true];
-		ctrlShow [MCC_CONSOLE_COMPASS_S,true];
-		ctrlShow [MCC_CONSOLE_COMPASS_W,true];
+		ctrlShow [MCC_CONSOLE_COMPASS_N,false];
+		ctrlShow [MCC_CONSOLE_COMPASS_E,false];
+		ctrlShow [MCC_CONSOLE_COMPASS_S,false];
+		ctrlShow [MCC_CONSOLE_COMPASS_W,false];
 		ctrlShow [MCC_CONSOLE_AC_MAP,true];
 		ctrlShow [5055,true];
+		(["center"] call MCC_fnc_acAim) params ["_az0", "_el0"];
+		MCC_acGround = ["ground", _az0, _el0] call MCC_fnc_acAim;
+		MCC_consoleACgunReady1 = true;
+		MCC_consoleACgunReady2 = true;
+		MCC_consoleACgunReady3 = true;
+		MCC_ConsoleACMouseButtonDown = false;
+		[_mccdialog, 0] call MCC_fnc_acReticle;
+		ctrlSetText [MCC_CONSOLE_AC_TARGET, ""];
 
 		//Handle on screen data
 		[] spawn {
-			private ["_structured","_data","_mccdialog","_uavPos","_uav"];
+			private "_structured";
+			private _data = [];
+			private _mccdialog = controlNull;
+			private "_uavPos";
+			private _uav = objNull;
 			disableSerialization;
 			_uav = missionNamespace getVariable ["MCC_ACConsoleUp",objNull];
 
@@ -184,7 +214,7 @@ if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]))
 						format ["X: %1 Y: %2",floor (_uavPos select 0),floor (_uavPos select 1)],
 						format ["Z %1",floor (_uavPos select 2)]
 					];
-				{_structured = composeText [_structured,_x,lineBreak]} forEach _data;
+				_structured = parseText ((_data apply {format ["<t align='right'>%1</t>", _x]}) joinString "<br/>");
 				(_mccdialog displayctrl MCC_CONSOLE_AC_TIME_TEXT) ctrlSetStructuredText _structured;
 				ctrlSetText [MCC_CONSOLE_AC_DIR_TEXT, format ["Dir: %1",floor (getdir MCC_fakeAC)]];
 
@@ -208,24 +238,35 @@ if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]))
 				//No time remain close the AC-130
 				if (MCC_ConsoleACTime -(time - (missionNameSpace getVariable ["MCC_ConsoleACTimeStart",time])) <=0) exitWith {
 
-					[group driver _uav, driver _uav, _uav, [_uav, 1500, floor random 360] call BIS_fnc_relPos] call MCC_fnc_deletePlane;
 					missionNamespace setVariable ["MCC_ACConsoleUp",objNull];
 					publicVariable "MCC_ACConsoleUp";
+					if !(_uav getVariable ["MCC_supportDone", false]) then {
+						_uav setVariable ["MCC_supportDone", true, true];
+						[group driver _uav, driver _uav, _uav, [_uav, 1500, floor random 360] call BIS_fnc_relPos] spawn MCC_fnc_deletePlane;
+					};
 
-					[[2,compile format ['["MCCNotifications",["AC-130 Left the scene","%1data\AC130_icon.paa",""]] call bis_fnc_showNotification;',MCC_path]], "MCC_fnc_globalExecute", playerSide, false] spawn BIS_fnc_MP;
+					[_uav, "leave", "Gunship", "Left the scene", format ["%1data\AC130_icon.paa", MCC_path], playerSide] call MCC_fnc_supportNotice;
+					MCC_ConsoleACMouseButtonDown = false;
+					while {dialog} do {closeDialog 0};
+					_null = [1] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf",MCC_path];
 				};
 
-				if (isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull])) exitWith {
+				if (isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]) || {!alive (missionNamespace getVariable ["MCC_ACConsoleUp",objNull])}) exitWith {
 					MCC_ConsoleACMouseButtonDown = false;
 					while {dialog} do {closeDialog 0};
 					MCC_ConsoleACMouseButtonDown = false;
 					[(_mccdialog displayctrl MCC_CONSOLE_ACPIP)] call MCC_fnc_pipOpen;
 					_null = [1] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf",MCC_path];
 
-					[[2,{["MCCNotifications",["AC-130 Left the scene",format ["%1data\AC130_icon.paa",MCC_path],""]] call bis_fnc_showNotification;}], "MCC_fnc_globalExecute", side player, false] spawn BIS_fnc_MP;
+					if (alive _uav) then {[_uav, "leave", "Gunship", "Left the scene", format ["%1data\AC130_icon.paa", MCC_path], playerSide] call MCC_fnc_supportNotice};
 				};
 
 				sleep 0.1;
+			};
+			if (dialog && {!alive _uav}) then {
+				MCC_ConsoleACMouseButtonDown = false;
+				while {dialog} do {closeDialog 0};
+				_null = [1] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf",MCC_path];
 			};
 
 			_cam = missionNamespace getVariable ["MCC_fakeAC",objNull];
@@ -244,16 +285,42 @@ if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]))
 
 		// Move camera in a circle
 		0 spawn	{
-			private ["_pos", "_alt", "_rad", "_coords","_uav","_cam","_target"];
+			private "_alt";
+			private "_rad";
+			private "_coords";
+			private _uav = objNull;
+			private _cam = objNull;
+			private _target = objNull;
 
 			_uav = missionNamespace getVariable ["MCC_ACConsoleUp",objNull];
 			_cam = missionNamespace getVariable ["MCC_fakeAC",objNull];
 			_target = missionNamespace getVariable ["MCC_fakeACCenter",objNull];
 
-			while {alive _cam && alive _uav && alive _target} do {
-				_cam camsetpos (_uav modelToWorld [-6,2,-5]);
-				_cam camsetTarget _target;
-				_cam camcommit 0.01;
-			};
+			{
+				private _g = _uav turretUnit _x;
+				if (!isNull _g) then {_g disableAI "AUTOTARGET"; _g disableAI "TARGET"; _g doWatch _target};
+			} forEach [[1], [2]];
+			if ((missionNamespace getVariable ["MCC_acCamEH", -1]) >= 0) then {removeMissionEventHandler ["EachFrame", MCC_acCamEH]};
+			MCC_acCamEH = addMissionEventHandler ["EachFrame", {
+				private _uav = missionNamespace getVariable ["MCC_ACConsoleUp", objNull];
+				private _cam = missionNamespace getVariable ["MCC_fakeAC", objNull];
+				private _target = missionNamespace getVariable ["MCC_fakeACCenter", objNull];
+				if (isNull _cam || {!alive _uav} || {isNull _target} || {isNull (findDisplay 5010)}) exitWith {removeMissionEventHandler ["EachFrame", _thisEventHandler]; MCC_acCamEH = -1};
+				private _eye = ["eye"] call MCC_fnc_acAim;
+				private _g = missionNamespace getVariable ["MCC_acGround", []];
+				if (count _g < 3) then {(["center"] call MCC_fnc_acAim) params ["_a0", "_e0"]; _g = ["ground", _a0, _e0] call MCC_fnc_acAim; MCC_acGround = _g};
+				(["angles", _g] call MCC_fnc_acAim) params ["_az", "_el"];
+				(["clamp", _az, _el] call MCC_fnc_acAim) params ["_caz", "_cel"];
+				if (abs (_caz - _az) > 0.05 || {abs (_cel - _el) > 0.05}) then {_g = ["ground", _caz, _cel] call MCC_fnc_acAim; MCC_acGround = _g};
+				_cam camSetPos _eye;
+				_cam camSetTarget _g;
+				_cam camCommit 0;
+				private _ground = _g;
+				_target setPosATL _ground;
+				if (time > (missionNamespace getVariable ["MCC_acWatchT", 0])) then {
+					MCC_acWatchT = time + 0.3;
+					{private _g = _uav turretUnit _x; if (!isNull _g) then {_g doWatch _ground}} forEach [[1], [2]];
+				};
+			}];
 		};
 	};

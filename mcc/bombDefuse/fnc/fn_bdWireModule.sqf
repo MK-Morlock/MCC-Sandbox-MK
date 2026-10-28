@@ -6,11 +6,19 @@
     _serialNumber - INTEGER
 */
 
-private ["_difficulty","_ctrlGroup","_display","_idc","_wires","_wiresColor","_ratio","_ctrl","_yPos","_ctrls","_color","_colorName","_serialNumber","_correctWireIndex"];
+private "_display";
+private "_idc";
+private "_wires";
+private _wiresColor = [];
+private "_ratio";
+private _ctrl = controlNull;
+private _yPos = 0;
+private _ctrls = [];
+private "_color";
+private "_colorName";
+private _correctWireIndex = false;
 disableSerialization;
-_difficulty = _this select 0;
-_ctrlGroup = _this select 1;
-_serialNumber = _this select 2;
+params ["_difficulty", "_ctrlGroup", "_serialNumber"];
 
 _display = ctrlParent _ctrlGroup;
 _idc = ctrlIDC _ctrlGroup *1000;
@@ -27,7 +35,7 @@ _colorArray = [];
 _yPos = 0.05;
 
 for "_i" from 1 to _wires do {
-    _ctrl = _display ctrlCreate ["RscButtonMenu", _idc+_i,_ctrlGroup];
+    _ctrl = _display ctrlCreate ["MCC_RscButtonMenuStd", _idc+_i,_ctrlGroup];
     _ctrl ctrlSetPosition [0.03*_ratio, _yPos*_ratio, 0.15*_ratio, 0.01*_ratio];
     _color = _wiresColor call bis_fnc_selectRandom;
     _colorName = switch (str _color) do {

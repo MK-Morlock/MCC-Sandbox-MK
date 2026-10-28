@@ -1,7 +1,11 @@
 //==================================================================MCC_fnc_gainXPfromRoles======================================================================================
 // Gain XP from specific roles.
 //==============================================================================================================================================================================
-private ["_role","_playerVehicle","_string","_counter","_notes"];
+private _role = "";
+private "_playerVehicle";
+private _string = "";
+private _counter = 0;
+private _notes = false;
 _role 			= tolower (player getvariable ["CP_role","n/a"]);
 _playerVehicle	= vehicle player;
 _notes = missionNamespace getvariable ["CP_expNotifications",true];

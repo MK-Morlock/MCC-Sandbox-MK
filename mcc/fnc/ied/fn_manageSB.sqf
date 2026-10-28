@@ -9,7 +9,20 @@
 //==================================================================================================================================================================
 #define	MCC_MANAGESB_IED "DemoCharge_Remote_Ammo"
 
-private ["_sb","_iedside","_trapvolume","_IEDExplosionType","_check","_close","_dummy","_init","_closeunit","_enemy","_sound","_targ","_sbspeed","_IedExplosion"];
+private _sb = objNull;
+private _iedside = west;
+private _trapvolume = "";
+private _IEDExplosionType = 0;
+private _check = false;
+private _close = [];
+private _dummy = objNull;
+private _init = "";
+private _closeunit = [];
+private _enemy = objNull;
+private _sound = 0;
+private _targ = [];
+private _sbspeed = [];
+private _IedExplosion = {};
 _sb					= param [0,objNull];
 _iedside			= param [1,west];
 _trapvolume			= param [2,"medium"];
@@ -37,7 +50,7 @@ removeallweapons _sb;
 
 _dummy = MCC_dummy createVehicle (getpos _sb);
 _init = '_this hideobject true;';
-[[[netid _dummy,_dummy], _init], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
+[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
 
 _dummy attachto [_sb,[0,0,0]];
 
@@ -67,7 +80,7 @@ while {alive _sb && _check} do {
 					if(_enemy isKindOf _x && ({alive _x} count (crew _enemy) > 0) && _check) then {
 
 						//Revel demo charges
-						private ["_exp"];
+						private _exp = objNull;
 						{
 							_exp = MCC_MANAGESB_IED createVehicle position _sb;
 							_exp attachTo [_sb, (_x select 0), "Pelvis"];
@@ -81,10 +94,10 @@ while {alive _sb && _check} do {
 						_sb setskill 1;
 						_sb setskill ["courage",1];
 						_sb domove (getpos _enemy);
-						sleep 5 + random 10;
+						sleep (5 + random 10);
 						if ((_sb distance _enemy) < 40) then
 						{
-							_sb setspeedmode "FULLSPEED";
+							_sb setspeedmode "FULL";
 							_sb forceSpeed 10;
 							_sb setBehaviour "CARELESS";
 							_sb setunitpos "UP";
@@ -101,7 +114,7 @@ while {alive _sb && _check} do {
 								_sb domove (getpos _enemy);
 								if (_sound == 1) then
 								{
-									[[[netid _sb,_sb], format ["suicide%1", (floor random 4)+1]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+									[[netid _sb,_sb], format ["suicide%1", (floor random 4)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 									_sound = 0
 								};
 								if ((_sb distance _enemy) <=15) exitwith { _check= false;};

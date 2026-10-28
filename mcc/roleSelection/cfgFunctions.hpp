@@ -5,6 +5,7 @@ class roleSelection {
 	file = "mcc\roleSelection\fnc";
 	#endif
 
+	class respawnObjects	{description = "Respawn positions as objects/groups (markers and positions become helpers)";};
 	class unlock	{description = "Check for gear unlocks and notify the player.";};
 	class gainXPfromRoles	{description = "gain XP from specific roles.";};
 	class createRespawnTent	{description = "Creates a respawn tent";};
@@ -25,7 +26,8 @@ class roleSelection {
 	class RSSquadJoin {description = "Handles player joining a squad";};
 	class RSSquadCreate {description = "Create a new sqaud";};
 	class RSSquadLock {description = "Lock sqaud";};
-	class RSSquadRename {description = "Rename sqaud";};
+	class rsMessage {description = "Small white message near the top centre";};
+		class RSSquadRename {description = "Rename sqaud";};
 	class RSunitSelected {description = "Selecting a unit from squadMenu";};
 	class RSunitSelectedClicked {description = "Executing selected unit";};
 	class RSTakeCommander {description = "Become a commander";};

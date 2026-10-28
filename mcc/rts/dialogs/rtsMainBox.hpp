@@ -1,4 +1,4 @@
-class MCC_rtsMainBox
+class MCCDLG_NAME
 {
 	idd = -1;
 	movingEnable = false;
@@ -18,12 +18,15 @@ class MCC_rtsMainBox
 	{
 		class bckg: MCC_RscText
 		{
+			colorText[] = {0.11,0.12,0.13,0.96};
+			text = "\mcc_sandbox_mod\data\panel_round_ca.paa";
+			style = 48;
 			idc = -1;
 			x = 0.695937 * safezoneW + safezoneX;
 			y = 0.159 * safezoneH + safezoneY;
 			w = 0.103125 * safezoneW;
 			h = 0.627 * safezoneH;
-			colorBackground[] = {0,0,0,0.6};
+			colorBackground[] = {0,0,0,0};
 		};
 
 		class MCC_ResourcesControlsGroup: MCC_RscControlsGroupNoScrollbars
@@ -86,6 +89,8 @@ class MCC_rtsMainBox
 				{
 					idc = -1;
 
+					style = 2096;
+
 					text =  __EVAL(MCCPATH +"mcc\rts\data\IconAmmo.paa");
 					tooltip = "Ammo";
 					colorText[] = { 0.9, 0, 0, 1 };
@@ -99,8 +104,10 @@ class MCC_rtsMainBox
 				{
 					idc = -1;
 
+					style = 2096;
+
 					text = __EVAL(MCCPATH +"mcc\rts\data\IconRepair.paa");
-					tooltip = "Materials";
+					tooltip = "Supplies";
 					colorText[] = { 0, 0.5, 0.9, 1 };
 
 					x = 0.00515625 * safezoneW;
@@ -111,6 +118,8 @@ class MCC_rtsMainBox
 				class MCC_Fuel: MCC_RscPicture
 				{
 					idc = -1;
+
+					style = 2096;
 
 					text = __EVAL(MCCPATH +"mcc\rts\data\IconFuel.paa");
 					tooltip = "Fuel";
@@ -125,9 +134,11 @@ class MCC_rtsMainBox
 				{
 					idc = -1;
 
+					style = 2096;
+
 					text = __EVAL(MCCPATH +"mcc\rts\data\IconFood.paa");
 					tooltip = "Food";
-					colorText[] = { 0.9, 0.5, 0, 1 };
+					colorText[] = { 0.77, 0.51, 0.08, 1 };
 
 					x = 0.00515625 * safezoneW;
 					y = 0.143 * safezoneH;
@@ -137,6 +148,8 @@ class MCC_rtsMainBox
 				class MCC_MedPic: MCC_RscPicture
 				{
 					idc = -1;
+
+					style = 2096;
 
 					text = __EVAL(MCCPATH +"mcc\rts\data\IconMed.paa");
 					tooltip = "Meds";
@@ -376,7 +389,7 @@ class MCC_rtsMainBox
 				};
 
 				//Buttons
-				class buy: MCC_RscButton
+				class buy: MCCBTN_R
 				{
 					idc = -1;
 					text = ">";
@@ -389,7 +402,7 @@ class MCC_rtsMainBox
 					h = 0.055 * safezoneH;
 				};
 
-				class sell: MCC_RscButton
+				class sell: MCCBTN_R
 				{
 					idc = -1;
 					text = "<";
@@ -402,7 +415,7 @@ class MCC_rtsMainBox
 					h = 0.055 * safezoneH;
 				};
 				/*
-				class buyToBox: MCC_RscButton
+				class buyToBox: MCCBTN_R
 				{
 					idc = -1;
 					text = ">>";
@@ -418,6 +431,8 @@ class MCC_rtsMainBox
 				class ValorIcon: MCC_RscPicture
 				{
 					idc = -1;
+
+					style = 2096;
 					text = __EVAL(MCCPATH +"mcc\rts\data\valorIcon.paa");
 					colorText[] = { 0.9, 0.9, 0, 1 };
 					x = 0.16 * safezoneW;
@@ -437,7 +452,7 @@ class MCC_rtsMainBox
 					h = 0.055 * safezoneH;
 				};
 
-				class Close: MCC_RscButton
+				class Close: MCCBTN_R
 				{
 					idc = -1;
 					text = "X";

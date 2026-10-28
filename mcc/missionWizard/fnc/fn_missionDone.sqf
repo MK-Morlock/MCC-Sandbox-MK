@@ -5,7 +5,22 @@
 // Return - nothing
 //=============================================================================================================================================================================
 //Calculate reources
-private ["_resources","_penalty","_baseResource","_succeedObjectives","_sumResource","_CompleteText","_sidePlayer","_resourceGain","_allocationRatio","_allocatedResources","_randomAsset","_totalShells","_sumTickets","_maxResources","_storagePenalty","_res"];
+private "_resources";
+private _penalty = 0;
+private _baseResource = 0;
+private "_succeedObjectives";
+private "_sumResource";
+private _CompleteText = "";
+private "_sidePlayer";
+private _resourceGain = 0;
+private _allocationRatio = [];
+private _allocatedResources = [];
+private "_randomAsset";
+private _totalShells = 0;
+private "_sumTickets";
+private _maxResources = [];
+private _storagePenalty = 0;
+private "_res";
 _mission =  param [ 0, "Main", [""]];
 _activeObjectives =  param [ 1, 0, [0]];
 _failedObjectives =  param [ 2, 0, [0]];
@@ -29,30 +44,37 @@ if (_mission == "Main") then {
 		_resourceGain = _resourceGain + (floor (_sumTickets*_difficulty) max 1);
 	};
 
+//Collateral damage penalty is taken off the gain before it is shared out (it used to be shown in the summary only)
+_sumResource = (_resourceGain - _penalty) max 0;
+
 _allocatedResources = [];
 {
-	_allocatedResources set [_foreachIndex, floor (_resourceGain * _x)];
+	_allocatedResources set [_foreachIndex, floor (_sumResource * _x)];
 } forEach _allocationRatio;
 
 //Make sure we are not giving more resources then storage areas
 _maxResources = ["resources",_sidePlayer] call MCC_fnc_rtsCalculateResourceTreshold;
-_sumResource = (_resourceGain - _penalty) max 0;
+private _resourcesBefore = +_resources;
 
 //Make sure we are not giving more resources then storage areas
 _storagePenalty = 0;
 for "_i" from 0 to 4 do {
 	_res = (_resources select _i)+(_allocatedResources select _i);
-	_storagePenalty = _storagePenalty + ((_res - _maxResources) max 0);
-	_resources set [_i,(_resources select _i)+(_allocatedResources select _i) min _maxResources];
+	// Campaign init "Resources Over Storage Limit":
+	//   Cut (default, original MCC) - everything is capped at the storage limit, stock already over it included
+	//   Keep - only the new gain is capped; stock already over the limit stays (the hourly day-cycle check reduces it by 10%)
+	private _cap = if (missionNamespace getVariable ["MCC_campaignKeepOverStorage", false]) then {_maxResources max (_resources select _i)} else {_maxResources};
+	_storagePenalty = _storagePenalty + ((_res - _cap) max 0);
+	_resources set [_i, _res min _cap];
 };
 
 _sumResource = (_sumResource - _storagePenalty) max 0;
 
-//Calculate resources allocation again this time from the sum resouces for the UI
+//What each resource actually went up by, for the UI
 _allocatedResources = [];
 {
-	_allocatedResources set [_foreachIndex, floor (_sumResource * _x)];
-} forEach _allocationRatio;
+	_allocatedResources set [_foreachIndex, floor (((_resources select _foreachIndex) - _x) max 0)];
+} forEach _resourcesBefore;
 
 
 //Generate summary
@@ -60,19 +82,19 @@ if (_mission != "side") then {
 	_CompleteText =         format ["<t align='center' size='1.8' color='#FFCF11'>%1 Mission Completed</t><br/>",_mission]
 							+"____________________<br/>"
 							+ format ["Total Objectives: %1<br/>",_activeObjectives]
-							+ format ["Objectives Succeed: <t color='#2CC916'>%1</t><br/>", _succeedObjectives]
+							+ format ["Objectives Succeeded: <t color='#2CC916'>%1</t><br/>", _succeedObjectives]
 							+ format ["Objectives Failed: <t color='#FF0000'>%1</t><br/>", _failedObjectives]
 							+ "____________________<br/>"
-							+ format ["Resource Gained: <t color='#2CC916'>%1</t><br/>",_resourceGain max 0]
+							+ format ["Resources Gained: <t color='#2CC916'>%1</t><br/>",_resourceGain max 0]
 							+ format ["Penalty - Collateral Damage: <t color='#FF0000'>%1</t><br/>", _penalty]
 							+ format ["Penalty - No Storage: <t color='#FF0000'>%1</t><br/>", _storagePenalty]
-							+ format ["Total Resource gained: <t color='#2CC916'>%1</t><br/>",_sumResource]
+							+ format ["Total Resources Gained: <t color='#2CC916'>%1</t><br/>",_sumResource]
 							+ "____________________<br/><br/>";
 } else {
 	_CompleteText =         "<t align='center' size='1.8' color='#FFCF11'>Enemy Have Completed A Mission</t><br/>"
 							+"____________________<br/>"
 							+ format ["Total Objectives: %1<br/>",_activeObjectives]
-							+ format ["Objectives Succeed: <t color='#FF0000'>%1</t><br/>", _succeedObjectives]
+							+ format ["Objectives Succeeded: <t color='#FF0000'>%1</t><br/>", _succeedObjectives]
 							+ format ["Objectives Failed: <t color='#2CC916'>%1</t><br/>", _failedObjectives]
 							+ "____________________<br/>"
 							+ format ["Enemy Casualties: <t color='#2CC916'>%1</t><br/>", _sumTickets]
@@ -106,7 +128,7 @@ private _relationText = if (_civRelations > 0.9) then {"Excelent"} else {
 
 _CompleteText = _CompleteText 	+  "<t align='center' size='1.2' color='#FFCF11'> Hearts and Minds</t><br/>"
 								+ format ["Civilians Killed: <t color='#FF0000'>%1</t><br/>",(missionNamespace getvariable [format ["MCC_civiliansKilled_%1",_sidePlayer],0])]
-								+ format ["The local population relation to you is:<br/> %1 <br/>",_relationText]
+								+ format ["The local population's attitude towards you:<br/> %1 <br/>",_relationText]
 								+ "____________________<br/><br/>";
 
 //penalty for failed objectives
@@ -121,12 +143,14 @@ publicVariable format ["MCC_civRelations_%1",_sidePlayer];
 missionNamespace setvariable [format ["MCC_civiliansKilled_%1",_sidePlayer],0];
 publicVariable format ["MCC_civiliansKilled_%1",_sidePlayer];
 
-private ["_counter","_totalShells","_startPos"];
+private "_counter";
+private _totalShells = 0;
+private "_startPos";
 
 //Assets if succeed
 _totalShells = 0;
 _counter = if (_mission != "side") then {_succeedObjectives} else {_failedObjectives};
-_startPos = call compile format ["MCC_START_%1",_sidePlayer];
+_startPos = missionNamespace getVariable (format ["MCC_START_%1", _sidePlayer]);
 
 _CompleteText = _CompleteText + "<t align='center' size='1.2' color='#FFCF11'>Assets Gained:</t><br/>";
 for "_i" from 1 to _counter do {
@@ -134,7 +158,13 @@ for "_i" from 1 to _counter do {
 
 	//Add Supply drop
 	if (_randomAsset > 0.2 &&  ([["hq",2], _sidePlayer, 200] call MCC_fnc_CheckBuildings)) then {
-		private ["_arrayName","_spawnKind","_planeType","_isParachute","_tempArray","_boxArray","_displayName"];
+		private _arrayName = "";
+		private _spawnKind = [];
+		private _planeType = [];
+		private "_isParachute";
+		private "_tempArray";
+		private _boxArray = [];
+		private _displayName = "";
 		_boxArray = [];
 		_tempArray = if (_sidePlayer == east) then {MCC_logisticsCrates_TypesEast} else {MCC_logisticsCrates_TypesWest};
 		_isParachute = random 1 > 0.5;
@@ -172,8 +202,7 @@ for "_i" from 1 to _counter do {
 	//Aritllery add
 	if (_randomAsset > 0.4) then {
 
-		private ["_nshell"];
-		_nshell = ((floor random 3) +1) * 10;
+		private _nshell = ((floor random 3) +1) * 10;
 		_totalShells = _totalShells + _nshell;
 		HW_arti_number_shells_per_hour = (missionNamespace getvariable ["HW_arti_number_shells_per_hour",0]) + _nshell;
 		publicVariable "HW_arti_number_shells_per_hour";
@@ -188,13 +217,17 @@ for "_i" from 1 to _counter do {
 
 	//CAS
 	if (_randomAsset > 0.6 && ([["hq",3], _sidePlayer, 200] call MCC_fnc_CheckBuildings)) then {
-		private ["_arrayName","_spawnKind","_planeType"];
+		private _arrayName = "";
+		private _spawnKind = [];
+		private "_planeType";
 		_spawnKind = ["Gun-run (Direct)","Rockets-run (Direct)","CAS-run (Direct)","Bombs-run (Direct)","SnD","Rockets-run","AA run","JDAM","LGB","Bombing-run"] call bis_fnc_selectRandom;
 		_planeType = switch (_sidePlayer) do {
 						case west : {["B_Plane_CAS_01_F"]};
 						case east : {["O_Plane_CAS_02_F"]};
 						default {["I_Plane_Fighter_03_CAS_F"]};
 					};
+		private _plFac = faction (((allPlayers - entities "HeadlessClient_F") select {side group _x == _sidePlayer}) param [0, objNull]);
+		if (_plFac != "") then {_planeType = _planeType apply {[_x, _plFac] call MCCMK_fnc_factionVehicle}};
 		_arrayName		= format ["MCC_CASConsoleArray%1",_sidePlayer];
 		_array = missionNameSpace getVariable [_arrayName,[]];
 		_array pushBack [[_spawnKind], _planeType];

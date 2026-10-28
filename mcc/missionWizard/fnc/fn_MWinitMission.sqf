@@ -50,53 +50,78 @@
 //================================================================================================================================================================*/
 #define	MWinitMissionMusic	["LeadTrack01a_F","LeadTrack02_F","LeadTrack03_F","LeadTrack04a_F","LeadTrack05_F","LeadTrack06_F","AmbientTrack03_F","BackgroundTrack03_F","BackgroundTrack01_F","BackgroundTrack01a_F","BackgroundTrack02_F","LeadTrack01_F_EPA","LeadTrack02_F_EPA","EventTrack01_F_EPA","EventTrack01a_F_EPA","EventTrack03_F_EPA"]
 
-private ["_missionCenter","_missionCenterTrigger","_totalEnemyUnits","_isCQB","_objType","_objArray","_minObjectivesDistance","_maxObjectivesDistance","_objPos","_timeStart","_enemySide","_enemyfaction","_sidePlayer","_factionPlayer","_obj1","_obj2","_obj3","_pos","_center","_wholeMap","_armor","_vehicles","_stealth","_roadPositions","_script_handler","_isIED","_isAS","_isSB","_spawnbehavior","_isRoadblocks","_objectives","_isCiv","_weatherChange","_preciseMarkers","_reinforcement","_artillery","_civFaction","_playMusic","_animals","_markerName","_missionMaker","_campaignMission","_markers"];
+private _missionCenter = nil;
+private _missionCenterTrigger = objNull;
+private _objType = "";
+private _objArray = [];
+private _objPos = [];
+private _timeStart = 0;
+private _pos = [];
+private _center = [];
+private _script_handler = [];
+private _spawnbehavior = [];
+private _objectives = [];
+private _markerName = "";
+private _missionMaker = nil;
+private _campaignMission = false;
 
-private ["_arrayGeneral","_arraySides","_arrayObjectives","_arrayDefines","_arrayAssets"];
-_arrayGeneral		= _this select 0;
-_wholeMap 				= _arrayGeneral select 0;
-_totalEnemyUnits 		= _arrayGeneral select 1;
-_minObjectivesDistance 	= _arrayGeneral select 2;
-_maxObjectivesDistance	= _arrayGeneral select 3;
-_weatherChange 			= _arrayGeneral select 4;
-_preciseMarkers 		= _arrayGeneral select 5;
-_playMusic 				= _arrayGeneral select 6;
-_markers 				= _arrayGeneral param [7,true,[true]];
+params ["_arrayGeneral","_arraySides","_arrayObjectives","_arrayDefines","_arrayAssets"];
 
-_arraySides			= _this select 1;
-_enemySide 				= _arraySides select 0;
-_enemyfaction 			= _arraySides select 1;
-_sidePlayer 			= _arraySides select 2;
-_factionPlayer 			= _arraySides select 3;
-_civFaction 			= _arraySides select 4;
+_arrayGeneral params [
+	["_wholeMap", false, [false, []]], // Boolean from the console (true=whole map, false=manual zone), or an [pos,name] location ARRAY from the campaign loop - both are valid, so both types must be accepted here or params silently discards the campaign's location and substitutes the default.
+	["_totalEnemyUnits", 0, [0]],
+	["_minObjectivesDistance", 0, [0]],
+	["_maxObjectivesDistance", 0, [0]],
+	["_weatherChange", 0, [0]],
+	["_preciseMarkers", false, [false]],
+	["_playMusic", 0, [0]],
+	["_markers", true, [true]]
+];
 
-_arrayObjectives	= _this select 2;
-_obj1 					= _arrayObjectives select 0;
-_obj2 					= _arrayObjectives select 1;
-_obj3 					= _arrayObjectives select 2;
+_arraySides params [
+	["_enemySide", sideUnknown, [sideUnknown]],
+	["_enemyfaction", "", [""]],
+	["_sidePlayer", sideUnknown, [sideUnknown]],
+	["_factionPlayer", "", [""]],
+	["_civFaction", "", [""]]
+];
 
-_arrayDefines		= _this select 3;
-_isCQB 					= _arrayDefines select 0;
-_isCiv 					= _arrayDefines select 1;
-_armor 					= _arrayDefines select 2;
-_vehicles 				= _arrayDefines select 3;
-_stealth 				= _arrayDefines select 4;
-_isIED 					= _arrayDefines select 5;
-_isAS 					= _arrayDefines select 6;
-_isSB 					= _arrayDefines select 7;
-_isRoadblocks 			= _arrayDefines select 8;
-_animals 				= _arrayDefines select 9;
+_arrayObjectives params [
+	["_obj1", "", [""]],
+	["_obj2", "", [""]],
+	["_obj3", "", [""]]
+];
 
-_arrayAssets		= _this select 4;
-_reinforcement 			= _arrayAssets select 0;
-_artillery 				= _arrayAssets select 1;
+_arrayDefines params [
+	["_isCQB", false, [false]],
+	["_isCiv", false, [false]],
+	["_armor", false, [false]],
+	["_vehicles", false, [false]],
+	["_stealth", false, [false]],
+	["_isIED", false, [false]],
+	["_isAS", false, [false]],
+	["_isSB", false, [false]],
+	["_isRoadblocks", false, [false]],
+	["_animals", false, [false]]
+];
+
+_arrayAssets params [
+	["_reinforcement", 0, [0]],
+	["_artillery", 0, [0]]
+];
+
+//Record what this mission creates so it can be deleted again (MCC_fnc_generatedMissions / "Delete Missions")
+private _registryId = format ["MW_%1", ["MCC_generatedMissionCounter",1] call BIS_fnc_counter];
+["start", [_registryId]] call MCC_fnc_generatedMissions;
+missionNamespace setVariable ["MCC_MWCurrentMissionId", _registryId];
+["genStart", [_registryId]] call MCC_fnc_perfLog;	//performance diagnostics (CBA: MCC General > Performance log)
 
 _objArray			 	= missionNamespace getVariable ["MCC_MWMissionType",["Secure HVT",
 																			   "Kill HVT",
 																			   "Destroy Vehicle",
 																			   "Destroy AA",
 																			   "Destroy Artillery",
-																			   "Destroy Weapon Cahce",
+																			   "Destroy Weapon Cache",
 																			   "Destroy Fuel Depot",
 																			   "Destroy Radar/Radio",
 																			   "Acquire Intel",
@@ -112,12 +137,14 @@ _objArray			 	= missionNamespace getVariable ["MCC_MWMissionType",["Secure HVT",
 } forEach ["None","Random"];
 
 //Lets find the mission maker owner and make sure he'll get the zone markers too.
-private ["_missionMaker"];
+private _missionMaker = nil;
 {
 	if (name _x == mcc_missionmaker) exitWith {_missionMaker = owner _x};
-} foreach playableUnits;
+} foreach (playableUnits + allPlayers);
+private _missionMakerFound = !isNil "_missionMaker";
+if (isNil "_missionMaker") then {_missionMaker = 0};
 
-if (!isnil "_missionMaker") then {
+if (_missionMakerFound) then {
 	[] remoteExec ["MCC_fnc_createMCCZones",_missionMaker]
 };
 
@@ -129,6 +156,7 @@ MCC_MWCleanup =
 	//Clear up
 	MCC_MWisGenerating = false;
 	publicVariable "MCC_MWisGenerating";
+	missionNamespace setVariable ["MCC_perfGen", []];	//generation abandoned: stop the performance sampler
 
 	if (!isnil "MCC_worldArea") then {deleteVehicle MCC_worldArea;	MCC_worldArea = nil};
 	if (!isnil "MWMissionArea") then {deleteVehicle MWMissionArea;	MWMissionArea = nil};
@@ -146,15 +174,17 @@ if (typeName _wholeMap == typeName true ) then {
 	_campaignMission = false;
 	if (_wholeMap) then	{
 		//--------------------------------------------------------------Create a ceneter trigger --------------------------------------------------------------------------
-		private ["_worldPath","_mapSize","_mapCenter"];
+		private _worldPath = configNull;
+		private _mapSize = 0;
+		private _mapCenter = [];
 
 		if (isnil "MCC_worldArea") then {
 			_worldPath = configfile >> "cfgworlds" >> worldname;
 			_mapSize = getnumber (_worldPath >> "mapSize");
-			if (_mapSize == 0) exitWith {
-				diag_log FORMAT ["MCC: Mission Wizard Error: mapSize param not defined for '%1'",worldname];
-				[["mapSize param not defined for '%1'",worldname],"bis_fnc_halt",MCC_fnc_halt, false] call BIS_fnc_MP;
-				[[_markerName]] call MCC_MWCleanup;
+			// Many modded terrains don't define mapSize; the Mission Wizard refused to run on them. worldSize always exists.
+			if (_mapSize == 0) then {
+				_mapSize = worldSize;
+				["INFO", "fn_MWinitMission", "%1 has no mapSize in its config - using worldSize %2", [worldName, _mapSize]] call MCC_fnc_log;
 			};
 
 			_mapSize = _mapSize / 2;
@@ -171,11 +201,11 @@ if (typeName _wholeMap == typeName true ) then {
 
 		//First time? Let's map the island
 		if (isnil "MCC_MWcityLocations") then {
-			MCC_MWcityLocations     = [getpos MWMissionArea,15000,"city"] call MCC_fnc_MWbuildLocations;
-			MCC_MWmilitaryLocations = [getpos MWMissionArea,15000,"mil"] call MCC_fnc_MWbuildLocations;
-			MCC_MWhillsLocations 	= [getpos MWMissionArea,15000,"hill"] call MCC_fnc_MWbuildLocations;
-			MCC_MWnatureLocations 	= [getpos MWMissionArea,15000,"nature"] call MCC_fnc_MWbuildLocations;
-			MCC_MWmarineLocations	= [getpos MWMissionArea,15000,"marine"] call MCC_fnc_MWbuildLocations;
+			MCC_MWcityLocations     = [getpos MWMissionArea,(worldSize * 0.75) max 15000,"city"] call MCC_fnc_MWbuildLocations;
+			MCC_MWmilitaryLocations = [getpos MWMissionArea,(worldSize * 0.75) max 15000,"mil"] call MCC_fnc_MWbuildLocations;
+			MCC_MWhillsLocations 	= [getpos MWMissionArea,(worldSize * 0.75) max 15000,"hill"] call MCC_fnc_MWbuildLocations;
+			MCC_MWnatureLocations 	= [getpos MWMissionArea,(worldSize * 0.75) max 15000,"nature"] call MCC_fnc_MWbuildLocations;
+			MCC_MWmarineLocations	= [getpos MWMissionArea,(worldSize * 0.75) max 15000,"marine"] call MCC_fnc_MWbuildLocations;
 		};
 
 		//Find out if the map have locations in it.
@@ -186,15 +216,15 @@ if (typeName _wholeMap == typeName true ) then {
 
 		_missionCenter = (_center select 0);
 		if (isNil "_missionCenter") exitWith {
-			diag_log "MCC: Mission Wizard Error: Can't find mission center";
-			["MCC: Mission Wizard Error: Can't find mission center try building your mission in a zone"] remoteExec ["MCC_fnc_halt",_missionMaker];
+			if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: Mission Wizard Error: Can't find mission center"};
+			["MCC: Mission Wizard Error: Can't find the mission center. Try building your mission in a zone."] remoteExec ["MCC_fnc_halt",_missionMaker];
 			[[_markerName]] call MCC_MWCleanup;
 		};
 	} else {
 		//--------------------------------------------------------------Create a ceneter trigger --------------------------------------------------------------------------
 		if (count mcc_zone_markposition == 0) exitWith {
-			diag_log "MCC: Mission Wizard Error: Create a zone first";
-			[["MCC: Mission Wizard Error: Create a zone first"],"MCC_fnc_halt",_missionMaker, false] call BIS_fnc_MP;
+			if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: Mission Wizard Error: Create a zone first"};
+			["MCC: Mission Wizard Error: Create a zone first"] remoteExec ["MCC_fnc_halt",_missionMaker];
 			[[_markerName]] call MCC_MWCleanup;
 		};
 
@@ -202,8 +232,18 @@ if (typeName _wholeMap == typeName true ) then {
 		MWMissionArea settriggerarea [mcc_zone_marker_X,mcc_zone_marker_Y,0,true];
 		MCC_worldArea = MWMissionArea;
 
-		private ["_markerPos","_radius"];
+		private _markerPos = [];
+		private _radius = 0;
 		_radius = (mcc_zone_marker_X + mcc_zone_marker_Y)/2;
+		// The zone the player actually drew only constrains where the mission's CENTER can
+		// be found (see the distance check below) - once a center is picked, everything
+		// downstream (objective spread, and the visible red border marker itself a few
+		// lines down) is sized purely by _maxObjectivesDistance, a separate Wizard setting
+		// with no relationship to the drawn zone's size. If that setting is bigger than the
+		// zone, objectives visibly spill outside the marker the player drew. Cap it here so
+		// the mission's actual footprint (_maxObjectivesDistance*3, per the border marker
+		// below) never exceeds the zone's own radius.
+		_maxObjectivesDistance = _maxObjectivesDistance min (_radius/3);
 		_markerPos = getpos MWMissionArea;
 
 		//Let's map the area
@@ -227,15 +267,15 @@ if (typeName _wholeMap == typeName true ) then {
 		_missionCenter = (_center select 0);
 
 		if (isNil "_missionCenter") exitWith {
-			diag_log "MCC: Mission Wizard Error: Can't find mission center";
-			["MCC: Mission Wizard Error: Can't find mission center try building your mission in a zone"] remoteExec ["MCC_fnc_halt",_missionMaker];
+			if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: Mission Wizard Error: Can't find mission center"};
+			["MCC: Mission Wizard Error: Can't find the mission center. Try building your mission in a zone."] remoteExec ["MCC_fnc_halt",_missionMaker];
 			[[_markerName]] call MCC_MWCleanup;
 		};
 
 		if (_missionCenter distance2D _markerPos > _radius) exitWith {
 			_missionCenter = nil;
-			diag_log "MCC: Mission Wizard Error: Can't find mission center";
-			["MCC: Mission Wizard Error: Can't find mission center try building your mission in a zone"] remoteExec ["MCC_fnc_halt",_missionMaker];
+			if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: Mission Wizard Error: Can't find mission center"};
+			["MCC: Mission Wizard Error: Can't find the mission center. Try building your mission in a zone."] remoteExec ["MCC_fnc_halt",_missionMaker];
 			[[_markerName]] call MCC_MWCleanup;
 		};
 	};
@@ -247,6 +287,7 @@ if (typeName _wholeMap == typeName true ) then {
 
 if (isNil "_missionCenter") exitWith {};
 
+["genStage", ["find mission location"]] call MCC_fnc_perfLog;
 //Init the MW groups configs
 [_enemyfaction] call MCC_fnc_createConfigs;
 
@@ -255,7 +296,7 @@ _missionCenterTrigger settriggerarea [_maxObjectivesDistance*2.5,_maxObjectivesD
 MCC_MWmissionsCenter set [count MCC_MWmissionsCenter, _missionCenterTrigger];
 publicvariable "MCC_MWmissionsCenter";
 
-diag_log format ["MCC Mission Wizard center = %1", _missionCenter];
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC Mission Wizard center = %1", _missionCenter]};
 
 //Create the marker
 _markerName =  FORMAT ["MCCMW_operationMarker_%1",["MCCMW_operationMarker",1] call bis_fnc_counter];
@@ -264,7 +305,16 @@ if (!_campaignMission) then {
 };
 
 //-------------------------------------Mission Name ------------------------------
-private ["_factionName","_music","_missionName1","_missionName2","_html","_html2","_control","_tempText","_missionTittle","_sounds","_plainText"];
+private _factionName = "";
+private _music = "";
+private _missionName1 = [];
+private _missionName2 = [];
+private _html = "";
+private _html2 = "";
+private _tempText = [];
+private _missionTittle = "";
+private _sounds = [];
+private _plainText = [];
 _sounds = [];
 
 _missionName1 = [
@@ -335,7 +385,10 @@ _sounds set [count _sounds, _missionName1 select 1];
 _sounds set [count _sounds, _missionName2 select 1];
 
 //Create the parent Task
-private ["_missionObjective","_taskId","_missionName","_multipleObjectives"];
+private _missionObjective = objNull;
+private _taskId = "";
+private _missionName = "";
+private _multipleObjectives = {};
 
 //More then one objective
 _multipleObjectives = {_x != "None" && _x != ""} count [_obj1, _obj2, _obj3] > 1;
@@ -343,8 +396,9 @@ _multipleObjectives = {_x != "None" && _x != ""} count [_obj1, _obj2, _obj3] > 1
 //If just one task no need to create parent
 if (_multipleObjectives) then {
 	_missionName = (_missionName1 select 0) + " " + (_missionName2 select 0);
-	_missionObjective = (createGroup sideLogic) createunit ["MCC_ModuleObjective_FCurator", [-2000,-2000,0],[],0.5,"NONE"];
+	_missionObjective = (createGroup sideLogic) createunit ["MCC_ModuleObjective_FCurator", _missionCenter,[],0.5,"NONE"];
 	_missionObjective setVariable ["BIS_fnc_initModules_disableAutoActivation", false,true];
+	_missionObjective setVariable ["MCC_MWMissionId", _registryId];
 	_taskId = str _missionObjective + str (["MCC_fnc_moduleObjective_id",1] call bis_fnc_counter);
 	_missionObjective setvariable ["RscAttributeOwners",[_sidePlayer,_enemySide],true];
 	_missionObjective setvariable ["RscAttributeTaskState","created", true];
@@ -353,9 +407,10 @@ if (_multipleObjectives) then {
 	_missionObjective setvariable ["proiority",-1,true];
 	_missionObjective setvariable ["notification",false,true];
 	_missionObjective setvariable ["show3d",false,true];
-	_missionObjective setvariable ["showMarker",[-2000,-2000,0],true];
+	_missionObjective setvariable ["showMarker",_missionCenter,true];	//was [-2000,-2000,0]: the parent task marker sat in the bottom-left corner of the map
 	_missionObjective setvariable ["taskType","parent",true];
 	_missionObjective setvariable ["updated",true,true];
+	[_missionObjective, "init"] spawn MCC_fnc_ModuleObjective_F;
 } else {
 	_taskId = "";
 };
@@ -363,6 +418,7 @@ missionNamespace setVariable ["MCC_fnc_MWinitMission_missionName",_taskId];
 publicvariable "MCC_fnc_MWinitMission_missionName";
 
 
+["genStage", ["unit lists, marker, mission name, parent task"]] call MCC_fnc_perfLog;
 //---------------------------------------------------------------------------Let's build objectives----------------------------------------------------------------------
 
 _objectives = [];
@@ -381,7 +437,7 @@ _objectives = [];
 		_objPos = [];
 		_timeStart = time;
 		while {(count _objPos == 0) && (time < _timeStart +5)} do {
-			_objPos = [_missionCenterTrigger,_isCQB, _minObjectivesDistance, _maxObjectivesDistance] call MCC_fnc_MWfindObjectivePos;
+			_objPos = [getpos _missionCenterTrigger,_isCQB, _minObjectivesDistance, _maxObjectivesDistance] call MCC_fnc_MWfindObjectivePos;
 			sleep 0.1;
 		};
 
@@ -400,7 +456,8 @@ _objectives = [];
 
 					case (_objType in ["Secure HVT"]): {
 
-						private ["_defendingFaction","_defendingSide"];
+						private _defendingFaction = "";
+						private _defendingSide = sideUnknown;
 						//Change faction because we are dealing with a hostage and not an enemy
 						if ((random 1)>0.5) then {
 							_defendingFaction 	= _factionPlayer;
@@ -437,7 +494,14 @@ _objectives = [];
 						[_objPos, _isCQB,_enemySide, _enemyfaction, _sidePlayer, _factionPlayer, _civFaction, _preciseMarkers] spawn {
 							params ["_objPos", "_isCQB","_enemySide", "_enemyfaction","_sidePlayer","_factionPlayer","_civFaction","_preciseMarkers"];
 
-							private ["_supplyTruck","_startPos","_unit","_supplyTruckClass","_aidSide","_unitsArray","_units","_counter","_group"];
+							private _supplyTruck = objNull;
+							private _startPos = [];
+							private _supplyTruckClass = nil;
+							private _aidSide = "";
+							private _unitsArray = [];
+							private _units = [];
+							private _counter = 0;
+							private _group = [];
 
 							_objPos set [2,0];
 
@@ -458,7 +522,7 @@ _objectives = [];
 							_startPos = [_sidePlayer,_supplyTruckClass] call MCC_fnc_MWGetStartLocation;
 
 							if (count _startPos <= 0) exitWith {
-								diag_log "MCC_fnc_MCCMissioWizard: Error Can't find a start location position";
+								if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC_fnc_MCCMissioWizard: Error Can't find a start location position"};
 								[[_markerName]] call MCC_MWCleanup;
 							};
 
@@ -482,26 +546,49 @@ _objectives = [];
 							};
 
 							//Spawn one group in defend
-							_unitsArray = [_enemyfaction ,"soldier"] call MCC_fnc_makeUnitsArray;
+							_unitsArray = [[_enemyfaction ,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 
 							if (count _unitsArray > 0) then {
 								if (count _unitsArray > 6) then {_unitsArray resize 6};
 
 								_units = [];
 
-								_objPos = [_objPos,0,100,2,0,50,0] call BIS_fnc_findSafePos;
+								private _defendPos = [_objPos,0,100,2,0,50,0] call BIS_fnc_findSafePos;
+								if ((_defendPos distance2D _objPos) > 150) then {_defendPos = +_objPos};
 
-							    _counter = floor random 8;
+								_units = [_enemyfaction, 2 + floor random 6] call MCCMK_fnc_buildSquad;
 
-								for "_i" from 1 to _counter do {
-									_units pushBack ((_unitsArray call bis_fnc_selectRandom) select 0);
+								if (count _units > 0) then {
+									_group = [_defendPos, _units, 1, _enemySide, false, false] call MCC_fnc_groupSpawn;
+									[_group, _defendPos] call bis_fnc_taskDefend;
 								};
-
-								_group = [_objPos, _units, 1, _enemySide, false, false] call MCC_fnc_groupSpawn;
-								[_group, _objPos] call bis_fnc_taskDefend;
 							};
+							private _fnc_drivable = {
+								params ["_p"];
+								!(surfaceIsWater _p)
+								&& {((surfaceNormal _p) select 2) > 0.96}
+								&& {count (nearestTerrainObjects [_p, ["TREE","SMALL TREE","BUSH","BUILDING","HOUSE","WALL","FENCE","ROCK","ROCKS","HIDE","FUELSTATION","CHURCH","CHAPEL"], 6, false, true]) == 0}
+								&& {count ((nearestObjects [_p, ["Static","AllVehicles","Thing"], 6]) select {!(_x isKindOf "Logic") && {!(_x isKindOf "CAManBase")}}) == 0}
+							};
+							private _deliveryPos = +_objPos;
+							if !([_objPos] call _fnc_drivable) then {
+								private _cands = ((_objPos nearRoads 150) apply {getPos _x}) select {!(surfaceIsWater _x)};
+								for "_d" from 10 to 150 step 10 do {
+									for "_a" from 0 to 345 step 15 do {_cands pushBack (_objPos getPos [_d, _a])};
+								};
+								_cands = [_cands, [], {_x distance2D _objPos}, "ASCEND"] call BIS_fnc_sortBy;
+								private _i = _cands findIf {[_x] call _fnc_drivable};
+								if (_i >= 0) then {
+									_deliveryPos = _cands select _i;
+									["INFO", "fn_MWinitMission", "Logistics: delivery point moved %1 m from the aid camp to drivable ground at %2", [round (_deliveryPos distance2D _objPos), mapGridPosition _deliveryPos]] call MCC_fnc_log;
+								} else {
+									["WARN", "fn_MWinitMission", "Logistics: no drivable spot within 150 m of the aid camp at %1 - delivery point left on the camp", [mapGridPosition _objPos]] call MCC_fnc_log;
+								};
+							};
+							_deliveryPos = [_deliveryPos select 0, _deliveryPos select 1, 0];
+
 							//Land_WaterBottle_01_stack_F Land_FoodSacks_01_small_brown_idap_F
-							[_supplyTruck, _objPos,"Logistics",_preciseMarkers,_enemySide,400] call MCC_fnc_MWCreateTask;
+							[_supplyTruck, _deliveryPos,"Logistics",_preciseMarkers,_enemySide,400] call MCC_fnc_MWCreateTask;
 						};
 
 						//prevent spawning garrison in houses
@@ -527,7 +614,7 @@ _objectives = [];
 				_alarm setVariable ["vehicleinit",_init];
 				{_x addCuratorEditableObjects [[_alarm],false]} forEach allCurators;
 
-				[["", getpos _alarm, 100, 100, _activate, _cond,"AlarmSfx",false],"MCC_fnc_MusicTrigger",true,false] spawn BIS_fnc_MP;
+				["", getpos _alarm, 100, 100, _activate, _cond,"AlarmSfx",false] remoteExec ["MCC_fnc_MusicTrigger",0,false];
 			};
 			*/
 
@@ -544,21 +631,24 @@ _objectives = [];
 			//Spawn some Infantry groups
 			_spawnbehavior	= ["NOFOLLOW","bisd"] call BIS_fnc_selectRandom;
 			_unitPlaced = [(_totalEnemyUnits*0.2),_zoneNumber,_spawnbehavior,_enemySide] call MCC_fnc_MWSpawnInfantry;
-			if (MCC_debug) then {diag_log format ["Total enemy's infantry Spawned in zone%1: %2", _zoneNumber,_unitPlaced]};
+			if (MCC_debug) then {diag_log format ["Total enemy infantry spawned in zone %1: %2", _zoneNumber,_unitPlaced]};
 
 			// Is CQB
 			if (_isCQB) then {
-				[[_objPos,(_maxObjectivesDistance*0.5),0,(_totalEnemyUnits*0.05) min 2,_enemyfaction, _enemySide],"MCC_fnc_garrison",false,false] spawn BIS_fnc_MP;
+				[_objPos,(_maxObjectivesDistance*0.5),0,(_totalEnemyUnits*0.05) min 2,_enemyfaction, _enemySide] remoteExec ["MCC_fnc_garrison", 2,false];
 			};
 
 			// Is _isCiv
 			if (_isCiv) then {
-				[[_objPos,(_maxObjectivesDistance*0.5),1,(_totalEnemyUnits*0.05) min 2,_civFaction,"CIV"],"MCC_fnc_garrison",false,false] spawn BIS_fnc_MP;
+				[_objPos,(_maxObjectivesDistance*0.5),1,(_totalEnemyUnits*0.05) min 2,_civFaction,"CIV"] remoteExec ["MCC_fnc_garrison", 2,false];
 			};
 
 
 			//Suicide Bombers
-			private ["_name","_objectType","_unitsArray","_pos"];
+			private _name = "";
+			private _objectType = "";
+			private _unitsArray = [];
+			private _pos = [];
 			_unitsArray 	= [_civFaction, "soldier"] call MCC_fnc_makeUnitsArray;		//Let's build the faction unit's array
 
 			if (_isSB && (count _unitsArray > 0)) then {
@@ -568,11 +658,12 @@ _objectives = [];
 						_objectType = (_unitsArray call BIS_fnc_selectRandom) select 0;
 						_pos = [[[_objPos,(_maxObjectivesDistance*0.7)]],["water"],{true}] call BIS_fnc_randomPos;
 
-						[[_pos,_objectType,"large",floor (random 2),_sidePlayer],"MCC_fnc_SBSingle",false,false] spawn BIS_fnc_MP;
+						[_pos,_objectType,"large",floor (random 2),_sidePlayer] remoteExec ["MCC_fnc_SBSingle", 2,false];
 
 						//Debug
 						if (MCC_debug) then {
-							private ["_marker","_name"];
+							private _marker = "";
+							private _name = "";
 							_name = FORMAT ["SBMarker_%1", ["SBMarker",1] call bis_fnc_counter];
 							_marker = createMarkerLocal[_name, _pos];
 							_marker setMarkerTypeLocal "mil_dot";
@@ -596,7 +687,8 @@ _objectives = [];
 
 						//Debug
 						if (MCC_debug) then {
-							private ["_marker","_name"];
+							private _marker = "";
+							private _name = "";
 							_name = FORMAT ["ACMarker_%1", ["ACMarker_",1] call bis_fnc_counter];
 							_marker = createMarkerLocal[_name, _pos];
 							_marker setMarkerTypeLocal "mil_dot";
@@ -608,15 +700,16 @@ _objectives = [];
 				};
 			};
 
-			_objectives pushBack MCC_MWObjectivesNames;
+			_objectives pushBack MCC_MWObjectivesNames; if (canSuspend) then {sleep ((missionNamespace getVariable ["MCC_spawnPacing", 0.5]) * 4)};
 		};
 	};
 } foreach [_obj1,_obj2,_obj3];
 
 
 
+["genStage", ["objectives (incl. objective zones and their AI)"]] call MCC_fnc_perfLog;
 //-----------------------------------------------------------------------------Main zone-----------------------------------------------------------------------------------------------
-private ["_unitPlaced","_safepos","_factor"];
+private _unitPlaced = 0;
 
 [_missionCenterTrigger,_enemyfaction,_civFaction,_totalEnemyUnits, false, false, _animals, _vehicles, _armor, _artillery, _isRoadblocks, _isIED, false, false, _reinforcement, _sidePlayer, _enemySide, _markers] call MCC_fnc_populateObjective;
 
@@ -626,7 +719,7 @@ publicVariable "MCC_MWMissions";
 
 if (_weatherChange != 0) then {
 	//------------------- Time ---------------------------------------------------------------------------------
-	private ["_hour"];
+	private _hour = 0;
 	if (_stealth) then {
 		_hour = if (random 1 > 0.5) then {floor (random 5)} else {floor ((random 3)+20)};
 	} else {
@@ -637,13 +730,13 @@ if (_weatherChange != 0) then {
 	MCC_date	= [(MCC_date select 0) + floor (random 10 - random 10), floor ((random 12)+1)  ,  floor ((random 28)+1), _hour,  floor (random 60)];
 	publicVariable "MCC_date";
 
-	[[MCC_date],"MCC_fnc_setTime",true,false] call BIS_fnc_MP;
+	[MCC_date] remoteExec ["MCC_fnc_setTime", 0,false];
 
 
 	//------------------- Weather ---------------------------------------------------------------------------------
 
 	if !(_weatherChange in [2,3,4]) then {
-		private "_monthFactor";
+		private _monthFactor = [];
 		["clear",false] remoteExec ["MCC_fnc_ppEffects",0,false];
 
 		_monthFactor = [1,1,0.8,0.8,0.6,0.4,0.2,0.2,0.4,0.6,0.8,1] select ((MCC_date select 1)-1);
@@ -665,7 +758,7 @@ if (_weatherChange != 0) then {
 			publicVariable "MCC_Lightnings";
 			publicVariable "MCC_Fog";
 
-			[[[MCC_Overcast, MCC_WindForce, MCC_Waves, MCC_Rain, MCC_Lightnings, MCC_Fog]],"MCC_fnc_setWeather",true,false] call BIS_fnc_MP;
+			[[MCC_Overcast, MCC_WindForce, MCC_Waves, MCC_Rain, MCC_Lightnings, MCC_Fog]] remoteExec ["MCC_fnc_setWeather", 0,false];
 		} else {
 			[[MCC_Overcast, MCC_WindForce, MCC_Waves]] remoteExec ["MCC_fnc_setWeather",0];
 			publicVariable "MCC_Overcast";
@@ -679,6 +772,7 @@ if (_weatherChange != 0) then {
 	};
 };
 
+["genStage", ["main zone (infantry, vehicles, statics, roadblocks, IEDs, civilians)"]] call MCC_fnc_perfLog;
 //Force AI to use flashlights
 
 [position _missionCenterTrigger, (triggerArea _missionCenterTrigger) select 0,(triggerArea _missionCenterTrigger) select 1] spawn {
@@ -780,10 +874,10 @@ if (_vehicles) then {
 
 //_armor
 if (_armor) then {
-    _html = _html + format ["<t size='0.8' color='#E2EEE0'>Be aware that there may be %1 armored vehicles or even MBT's operating in the OP. </t>",_factionName];
-	_html2 = _html2 + format ["<br/>Be aware that there may be %1 armored vehicles or even MBT operating in the OP.",_factionName];
-	_missionText =  _missionText + format ["<br/>Be aware that there may be %1 armored vehicles or even MBT operating in the OP.<br/>",_factionName];
-	//_plainText pushback [format ["Be aware that there may be %1 armored vehicles or even MBT operating in the OP.",_factionName],"<t size='0.7' color='#E2EEE0' font='PuristaMedium'>%1</t>",0];
+    _html = _html + format ["<t size='0.8' color='#E2EEE0'>Be aware that there may be %1 armored vehicles or even MBTs operating in the area. </t>",_factionName];
+	_html2 = _html2 + format ["<br/>Be aware that there may be %1 armored vehicles or even MBTs operating in the area.",_factionName];
+	_missionText =  _missionText + format ["<br/>Be aware that there may be %1 armored vehicles or even MBTs operating in the area.<br/>",_factionName];
+	//_plainText pushback [format ["Be aware that there may be %1 armored vehicles or even MBTs operating in the area.",_factionName],"<t size='0.7' color='#E2EEE0' font='PuristaMedium'>%1</t>",0];
 	_sounds set [count _sounds, ["isArmor",4.68]];
 };
 
@@ -816,17 +910,17 @@ if (_isIED || _isSB) then {
 };
 //_isAS
 if (_isAS) then {
-    _html = _html + format ["<t size='0.8' color='#E2EEE0'>The local civilians support %1, so be on the look out for any strange behavior. But keep civilian casualties to a minimum as the top Brass don't want to draw unnecessary attention. </t>",_factionName];
-	_html2 = _html2 + format ["The local civilians support %1, so be on the look out for any strange behavior. But keep civilian casualties to a minimum as the top Brass do not want to draw unnecessary attention.",_factionName];
+    _html = _html + format ["<t size='0.8' color='#E2EEE0'>The local civilians support %1, so be on the lookout for any strange behavior. But keep civilian casualties to a minimum as the top brass don't want to draw unnecessary attention. </t>",_factionName];
+	_html2 = _html2 + format ["The local civilians support %1, so be on the lookout for any strange behavior. But keep civilian casualties to a minimum as the top brass do not want to draw unnecessary attention.",_factionName];
 
-	_missionText =  _missionText + format ["<br/>The local civilians support %1, so be on the look out for any strange behavior. But keep civilian casualties to a minimum as the top Brass do not want to draw unnecessary attention.",_factionName];
-	//_plainText pushback [format ["The local civilians support %1, so be on the look out for any strange behavior. But keep civilian casualties to a minimum as the top Brass do not want to draw unnecessary attention.",_factionName],"<t size='0.7' color='#E2EEE0' font='PuristaMedium'>%1</t>",0];
+	_missionText =  _missionText + format ["<br/>The local civilians support %1, so be on the lookout for any strange behavior. But keep civilian casualties to a minimum as the top brass do not want to draw unnecessary attention.",_factionName];
+	//_plainText pushback [format ["The local civilians support %1, so be on the lookout for any strange behavior. But keep civilian casualties to a minimum as the top brass do not want to draw unnecessary attention.",_factionName],"<t size='0.7' color='#E2EEE0' font='PuristaMedium'>%1</t>",0];
 	_sounds set [count _sounds, ["isAS",10.77]];
 };
 
 //Reinforcment
 if (_reinforcement in [1,2,3] || _stealth) then {
-	private "_text";
+	private _text = "";
 	switch (_reinforcement) do {
 		case 0: {
 			_text = "";
@@ -871,28 +965,56 @@ _music = MWinitMissionMusic call BIS_fnc_selectRandom;
 
 if (_playMusic > 0 ) then {_music = ""};
 
-[[_html2, ((_missionName1 select 0) +" " + (_missionName2  select 0)), [_missionTittle], [_missionCenter,_objectives,1,_html,_sounds,_music,_plainText,_sidePlayer,_playMusic,_preciseMarkers]],"MCC_fnc_makeBriefing",false,false] spawn BIS_fnc_MP;
+[_html2, ((_missionName1 select 0) +" " + (_missionName2  select 0)), [_missionTittle], [_missionCenter,_objectives,1,_html,_sounds,_music,_plainText,_sidePlayer,_playMusic,_preciseMarkers]] remoteExec ["MCC_fnc_makeBriefing", 2,false];
 
 
 //Broadcast missionInfo to all side
 missionNamespace setVariable [format ["MCC_missionsInfo_%1", _sidePlayer],[_missionCenter,_objectives,1,_html,_sounds]];
 publicVariable format ["MCC_missionsInfo_%1", _sidePlayer];
 
+["genEnd", ["briefing and generator finished"]] call MCC_fnc_perfLog;
+
 //Clear up
 MCC_MWisGenerating = false;
 publicVariable "MCC_MWisGenerating";
 
+//Finish the record after the objectives and their AI have had time to spawn
+[_registryId, format ["%1%2 %3", ["", "Campaign: "] select _campaignMission, _missionName1 select 0, _missionName2 select 0]] spawn {
+	params ["_id", "_name"];
+	sleep 45;
+	["finish", [_id, _name]] call MCC_fnc_generatedMissions;
+};
+
 if (!isnil "MCC_worldArea") then {deleteVehicle MCC_worldArea;	MCC_worldArea = nil};
 if (!isnil "MWMissionArea") then {deleteVehicle MWMissionArea;	MWMissionArea = nil};
 
-//Wait till mission end
-[_missionCenter,_maxObjectivesDistance,_markerName] spawn {
-	params ["_missionCenter","_maxObjectivesDistance","_markerName"];
+missionNamespace setVariable ["MCC_MWCurrentMissionId", ""];
 
+//Wait till mission end
+[_missionCenter,_maxObjectivesDistance,_markerName,_registryId] spawn {
+	params ["_missionCenter","_maxObjectivesDistance","_markerName","_registryId"];
+
+	private _fnc_own = {(allMissionObjects "MCC_ModuleObjective_FCurator") select {(_x getVariable ["MCC_MWMissionId", ""]) == _registryId}};
+
+	//"Mission running" stays true while any generated mission is still running (the campaign waits for it)
+	private _running = missionNamespace getVariable ["MCC_MWRunningMissions", []];
+	_running pushBackUnique _registryId;
+	missionNamespace setVariable ["MCC_MWRunningMissions", _running];
 	missionNamespace setVariable ["MCC_MWMissionRuning",true];
 	publicvariable "MCC_MWMissionRuning";
 
-	while {{(_x getvariable ["MCC_customTask",false]) && ((_x getvariable ["RscAttributeTaskState",""]) in ["created","assigned"])} count (allMissionObjects "MCC_ModuleObjective_FCurator") > 0} do {
+	// Do not judge the mission before its objectives exist (this loop used to start before the objective modules were
+	// flagged, found none open and announced "mission accomplished" right after generating)
+	private _waitStart = time;
+	waitUntil {
+		sleep 1;
+		({_x getvariable ["MCC_customTask",false]} count (call _fnc_own)) > 0 || {time - _waitStart > 120}
+	};
+	if (({_x getvariable ["MCC_customTask",false]} count (call _fnc_own)) == 0) then {
+		["WARN", "fn_MWinitMission", "no objective task was created for this mission - ending it", []] call MCC_fnc_log;
+	};
+
+	while {{(_x getvariable ["MCC_customTask",false]) && ((_x getvariable ["RscAttributeTaskState",""]) in ["created","assigned"])} count (call _fnc_own) > 0} do {
 		sleep 1;
 	};
 
@@ -902,10 +1024,14 @@ if (!isnil "MWMissionArea") then {deleteVehicle MWMissionArea;	MWMissionArea = n
 	};
 	*/
 
-	missionNamespace setVariable ["MCC_MWMissionRuning",false];
+	private _running = (missionNamespace getVariable ["MCC_MWRunningMissions", []]) - [_registryId];
+	missionNamespace setVariable ["MCC_MWRunningMissions", _running];
+	missionNamespace setVariable ["MCC_MWMissionRuning", count _running > 0];
 	publicvariable "MCC_MWMissionRuning";
 
-	//Global Radio message when done
-	(selectRandom ["cp_mission_accomplished_1", "cp_mission_accomplished_2", "cp_mission_accomplished_3"]) remoteExec ["playSound",0];
+	//Global Radio message when done (not when the mission was deleted)
+	if !(missionNamespace getVariable [format ["MCC_missionDeleted_%1", _registryId], false]) then {
+		(selectRandom ["cp_mission_accomplished_1", "cp_mission_accomplished_2", "cp_mission_accomplished_3"]) remoteExec ["playSound",0];
+	};
 	deleteMarker _markerName;
 };

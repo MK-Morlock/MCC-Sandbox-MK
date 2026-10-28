@@ -35,7 +35,7 @@ class MCC_Module_setResources : Module_F
 
 		class repair
 		{
-			displayName = "Materials";
+			displayName = "Supplies";
 			typeName = "NUMBER";
 			defaultValue = 500;
 		};

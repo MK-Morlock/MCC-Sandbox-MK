@@ -2,8 +2,9 @@
 // Create a camera object on player
 // Example: [_displayVar] call MCC_fnc_createCameraOnPlayer
 //==============================================================================================================================================================================
-private ["_camLogic","_displayVar"];
-_displayVar = [_this, 0, "No display", [""]] call BIS_fnc_param;
+private "_camLogic";
+private _displayVar = "";
+_displayVar = _this param [0, "No display", [""]];
 
 _camLogic = vehicle player;
 

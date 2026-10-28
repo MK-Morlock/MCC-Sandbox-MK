@@ -2,7 +2,7 @@
 #define MCC_UM_LIST 3069
 disableSerialization;
 
-private ["_type","_mccdialog", "_name", "_worldPos"];
+private _mccdialog = controlNull;
 
 MCC_UMunitsNames = [];
 UMgroupNames = [];

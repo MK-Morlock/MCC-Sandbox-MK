@@ -1,9 +1,12 @@
 //==================================================================MCC_fnc_time===============================================================================================
 // convert time to hh:mm:ss
 //==============================================================================================================================================================================	
-private ["_secTotal","_h","_m","_s","_string"];
+private _h = [];
+private _m = [];
+private _s = [];
+private _string = "";
 
-_secTotal = _this select 0;
+params ["_secTotal"];
 
 _s = [floor(_secTotal MOD 60)]call MCC_fnc_time2string;
 _m = [floor((_secTotal/60) MOD 60)]call MCC_fnc_time2string;

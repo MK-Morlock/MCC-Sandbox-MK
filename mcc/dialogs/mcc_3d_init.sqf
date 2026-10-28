@@ -17,7 +17,10 @@ ctrlShow [MCC_3DCargoGen,false];
 ctrlShow [MCC_3dTasksControlsIDC,false];
 
 disableSerialization;
-private ["_mccdialog","_comboBox","_displayname","_x"];
+private _mccdialog = controlNull;
+private _comboBox = controlNull;
+private _displayname = "";
+private "_x";
 
 MCC3DInitDone = false;
 missionNamespace setVariable ["MCC_mcc_screen",1];
@@ -28,7 +31,7 @@ uiNamespace setVariable ["MCC3D_Dialog", _this select 0];
 //track Units
 MCC_trackMarkerHandler3DDialog = ((uiNamespace getVariable "MCC3D_Dialog") displayCtrl 0) ctrladdeventhandler ["draw","_this call MCC_fnc_trackUnits;"];
 
-((uiNamespace getVariable "MCC3D_Dialog") displayCtrl 0) ctrlMapAnimAdd [0, uiNamespace getVariable "MCC3D_DialogMapScale", getpos MCC_3D_CAM];
+((uiNamespace getVariable "MCC3D_Dialog") displayCtrl 0) ctrlMapAnimAdd [0, uiNamespace getVariable ["MCC3D_DialogMapScale", 0.15], getpos MCC_3D_CAM];
 ctrlMapAnimCommit ((uiNamespace getVariable "MCC3D_Dialog") displayCtrl 0);
 
 _comboBox = _mccdialog displayCtrl MCC_FACTION;		//fill combobox CFG factions
@@ -44,12 +47,33 @@ lbClear _comboBox;
 {
 	_displayname =  _x;
 	_index = _comboBox lbAdd _displayname;
+	_comboBox lbSetValue [_index, _forEachIndex];
+	if (_forEachIndex == 0) then {
+		private _g = _comboBox lbAdd "Infantry Groups";
+		_comboBox lbSetValue [_g, 999];
+	};
 } foreach ["Infantry", "Vehicles", "Tracked/Static", "Motorcycle", "Helicopter", "Fixed-wing", "Ship", "D.O.C", "Ammo", "Objects (Fortifications)", "Objects (Dead Bodies)", "Objects (Furniture)",
 			"Objects (Market)", "Objects (Construction)", "Objects (Signs)", "Objects (Flags)", "Objects (Military)","Objects (Small)", "Objects (Wrecks)", "Objects (Submerged)", "Objects (Tents)","Objects (Garbage)","Objects (Lamps)",
 			"Objects (Container)","Objects (Helpers)","Objects (Training)","Mines","Animals","Structures (Airport)","Structures (Military)","Structures (Cultural)","Structures (Walls)","Structures (Infrastructure)","Structures (commercial)",
 			"Structures (Industrial)","Structures (Town)","Structures (Village)","Structures (Fences)","Structures (General)","Backpacks","Intel","Items","Items (Headgear)","Items (Uniforms)","Items (Vests)","Weapons (Accessories)","Weapons (Handguns)",
 			"Weapons (Primary)","Weapons (Secondary)","Respawn Items"];
 _comboBox lbSetCurSel MCC_class_index;
+private _behBox = _mccdialog displayCtrl 8034;
+lbClear _behBox;
+{
+	private _bi = _behBox lbAdd (_x select 0);
+	_behBox lbSetData [_bi, _x select 1];
+} forEach [["Hold position", "hold"], ["None (Arma default)", "bis"], ["BIS Defence", "bisd"], ["BIS Patrol", "bisp"]];
+private _behSel = ["hold", "bis", "bisd", "bisp"] find (missionNamespace getVariable ["MCC_3D_beh", "hold"]);
+_behBox lbSetCurSel (_behSel max 0);
+private _cmdBox = _mccdialog displayCtrl 8035;
+lbClear _cmdBox;
+{_cmdBox lbAdd _x} forEach ["No", "Yes"];
+_cmdBox lbSetCurSel ([0, 1] select (missionNamespace getVariable ["MCC_3D_cmd", false]));
+private _searchBox = _mccdialog displayCtrl 8031;
+private _searchText = uiNamespace getVariable ["MCC3D_factionSearchText", ""];
+_searchBox ctrlSetText _searchText;
+if (_searchText != "") then {ctrlSetFocus _searchBox};
 
 _comboBox = _mccdialog displayCtrl MCC_SETTING_EMPTY;		//fill combobox Empty on/off
 lbClear _comboBox;

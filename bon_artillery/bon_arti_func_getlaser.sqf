@@ -1,7 +1,17 @@
 //by Bon_Inf*
 /** returns the laser target the _unit is lasering at, or ObjNull if it does not exist **/
 
-private ["_xpos","_ypos","_myLaserTarget","_lasertargets","_dir","_distance","_min","_target","_targetpos","_targetdistance","_aimpos"];
+private "_xpos";
+private "_ypos";
+private _myLaserTarget = objNull;
+private _lasertargets = objNull;
+private "_dir";
+private "_distance";
+private "_min";
+private "_target";
+private _targetpos = [];
+private "_targetdistance";
+private _aimpos = [];
 _unit = _this;
 _threshold = 100;
 

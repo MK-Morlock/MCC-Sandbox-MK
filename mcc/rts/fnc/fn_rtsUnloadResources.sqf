@@ -3,14 +3,26 @@
 //  Parameter(s):
 //     	_ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_ctrl","_truck","_cratesType","_attachPoint","_loadedCrates","_res","_unload","_maxLoad","_startPos","_nearByCrates","_crate","_resLevel","_attachedObjects","_position","_factor"];
+private "_truck";
+private _cratesType = [];
+private _attachPoint = configNull;
+private _loadedCrates = [];
+private "_res";
+private _unload = false;
+private _maxLoad = 0;
+private "_startPos";
+private "_crate";
+private "_resLevel";
+private "_attachedObjects";
+private "_position";
+private "_factor";
 #define CRATE_COST 200
 #define ANCHOR_POINT_WEST [0,-0.2,0]
 #define ANCHOR_POINT_EAST [0,-0.9,0]
 #define ANCHOR_POINT_GUER [0,+0.5,0]
 
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 
@@ -32,7 +44,7 @@ _unload	= false;
 _maxLoad =3;
 
 //Are we near start location
-_startPos = call compile format ["MCC_START_%1",playerside];
+_startPos = missionNamespace getVariable (format ["MCC_START_%1", playerside]);
 if (isnil "_startPos") then {_startPos = [0,0,0]};
 _startLoad = _startPos distance _truck <= 50;
 

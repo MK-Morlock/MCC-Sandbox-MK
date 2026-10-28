@@ -1,7 +1,9 @@
-private ["_markerArray", "_isvip", "_car1", "_convoyArray", "_marker", "_activewp", "_wp","_cargoNum","_fillSlots", "_pos", "_locGr", "_spawned","_unitsArray","_group","_type"];
+private _car1 = objNull;
+private _convoyArray = [];
+private _activewp = [];
+private _wp = [];
 
-_markerArray = _this select 0;
-_isvip = _this select 1;
+params ["_markerArray", "_isvip"];
 
 _convoyArray = missionNamespace getVariable ["MCC_convoyVehicles",[]];
 _car1 = _convoyArray select 0;

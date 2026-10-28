@@ -17,7 +17,7 @@ class MCC_Module_captureZone : Module_F
 		{
 			displayName = "Type";
 			typeName = "NUMBER";
-			property = "type";
+			property = "MCC_Module_captureZone_type";
 
 			class values
 			{
@@ -50,36 +50,36 @@ class MCC_Module_captureZone : Module_F
 			displayName = "Score Reward";
 			typeName = "NUMBER";
 			defaultValue = 50;
-			property = "ScoreReward";
+			property = "MCC_Module_captureZone_ScoreReward";
 		};
 
 		class flag : Checkbox
 		{
 			displayName = "Flag";
 			typeName = "BOOL";
-			property = "faction1";
+			property = "MCC_Module_captureZone_faction1";
 		};
 
 		class respawn : Checkbox
 		{
 			displayName = "Respawn";
-			description = "Owner side can respawn on sector";
+			description = "The owner side can respawn at the sector";
 			typeName = "BOOL";
-			property = "respawn";
+			property = "MCC_Module_captureZone_respawn";
 		};
 
 		class enableHUD  : Checkbox
 		{
 			displayName = "HUD";
 			typeName = "BOOL";
-			property = "enableHUD";
+			property = "MCC_Module_captureZone_enableHUD";
 		};
 
 		class sectorName : Edit
 		{
 			displayName = "Designation";
 			typeName = "STRING";
-			property = "sectorName";
+			property = "MCC_Module_captureZone_sectorName";
 		};
 
 		class ModuleDescription: ModuleDescription{};
@@ -87,7 +87,7 @@ class MCC_Module_captureZone : Module_F
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Create a capture zone that yield resources over time, sync the module with a trigger to set the are of capturing and a flagpole (optional)";
+		description = "Create a capture zone that yields resources over time. Sync the module with a trigger to set the capture area, and with a flagpole (optional)";
 		position = 1;
 		direction = 1;
 		optional = 0;
@@ -124,7 +124,7 @@ class MCC_Module_captureZone : Module_F
 
 		class TriggerUnlock
 		{
-			description = "This trigger have to be activated to enable the capture point.";
+			description = "This trigger has to be activated to enable the capture point.";
 			duplicate = 1;
 			optional = 1;
 			vehicle = "EmptyDetector";

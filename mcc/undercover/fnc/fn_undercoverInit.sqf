@@ -2,12 +2,14 @@
 	Init under cover script
 
 */
-private ["_unit", "_removeWeapons","_null"];
+private _unit = objNull;
+private _removeWeapons = false;
+private _null = false;
 _unit =  param [0, objNull, [objNull]];
 _removeWeapons =  param [1, false, [false]];
 
 if (isNull _unit) exitWith {};
-if (_unit != player || !local _unit) exitWith {diag_log "MCC_fnc_undercoverInit: not a player unit"};
+if (_unit != player || !local _unit) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC_fnc_undercoverInit: not a player unit"}};
 
 //Add EH
 if !(player getVariable ["MCC_underCoverInitEH",false]) then {

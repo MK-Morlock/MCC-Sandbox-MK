@@ -4,7 +4,9 @@
 //     _ctrl: CONTROL
 //     _ctrlText: STRING
 //==============================================================================================================================================================================
-private ["_ctrl","_ctrlText","_disp","_text"];
+private "_ctrl";
+private "_ctrlText";
+private "_disp";
 disableSerialization;
 
 _ctrl = (_this select 0) select 0;
@@ -15,7 +17,7 @@ if (str (_disp displayCtrl 150) != "No control") then {
 	(_disp displayCtrl 150) ctrlSetStructuredText parseText"";
 };
 
-if (count MCC_ConsoleGroupSelected <=0) then {((uiNamespace getVariable "MCC_LOGISTICS_BASE_BUILD") displayCtrl 9999) ctrlSetStructuredText parseText ""};
+if (count MCC_ConsoleGroupSelected <=0) then {((uiNamespace getVariable "MCC_LOGISTICS_BASE_BUILD") displayCtrl 9999) ctrlSetStructuredText parseText ""; [] call MCC_fnc_rtsSelectedPic};
 
 
 

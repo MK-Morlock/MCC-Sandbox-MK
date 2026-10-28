@@ -4,7 +4,12 @@
 
 */
 
-private ["_fullCount","_mgazinesAmmo","_mgazinesClasses","_index","_totalAmmo","_success"];
+private _fullCount = 0;
+private _mgazinesAmmo = [];
+private _mgazinesClasses = [];
+private "_index";
+private "_totalAmmo";
+private _success = [];
 _mgazinesAmmo = [];
 _mgazinesClasses = [];
 

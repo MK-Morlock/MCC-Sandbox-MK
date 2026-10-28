@@ -10,7 +10,8 @@
 
 */
 
-private ["_spawnCenters","_isVisibale"];
+private _spawnCenters = [];
+private _isVisibale = false;
 params [
 	["_object",objNull,[objNull,[]]],
 	["_radius",0,[0]]

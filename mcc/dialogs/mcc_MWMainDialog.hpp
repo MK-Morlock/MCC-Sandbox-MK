@@ -1,7 +1,7 @@
 #define MCC_MINIMAP 9000
 #define MCCMWDialog_IDD 2989
 
-class MCCMWDialog
+class MCCDLG_NAME
 {
 	idd = MCCMWDialog_IDD;
 	movingEnable = true;
@@ -22,7 +22,7 @@ class MCCMWDialog
 		class MCCMWDialogFrame: MCC_RscText
 		{
 			idc = -1;
-			colorBackground[] = { 0.051, 0.051, 0.051,1};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 
 			x = 0.225 * safezoneW + safezoneX;
 			y = 0.11515 * safezoneH + safezoneY;
@@ -41,13 +41,13 @@ class MCCMWDialog
 			h = 0.0549786 * safezoneH;
 		};
 
-		class MCCMWDialogClose: MCC_RscButtonMenu
+		class MCCMWDialogClose: MCCBTN_R
 		{
 			idc = -1;
 			text = "Close"; //--- ToDo: Localize;
 			action = "MCC_mcc_screen = 2;closeDialog 0;";
 
-			x = 0.694792 * safezoneW + safezoneX;
+			x = 0.233000 * safezoneW + safezoneX;
 			y = 0.83 * safezoneH + safezoneY;
 			w = 0.0744792 * safezoneW;
 			h = 0.0329871 * safezoneH;
@@ -55,18 +55,17 @@ class MCCMWDialog
 
 
 		//Generate
-		class MCC_MWGenerate: MCC_RscButton
+		class MCC_MWGenerate: MCCBTN_R
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[0] execVM '"+MCCPATH+"mcc\missionWizard\scripts\missionWizardInit.sqf'");
 			text = "Generate Mission"; //--- ToDo: Localize;
 
-			x = 0.45 * safezoneW + safezoneX;
+			x = 0.682000 * safezoneW + safezoneX;
 			y = 0.83 * safezoneH + safezoneY;
 			w = 0.085 * safezoneW;
 			h = 0.0329871 * safezoneH;
 			tooltip = "Generate a mission "; //--- ToDo: Localize;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 		};
 
 		class MCC_mapBackground : MCC_RscText
@@ -101,9 +100,10 @@ class MCCMWDialog
 
 		class MCCMWZoneTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
-			text = "Zone:";
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
+			text = "Zone";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 
 			x = 0.540104 * safezoneW + safezoneX;
 			y = 0.456017 * safezoneH + safezoneY;
@@ -123,11 +123,10 @@ class MCCMWDialog
 			h = 0.0219914 * safezoneH;
 		};
 
-		class MCCMWZoneUpdateButton: MCC_RscButton
+		class MCCMWZoneUpdateButton: MCCBTN_R
 		{
 			idc = -1;
 			text = "Update Zone";
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			tooltip = "Click and drag on the minimap to make a zone";
 			onButtonClick = "if (mcc_missionmaker == (name player)) then {MCC_zone_drawing= true;} else {player globalchat 'Access Denied'};";
 

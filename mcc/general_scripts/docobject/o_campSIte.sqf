@@ -1,6 +1,4 @@
-private ["_objs"];
-_objs =
-[
+private _objs = [
 		["Land_Ground_sheet_OPFOR_F",[-2.07031,-0.220703,0],143.203,1,0,{}],
 	["Land_Ground_sheet_OPFOR_F",[-2.78125,-0.855469,0],143.203,1,0,{}],
 	["Campfire_burning_F",[-1.24414,-2.80273,0],0,1,0,{}],

@@ -6,7 +6,10 @@ MCC_fnc_mapDrawPlayersWPConsole =
 	{
 		_wpArray = waypoints (group player);
 		if (count _wpArray > 0)then {
-			private ["_wp","_wPos","_wType","_lastPos"];
+			private "_wp";
+			private "_wPos";
+			private "_wType";
+			private "_lastPos";
 			_lastPos = nil;
 			_texture = gettext (configfile >> "CfgMarkers" >> "waypoint" >> "icon");
 
@@ -46,8 +49,15 @@ MCC_fnc_mapDrawPlayersWPConsole =
 	};
 
 	//Custom Group Markers
-	if (missionNamespace getVariable ["MCC_groupMarkers",true]) then {
-		private ["_groups","_texture","_blackList","_units","_iconSize","_iconText","_group","_textSize"];
+	if (missionNamespace getVariable ["MCC_groupMarkers",false]) then {
+		private "_groups";
+		private _texture = configNull;
+		private _blackList = [];
+		private _units = [];
+		private _iconSize = 0;
+		private "_iconText";
+		private "_group";
+		private _textSize = 0;
 		_groups	 = switch (side player) do
 				{
 					case west:			{CP_westGroups};
@@ -129,11 +139,17 @@ findDisplay 12 displayCtrl 51 ctrlAddEventHandler ["Draw","_this call MCC_fnc_ma
 
 sleep 10;
 //Loop
-private ["_wpArray","_rating","_exp","_level","_role","_oldLevel","_newLevel","_nextCheck","_time","_fnc_supplyBox","_vehicle"];
+private _nextCheck = 0;
+private _fnc_supplyBox = {};
+private _vehicle = objNull;
 _nextCheck = time + 300;
 
 _fnc_supplyBox = {
-	private ["_crateClass","_type","_nearItems","_value","_text"];
+	private "_crateClass";
+	private "_type";
+	private "_nearItems";
+	private "_value";
+	private "_text";
 	_crateClass = _this select 0;
 	_type = _this select 1;
 	_text = _this select 2;

@@ -3,7 +3,10 @@
 //  Parameter(s):
 //     _ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_group","_vehicle","_groups","_vehicles"];
+private "_group";
+private "_vehicle";
+private _groups = [];
+private _vehicles = [];
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 
@@ -27,7 +30,7 @@ player globalRadio "CuratorWaypointPlaced";
 		} forEach assignedCargo _vehicle;
 
 		{
-			[[[_x,_vehicle], {(_this select 0) leaveVehicle (_this select 1);}], "BIS_fnc_spawn", leader _x, false] call BIS_fnc_MP;
+			[[_x,_vehicle], {(_this select 0) leaveVehicle (_this select 1);}] remoteExec ["call", leader _x, false];
 		} forEach _groups;
 	};
 } forEach _vehicles;

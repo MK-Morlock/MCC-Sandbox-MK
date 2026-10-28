@@ -13,14 +13,45 @@
 			_this select 8 -  _spawnVehicles	- BOOLEAN - if true will spawn empty vehicle similar to the enemy vheicles
 */
 
-private ["_sectors","_autoBalance","_minPerSide","_spawnInDefensive","_AIUnits","_enemyNumber","_startPos","_sideNumber","_counter","_unitsArray","_spawnPos","_numberOfGroups","_groupArray","_group","_enemySide","_side","_maxUnits","_defendZonesPos","_areas","_faction","_nearVehicles","_searchRadius","_vehicleClass","_simType","_wepArray","_useDefaultGear","_unitNumber","_groupSize","_tempGroup","_vehicleGear","_i","_enemyVehiclesSims","_spawnVehicles","_friendlyVehiclesSims","_vehiclesToSpawn","_vehiclesArray"];
+private _sectors = [];
+private _autoBalance = false;
+private _minPerSide = 0;
+private _spawnInDefensive = false;
+private _enemyNumber = 0;
+private _startPos = [];
+private _sideNumber = 0;
+private "_counter";
+private _unitsArray = [];
+private "_spawnPos";
+private "_numberOfGroups";
+private _group = [];
+private "_enemySide";
+private _side = [];
+private "_maxUnits";
+private _defendZonesPos = [];
+private _areas = [];
+private _faction = nil;
+private _nearVehicles = objNull;
+private _searchRadius = 0;
+private "_vehicleClass";
+private _simType = "";
+private _wepArray = configNull;
+private _useDefaultGear = [];
+private _groupSize = 0;
+private _vehicleGear = [];
+private "_i";
+private _enemyVehiclesSims = [];
+private _spawnVehicles = false;
+private _friendlyVehiclesSims = [];
+private _vehiclesToSpawn = [];
+private _vehiclesArray = [];
 
 //Module or function call
 if (typeName (_this select 0) != typeName objNull) then {
 
 	if (isServer) then {
 		_faction =  param [0, "BLU_F"];
-		_side = [(getNumber (configfile >> "CfgFactionClasses" >> _faction >> "side"))] call BIS_fnc_sideType;
+		_side = [([_faction] call MCC_fnc_factionSide)] call BIS_fnc_sideType;
 		_enemySide = param [1, east];
 		_autoBalance = param [2, true];
 		_minPerSide = param [3, 20];
@@ -32,11 +63,12 @@ if (typeName (_this select 0) != typeName objNull) then {
 	};
 } else {
     _module = param [0, objNull, [objNull]];
-    if (isNull _module)  exitWith {diag_log "MCC MCC_fnc_aas_AIspawn: No module found"};
+    if (isNull _module)  exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC MCC_fnc_aas_AIspawn: No module found"}};
 
     //Curator
     if ((_module isKindOf "MCC_module_AASSpawnAI") && !(isnull curatorcamera) && (local _module)) then {
-    	private ["_factionArray","_resualt"];
+    	private _factionArray = [];
+    	private _resualt = [];
 
     	_factionArray = [];
 		{
@@ -47,16 +79,16 @@ if (typeName (_this select 0) != typeName objNull) then {
     			[localize "STR_Module__AASSpawnAI_faction1_displayName",_factionArray,"Faction units will spawn next to the module location"],
 				[localize "STR_Module__AASSpawnAI_enemySide_displayName",["East","West","Resistance"],"The selected faction will try to capture points from this side"],
 				[localize "STR_Module__AASSpawnAI_searchRadius_displayName",500,"How far AI will look for empty vehicles around spawn point"],
-				[localize "STR_Module__AASSpawnAI_minAI_displayName",50,"Minimun number of AI for the selected faction on every given moment"],
+				[localize "STR_Module__AASSpawnAI_minAI_displayName",50,"Minimum number of AI for the selected faction at any given moment"],
 				[localize "STR_Module__AASSpawnAI_autoBalance_description",true,"Auto balance the number of AI to meet the rival factions"],
 				[localize "STR_Module__AASSpawnAI_spawnAIDefensive_displayName",true,"Spawn AI in captured points own by the faction"],
 				[localize "STR_Module__AASSpawnAI_useRoles_displayName",true,"Use defined roles from the MCC roles selection system"],
 				[localize "STR_Module__AASSpawnAI_spawnVehicles_displayName",true,"Automatically spawn vehicles to match the number and the strength of the opposite side"]
 			  ],format ["<t align='center'> %1</t>",localize "STR_Module__AASSpawnAI_ModuleDescription_description"]] call MCC_fnc_initDynamicDialog;
 
-		if (count _resualt == 0) then {deleteVehicle _module} exitWith {
+		if (count _resualt == 0) then {deleteVehicle _module} else {
 			_faction = ((U_FACTIONS select (_resualt select 0)) select 2);
-			_side = [(getNumber (configfile >> "CfgFactionClasses" >> _faction >> "side"))] call BIS_fnc_sideType;
+			_side = [([_faction] call MCC_fnc_factionSide)] call BIS_fnc_sideType;
 			_enemySide = [(_resualt select 1)] call BIS_fnc_sideType;
 			_searchRadius = (_resualt select 2);
 			_minPerSide = (_resualt select 3);
@@ -73,7 +105,7 @@ if (typeName (_this select 0) != typeName objNull) then {
 	} else {
 		//3den
 		_faction =  _module getVariable ["faction1",""];
-		_side = [(getNumber (configfile >> "CfgFactionClasses" >> _faction >> "side"))] call BIS_fnc_sideType;
+		_side = [([_faction] call MCC_fnc_factionSide)] call BIS_fnc_sideType;
 		_enemySide = [_module getVariable ["enemySide",0]] call BIS_fnc_sideType;
 		_autoBalance = _module getVariable ["autoBalance",false];
 		_minPerSide = _module getVariable ["minAI",0];
@@ -93,20 +125,20 @@ _groupSize = 5;
 if (isNil "_faction") exitWith {};
 
 private _varName = format ["MCC_fnc_aas_AIspawnActive_%1", _faction];
-if (!isServer || (missionNamespace getVariable [_varName,false])) exitWith {systemChat "Faction AAS already initilized"};
+if (!isServer || (missionNamespace getVariable [_varName,false])) exitWith {systemChat "Faction AAS already initialized"};
 missionNamespace setVariable [_varName,true];
 publicVariable _varName;
 
 [_side] spawn MCC_fnc_aas_AIControl;
 
 //Spawn AI
-_unitsArray 	= [_faction,"soldier","men",false] call MCC_fnc_makeUnitsArray;
+_unitsArray 	= [[_faction,"soldier","men",false] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 if (count _unitsArray < 4) then {
-	_unitsArray = [_faction,"soldier","",false] call MCC_fnc_makeUnitsArray;
+	_unitsArray = [[_faction,"soldier","",false] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 };
 
 //No units get out
-if (count _unitsArray <2) exitWith {diag_log "MCC: MCC_fnc_aas_AIControl _unitsArray < 2"};
+if (count _unitsArray <2) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: MCC_fnc_aas_AIControl _unitsArray < 2"}};
 
 _sectors = [];
 
@@ -152,7 +184,8 @@ while {true} do {
 
 	//Spawn vehicles
 	if (_spawnVehicles) then {
-		private ["_vehicleClass","_vehicle"];
+		private "_vehicleClass";
+		private _vehicle = objNull;
 
 		//Get how many vehicle class on each side.
 		_friendlyVehiclesSims = [];

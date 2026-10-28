@@ -3,9 +3,7 @@
 */
 #include "\A3\ui_f_curator\ui\defineResinclDesign.inc"
 
-_mode = _this select 0;
-_params = _this select 1;
-_entity = _this select 2;
+params ["_mode", "_params", "_entity"];
 
 switch _mode do {
 	case "onLoad": {
@@ -20,7 +18,9 @@ switch _mode do {
 			// ACE EH
 			[{
 			    params ["_args", "_handler"];
-			    private ["_cargoItems","_index","_class","_displayName"];
+			    private _cargoItems = [];
+			    private _index = configNull;
+			    private "_class";
 			    _args params ["_vehicle", "_ctrl"];
 
 
@@ -45,7 +45,8 @@ switch _mode do {
 			[{
 			    params ["_args", "_handler"];
 			    _args params ["_object", "_ctrl"];
-			    private ["_cargoItems","_index"];
+			    private _cargoItems = [];
+			    private _index = configNull;
 			    // Display closed or vehicle deleted
 			    if (isNull _ctrl || {isNull _vehicle || {!alive _vehicle}}) exitWith {
 			        [_handler] call CBA_fnc_removePerFrameHandler;
@@ -77,7 +78,9 @@ switch _mode do {
 			missionNamespace setVariable ["MCC_fnc_RscAttributeVehicleCargo_runing",true];
 
 			if (isClass (configFile >> "CfgPatches" >> "ace_cargo")) then {
-				private ["_object","_vehicle","_loadedObjects"];
+				private "_object";
+				private _vehicle = objNull;
+				private _loadedObjects = [];
 				_vehicle = missionnamespace getvariable ["BIS_fnc_initCuratorAttributes_target",objnull];
 				_loadedObjects = _vehicle getVariable ["ACE_cargo_loaded",[]];
 

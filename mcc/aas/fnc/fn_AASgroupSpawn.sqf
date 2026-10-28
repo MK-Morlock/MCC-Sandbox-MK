@@ -2,7 +2,20 @@
 	Spawn group for MCC Advance and secure
 */
 
-private ["_unitNumber","_groupSize","_useDefaultGear","_groupArray","_defaultGroups","_group","_tempGroup","_unit","_selectedRole","_side","_unitsArray","_spawnPos","_i","_p","_t"];
+private _unitNumber = 0;
+private _groupSize = 0;
+private _useDefaultGear = [];
+private _groupArray = [];
+private "_defaultGroups";
+private _group = nil;
+private "_tempGroup";
+private _unit = objNull;
+private "_selectedRole";
+private "_side";
+private _unitsArray = [];
+private _spawnPos = [];
+private "_p";
+private _t = 0;
 _unitNumber = param [0,4];
 _groupSize = param [1,6];
 _useDefaultGear = param [2,[]];
@@ -11,10 +24,7 @@ _side = param [4,sideUnknown];
 _unitsArray = param [5,[]];
 _spawnPos = param [6,[]];
 
-_groupArray = [];
-for "_p" from 1 to _unitNumber step 1 do {
-	_groupArray pushBack ((_unitsArray call bis_fnc_selectRandom) select 0);
-};
+_groupArray = [_unitsArray, _unitNumber] call MCCMK_fnc_buildSquad;
 
 _fnc_killed = {
 	params ["_unit"];
@@ -87,7 +97,12 @@ if (isNull _vehicle) then {
 		{_x addCuratorEditableObjects [[_unit],false]} forEach allCurators;
 	} forEach _groupArray;
 } else {
-	private ["_cfg","_turrets","_path","_index","_isCargo","_t"];
+	private _cfg = configNull;
+	private _turrets = [];
+	private _path = [];
+	private _index = 0;
+	private _isCargo = [];
+	private _t = 0;
 	_cfg = configFile >> "CfgVehicles" >> typeOf _vehicle;
 	_turrets = [_cfg >> "turrets"] call BIS_fnc_returnVehicleTurrets;			//All turrets were found, now spawn crew for them
 	_path = [];
@@ -107,9 +122,8 @@ if (isNull _vehicle) then {
 	{_x addCuratorEditableObjects [[_unit],false]} forEach allCurators;
 
 	while {_t < (count _turrets)} do {
-		private ["_turretIndex", "_thisTurret"];
-		_turretIndex = _turrets select _t;
-		_thisTurret = _path + [_turretIndex];
+		private _turretIndex = _turrets select _t;
+		private _thisTurret = _path + [_turretIndex];
 		_turretPath = configName ((configFile >> "CfgVehicles" >> typeOf _vehicle >> "turrets") Select _index);
 
 		_isCargo = ["cargo",tolower _turretPath] call BIS_fnc_inString;

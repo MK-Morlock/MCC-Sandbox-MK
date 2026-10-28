@@ -137,6 +137,32 @@ class MCC_Module_inGameUI : Module_F
 			};
 		};
 
+		class suppressionLevel
+		{
+			displayName = "Suppression strength";
+			description = "How strong the suppression effects (blur, red tint, screen shake) are. Maximum = the original effect.";
+			typeName = "NUMBER";
+			class values
+			{
+				class minimal
+				{
+					name = "Minimal";
+					value = 1;
+				};
+				class average
+				{
+					name = "Average";
+					value = 2;
+				};
+				class maximum
+				{
+					name = "Maximum";
+					value = 3;
+					default = 1;
+				};
+			};
+		};
+
 		class hitRadar
 		{
 			displayName = "Fire Direction indicator";
@@ -168,7 +194,7 @@ class MCC_Module_inGameUI : Module_F
 		class tickets
 		{
 			displayName = "Tickets";
-			description = "Show opposing sides and tickets remains";
+			description = "Show the opposing sides and their remaining tickets";
 			typeName = "BOOL";
 			class values
 			{
@@ -190,21 +216,25 @@ class MCC_Module_inGameUI : Module_F
 		class groupMarkers
 		{
 			displayName = "Squads Markers";
-			description = "Show Squads markers on the map for all players while playing in a squad from the Squad Dialog";
-			typeName = "BOOL";
+			description = "Show squad markers on the map for all players while playing in a squad from the Squad Dialog";
+			typeName = "NUMBER";
 			class values
 			{
+				class addonOptions
+				{
+					name = "Players choose (Addon Options)";
+					value = -1;
+					default = 1;
+				};
 				class disable
 				{
-					name = "Disable";
-					value = false;
+					name = "Force Disable";
+					value = 0;
 				};
-
 				class enable
 				{
-					name = "Enable";
-					value = true;
-					default = 1;
+					name = "Force Enable";
+					value = 1;
 				};
 			};
 		};
@@ -212,21 +242,25 @@ class MCC_Module_inGameUI : Module_F
 		class indevidualMarkers
 		{
 			displayName = "Units Markers";
-			description = "Show units markers on the map for all players while playing in a squad from the Squad Dialog";
-			typeName = "BOOL";
+			description = "Show unit markers on the map for all players while playing in a squad from the Squad Dialog";
+			typeName = "NUMBER";
 			class values
 			{
-				class disable
+				class addonOptions
 				{
-					name = "Disable";
-					value = false;
+					name = "Players choose (Addon Options)";
+					value = -1;
 					default = 1;
 				};
-
+				class disable
+				{
+					name = "Force Disable";
+					value = 0;
+				};
 				class enable
 				{
-					name = "Enable";
-					value = true;
+					name = "Force Enable";
+					value = 1;
 				};
 			};
 		};
@@ -234,7 +268,7 @@ class MCC_Module_inGameUI : Module_F
 		class tutorials
 		{
 			displayName = "MCC Tutorials";
-			description = "Enable MCC Tutorials such as Squad Leader role exc";
+			description = "Enable MCC tutorials such as the Squad Leader role, etc.";
 			typeName = "BOOL";
 			class values
 			{

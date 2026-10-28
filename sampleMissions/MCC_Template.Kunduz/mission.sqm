@@ -1,8 +1,7 @@
 version=12;
 class Mission
 {
-	addOns[]=
-	{
+	addOns[]={
 		"A3_Characters_F_BLUFOR",
 		"A3_Characters_F_OPFOR",
 		"a3_characters_f_beta",
@@ -16,8 +15,7 @@ class Mission
 		"mcc_sandbox",
 		"pra3_kz"
 	};
-	addOnsAuto[]=
-	{
+	addOnsAuto[]={
 		"A3_Characters_F_BLUFOR",
 		"a3_characters_f",
 		"A3_Characters_F_OPFOR",
@@ -48,7 +46,7 @@ class Mission
 	};
 	class Groups
 	{
-		items=56;
+		items=55;
 		class Item0
 		{
 			side="WEST";
@@ -2522,52 +2520,6 @@ class Mission
 			side="LOGIC";
 			class Vehicles
 			{
-				items=1;
-				class Item0
-				{
-					position[]={4726.3765,6.5401878,1075.72};
-					class args
-					{
-						items=4;
-						class Item0
-						{
-							value="1";
-							parentCls="mcc_sandbox_moduleCover";
-							typeName="cover";
-						};
-						class Item1
-						{
-							value="1";
-							parentCls="mcc_sandbox_moduleCover";
-							typeName="coverUI";
-						};
-						class Item2
-						{
-							value="1";
-							parentCls="mcc_sandbox_moduleCover";
-							typeName="";
-						};
-						class Item3
-						{
-							value="1";
-							parentCls="mcc_sandbox_moduleCover";
-							typeName="coverVault";
-						};
-					};
-					id=149;
-					side="LOGIC";
-					vehicle="mcc_sandbox_moduleCover";
-					leader=1;
-					lock="UNLOCKED";
-					skill=0.60000002;
-				};
-			};
-		};
-		class Item55
-		{
-			side="LOGIC";
-			class Vehicles
-			{
 				items=2;
 				class Item0
 				{
@@ -2578,43 +2530,43 @@ class Mission
 						class Item0
 						{
 							value="1";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="medicComplex";
 						};
 						class Item1
 						{
 							value="1";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="medicBleedingEnabled";
 						};
 						class Item2
 						{
 							value="200";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="BleedingTime";
 						};
 						class Item3
 						{
 							value="0.8";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="DamageCoef";
 						};
 						class Item4
 						{
 							value="1";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="medicXPmesseges";
 						};
 						class Item5
 						{
 							value="1";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="medicPunishTK";
 						};
 					};
 					id=150;
 					side="LOGIC";
-					vehicle="mcc_sandbox_moduleMedicSystem";
+					vehicle="MCC_Module_settingsMedicSystem";
 					leader=1;
 					lock="UNLOCKED";
 					skill=0.60000002;
@@ -2635,14 +2587,12 @@ class Mission
 };
 class Intro
 {
-	addOns[]=
-	{
+	addOns[]={
 		"a3_map_stratis",
 		"a3_map_altis",
 		"pra3_kz"
 	};
-	addOnsAuto[]=
-	{
+	addOnsAuto[]={
 		"pra3_kz"
 	};
 	randomSeed=8428644;
@@ -2667,14 +2617,12 @@ class Intro
 };
 class OutroWin
 {
-	addOns[]=
-	{
+	addOns[]={
 		"a3_map_stratis",
 		"a3_map_altis",
 		"pra3_kz"
 	};
-	addOnsAuto[]=
-	{
+	addOnsAuto[]={
 		"pra3_kz"
 	};
 	randomSeed=4674277;
@@ -2699,14 +2647,12 @@ class OutroWin
 };
 class OutroLoose
 {
-	addOns[]=
-	{
+	addOns[]={
 		"a3_map_stratis",
 		"a3_map_altis",
 		"pra3_kz"
 	};
-	addOnsAuto[]=
-	{
+	addOnsAuto[]={
 		"pra3_kz"
 	};
 	randomSeed=6586695;

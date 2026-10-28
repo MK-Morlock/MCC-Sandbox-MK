@@ -1,7 +1,7 @@
-private ["_disp"];
+
 disableSerialization;
 
-_disp = _this select 0;
+params ["_disp"];
 uiNamespace setVariable ["MCC_SANDBOXLOADING_IDD", _disp];
 uiNamespace setVariable ["MCC_BACKGROUND", _disp displayCtrl 0];
 

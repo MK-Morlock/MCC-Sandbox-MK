@@ -1,6 +1,19 @@
-private ["_type","_pos","_zoneX","_zoneY","_activate","_cond","_angle","_shape","_text","_capture","_trigger","_s","_timeMin","_timeMax","_stateCond","_stateDiac"];
+private "_pos";
+private "_zoneX";
+private "_zoneY";
+private "_activate";
+private "_cond";
+private "_shape";
+private "_text";
+private "_capture";
+private "_trigger";
+private "_s";
+private "_timeMin";
+private "_timeMax";
+private "_stateCond";
+private "_stateDiac";
 
-_type = _this select 0;
+params ["_type"];
 switch (_type) do
 {
 	case 0:	//Generate

@@ -3,10 +3,16 @@
 // Example:[_string,_filter, _new] call MCC_fnc_replaceString; 
 // Return - string
 //========================================================================================================================================================================================
-private ["_text","_filter","_textArray","_filterArray","_new","_match","_replace","_break","_time","_i","_x","_currentCharacter"];
-_text  	= _this select 0;
-_filter = _this select 1;
-_new	= _this select 2;
+private "_textArray";
+private "_filterArray";
+private _match = false;
+private "_replace";
+private _break = false;
+private "_time";
+private _i = false;
+private "_x";
+private "_currentCharacter";
+params ["_text", "_filter", "_new"];
 
 _textArray 		= toarray _text;
 _filterArray 	= toarray _filter;

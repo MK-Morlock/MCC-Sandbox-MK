@@ -15,7 +15,7 @@
 //-----------------------------------------------------------------------------
 // Main dialog
 //-----------------------------------------------------------------------------
-class MCC_SaveLoadScreen
+class MCCDLG_NAME
 {
 	idd = MCC_SaveLoadScreen_IDD;
 	movingEnable = true;
@@ -63,7 +63,7 @@ class MCC_SaveLoadScreen
 			y = 0.434 * safezoneH + safezoneY;
 			w = 0.221719 * safezoneW;
 			h = 0.033 * safezoneH;
-			colorText[] = {1,1,1,1};
+			colorText[] = {0.88,0.89,0.90,1};
 			colorBackground[] = {1,0,1,0};
 		};
 
@@ -88,7 +88,7 @@ class MCC_SaveLoadScreen
 		};
 
 		//========================================= Buttons ========================================
-		class MCC_SaveButton: MCC_RscButton		//Save to clipboard
+		class MCC_SaveButton: MCCBTN_R		//Save to clipboard
 		{
 			idc = 0;
 			text = "Save To Clipboard";
@@ -97,11 +97,11 @@ class MCC_SaveLoadScreen
 			y = 0.467 * safezoneH + safezoneY;
 			w = 0.103125 * safezoneW;
 			h = 0.032987 * safezoneH;
-			tooltip = "Save current MCC configuration to ClipBoard";
+			tooltip = "Save the current MCC configuration to the clipboard";
 			onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
 		};
 
-		class MCC_LoadButton: MCC_RscButton		//Load from clipboard
+		class MCC_LoadButton: MCCBTN_R		//Load from clipboard
 		{
 			idc = -1;
 			text = "Load From Clipboard";
@@ -110,16 +110,16 @@ class MCC_SaveLoadScreen
 			y = 0.467 * safezoneH + safezoneY;
 			w = 0.108854 * safezoneW;
 			h = 0.032987 * safezoneH;
-			tooltip = "Paste MCC mission configuration code from clipboard (crtl-v) in text box first";
+			tooltip = "Paste the MCC mission configuration code from the clipboard (Ctrl+V) into the text box first";
 			onButtonClick = __EVAL("[0] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
 		};
 
-		class MCC_CancelButton: MCC_RscButton	//Close dialog
+		class MCC_CancelButton: MCCBTN_R	//Close dialog
 		{
 			idc = -1;
 			text = "Close";
 			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
-			x = 0.6375 * safezoneW + safezoneX;
+			x = 0.288000 * safezoneW + safezoneX;
 			y = 0.719914 * safezoneH + safezoneY;
 			w = 0.0802083 * safezoneW;
 			h = 0.0329871 * safezoneH;
@@ -170,21 +170,21 @@ class MCC_SaveLoadScreen
 		class MCC_saveNameTittle: MCC_RscText
 		{
 			idc = -1;
-			text = "Save Name:"; //--- ToDo: Localize;
-			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			text = "Save Name"; //--- ToDo: Localize;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 			x = 0.288021 * safezoneW + safezoneX;
 			y = 0.675931 * safezoneH + safezoneY;
 			w = 0.06875 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			colorText[] = {0,1,1,1};
+			colorText[] = {0.62,0.65,0.68,1};
 		};
 
-		class MCC_saveUIButton: MCC_RscButton	//Save to UI
+		class MCC_saveUIButton: MCCBTN_R	//Save to UI
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
 			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
-			tooltip = "Save a mission to profile name space - choose a slot from the above list first";
+			tooltip = "Save a mission to the profile namespace - choose a slot from the list above first";
 			text = "Save To Profile"; //--- ToDo: Localize;
 			x = 0.5 * safezoneW + safezoneX;
 			y = 0.675931 * safezoneH + safezoneY;
@@ -192,12 +192,12 @@ class MCC_SaveLoadScreen
 			h = 0.0329871 * safezoneH;
 		};
 
-		class MCC_loadUIButton: MCC_RscButton	//Load from UI
+		class MCC_loadUIButton: MCCBTN_R	//Load from UI
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[4] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
 			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
-			tooltip = "Load a mission from profile name space - choose a slot from the above list first";
+			tooltip = "Load a mission from the profile namespace - choose a slot from the list above first";
 			text = "Load From Profile"; //--- ToDo: Localize;
 			x = 0.620312 * safezoneW + safezoneX;
 			y = 0.675931 * safezoneH + safezoneY;
@@ -205,49 +205,44 @@ class MCC_SaveLoadScreen
 			h = 0.0329871 * safezoneH;
 		};
 
-		class MCC3DSaveAllToSQM: MCC_RscButton
+		class MCC3DSaveAllToSQM: MCCBTN_R
 		{
 			idc = -1;
-			colorDisabled[] = {1,0.4,0.3,0.8};
 			onButtonClick = __EVAL("[5] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
-			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.85)";
-			tooltip = "Save all missions's object in SQM file format and copy it to clipboard."; //--- ToDo: Localize;
+			tooltip = "Save all of the mission's objects in SQM format and copy them to the clipboard."; //--- ToDo: Localize;
 			text = "Save All (SQM)"; //--- ToDo: Localize;
-			x = 0.288021 * safezoneW + safezoneX;
+			x = 0.507100 * safezoneW + safezoneX;
 			y = 0.719914 * safezoneH + safezoneY;
 			w = 0.103125 * safezoneW;
 			h = 0.0329871 * safezoneH;
 		};
 
-		class MCC3DSaveToSQM: MCC_RscButton
+		class MCC3DSaveToSQM: MCCBTN_R
 		{
 			idc = -1;
-			colorDisabled[] = {1,0.4,0.3,0.8};
 			onButtonClick = __EVAL("[7] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
-			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.85)";
-			tooltip = "Save only MCC/Zeus missions's object in SQM file format and copy it to clipboard."; //--- ToDo: Localize;
+			tooltip = "Save only the MCC/Zeus objects in SQM format and copy them to the clipboard."; //--- ToDo: Localize;
 			text = "Save MCC (SQM)"; //--- ToDo: Localize;
-			x = 0.4 * safezoneW + safezoneX;
+			x = 0.614200 * safezoneW + safezoneX;
 			y = 0.719914 * safezoneH + safezoneY;
 			w = 0.103125 * safezoneW;
 			h = 0.0329871 * safezoneH;
 		};
 
-		class MCC3DSaveToComp: MCC_RscButton
+		class MCC3DSaveToComp: MCCBTN_R
 		{
 			idc = -1;
-			colorDisabled[] = {1,0.4,0.3,0.8};
 			onButtonClick = __EVAL("[6] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
-			tooltip = "Save MCC's 3D editor placments in a composition's format to clipboard and RPT file"; //--- ToDo: Localize;
+			tooltip = "Save MCC's 3D editor placements in composition format to the clipboard and the RPT file"; //--- ToDo: Localize;
 			text = "Save Comp"; //--- ToDo: Localize;
-			x = 0.402604 * safezoneW + safezoneX;
+			x = 0.614200 * safezoneW + safezoneX;
 			y = 0.719914 * safezoneH + safezoneY;
 			w = 0.103125 * safezoneW;
 			h = 0.0329871 * safezoneH;
 		};
 
 		//Persistent saving
-		class activatePersistent: MCC_RscButton
+		class activatePersistent: MCCBTN_R
 		{
 			idc = MCC_SAVE_PERSISTENT;
 			text = "Activate Persistent"; //--- ToDo: Localize;
@@ -256,10 +251,10 @@ class MCC_SaveLoadScreen
 			w = 0.0773437 * safezoneW;
 			h = 0.044 * safezoneH;
 			onButtonClick = __EVAL("[8] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
-			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
-			tooltip = "Activate Persistent data saving and loading from DB"; //--- ToDo: Localize;
+			tooltip = "Activate persistent data saving and loading from the DB"; //--- ToDo: Localize;
+			class TextPos {left = 0; top = "((0.044 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};
-		class clearPersistent: MCC_RscButton
+		class clearPersistent: MCCBTN_R
 		{
 			idc = -1;
 			text = "Clear Persistent"; //--- ToDo: Localize;
@@ -268,8 +263,8 @@ class MCC_SaveLoadScreen
 			w = 0.0773437 * safezoneW;
 			h = 0.044 * safezoneH;
 			onButtonClick = __EVAL("[9] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
-			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
-			tooltip = "Clear defualt persistent data from DB"; //--- ToDo: Localize;
+			tooltip = "Clear the default persistent data from the DB"; //--- ToDo: Localize;
+			class TextPos {left = 0; top = "((0.044 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};
 	};
 };

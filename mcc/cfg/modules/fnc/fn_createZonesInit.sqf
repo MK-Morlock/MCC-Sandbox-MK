@@ -15,7 +15,10 @@ if (isNull curatorCamera) exitWith {
 	_module spawn {
 		params ["_module"];
 
-		private ["_behavior","_zoneNumber","_triggers","_assignAImodule"];
+		private _behavior = 0;
+		private "_zoneNumber";
+		private _triggers = [];
+		private _assignAImodule = [];
 		waitUntil {time > 0};
 
 		//Who synced with the module
@@ -62,7 +65,7 @@ if (isNull curatorCamera) exitWith {
 //Not curator exit
 if (!(local _module) || isnull curatorcamera) exitWith {};
 
-private ["_zones"];
+private _zones = [];
 _pos = getpos _module;
 _zones = ["New"];
 {

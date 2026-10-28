@@ -5,9 +5,13 @@
 #define MCC_GroupGenWPbehaviorCombo_IDC 9018
 
 
-private ["_wp","_wpType","_groups","_wpFormation","_wpSpeed","_wpBehavior"];
+private _wpType = 0;
+private _groups = [];
+private _wpFormation = [];
+private _wpSpeed = [];
+private _wpBehavior = [];
 
-_action 	= _this select 0; 
+params ["_action"]; 
 _wpType 	= lbCurSel MCC_GroupGenWPCombo_IDC; 
 _groups		= []; 
 _wpFormation = ["NO CHANGE", "COLUMN", "STAG COLUMN", "WEDGE", "ECH LEFT", "ECH RIGHT", "VEE", "LINE", "FILE", "DIAMOND"] select (lbCurSel MCC_GroupGenWPformationCombo_IDC); 
@@ -22,7 +26,7 @@ _wpBehavior = ["UNCHANGED", "CARELESS", "SAFE", "AWARE", "COMBAT", "STEALTH"] se
 } foreach MCC_GroupGenGroupSelected;
 
 //Call the server to handle WP
-[[_action,MCC_ConsoleWPpos,[_wpType,"NO CHANGE",_wpFormation,_wpSpeed,_wpBehavior,"true","",0],_groups],"MCC_fnc_manageWp", false, false] spawn BIS_fnc_MP;	
+[_action,MCC_ConsoleWPpos,[_wpType,"NO CHANGE",_wpFormation,_wpSpeed,_wpBehavior,"true","",0],_groups] remoteExec ["MCC_fnc_manageWp", 2, false];	
 	
 ctrlShow [510,false];
 

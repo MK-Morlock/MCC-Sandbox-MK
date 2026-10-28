@@ -1,10 +1,15 @@
 //==================================================================MCC_fnc_grenadeThrow===============================================================================
 // Example: [] call MCC_fnc_grenadeThrow;
 //===========================================================================================================================================================================
-private ["_utility","_vel","_dir","_handPos","_speed","_magData","_magClass","_magMuzzle","_precise","_eh","_ctrl"];
+private _magData = [];
+private _magClass = "";
+private _magMuzzle = "";
+private _precise = 0;
+private "_eh";
+private _ctrl = controlNull;
 disableSerialization;
 
-_primaryMod = _this select 0;
+params ["_primaryMod"];
 _magData 	= player getVariable ["MCC_utilityItem",[]];
 _precise 	= player getVariable ["MCC_falseGrenadePrecise",2];
 _ctrl 		= ((uiNamespace getVariable "mcc_3dObject") displayCtrl 0);

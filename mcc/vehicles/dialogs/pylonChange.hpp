@@ -1,4 +1,4 @@
-class MCC_displayPylonChange
+class MCCDLG_NAME
 {
 	idd = 1031981;
 	movingEnable = true;
@@ -7,7 +7,7 @@ class MCC_displayPylonChange
 		class Background: MCC_RscText
 		{
 			idc = -1;
-			colorBackground[] = {0,0,0,0.6};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 			x = 0.29375 * safezoneW + safezoneX;
 			y = 0.203 * safezoneH + safezoneY;
 			w = 0.4125 * safezoneW;
@@ -129,7 +129,7 @@ class MCC_displayPylonChange
 			colorBackground[] = {"(profilenamespace getvariable ['GUI_BCG_RGB_R',0.192])","(profilenamespace getvariable ['GUI_BCG_RGB_G',0.192])","(profilenamespace getvariable ['GUI_BCG_RGB_B',0.192])","(profilenamespace getvariable ['GUI_BCG_RGB_A',0.8])"};
 		};
 
-		class Cancel: MCC_RscButtonMenu
+		class Cancel: MCCBTN_R
 		{
 			idc = 2400;
 			text = "$STR_DISP_VEHICLESPYLON_CANCEL";
@@ -138,7 +138,7 @@ class MCC_displayPylonChange
 			w = 0.0773437 * safezoneW;
 			h = 0.033 * safezoneH;
 		};
-		class confirm: MCC_RscButtonMenu
+		class confirm: MCCBTN_R
 		{
 			idc = 2401;
 			text = "$STR_DISP_VEHICLESPYLON_CONFIRM";

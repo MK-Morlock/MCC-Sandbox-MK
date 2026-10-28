@@ -2,13 +2,22 @@
 // Interaction with IED type
 // Example: [_men,_ied] spawn MCC_fnc_interactMan;
 //=================================================================================================================================================================================
-private ["_ied","_men","_rand","_disarmTime", "_footer", "_break","_dummyMarker","_isEngineer","_ok","_c4","_waitTime"];
+private "_rand";
+private "_disarmTime";
+private _break = false;
+private _isEngineer = configNull;
+private _c4 = "";
+private _waitTime = 0;
 
 #define MCC_CHARGE "DemoCharge_Remote_Mag"
 
-_men 		= _this select 0;
-_ied 		= _this select 1;
+params ["_men", "_ied", ["_mode", ""]];
 if (isnil "_ied") exitWith {};
+
+if (_mode == "" && {(_ied getVariable ["MCC_MWIEDMode",-1]) == 3} && {_ied getvariable ["armed",false]}) exitWith {
+	player setVariable ["MCC_interactionActive",false];
+	[_ied, "charge"] spawn MCC_fnc_MWIEDMenu;
+};
 _waitTime = 1;
 _rand		= random 1;
 
@@ -18,7 +27,7 @@ _disarmTime =  _ied getvariable "MCC_disarmTime";
 _pos=[((getposATL _ied) select 0),(getposATL _ied) select 1,((getPosATL _ied) select 2)];
 
 //Is it a mini-game
-if ((_ied getVariable ["MCC_isIEDMiniGame",false]) && (_ied getvariable ["armed",false])) exitWith {
+if (_mode == "" && {_ied getVariable ["MCC_isIEDMiniGame",false]} && {_ied getvariable ["armed",false]}) exitWith {
 	[_ied,true] spawn MCC_fnc_bdStart;
 	player setVariable ["MCC_interactionActive",false];
 };
@@ -30,9 +39,10 @@ if (_men distance _ied <4) then {
 	_ied setVariable ["MCC_isInteracted",true,true];
 
 	//Open dialog
-	if !((missionNamespace getVariable ["MCC_interactionKey_holding",false])) exitWith {
+	if (_mode == "" && {!(missionNamespace getVariable ["MCC_interactionKey_holding",false])}) exitWith {
 		MCC_fnc_IEDMenuClicked = {
-			private ["_ctrl","_index","_ctrlData","_ied"];
+			private "_ctrlData";
+			private _ied = objNull;
 			disableSerialization;
 
 			_ctrlData	= _this select 0;
@@ -83,7 +93,7 @@ if (_men distance _ied <4) then {
 	if (_isEngineer) then {
 		if (_rand > 0.20) then {
 			hint "disarmed";
-			[[[netid _men,_men], format ["disarm%1", (floor random 7)+1]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+			[[netid _men,_men], format ["disarm%1", (floor random 7)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 
 			sleep 1;
 			if (_isEngineer) then {player addrating 500};
@@ -94,16 +104,16 @@ if (_men distance _ied <4) then {
 			if (_rand >0.05) then {
 				hint "Fail to disarm";
 
-				[[[netid _men,_men], format ["disarmfail%1", (floor random 3)+1]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+				[[netid _men,_men], format ["disarmfail%1", (floor random 3)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 			} else {
-				hint "Critical fail start runing";
+				hint "Critical fail - start running";
 
-				[[[netid _men,_men], format ["disarmcrit%1", (floor random 2)+1]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+				[[netid _men,_men], format ["disarmcrit%1", (floor random 2)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 
 				//_ied setvariable ["armed",false,true];
-				sleep 2 + random 3;
+				sleep (2 + random 3);
 				"SmallSecondary" createVehicle _pos;
-				sleep 10 + random 10;
+				sleep (10 + random 10);
 				_ied setvariable ["iedTrigered",true,true];
 			};
 		}
@@ -111,23 +121,23 @@ if (_men distance _ied <4) then {
 		//If it isn't a bomb expert <*Kaboom*>
 		if (_rand > 0.70) then {
 			hint "disarmed";
-			[[[netid _men,_men], format ["disarm%1", (floor random 7)+1]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+			[[netid _men,_men], format ["disarm%1", (floor random 7)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 
 			sleep 1;
 			_ied setvariable ["armed",false,true];
 		} else {
 			hint "Fail to disarm";
 			if (_rand >0.3) then {
-				[[[netid _men,_men], format ["disarmfail%1", (floor random 3)+1]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+				[[netid _men,_men], format ["disarmfail%1", (floor random 3)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 			} else {
-				hint "Critical fail start runing";
+				hint "Critical fail - start running";
 
-				[[[netid _men,_men], format ["disarmcrit%1", (floor random 2)+1]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+				[[netid _men,_men], format ["disarmcrit%1", (floor random 2)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 
 				//_ied setvariable ["armed",false,true];
-				sleep 2 + random 3;
+				sleep (2 + random 3);
 				"SmallSecondary" createVehicle _pos;
-				sleep 10 + random 10;
+				sleep (10 + random 10);
 				_ied setvariable ["iedTrigered",true,true];
 			};
 		};

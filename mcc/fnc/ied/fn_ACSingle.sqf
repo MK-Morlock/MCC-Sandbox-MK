@@ -9,13 +9,13 @@
 //		_static 			=integer, should he move around or just stand there
 // <out>	unit, object
 //=================================================================================================================================================================
-private ["_pos", "_trapkind","_iedside", "_iedMarkerName","_group", "_sb", "_iedDir","_init","_rank","_static"];
+private _group = grpNull;
+private _sb = objNull;
+private _init = "";
+private _rank = [];
+private "_static";
 
-_pos 			= _this select 0;
-_trapkind 		= _this select 1;
-_iedside		= _this select 2;
-_iedMarkerName 	= _this select 3;
-_iedDir 		= _this select 4;
+params ["_pos", "_trapkind", "_iedside", "_iedMarkerName", "_iedDir"];
 _static			= if (count _this > 5) then {_this select 5} else {false};
 
 if (count _this > 5) then {_static	=  true};
@@ -40,7 +40,7 @@ _init = FORMAT [";%2 = _this;[_this, '%1',25] spawn MCC_fnc_manageAC;"
 				,MCC_tempName
 				];
 
-[[[netid _sb,_sb], _init], "MCC_fnc_setVehicleInit", false, false] spawn BIS_fnc_MP;
+[[netid _sb,_sb], _init] remoteExec ["MCC_fnc_setVehicleInit", 2, false];
 
 {_x addCuratorEditableObjects [[_sb],false]} forEach allCurators;
 

@@ -21,7 +21,13 @@
 #define BON_ARTY_ADJUSTBUTTON 999920
 #define BON_ARTY_MISSIONTYPE 999921
 disableSerialization;
-private ["_newArray","_vehicle","_isArty","_cannon","_displayName","_index","_realCannons","_isCommander"];
+private "_vehicle";
+private _isArty = configNull;
+private "_cannon";
+private _displayName = "";
+private "_index";
+private _realCannons = [];
+private _isCommander = false;
 
 //is the player the commander or just using the artillery computer
 _isCommander = ((MCC_server getVariable [format ["CP_commander%1",side player],""]) == getPlayerUID player) or ("MCC_itemConsole" in (assignedItems player));

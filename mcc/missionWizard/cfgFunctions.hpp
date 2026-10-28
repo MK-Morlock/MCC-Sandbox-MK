@@ -13,10 +13,16 @@ class missionWizard
 	class MWfindObjectivePos	{description = "Create objective position";};
 	class MWObjectiveHVT		{description = "Create an HVT objective";};
 	class MWObjectiveDestroy	{description = "Create a Destroy objective";};
+	class MWCacheDestructible	{description = "Make a weapons cache objective destroyable";};
 	class MWObjectiveIntel		{description = "Create a pick intel objective";};
 	class MWObjectiveClear		{description = "Create a clear area objective";};
 	class MWObjectiveDisable	{description = "Create a disable IED area objective";};
+	class MWIEDMenu			{description = "Disarm IED objective: choice menu (bomb manual, safe disarm, chance disarm, charge)";};
+	class MWEnemyFaction	{description = "Mission Generator enemy faction, separate from the console faction";};
 	class MWCreateUnitsArray	{description = "Create units array by type";};
+	class generatedMissions	{description = "Record / delete what generated missions created";};
+	class deleteMissionDialog	{description = "Pick a generated mission to delete";};
+	class FLGenerate			{description = "Front Lines generator (server)";};
 	class MWUpdateZone			{description = "Create or update a new zone";};
 	class MWSpawnInZone			{description = "Spawn units or groups in a zone";};
 	class MWSpawnInfantry		{description = "Spawn infantry groups in the zone.";};
@@ -38,6 +44,8 @@ class missionWizard
 	class findMarkers			{description = "bring all markers names around a sepcific position with the given radius";};
 	class campaignPaintMarkers 	{description = "change all tiles in the given radius to show under the specific side control";};
 	class campaignGetNearestTile {description = "find the nearest tile and return the [tile,side that holding";};
+	class campaignTileSetAlpha {description = "Set a campaign tile intensity (stored on server; drawn with the map overlay transparency applied)";};
+	class campaignTileAlpha {description = "Get a campaign tile intensity";};
 	class campaignGetBorders  {description = "find the borders or a selected zone by his tiles";};
 	class playBriefings {};
 	class movieMaker {};

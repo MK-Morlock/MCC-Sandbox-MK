@@ -9,10 +9,25 @@
 #define	 AMMO3 "cannon_105mm_VTOL_01"
 
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params","_ctrl","_pressed","_posX","_posY","_shift","_ctrlKey","_alt","_mccdialog","_control1","_control2","_control3","_ac","_center","_uav","_ammoLeft","_ammoSelected"];
+private "_ctrl";
+private "_pressed";
+private "_posX";
+private "_posY";
+private "_shift";
+private "_ctrlKey";
+private "_alt";
+private _mccdialog = controlNull;
+private _control1 = controlNull;
+private _control2 = controlNull;
+private _control3 = controlNull;
+private _ac = objNull;
+private _center = objNull;
+private _uav = objNull;
+private _ammoLeft = [];
+private "_ammoSelected";
 disableSerialization;
 
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _pressed = _params select 1;
@@ -46,9 +61,9 @@ if (_pressed==1) then {
 if (typeOf _uav == "B_T_VTOL_01_armed_F") then {
 	//AmmosetVehicleAmmo
 	_ammoLeft = [
-				 ["20mm",_uav ammo "gatling_20mm_VTOL_01","gatling_20mm_VTOL_01","B_25mm"],
-				 ["40mm",((crew _uav) select 3) ammo "HE","HE","B_40mm_GPR_Tracer_Red"],
-				 ["105mm",_uav ammo "cannon_105mm_VTOL_01","cannon_105mm_VTOL_01","Sh_105mm_HEAT_MP"]
+				 ["20mm",[_uav, "gatling_20mm_VTOL_01"] call MCC_fnc_acAmmo,"gatling_20mm_VTOL_01","B_25mm"],
+				 ["40mm",([_uav] call MCC_fnc_acAmmoType) select 2,"HE","B_40mm_GPR_Tracer_Red"],
+				 ["105mm",[_uav, "cannon_105mm_VTOL_01"] call MCC_fnc_acAmmo,"cannon_105mm_VTOL_01","Sh_105mm_HEAT_MP"]
 				];
 
 } else {
@@ -62,6 +77,7 @@ if (typeOf _uav == "B_T_VTOL_01_armed_F") then {
 //Fire
 if (_pressed==0) then {
 	MCC_consoleACmousebuttonUp = false;
+	["DEBUG", "console", "AC-130 console fire: %1 at %2 | gunship at %3 heading %4 | camera at %5 looking %6", [["20mm", "40mm", "105mm"] select (MCC_ConsoleACweaponSelected max 0 min 2), (getPosATL _center) apply {round _x}, (getPosATL _uav) apply {round _x}, round (getDir _uav), (getPosATL _ac) apply {round _x}, (vectorDir _ac) apply {round (_x * 100) / 100}]] call MCC_fnc_log;
 
 	switch (MCC_ConsoleACweaponSelected) do {
 		// 25mm
@@ -74,14 +90,14 @@ if (_pressed==0) then {
 				//Fire
 				playSound "gun1";
 
-				if ("gatling_20mm_VTOL_01" in weapons _uav) then {
-					gunner _uav forceWeaponFire ["gatling_20mm_VTOL_01", "manual"];
+				if (true) then {
+					if (local _uav) then {[_uav, getPosATL _center, 0, 8] call MCC_fnc_casGuideArm} else {[_uav, getPosATL _center, 0, 8] remoteExec ["MCC_fnc_casGuideArm", _uav]};
+				[_uav, "gatling_20mm_VTOL_01"] call MCC_fnc_acFire;
 				} else {
 					playSound3D ["A3\Sounds_F_Exp\arsenal\vehicle_weapons\gatling_20mm\20mm_01_burst.wss",_uav,false,getposasl _uav,1,1,1500];
 				};
 
 
-				[_center, getpos _ac, "B_25mm",1500,1] execVM MCC_path + "mcc\general_scripts\console\ac_fire.sqf";
 
 				//Update ammo count
 				_ammoSelected set [1,(_ammoSelected select 1)-1];
@@ -100,25 +116,22 @@ if (_pressed==0) then {
 		// 40mm
 		case 1: {
 			_ammoSelected = _ammoLeft select 1;
-			if (!MCC_consoleACgunReady2 || (_ammoSelected select 1) <=0) exitwith {};
+			if (!MCC_consoleACgunReady2 || (_ammoSelected select 1) <=0) exitwith {[] call MCC_fnc_acAmmoRefresh};
 			while {!MCC_consoleACmousebuttonUp && (_ammoSelected select 1) >0} do {
 				MCC_consoleACgunReady2 = false;
 
-				//Fire
-				playSound "gun2";
-
-				_uav fire "HE";
-				playSound3D ["A3\Sounds_F\arsenal\weapons_vehicles\gatling_30mm\30mm_02_burst.wss",_uav,false,getposasl _uav,1,1,1500];
-
-
-				[_center, getpos _ac, "B_40mm_GPR_Tracer_Red",1500,1] execVM MCC_path + "mcc\general_scripts\console\ac_fire.sqf";
-
-				//Update ammo count
-				_ammoSelected set [1,(_ammoSelected select 1)-1];
+				if (local _uav) then {[_uav, getPosATL _center, 0, 8] call MCC_fnc_casGuideArm} else {[_uav, getPosATL _center, 0, 8] remoteExec ["MCC_fnc_casGuideArm", _uav]};
+				private _fired = [_uav, "autocannon_40mm_VTOL_01"] call MCC_fnc_acFire;
+				if (_fired) then {
+					playSound "gun2";
+					playSound3D ["A3\Sounds_F\arsenal\weapons_vehicles\gatling_30mm\30mm_02_burst.wss",_uav,false,getposasl _uav,1,1,1500];
+					_ammoSelected set [1,(_ammoSelected select 1)-1];
+				} else {
+					_ammoSelected set [1,0];
+				};
 				_ammoLeft set [1,_ammoSelected];
 
-				//Update UI
-				ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT2, ("40mm: " + str (_ammoSelected select 1))];
+				[] call MCC_fnc_acAmmoRefresh;
 
 				_control2 ctrlSetTextColor [1, 0, 0, 0.4];
 				sleep 0.5;
@@ -136,14 +149,14 @@ if (_pressed==0) then {
 			//Fire
 			playSound "gun3";
 
-			if ("cannon_105mm_VTOL_01" in weapons _uav) then {
-				gunner _uav forceWeaponFire ["cannon_105mm_VTOL_01", "medium"];
+			if (true) then {
+				if (local _uav) then {[_uav, getPosATL _center, 0, 8] call MCC_fnc_casGuideArm} else {[_uav, getPosATL _center, 0, 8] remoteExec ["MCC_fnc_casGuideArm", _uav]};
+				[_uav, "cannon_105mm_VTOL_01"] call MCC_fnc_acFire;
 			} else {
 				playSound3D ["A3\Sounds_F\arsenal\weapons_vehicles\cannon_105mm\slammer_105mm_distant.wss",_uav,false,getposasl _uav,1,1,1500];
 			};
 
 
-			[_center, getpos _ac, "Sh_105mm_HEAT_MP",1500,1] execVM MCC_path + "mcc\general_scripts\console\ac_fire.sqf";
 
 			//Update ammo count
 			_ammoSelected set [1,(_ammoSelected select 1)-1];

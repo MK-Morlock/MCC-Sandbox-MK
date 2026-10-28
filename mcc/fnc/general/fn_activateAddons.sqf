@@ -1,6 +1,5 @@
-private ["_cfg","_newAddons"];
-_cfg = (configFile >> "CfgPatches");
-_newAddons = [];
+private _cfg = (configFile >> "CfgPatches");
+private _newAddons = [];
 /*
 for "_i" from 0 to ((count _cfg) - 1) do
 {
@@ -14,3 +13,4 @@ if (count _newAddons > 0) then
 		_newAddons spawn BIS_fnc_activateAddons;
 };
 
+*/

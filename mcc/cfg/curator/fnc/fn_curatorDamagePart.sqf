@@ -1,8 +1,11 @@
 //============================================================MCC_fnc_curatorDamagePart===================================================================================
 // Damage part of object/Unit
 //===========================================================================================================================================================================
-private ["_pos","_module","_object","_resualt"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private "_pos";
+private _module = objNull;
+private _object = [];
+private _resualt = [];
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 //Not curator exit
@@ -18,7 +21,13 @@ if (count _object <2) exitWith {
 };
 _object = _object select 1;
 
-private ["_selectionsNames","_hitPointName","_hitPoints","_point","_displayNames","_displayArray","_resualtCount","_null"];
+private _selectionsNames = [];
+private _hitPoints = configNull;
+private "_point";
+private _displayNames = [];
+private _displayArray = [];
+private "_resualtCount";
+private _null = [];
 _selectionsNames = [];
 _displayNames = [];
 
@@ -57,7 +66,7 @@ if (_resualt select (_resualtCount - 1)) then {
 //Set Damage
 {
 	if (_x) then {
-		[[[_object, _selectionsNames select _foreachIndex], {(_this select 0) setHit [(_this select 1), 1];}], "BIS_fnc_spawn", _object] call BIS_fnc_MP;
+		[[_object, _selectionsNames select _foreachIndex], {(_this select 0) setHit [(_this select 1), 1];}] remoteExec ["call", _object, false];
 	}
 } forEach _resualt;
 

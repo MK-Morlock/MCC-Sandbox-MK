@@ -12,18 +12,29 @@
 // 	<OUT>
 //			Nothing
 //========================================================================================================================================================================================
-private ["_reinforcement","_side","_missionCenterTriggerPos","_missionCenterTriggerArea","_cond","_trigger","_tlist","_zoneNumber","_script_handler","_found",
-         "_faction","_warning","_ar","_totalEnemyUnits","_size","_strDir","_command","_para","_check"];
+private _trigger = objNull;
+private _tlist = 0;
+private _found = false;
+private _ar = [];
+private _size = 0;
+private _strDir = "";
+private _command = "";
+private _para = [];
+private _check = [];
 
-_reinforcement 				= _this select 0;
-_side 						= _this select 1;
-_missionCenterTriggerPos 	= _this select 2;
-_missionCenterTriggerArea 	= _this select 3;
-_cond					 	= _this select 4;
-_zoneNumber					= _this select 5;
-_faction					= _this select 6;
-_warning					= param [7,true];
-_totalEnemyUnits			= _this select 8;
+params [
+	["_reinforcement", 0, [0]],
+	["_side", sideUnknown, [sideUnknown]],
+	["_missionCenterTriggerPos", [0,0,0], [[]]],
+	["_missionCenterTriggerArea", [], [[]]],
+	["_cond", [], [[]]],
+	["_zoneNumber", 0, [0, ""]],
+	["_faction", "", [""]],
+	["_warning", true, [true]],
+	["_totalEnemyUnits", 0, [0]],
+	["_fromDir", -1, [0]],	//optional: reinforcements come from this direction (+-45 deg) instead of anywhere (Front Lines: from behind the line)
+	["_waitForPlayers", true, [true]]	//optional: false = do not wait for a player to come near first (AI vs AI with no player nearby)
+];
 
 
 if !(isServer || isDedicated) exitWith {};
@@ -58,13 +69,16 @@ _trigger setTriggerActivation [str _side, "PRESENT", true];
 sleep 5;
 
 //Wait untill player is nearby to work with cache and delayed spawn
-if (!isNil "GAIA_fnc_isNearPlayer") then {
+if (_waitForPlayers && {!isNil "GAIA_fnc_isNearPlayer"}) then {
 	while {!([getposAtl _trigger,((missionNamespace getVariable ["GAIA_CACHE_STAGE_1",1000])/2)] call GAIA_fnc_isNearPlayer)} do {sleep 10};
 };
 
 _tlist = (_side countSide (list _trigger)) max 1;
 
-private ["_dir","_distance","_newPos","_script_handler","_rfc"];
+private _dir = 0;
+private _distance = false;
+private _newPos = nil;
+private _rfc = 0;
 
 for "_i" from 0 to (count _cond) step 1 do
 {
@@ -76,7 +90,7 @@ for "_i" from 0 to (count _cond) step 1 do
 
 	while {!_found} do
 	{
-		_dir = floor random 360;
+		_dir = if (_fromDir >= 0) then {_fromDir - 45 + random 90} else {floor random 360};
 		_distance = (floor (random 1000)) + (if (_rfc == 0) then {2000} else {1000});
 		_newPos = [_missionCenterTriggerPos, _distance, _dir] call BIS_fnc_relPos;
 		_newPos = getposATL ((_newPos nearRoads 200) select 0);
@@ -118,9 +132,9 @@ for "_i" from 0 to (count _cond) step 1 do
 			{
 				//Lets give the player some hint about movment
 				_dir 	= [_missionCenterTriggerPos, _newPos] call BIS_fnc_dirTo;
-				_strDir = "<t size='1' t font = 'puristaLight' color='#FFFFFF'> HQ: Enemy aerial QRF is moving in from the " + ([_dir] call MCC_fnc_dirToString) + "</t>";
-				_command = format ['["%1",0,0.2,5,1,0.0] spawn bis_fnc_dynamictext;',_strDir];
-				[[2,compile _command], "MCC_fnc_globalExecute", true, false] spawn BIS_fnc_MP;
+				_strDir = "HQ: Enemy aerial QRF is moving in from the " + ([_dir] call MCC_fnc_dirToString);	//small, near the top, as on the squad screen (MCC_fnc_rsMessage)
+				_command = format ['["%1",6] spawn MCC_fnc_rsMessage;',_strDir];
+				[2,compile _command] remoteExec ["MCC_fnc_globalExecute", 0, false];
 			};
 		};
 
@@ -131,9 +145,9 @@ for "_i" from 0 to (count _cond) step 1 do
 			{
 				//Lets give the player some hint about movment
 				_dir 	= [_missionCenterTriggerPos, _newPos] call BIS_fnc_dirTo;
-				_strDir = "<t size='1' t font = 'puristaLight' color='#FFFFFF'> HQ: Enemy motorized QRF is moving in from the " + ([_dir] call MCC_fnc_dirToString) + "</t>";
-				_command = format ['["%1",0,0.2,5,1,0.0] spawn bis_fnc_dynamictext;',_strDir];
-				[[2,compile _command], "MCC_fnc_globalExecute", true, false] spawn BIS_fnc_MP;
+				_strDir = "HQ: Enemy motorized QRF is moving in from the " + ([_dir] call MCC_fnc_dirToString);	//small, near the top, as on the squad screen (MCC_fnc_rsMessage)
+				_command = format ['["%1",6] spawn MCC_fnc_rsMessage;',_strDir];
+				[2,compile _command] remoteExec ["MCC_fnc_globalExecute", 0, false];
 			};
 
 		};
@@ -170,7 +184,7 @@ for "_i" from 0 to (count _cond) step 1 do
 				, false
 				];
 
-	[_ar, "mcc_setup", false, false] spawn BIS_fnc_MP;
+	_ar remoteExec ["mcc_setup", 2, false];
 };
 
 //Clean up

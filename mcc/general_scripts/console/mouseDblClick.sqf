@@ -1,5 +1,17 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params","_ctrl","_button","_posX","_posY","_shift","_ctrlKey","_alt","_mccdialog","_html","_comboBox","_displayname","_index","_3dCommander"];
+private "_ctrl";
+private "_button";
+private "_posX";
+private "_posY";
+private "_shift";
+private "_ctrlKey";
+private "_alt";
+private _mccdialog = controlNull;
+private _html = "";
+private _comboBox = controlNull;
+private "_displayname";
+private "_index";
+private "_3dCommander";
 #define mcc_playerConsole_IDD 2993
 #define mcc_playerConsole2_IDD 5000
 #define mcc_playerConsole3_IDD 5010
@@ -17,10 +29,11 @@ private ["_params","_ctrl","_button","_posX","_posY","_shift","_ctrlKey","_alt",
 #define MCC_CONSOLEWPADD 	9159
 #define MCC_CONSOLEWPREPLACE 9160
 #define MCC_CONSOLEWPCLEAR 9161
+#define MCC_CONSOLEWPCANCEL 9169
 
 disableSerialization;
 MCC_doubleClicked = true;
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _button = _params select 1;
@@ -42,6 +55,7 @@ if (MCC_Console3Open) then {_mccdialog = findDisplay mcc_playerConsole3_IDD};
 if ((_button == 0) && (count (missionNamespace getVariable ["MCC_ConsoleGroupSelected",[]]) > 0) && !_ctrlKey && !_3dCommander)  then {
 	//worldPos
 	MCC_ConsoleWPpos = _ctrl ctrlMapScreenToWorld [_posX,_posY];
+	MCC_consoleWPHidden = [ctrlShown (_mccdialog displayCtrl MCC_CONSOLEINFOTEXT), ctrlShown (_mccdialog displayCtrl MCC_CONSOLEINFOLIVEFEED), ctrlShown (_mccdialog displayCtrl MCC_CONSOLEINFOUAVCONTROL)];
 	ctrlShow [MCC_CONSOLEINFOTEXT,false];
 	ctrlShow [MCC_CONSOLEINFOLIVEFEED,false];
 	ctrlShow [MCC_CONSOLEINFOUAVCONTROL,false];
@@ -72,7 +86,7 @@ if ((_button == 0) && (count (missionNamespace getVariable ["MCC_ConsoleGroupSel
 		_displayname =  _x;
 		_index = _comboBox lbAdd _displayname;
 	} foreach ["Move", "Destroy", "Get In", "Search & Destroy", "Join Group", "Join Group As Leader", "Get Out", "Cycle Waypoints", "Load", "Unload", "Troops Unload", "Hold", "Senetry"
-			   ,"Guard","Support","Get In Nearest","Dismiss","Helicopter - Land","Helicopter - Get in","Artillery - Fire Mission","Loiter"];
+			   ,"Guard","Support","Get In Nearest","Dismiss","Helicopter - Land","Helicopter - Get in","Artillery - Fire Mission","Loiter","Taru - Pick up pod","Taru - Winch drop pod","Taru - Parachute pod","Taru - Release pod"];
 	_comboBox lbSetCurSel 0;
 
 	//Reveal WP  Formation Combo
@@ -126,11 +140,18 @@ if ((_button == 0) && (count (missionNamespace getVariable ["MCC_ConsoleGroupSel
 	} foreach   ["UNCHANGED", "CARELESS", "SAFE", "AWARE", "COMBAT", "STEALTH"];
 	_comboBox lbSetCurSel 0;
 
+	(_mccdialog displayctrl MCC_CONSOLEWPCANCEL) ctrlSetPosition [_posX,_posY,0,0];
+	ctrlShow [MCC_CONSOLEWPCANCEL,true];
+	(_mccdialog displayctrl MCC_CONSOLEWPCANCEL) ctrlCommit 0;
+	(_mccdialog displayctrl MCC_CONSOLEWPCANCEL) ctrlSetPosition [_posX + (0.005 * safezoneW), _posY + (0.148 * safezoneH),0.033 * safezoneW,0.03 * safezoneH];
+	(_mccdialog displayctrl MCC_CONSOLEWPCANCEL) ctrlCommit 0;
+	waituntil {ctrlCommitted (_mccdialog displayctrl MCC_CONSOLEWPCANCEL)};
+
 	//Reveal WP  Button - ADD
 	(_mccdialog displayctrl MCC_CONSOLEWPADD) ctrlSetPosition [_posX,_posY,0,0];
 	ctrlShow [MCC_CONSOLEWPADD,true];
 	(_mccdialog displayctrl MCC_CONSOLEWPADD) ctrlCommit 0;
-	(_mccdialog displayctrl MCC_CONSOLEWPADD) ctrlSetPosition [_posX + (0.005 * safezoneW), _posY + (0.148 * safezoneH),0.045 * safezoneW,0.03 * safezoneH];
+	(_mccdialog displayctrl MCC_CONSOLEWPADD) ctrlSetPosition [_posX + (0.041 * safezoneW), _posY + (0.148 * safezoneH),0.033 * safezoneW,0.03 * safezoneH];
 	(_mccdialog displayctrl MCC_CONSOLEWPADD) ctrlCommit 0;
 	waituntil {ctrlCommitted (_mccdialog displayctrl MCC_CONSOLEWPADD)};
 
@@ -138,7 +159,7 @@ if ((_button == 0) && (count (missionNamespace getVariable ["MCC_ConsoleGroupSel
 	(_mccdialog displayctrl MCC_CONSOLEWPREPLACE) ctrlSetPosition [_posX,_posY,0,0];
 	ctrlShow [MCC_CONSOLEWPREPLACE,true];
 	(_mccdialog displayctrl MCC_CONSOLEWPREPLACE) ctrlCommit 0;
-	(_mccdialog displayctrl MCC_CONSOLEWPREPLACE) ctrlSetPosition [_posX + (0.052 * safezoneW), _posY + (0.148 * safezoneH),0.045 * safezoneW,0.03 * safezoneH];
+	(_mccdialog displayctrl MCC_CONSOLEWPREPLACE) ctrlSetPosition [_posX + (0.077 * safezoneW), _posY + (0.148 * safezoneH),0.033 * safezoneW,0.03 * safezoneH];
 	(_mccdialog displayctrl MCC_CONSOLEWPREPLACE) ctrlCommit 0;
 	waituntil {ctrlCommitted (_mccdialog displayctrl MCC_CONSOLEWPREPLACE)};
 
@@ -146,13 +167,15 @@ if ((_button == 0) && (count (missionNamespace getVariable ["MCC_ConsoleGroupSel
 	(_mccdialog displayctrl MCC_CONSOLEWPCLEAR) ctrlSetPosition [_posX,_posY,0,0];
 	ctrlShow [MCC_CONSOLEWPCLEAR,true];
 	(_mccdialog displayctrl MCC_CONSOLEWPCLEAR) ctrlCommit 0;
-	(_mccdialog displayctrl MCC_CONSOLEWPCLEAR) ctrlSetPosition [_posX + (0.099 * safezoneW), _posY + (0.148 * safezoneH),0.045 * safezoneW,0.03 * safezoneH];
+	(_mccdialog displayctrl MCC_CONSOLEWPCLEAR) ctrlSetPosition [_posX + (0.113 * safezoneW), _posY + (0.148 * safezoneH),0.032 * safezoneW,0.03 * safezoneH];
 	(_mccdialog displayctrl MCC_CONSOLEWPCLEAR) ctrlCommit 0;
 	waituntil {ctrlCommitted (_mccdialog displayctrl MCC_CONSOLEWPCLEAR)};
 };
 
 if (_3dCommander) then {
-	private ["_cam","_hight","_pos"];
+	private _cam = objNull;
+	private "_hight";
+	private "_pos";
 	_cam = missionNamespace getVariable ["MCC_CONST_CAM",objNull];
 	if !(isNull _cam) then {
 		_hight = (getpos _cam) select 2;

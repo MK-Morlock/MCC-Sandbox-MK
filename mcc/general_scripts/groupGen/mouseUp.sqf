@@ -1,8 +1,17 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params", "_ctrl", "_pressed", "_posX", "_posY", "_shift", "_ctrlKey", "_alt", "_eib_marker","_pointB","_nearObjectsA","_nearObjectsB","_mcc_XYmap"];
+private _ctrl = controlNull;
+private _pressed = 0;
+private _posX = 0;
+private _posY = 0;
+private _shift = false;
+private _ctrlKey = false;
+private _alt = false;
+private _nearObjectsA = [];
+private _nearObjectsB = [];
+private _mcc_XYmap = [];
 disableSerialization;
 
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _pressed = _params select 1;
@@ -36,10 +45,10 @@ if (MCC_ambushPlacing && _pressed!=1) exitWith {
 	if (MCC_capture_state) then {
 		hint "Ambush Captured.";
 		MCC_capture_var = MCC_capture_var
-				+ FORMAT ["[[%1 , '%2' , '%3', %4, %5, %6, %7, %8],'MCC_fnc_ambushSingle',true,false] call BIS_fnc_MP;", MCC_pointA, IEDAmbushspawnname, mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside];
+				+ FORMAT ["[%1 , '%2' , '%3', %4, %5, %6, %7, %8] remoteExec ['MCC_fnc_ambushSingle', 0, false];", MCC_pointA, IEDAmbushspawnname, mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside];
 	} else  {
 		hint "Ambush Placed.";
-		[[MCC_pointA , IEDAmbushspawnname,mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside],"MCC_fnc_ambushSingle",false,false] call BIS_fnc_MP;
+		[MCC_pointA , IEDAmbushspawnname,mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside] remoteExec ["MCC_fnc_ambushSingle", 2, false];
 	};
 
 	MCC_ambushPlacing = false;
@@ -51,6 +60,6 @@ if (_shift && _pressed!=1) exitWith {
 	_nearObjectsB = MCC_pointB nearObjects [MCC_dummy,50];
 
 	if (count _nearObjectsA > 0 && count _nearObjectsB > 0) then{
-		[[MCC_pointA , MCC_pointB],"MCC_fnc_iedSync",true,false] call BIS_fnc_MP;
+		[MCC_pointA , MCC_pointB] remoteExec ["MCC_fnc_iedSync", 0, false];
 	};
 };

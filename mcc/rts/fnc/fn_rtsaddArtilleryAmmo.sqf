@@ -3,9 +3,13 @@
 //  Parameter(s):
 //     	_ctrl: CONTROL
 //==============================================================================================================================================================*/
-private ["_ctrl","_artyTypes","_sideVar","_ammoNew","_res","_side"];
+private _artyTypes = [];
+private _sideVar = "";
+private "_ammoNew";
+private _res = [];
+private "_side";
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _res = param [1, [], [[]]];
 _side = playerSide;
 

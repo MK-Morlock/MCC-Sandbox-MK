@@ -4,15 +4,22 @@
 //     _ctrl: CONTROL
 //=======================================================================================================================================================================*/
 
-private ["_ctrl","_cfgName","_obj","_units","_res","_side","_emptyPos","_startPos","_buildings","_unitsSpace"];
+private "_obj";
+private _units = {};
+private _res = [];
+private "_side";
+private _emptyPos = 0;
+private "_startPos";
+private "_buildings";
+private _unitsSpace = 0;
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _res = param [1, [], [[]]];
 _side = playerSide;
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 _obj = MCC_ConsoleGroupSelected select 0;
 
-_startPos = call compile format ["MCC_START_%1",_side];
+_startPos = missionNamespace getVariable (format ["MCC_START_%1", _side]);
 _buildings = _startPos nearObjects ["UserTexture10m_F", 300];
 _unitsSpace = 4;
 
@@ -44,7 +51,7 @@ createVehicleCrew _obj;
 _ehID = _obj addMPEventHandler ["mpkilled", {
 												_unit = getText (configfile >> "CfgVehicles" >> typeof (_this select 0) >> "displayName");
 												_killer = name (_this select 1);
-												[["MCCNotificationBad",["Unit Down",format ["%1 was killed by %2",_unit,_killer],""]], "bis_fnc_showNotification", _sidePlayer, false] spawn BIS_fnc_MP;
+												["MCCNotificationBad",["Unit Down",format ["%1 was killed by %2",_unit,_killer],""]] remoteExec ["bis_fnc_showNotification", _sidePlayer, false];
 											  }];
 
 {

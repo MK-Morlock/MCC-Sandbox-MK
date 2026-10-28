@@ -19,22 +19,48 @@
 //	MCC_MWunitsArraySubmarine = []; 	// vehicleClass = "Submarine";
 //	MCC_MWunitsArrayStatic = []; 		// vehicleClass = "Static";
 //========================================================================================================================================================================================
-private ["_CfgVehicles","_type","_i","_CfgVehicle","_vehicleClass","_simulation","_simTypesUnits","_faction","_side"];
+private _CfgVehicles = configNull;
+private _type = "";
+private _i = 0;
+private _CfgVehicle = configNull;
+private _vehicleClass = "";
+private _simulation = "";
+private _simTypesUnits = [];
 
-if (count _this > 0) then
-{
-	_faction = _this select 0;
-	_side	 = _this select 1;
-}
-else
+params [["_faction", "", [""]], ["_side", sideUnknown, [sideUnknown, ""]]];
+
+// _side is polymorphic across callers - some pass a real Side (e.g. fn_campaignInit.sqf's
+// `param [2, east]`), others pass mcc_sidename, which is a STRING ("WEST"/"EAST"/"GUER"/"CIV",
+// see mcc_factions.sqf). Normalize once here so the rest of the function can always rely on
+// _side being a genuine Side value.
+if (typeName _side == "STRING") then {
+	_side = switch (toUpper _side) do
+	{
+		case "EAST": {east};
+		case "WEST": {west};
+		case "GUER": {resistance};
+		default {civilian};
+	};
+};
+
+if (_faction == "") then
 {
 	while {isNil "mcc_faction"} do {sleep 1};
 	_faction = mcc_faction;
-	_side	 = mcc_sidename;
+	// mcc_sidename is a STRING ("WEST"/"EAST"/"GUER"/"CIV", see mcc_factions.sqf), not a
+	// real Side - convert it properly rather than assign the string directly into a
+	// variable that gets pushed into the unit arrays as a genuine Side value below.
+	_side	 = switch (toUpper mcc_sidename) do
+	{
+		case "EAST": {east};
+		case "WEST": {west};
+		case "GUER": {resistance};
+		default {civilian};
+	};
 };
 
 _simTypesUnits 	= ["soldier", "car","carx", "motorcycle", "tank", "helicopter", "airplane", "ship", "parachute","helicopterX","shipx","shipX","tankX","submarinex","airplanex","helicopterrtd"];
-_CfgVehicles 		= configFile >> "CfgVehicles" ;
+_CfgVehicles 		= [_faction] call MCC_fnc_factionClasses;	//only the faction public classes, picked by the engine (was every class, one by one)
 
 MCC_MWunitsArrayMen = [];			//vehicleClass = "Men";
 MCC_MWunitsArrayMenDiver = []; 		// vehicleClass = "MenDiver";
@@ -68,12 +94,13 @@ for "_i" from 0 to (count _CfgVehicles - 1) do
 			_cfgFaction 			= getText(_CfgVehicle >> "faction");
 			_simulation 			= getText(_CfgVehicle >> "simulation");
 			_vehicleDisplayName		= [_vehicleDisplayName, gettext(_CfgVehicle >> "picture")];
-			_vehicleclass			= getText(_CfgVehicle >> "vehicleclass");
+			_vehicleclass			= "";
 
 			if (_simulation in _simTypesUnits) then
 			{
 				if (toUpper(_cfgFaction) == toUpper _faction) then
 				{
+					_vehicleclass = [_CfgVehicle] call MCC_fnc_unitCategory;	//mod vehicleClass names mapped to MCCs (GitHub #48)
 					if (_vehicleclass in ["Men","MenDiver","MenRecon","MenSniper","MenSupport","MenStory","Car","Armored","Air","Autonomous","Support","Ship","Submarine","Static"]) then
 					{
 						switch (toLower(_vehicleclass)) do

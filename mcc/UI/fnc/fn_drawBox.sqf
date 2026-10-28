@@ -10,13 +10,11 @@
 //maxDist = Integer, maximum marker distance. 
 //Returns : marker name
 //==================================================================================================================================================================================
-private ["_start", "_end", "_markerName","_boxShape","_center","_boxType","_boxColor","_boxMarkerName","_hight","_width","_marker"];
-_start 		= _this select 0;
-_end 		= _this select 1;
-_markerName	= _this select 2;
-_boxShape 	= _this select 3;
-_boxColor 	= _this select 4;
-_boxType	= _this select 5;
+private _center = [];
+private _boxMarkerName = "";
+private _hight = 0;
+private _width = 0;
+params ["_start", "_end", "_markerName", "_boxShape", "_boxColor", "_boxType"];
 
 _boxMarkerName = format ["mccbox_%1", _markerName];
 

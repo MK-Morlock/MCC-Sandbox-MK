@@ -66,7 +66,7 @@ class mcc_sandbox_moduleGAIASettings : Module_F
 				};
 				class vetran
 				{
-					name = "Vetran";
+					name = "Veteran";
 					value = 10;
 				};
 			};
@@ -110,7 +110,7 @@ class mcc_sandbox_moduleGAIASettings : Module_F
 		class aiSmokeChance
 		{
 			displayName = "Smoke/flares Chance";
-			description = "Define how ofter AI will use smoke/flares";
+			description = "Define how often AI will use smoke/flares";
 			typeName = "NUMBER";
 			class values
 			{
@@ -136,7 +136,7 @@ class mcc_sandbox_moduleGAIASettings : Module_F
 		class cacheDistance
 		{
 			displayName = "Cache Distance";
-			description = "How far any player should be from a unit before it cached";
+			description = "How far any player should be from a unit before it is cached";
 			typeName = "NUMBER";
 			class values
 			{
@@ -161,8 +161,8 @@ class mcc_sandbox_moduleGAIASettings : Module_F
 
 		class gaiacontrol
 		{
-			displayName = "GAIA Controlls";
-			description = "If set to everyone GAIA will give order to all units availables even players";
+			displayName = "GAIA Controls";
+			description = "If set to everyone, GAIA will give orders to all available units, even players";
 			typeName = "BOOL";
 			class values
 			{

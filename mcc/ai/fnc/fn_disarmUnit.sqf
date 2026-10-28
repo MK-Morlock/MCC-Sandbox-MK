@@ -8,7 +8,11 @@
 // <OUT>
 //		Boolean
 //===========================================================================================================================================================================
-private["_anim","_npc","_wepHolder","_weapon","_weaponsNPC"];
+private _anim = "";
+private _npc = objNull;
+private _wepHolder = nil;
+private "_weapon";
+private _weaponsNPC = [];
 _npc = param [0,objNull,[objNull]];
 _anim = param [1,"",[""]];
 
@@ -33,7 +37,7 @@ if (MCC_isACE) then {
 	_npc disableAI "AUTOTARGET";
 
 	_npc setVariable ["MCC_disarmed",true,true];
-	[[_npc, "Hold %1 to interact"], "MCC_fnc_createHelper", false] call BIS_fnc_MP;
+	[_npc, "Hold %1 to interact"] remoteExec ["MCC_fnc_createHelper", 2, false];
 
 	if (_anim != "") then
 	{

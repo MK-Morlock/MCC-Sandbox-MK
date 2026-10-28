@@ -6,7 +6,17 @@
 //		_rad = integer, how far the armed civilian will look for threats
 // <out>	<nothing>
 //====================================================================================================================================================================
-private ["_suspect","_side","_rad","_targ","_count","_pos","_tim","_weapon","_mag","_weaponList","_dummy","_grp","_availableMagazines"];
+private _suspect = objNull;
+private _side = sideUnknown;
+private _rad = 0;
+private _targ = [];
+private _count = 0;
+private _weapon = "";
+private _mag = "";
+private _weaponList = [];
+private _dummy = objNull;
+private _grp = grpNull;
+private _availableMagazines = [];
 _suspect 		= param [0,objNull];
 _side 			= param [1,sideEnemy];
 _rad  			= param [2,25];
@@ -24,13 +34,29 @@ if (typeName _side == "STRING") then {
 
 if (typeName _side == typeName sideLogic) then {_side = [_side]};
 
-_weaponList = missionNamespace getVariable ["MCC_armedCivilansWeapons",["hgun_P07_F","hgun_Rook40_F","hgun_ACPC2_F","hgun_Pistol_heavy_01_F","hgun_Pistol_heavy_02_F","SMG_01_F","SMG_02_F","hgun_PDW2000_F"]];
+MCC_fnc_manageACPickWeapon = {
+	params ["_suspect"];
+	private _default = ["hgun_P07_F","hgun_Rook40_F","hgun_ACPC2_F","hgun_Pistol_heavy_01_F","hgun_Pistol_heavy_02_F","SMG_01_F","SMG_02_F","hgun_PDW2000_F"];
+	private _own = _suspect getVariable ["MCC_armedCivWeapon", ""];
+	if (_own isEqualType "" && {_own != ""} && {isClass (configFile >> "CfgWeapons" >> _own)}) exitWith {_own};
+	if (_own isEqualType "" && {_own != ""}) then {["WARN", "MCC_fnc_manageAC", "armed civilian weapon %1 does not exist - using the pool", [_own]] call MCC_fnc_log};
+	private _pool = missionNamespace getVariable ["MCC_armedCivilansWeapons", _default];
+	if !(_pool isEqualType []) then {_pool = _default};
+	_pool = _pool select {_x isEqualType "" && {isClass (configFile >> "CfgWeapons" >> _x)}};
+	if (_pool isEqualTo []) then {_pool = _default};
+	selectRandom _pool
+};
+MCC_fnc_manageACMagazine = {
+	params ["_weapon"];
+	private _mags = compatibleMagazines _weapon;
+	if (_mags isEqualTo []) then {_mags = getArray (configFile >> "cfgWeapons" >> _weapon >> "magazines")};
+	if (_mags isEqualTo []) exitWith {""};
+	_mags select 0
+};
 
-
-_weapon = _weaponList call BIS_fnc_selectRandom;
-_availableMagazines = getArray (configFile >> "cfgWeapons" >> _weapon >> "magazines");
-if (count _availableMagazines <= 0) exitWith {diag_log format ["Error MCC_fnc_manageAC: %1 does not have magazines", _weapon]};
-_mag = _availableMagazines select 0;
+_weapon = [_suspect] call MCC_fnc_manageACPickWeapon;
+_mag = [_weapon] call MCC_fnc_manageACMagazine;
+if (_mag == "") exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["Error MCC_fnc_manageAC: %1 does not have magazines", _weapon]}};
 
 removeallweapons _suspect;
 _suspect setbehaviour "CARELESS";
@@ -42,8 +68,7 @@ _dummy hideobjectGlobal true;
 _dummy attachto [_suspect,[0,0,0]];
 
 [_suspect, _dummy] spawn {
-	private ["_suspect"];
-	_suspect 	= _this select 0;
+	private _suspect = _this select 0;
 	_dummy 		= _this select 1;
 	waituntil {!alive _suspect || isnull _suspect};
 	sleep 1;
@@ -95,6 +120,14 @@ while {alive _suspect && _check} do {
 								_suspect setbehaviour "COMBAT";
 								if (alive _suspect) then {
 
+									//The weapon may have been changed (Zeus) since this script started
+									private _wanted = [_suspect] call MCC_fnc_manageACPickWeapon;
+									if ((_suspect getVariable ["MCC_armedCivWeapon",""]) != "" && {_wanted != _weapon}) then {
+										_weapon = _wanted;
+										private _m = [_weapon] call MCC_fnc_manageACMagazine;
+										if (_m != "") then {_mag = _m};
+									};
+
 									if (!(_suspect hasweapon _weapon)) then {
 
 										switch (side _enemy) do {
@@ -113,7 +146,7 @@ while {alive _suspect && _check} do {
 										{_suspect addmagazine _mag} foreach [1,2,3,4,5];
 										_suspect addweapon _weapon;
 										_suspect selectweapon _weapon;
-										[[[netid _suspect,_suspect], "pig"], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
+										[[netid _suspect,_suspect], "pig"] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 									};
 
 

@@ -12,10 +12,15 @@
 	True
 */
 disableserialization;
-private ["_text","_pos","_display","_control","_w","_h","_minsDis","_dis","_alpha","_pos2D"];
+private "_display";
+private _control = controlNull;
+private "_w";
+private "_h";
+private "_dis";
+private _alpha = 0;
+private "_pos2D";
 
-_text = _this select 0;
-_pos = _this select 1;
+params ["_text", "_pos"];
 _minDis = if (count _this > 2) then {_this select 2} else {20};
 _fadeDis = if (count _this > 3) then {_this select 3} else {0.5};
 if (isnil "BIS_fnc_3dCredits_n") then {BIS_fnc_3dCredits_n = 0;};

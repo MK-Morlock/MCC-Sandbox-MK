@@ -2,6 +2,8 @@
 #define ALLGEAR_IDD 8500
 #define BOXGEAR_IDD 8501
 #define GEARCLASS_IDD 8502
+#define BOXPRESET_IDD 8503
+#define BOXPRESETNAME_IDD 8504
 
 class MCC_3DCargoGenControls:MCC_RscControlsGroup
 {
@@ -27,7 +29,7 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 		class allGearBackground : MCC_RscText 
 		{
 			idc = -1;
-			colorBackground[] = { 0, 0, 0, 0.9 };
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 			colorText[] = { 1, 1, 1, 0 };
 			text = "";
 			moving = 1;
@@ -40,7 +42,7 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 		class boxGearBackground : MCC_RscText 
 		{
 			idc = -1;
-			colorBackground[] = { 0, 0, 0, 0.9 };
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 			colorText[] = { 1, 1, 1, 0 };
 			x = 0.217709 * safezoneW;
 			y = 0.0769698 * safezoneH;
@@ -95,7 +97,7 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 			idc = -1;
 			text = "Cargo Generator:";
 			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-			colorText[] = {0,1,1,1};
+			colorText[] = {0.77,0.51,0.08,1};
 			colorBackground[] = {1,1,1,0};
 			
 			x = 0.00572965 * safezoneW;
@@ -109,7 +111,7 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 			idc = -1;
 			text = "Class:";
 			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-			colorText[] = {1,1,1,1};
+			colorText[] = {0.88,0.89,0.90,1};
 			colorBackground[] = {1,1,1,0};
 			
 			x = 0.00572965 * safezoneW;
@@ -119,7 +121,7 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 		};
 		
 		//Buttons
-		class addAllButton: MCC_RscButton
+		class addAllButton: MCCBTN_S
 		{
 			idc = -1;
 			text = ">>";
@@ -130,9 +132,10 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 			y = 0.186927 * safezoneH;
 			w = 0.0286458 * safezoneW;
 			h = 0.0274893 * safezoneH;
+			class TextPos {left = 0; top = "((0.0274893 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};  
 		
-		class addOneButton: MCC_RscButton
+		class addOneButton: MCCBTN_S
 		{
 			idc = -1;
 			text = ">";
@@ -143,9 +146,10 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 			y = 0.23091 * safezoneH;
 			w = 0.0286458 * safezoneW;
 			h = 0.0274893 * safezoneH;
+			class TextPos {left = 0; top = "((0.0274893 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};  
 		
-		class removeOneButtton: MCC_RscButton
+		class removeOneButtton: MCCBTN_S
 		{
 			idc = -1;
 			text = "Clear";
@@ -155,9 +159,10 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 			y = 0.274893 * safezoneH;
 			w = 0.0286458 * safezoneW;
 			h = 0.0274893 * safezoneH;
+			class TextPos {left = 0; top = "((0.0274893 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};  
 		
-		class generateBoxButton: MCC_RscButton
+		class generateBoxButton: MCCBTN_S
 		{
 			idc = -1;
 			text = "Add";
@@ -168,6 +173,74 @@ class MCC_3DCargoGenControls:MCC_RscControlsGroup
 			y = 0.472816 * safezoneH;
 			w = 0.0572917 * safezoneW;
 			h = 0.0274893 * safezoneH;
+			class TextPos {left = 0; top = "((0.0274893 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		}; 
+
+		//Presets (GitHub #11): saved in the players profile, available in every mission
+		class boxPresetCombo: MCC_RscCombo
+		{
+			idc = BOXPRESET_IDD;
+			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.9)";
+			style = MCCST_LEFT;
+			colorText[] = { 1, 1, 1, 1 };
+			colorSelect[] = { 1.0, 0.35, 0.3, 1 };
+			colorBackground[]={0,0,0,1};
+			colorSelectBackground[] = { 0, 0, 0, 1 };
+			tooltip = "Saved cargo presets";
+			x = 0.00572965 * safezoneW;
+			y = 0.472816 * safezoneH;
+			w = 0.095 * safezoneW;
+			h = 0.0274893 * safezoneH;
+		};
+		class boxPresetName: MCC_RscText
+		{
+			idc = BOXPRESETNAME_IDD;
+			type = 2;
+			style = 0;
+			text = "";
+			tooltip = "Name for Save (empty = overwrite the selected preset)";
+			colorBackground[] = {0.11,0.12,0.13,0.96};
+			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.9)";
+			x = 0.1035 * safezoneW;
+			y = 0.472816 * safezoneH;
+			w = 0.081 * safezoneW;
+			h = 0.0274893 * safezoneH;
+		};
+		class boxPresetSave: MCCBTN_S
+		{
+			idc = -1;
+			text = "Save";
+			tooltip = "Save the box's current cargo as a preset";
+			onButtonClick =  __EVAL("[5,_this] execVM '"+MCCPATH+"mcc\general_scripts\boxGen\mcc_boxGen_change.sqf'");
+			x = 0.1875 * safezoneW;
+			y = 0.472816 * safezoneH;
+			w = 0.042 * safezoneW;
+			h = 0.0274893 * safezoneH;
+			class TextPos {left = 0; top = "((0.0274893 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
+		};
+		class boxPresetLoad: MCCBTN_S
+		{
+			idc = -1;
+			text = "Load";
+			tooltip = "Replace the box's cargo with the selected preset";
+			onButtonClick =  __EVAL("[6,_this] execVM '"+MCCPATH+"mcc\general_scripts\boxGen\mcc_boxGen_change.sqf'");
+			x = 0.2325 * safezoneW;
+			y = 0.472816 * safezoneH;
+			w = 0.042 * safezoneW;
+			h = 0.0274893 * safezoneH;
+			class TextPos {left = 0; top = "((0.0274893 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
+		};
+		class boxPresetDelete: MCCBTN_S
+		{
+			idc = -1;
+			text = "Delete";
+			tooltip = "Delete the selected preset";
+			onButtonClick =  __EVAL("[7,_this] execVM '"+MCCPATH+"mcc\general_scripts\boxGen\mcc_boxGen_change.sqf'");
+			x = 0.2775 * safezoneW;
+			y = 0.472816 * safezoneH;
+			w = 0.051 * safezoneW;
+			h = 0.0274893 * safezoneH;
+			class TextPos {left = 0; top = "((0.0274893 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
+		};
 	 };
 };

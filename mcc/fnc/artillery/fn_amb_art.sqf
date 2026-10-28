@@ -1,9 +1,10 @@
 //==================================================================MCC_fnc_amb_Art=======================================================================================
 // [4,_this select 0, _this select 4]
 //===========================================================================================================================================================================
-private ["_arti","_type","_dummypos"];
+private _arti = objNull;
+private _dummypos = [];
 
-_type = _this select 0;
+params ["_type"];
 
 if (!isserver) exitWith {};
 
@@ -36,9 +37,13 @@ switch (_type) do
 	case 0:	//Set Cannon
 	{
 		while {alive (gunner _arti) && alive _arti} do {
-			_arti fire (weapons _arti select 0);
-			sleep ((random 5)+5);
+			for "_s" from 1 to 3 do {
+				if (!alive (gunner _arti) || {!alive _arti}) exitWith {};
+				_arti fire (weapons _arti select 0);
+				if (_s < 3) then {sleep ((random 5)+5)};
+			};
 			_arti setVehicleAmmo 1;
+			sleep 300;
 		};
 		_arti removeAllEventHandlers "fired";
 	};
@@ -62,20 +67,32 @@ switch (_type) do
 	case 2:	//Set AA
 	{
 		_arti removeAllEventHandlers "fired";
+		private _w = (weapons _arti) select 0;
+		private _sim = toLower (getText (configFile >> "CfgAmmo" >> (getText (configFile >> "CfgMagazines" >> (currentMagazine _arti) >> "ammo")) >> "simulation"));
+		private _missile = _sim in ["shotmissile", "shotrocket"];
 		while {alive (gunner _arti) && alive _arti} do
 		{
-			for [{_i=0}, {_i<20}, {_i=_i+1}] do
-			{
-				_arti fire (weapons _arti select 0);
-				waituntil {canfire _arti || !alive (gunner _arti) || !alive _arti};
-				sleep 0.3;
+			if (_missile) then {
+				for "_i" from 1 to 5 do {
+					if (!alive (gunner _arti) || {!alive _arti}) exitWith {};
+					_arti fire _w;
+					if (_i < 5) then {sleep (8.5 + (random 11.5))};
+				};
+			} else {
+				for "_b" from 1 to 3 do {
+					private _tb = time + 3 + (random 5);
+					while {time < _tb && {alive (gunner _arti)} && {alive _arti}} do {
+						_arti fire _w;
+						sleep 0.08;
+					};
+					if (_b < 3) then {sleep 7.5};
+				};
 			};
-
 			_arti setVehicleAmmo 1;
-			sleep ((random 10)+10);
+			sleep 300;
 			_dummypos = [getpos _arti, 50, ((getdir _arti)+ 180 - (random 90)) ] call BIS_fnc_relPos;
-			sleep 1;
 			(gunner _arti) lookAt [_dummypos select 0, _dummypos select 1,(_dummypos select 2)+100];
+			sleep 3;
 		};
 	};
 

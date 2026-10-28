@@ -4,9 +4,11 @@
 //     	_ctrl: CONTROL
 //		_res: resources Needed
 //==============================================================================================================================================================================
-private ["_ctrl","_res","_side","_varName"];
+private _res = [];
+private "_side";
+private _varName = "";
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _res = param [1, [], [[]]];
 _side = playerSide;
 _varName = format ['MCC_rtsMissionOn_%1', _side];
@@ -19,4 +21,4 @@ publicVariable _varName;
 
 [MCC_ConsoleGroupSelected] spawn MCC_fnc_baseSelected;
 
-[[_side,10,true],"MCC_fnc_rtsScanResources",false,false] spawn BIS_fnc_MP;
+[_side,10,true] remoteExec ["MCC_fnc_rtsScanResources", 2, false];

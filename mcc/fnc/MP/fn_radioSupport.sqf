@@ -2,9 +2,7 @@
 // Broadcast radio support to all elements not including the broadcaster group
 // Example:[_caller, _messege] call MCC_fnc_radioSupport;
 //===============================================================================================================================================================================
-private ["_caller","_type","_vehicle","_broadcast","_messege"];
-_caller 	=_this select 0;
-_messege	=_this select 1;
+params ["_caller", "_messege"];
 
 //No dedi no HC
 if (isDedicated || !hasInterface) exitWith {};

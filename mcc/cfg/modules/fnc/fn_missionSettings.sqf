@@ -3,33 +3,50 @@
 // Example: [] call MCC_fnc_missionSettings;
 // _group1 = group, the group name
 //================================================================================================================================================================
-private ["_module"];
-
-_module = param [0, objNull, [objNull]];
+private _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {deleteVehicle _module};
+
+// Module values can arrive as strings ("1") or booleans when a mission sets them from script,
+// even though the attributes are declared NUMBER/BOOL. Read them defensively.
+private _fnc_num = {
+	params ["_key", "_default"];
+	private _v = _module getVariable [_key, _default];
+	if (_v isEqualType "") then {_v = parseNumber _v};
+	if (_v isEqualType true) then {_v = [0, 1] select _v};
+	if !(_v isEqualType 0) then {_v = _default};
+	_v
+};
+private _fnc_bool = {
+	params ["_key", "_default"];
+	private _v = _module getVariable [_key, _default];
+	if (_v isEqualType "") then {_v = (toLower _v) in ["true", "1"]};
+	if (_v isEqualType 0) then {_v = _v != 0};
+	if !(_v isEqualType true) then {_v = _default};
+	_v
+};
 
 if (_module isKindOf "MCC_Module_settings") exitWith {
 	//T2T
-	private _var 	= _module getvariable ["t2t",0];
+	private _var 	= (["t2t",0] call _fnc_num);
 	missionNamespace setVariable ["MCC_t2tIndex",_var];
 	if (MCC_t2tIndex isEqualTo 0) then {MCC_teleportToTeam = false};
 
 	//Save gear
-	_var 	= _module getvariable ["saveGear",1];
+	_var 	= (["saveGear",1] call _fnc_num);
 	missionNamespace setVariable ["MCC_saveGearIndex",_var];
 	MCC_saveGear = (_var isEqualTo 1);
 
 	//Messeges
-	_var 	= _module getvariable ["messages",1];
+	_var 	= (["messages",1] call _fnc_num);
 	missionNamespace setVariable ["MCC_MessagesIndex",_var];
 	MCC_Chat = (_var isEqualTo 1);
 
 	//Sync
-	_var 	= _module getvariable ["sync",1];
+	_var 	= (["sync",1] call _fnc_num);
 	MCC_syncOn = (_var isEqualTo 1);
 
 	//Artillery computer
-	_var 	= _module getvariable ["artilleryComputer",1];
+	_var 	= (["artilleryComputer",1] call _fnc_num);
 	missionNamespace setVariable ["MCC_artilleryComputerIndex",_var];
 	_var spawn {
 		waitUntil {time > 10};
@@ -37,7 +54,7 @@ if (_module isKindOf "MCC_Module_settings") exitWith {
 	};
 
 	//Time Excel
-	_var 	= _module getvariable ["timeAccel",0];
+	_var 	= (["timeAccel",0] call _fnc_num);
 	if (_var > 0) then	{
 		_var spawn {
 			waitUntil {time > 10};
@@ -46,60 +63,60 @@ if (_module isKindOf "MCC_Module_settings") exitWith {
 	};
 
 	//Delete players body
-	_var 	= _module getvariable ["deleteBody",1];
+	_var 	= (["deleteBody",1] call _fnc_num);
 	missionNamespace setVariable ["mcc_deletePlayerBodyIndex",_var];
 	MCC_deletePlayersBody = (_var isEqualTo 1);
 
 	//Respawn Menu
-	_var 	= _module getvariable ["respawnMenu",1];
+	_var 	= (["respawnMenu",1] call _fnc_num);
 	MCC_openRespawnMenu = (_var isEqualTo 1);
 
 	//Respawn Cinematic
-	MCC_respawnCinematic = ((_module getvariable ["respawnCinematic",1]) == 1);
+	MCC_respawnCinematic = (((["respawnCinematic",1] call _fnc_num)) == 1);
 
 	//Respawn on Leader
-	missionNameSpace setVariable ["MCC_respawnOnGroupLeader",(_module getvariable ["respawnOnGroupLeader",1]) ==1];
+	missionNameSpace setVariable ["MCC_respawnOnGroupLeader",((["respawnOnGroupLeader",1] call _fnc_num)) ==1];
 
 	//SQL PDA
-	_var 	= _module getvariable ["sqlPDA",1];
+	_var 	= (["sqlPDA",1] call _fnc_num);
 	MCC_allowsqlPDA = (_var isEqualTo 1);
 
 	//Commander Console
-	_var 	= _module getvariable ["commanderConsole",1];
+	_var 	= (["commanderConsole",1] call _fnc_num);
 	MCC_allowConsole = (_var isEqualTo 1);
 
 	//Commander Console Show units without GPS
-	_var 	= _module getvariable ["commanderConsoleShowGPS",1];
+	_var 	= (["commanderConsoleShowGPS",1] call _fnc_num);
 	MCC_ConsoleOnlyShowUnitsWithGPS = if (_var == 0) then {true} else {false};
 
 	//Commander Console Show friendly WP
-	_var 	= _module getvariable ["commanderConsoleWP",1];
+	_var 	= (["commanderConsoleWP",1] call _fnc_num);
 	MCC_ConsoleDrawWP = (_var isEqualTo 1);
 	MCC_ConsolePlayersCanSeeWPonMap = (_var isEqualTo 1);
 
 	//Commander Console Can command AI
-	_var 	= _module getvariable ["commanderConsoleAI",1];
+	_var 	= (["commanderConsoleAI",1] call _fnc_num);
 	MCC_ConsoleCanCommandAI = (_var isEqualTo 1);
 
 	//Logistics
-	_var 	= _module getvariable ["logistics",1];
+	_var 	= (["logistics",1] call _fnc_num);
 	MCC_allowlogistics =(_var isEqualTo 1);
 
 	//Allow RTS
-	_var 	= _module getvariable ["allowRTS",0];
+	_var 	= (["allowRTS",0] call _fnc_num);
 	MCC_allowRTS = (_var isEqualTo 1);
 
 	//Purchable airDrops
-	MCC_defaultSupplyDropsEnabled = _module getvariable ["defaultSupplyDropsEnabled",false];
+	MCC_defaultSupplyDropsEnabled = (["defaultSupplyDropsEnabled",false] call _fnc_bool);
 
 	//Purchable CAS
-	MCC_defaultCASEnabled = _module getvariable ["defaultCASEnabled",false];
+	MCC_defaultCASEnabled = (["defaultCASEnabled",false] call _fnc_bool);
 
 	//Disable Curator Edit
-	MCC_CuratorEditDisabled = _module getvariable ["CuratorEditDisabled",false];
+	MCC_CuratorEditDisabled = (["CuratorEditDisabled",false] call _fnc_bool);
 
 	//Armed Civilians Weapons
-	MCC_armedCivilansWeapons = call compile (_module getvariable ["armedCiviliansWeapons",["hgun_P07_F","hgun_Rook40_F","hgun_ACPC2_F","hgun_Pistol_heavy_01_F","hgun_Pistol_heavy_02_F","SMG_01_F","SMG_02_F","hgun_PDW2000_F"]]);
+	MCC_armedCivilansWeapons = [_module getvariable ["armedCiviliansWeapons",""], '["hgun_P07_F","hgun_Rook40_F","hgun_ACPC2_F","hgun_Pistol_heavy_01_F","hgun_Pistol_heavy_02_F","SMG_01_F","SMG_02_F","hgun_PDW2000_F"]', "armedCiviliansWeapons (module)"] call MCC_fnc_parseSetting;
 };
 
 //Not curator exit
@@ -125,7 +142,7 @@ _resualt = ["Settings MCC",[
  						["Purchasable CAS",(missionNamespace getVariable ["MCC_defaultCASEnabled",true])],
  						["Disable Zeus Edit",(missionNamespace getVariable ["MCC_CuratorEditDisabled",false])],
  						["Reduce Tickets on Respawn",(missionNamespace getVariable ["MCC_reduceTicketsOnDeath",true])],
- 						["Artilery Computer",true],
+ 						["Artillery Computer",true],
  						["Time Acceleration",20],
  						["Resistance Hostile To",["All","East","West"]]
  					  ]] call MCC_fnc_initDynamicDialog;

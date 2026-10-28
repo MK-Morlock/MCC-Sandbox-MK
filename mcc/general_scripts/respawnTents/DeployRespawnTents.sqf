@@ -5,7 +5,14 @@ Deploy respawn tents
 #define REQUIRE_MEMBERS 2
 #define REQUIRE_DISTANCE 15
 
-private ["_object","_caller","_index","_nearby","_pos","_safePos","_tentType","_obj"];
+private _object = objNull;
+private _caller = objNull;
+private "_index";
+private _nearby = {};
+private "_pos";
+private "_safePos";
+private "_tentType";
+private "_obj";
 
 // Who activated the action?
 _object 	= param [0,objNull,[objNull]];
@@ -16,8 +23,7 @@ _index 		= _this select 2;
 _nearby = {alive _x && {_x in (units _caller)}} count (getPosATL _caller nearEntities ["CAManBase", REQUIRE_DISTANCE]);
 
 if (_nearby < REQUIRE_MEMBERS) exitWith {
-	_str = "<t size='0.8' t font = 'puristaLight' color='#FFFFFF'>" +format ["Need %1 more squad members within %2m",REQUIRE_MEMBERS-_nearby,REQUIRE_DISTANCE] + "</t>";
-	_null = [_str,0,0.2,2,0.1,0.0] spawn bis_fnc_dynamictext;
+	[format ["Need %1 more squad members within %2m",REQUIRE_MEMBERS-_nearby,REQUIRE_DISTANCE], 3] spawn MCC_fnc_rsMessage;
 };
 
 _pos = ATLtoASL(_caller modelToWorld [0,3,0]);
@@ -37,8 +43,7 @@ while {lineIntersects [_pos, [_pos select 0, _pos select 1, (_pos select 2) + 1]
 _obj = lineIntersectsObjs [_pos, getposASL player, player, player, true, 32];
 
 if (lineIntersects [getPosASL player, _pos] || count _obj > 0) exitWith {
-	_str = "<t size='0.8' t font = 'puristaLight' color='#FFFFFF'>" +"No suitable position found" + "</t>";
-	_null = [_str,0,0.2,2,0.1,0.0] spawn bis_fnc_dynamictext;
+	["No suitable position found", 3] spawn MCC_fnc_rsMessage;
 };
 
 _safePos = ASLtoATL _pos;
@@ -52,13 +57,11 @@ if !(isnil "_index") then {
 };
 
 //Spawn the rally
-private ["_dir","_type","_rally"];
-_dir    = direction player;
-_type   = if (_tentType == "MCC_TentDome") then {"Land_TentDome_F"} else {"Land_TentA_F"};
-
-_rally = _type createVehicle _safePos;
+private _dir = direction player;
+private _type = if (_tentType == "MCC_TentDome") then {"Land_TentDome_F"} else {"Land_TentA_F"};
+private _rally = _type createVehicle _safePos;
 _rally setDir _dir;
 _rally setPosATL _safePos;
 
 //Let the server handle the rally point
-[[player, _rally], "MCC_fnc_createRespawnTent", false] call BIS_fnc_mp;
+[player, _rally] remoteExec ["MCC_fnc_createRespawnTent", 2, false];

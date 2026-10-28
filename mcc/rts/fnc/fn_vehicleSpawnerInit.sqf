@@ -9,7 +9,13 @@
 #define    MCC_billboard    "Land_Noticeboard_F"
 #define    MCC_helipad    "Land_HelipadEmpty_F"
 
-private ["_object","_vars","_null","_syncItems","_syncedObjects","_billboard","_helipad","_type"];
+private "_object";
+private "_vars";
+private "_null";
+private "_syncedObjects";
+private _billboard = objNull;
+private _helipad = objNull;
+private _type = "";
 
 params [
     ["_object",objNull],
@@ -21,6 +27,12 @@ waitUntil {time > 1};
 
 //We came here from a moudle
 if (_object isKindOf "mcc_sandbox_modulevehicleSpawner" || _object isKindOf "MCC_Module_vehicleSpawnerCurator") exitWith {
+    // The Eden module is global: its function also runs on every client, including each player who joins later.
+    // Every run created a new billboard + helipad (when the module is not synced to two objects) and re-sent the init
+    // to everyone, so boards and "Purchase" actions multiplied with each join/reconnect. Only the server sets it up;
+    // the JIP remoteExec below brings it to joining players.
+    if (!isServer || {_object getVariable ["MCC_vehicleSpawnerModuleDone", false]}) exitWith {};
+    _object setVariable ["MCC_vehicleSpawnerModuleDone", true];
     _syncedObjects = synchronizedObjects _object;
 
     //No synced Objects?
@@ -33,18 +45,17 @@ if (_object isKindOf "mcc_sandbox_modulevehicleSpawner" || _object isKindOf "MCC
     };
 
     _type = _object getVariable ["type","vehicle"];
-    missionNamespace setVariable ["MCC_vehicleKioskBySide",(_object getVariable ["spawnFrom",0]) isEqualTo 1];
+    missionNamespace setVariable ["MCC_vehicleKioskBySide",(_object getVariable ["spawnFrom",0]) isEqualTo 1, true];
 
     //Add the objects to curator
     [_billboard,_helipad,_type] spawn {
-        private ["_billboard","_helipad","_type"];
-        _billboard = _this select 0;
-        _helipad = _this select 1;
-        _type = _this select 2;
+        private _billboard = _this select 0;
+        private _helipad = _this select 1;
+        private _type = _this select 2;
 
         waitUntil {!isNil "MCC_curator"};
         {
-            [[[_x], {MCC_curator addCuratorEditableObjects [[_this select 0],false];}], "BIS_fnc_spawn", false, false, false] call BIS_fnc_MP;
+            [[_x], {MCC_curator addCuratorEditableObjects [[_this select 0],false];}] remoteExec ["call", 2, false];
         } forEach [_billboard,_helipad];
 
         [_billboard,[_type,_helipad],"init"] remoteExec ["MCC_fnc_vehicleSpawnerInit",0,_billboard];

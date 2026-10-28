@@ -11,7 +11,16 @@
 //		<nothing>
 //===========================================================================================================================================================================
 //Add magazines
-private ["_magazineCount","_magazineClass","_magazines","_trashHold","_weapon","_cost","_roleCount","_objectAmmo","_object","_infinate"];
+private _magazineCount = {};
+private "_magazineClass";
+private _magazines = [];
+private "_trashHold";
+private "_weapon";
+private _cost = 0;
+private _roleCount = configNull;
+private _objectAmmo = configNull;
+private _object = objNull;
+private _infinate = false;
 _object = param [0, objNull, [objNull]];
 _infinate = param [1, false, [false]];
 
@@ -71,7 +80,8 @@ if (count _eglms >1) then {
 };
 
 //Add FAIK
-private ["_bandage","_count"];
+private _bandage = "";
+private _count = {};
 if (missionNamespace getVariable ["MCC_medicComplex",false]) then {
 	_bandage = "MCC_bandage";
 	_count = {_bandage == _x} count magazines player;
@@ -107,7 +117,8 @@ if ((missionNamespace getVariable ["MCC_medicComplex",false]) || MCC_isACE) then
 };
 
 //Add grenades
-private ["_grenades","_grnd"];
+private _grenades = [];
+private "_grnd";
 _grenades = ["HandGrenade","SmokeShell"];
 
 {

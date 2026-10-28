@@ -14,10 +14,24 @@ Example:
 
 */
 
-private ["_sectors","_zoneTriggers","_triggersAreas","_trigger","_fnc_drawLine","_sides","_bleedTickets","_module"];
+private "_sectors";
+private _zoneTriggers = [];
+private _triggersAreas = [];
+private "_trigger";
+private _sides = [];
+private _bleedTickets = 0;
+private _module = objNull;
 
 MCC_fnc_AASHandleSector = {
-    private ["_owner","_owners","_index","_sides","_factor","_nextTriggerIndex","_lastTriggerIndex","_triggers","_nextTriggerOwner","_tlist"];
+    private "_owner";
+    private _owners = [];
+    private "_index";
+    private _sides = [];
+    private "_nextTriggerIndex";
+    private "_lastTriggerIndex";
+    private _triggers = [];
+    private _nextTriggerOwner = [];
+    private "_tlist";
     params ["_sector"];
 
     _owner = _sector getvariable ["owner",sideunknown];
@@ -81,7 +95,7 @@ if (typeName (_this select 0) == typeName []) then {
     _bleedTickets = param [2,5,[5]];
 } else {
     _module = param [0, objNull, [objNull]];
-    if (isNull _module)  exitWith {diag_log "MCC MCC_fnc_aasInit: No module found"};
+    if (isNull _module)  exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC MCC_fnc_aasInit: No module found"}};
 
     _sectors = synchronizedObjects _module;
     _sides = [];
@@ -102,7 +116,11 @@ if (typeName (_this select 0) == typeName []) then {
 
 //Bleed tickets
 [_sides,_bleedTickets] spawn {
-    private ["_count1","_count2","_side1","_side2","_bleedTickets"];
+    private _count1 = 0;
+    private _count2 = 0;
+    private "_side1";
+    private "_side2";
+    private "_bleedTickets";
     _side1 = (_this select 0) select 0;
     _side2 = (_this select 0) select 1;
     _bleedTickets = (abs(_this select 1))*-1;
@@ -126,7 +144,7 @@ _owners = [];
 {
     while {count (_x getvariable ["areas",[]]) == 0} do {sleep 1};
     _zoneTriggers = _x getvariable ["areas",[]];
-    if (count _zoneTriggers == 0) exitWith {diag_log format ["MCC_fnc_AAS Error: no trigger in sector %1", _foreachindex]};
+    if (count _zoneTriggers == 0) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC_fnc_AAS Error: no trigger in sector %1", _foreachindex]}};
     _trigger = _zoneTriggers select 0;
     _triggers pushBack _trigger;
     _triggersAreas pushBack (triggerArea _trigger);

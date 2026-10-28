@@ -22,7 +22,7 @@ if (player getVariable ["MCC_surviveIsSick",false]) then {
 		TitleText ["You feel better...", "PLAIN DOWN",0.5];
 
 		if !(_this) then {
-			sleep 360 + random 600;
+			sleep (360 + random 600);
 			player setVariable ["MCC_surviveIsSick",true];
 			TitleText ["You feel sick...", "PLAIN DOWN",0.5];
 		};

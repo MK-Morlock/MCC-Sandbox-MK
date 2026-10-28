@@ -7,7 +7,7 @@ class MCC_uavDialog {
 	fadeOut = 0;
 	name = "MCC_uavDialog";
 
-	onLoad = "uiNamespace setVariable [""MCC_uavDialog"", _this select 0]";
+	onLoad = "uiNamespace setVariable [""MCC_uavDialog"", _this select 0]; [""start""] call MCC_fnc_consoleCampaignTiles;";
 
 	class Controls {
 		class MCC_ConsoleACFeedTargetPic: MCC_RscPicture
@@ -122,8 +122,6 @@ class MCC_uavDialog {
 		class MCC_mapConsole : MCC_RscMapControl {
 			idc = 120;
 			moving = true;
-			colorBackground[] = { 1, 1, 1, 1};
-			colorText[] = { 1, 1, 1, 0};
 			x = 0.788749 * safezoneW + safezoneX;
 			y = 0.212936 * safezoneH + safezoneY;
 			w = 0.01 * safezoneW;

@@ -3,11 +3,16 @@
 	//Track units on the given map display
 	// Example: [] call KEGs_fnc_trackUnits; 
 	//==================================================================================================================================================================================
-	private ["_map","_leader","_markerColor","_mapsize","_group","_texture","_unit"]; 
+	private "_leader";
+	private _markerColor = [];
+	private _mapsize = 0;
+	private "_group";
+	private _texture = "";
+	private "_unit"; 
 	
 	disableSerialization;
 	
-	_map = _this select 0;
+	params ["_map"];
 	
 	{
 		_group = _x; 
@@ -64,7 +69,7 @@
 				
 				//if (!isnil "KEGscam_lockon") then
 				//{
-					private ["_size"];
+					private "_size";
 					_bbr = boundingBoxReal vehicle _unit;
 					_p1 = _bbr select 0;
 					_p2 = _bbr select 1;
@@ -99,7 +104,9 @@
 		_wpArray = waypoints (group _leader);
 		if (count _wpArray > 0)then
 		{
-			private ["_wp","_wPos","_wType"];
+			private "_wp";
+			private "_wPos";
+			private "_wType";
 			KEGs_lastWpPos = nil; 
 			_texture = gettext (configfile >> "CfgMarkers" >> "waypoint" >> "icon");
 			for [{_i= currentWaypoint (group _leader)},{_i < count _wpArray},{_i=_i+1}] do 	//Draw the current WP
@@ -135,8 +142,7 @@
 
 					//if (!isnil "KEGscam_lockon") then
 						//{
-							private ["_size"];
-							_size =if ((1.5 - ((KEGscam_lockon distance vehicle _leader)*0.001)) < 0) then {0} else {(1.5 - ((KEGscam_lockon distance vehicle _leader)*0.001))};
+							private _size = if ((1.5 - ((KEGscam_lockon distance vehicle _leader)*0.001)) < 0) then {0} else {(1.5 - ((KEGscam_lockon distance vehicle _leader)*0.001))};
 							
 							if (_size>0) then
 							{

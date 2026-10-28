@@ -1,8 +1,7 @@
 version=12;
 class Mission
 {
-	addOns[]=
-	{
+	addOns[]={
 		"A3_Characters_F_BLUFOR",
 		"A3_Characters_F_OPFOR",
 		"a3_characters_f_beta",
@@ -16,8 +15,7 @@ class Mission
 		"mcc_sandbox",
 		"a3_map_panthera3"
 	};
-	addOnsAuto[]=
-	{
+	addOnsAuto[]={
 		"A3_Characters_F_BLUFOR",
 		"a3_characters_f",
 		"A3_Characters_F_OPFOR",
@@ -48,7 +46,7 @@ class Mission
 	};
 	class Groups
 	{
-		items=62;
+		items=61;
 		class Item0
 		{
 			side="WEST";
@@ -2739,53 +2737,6 @@ class Mission
 			side="LOGIC";
 			class Vehicles
 			{
-				items=1;
-				class Item0
-				{
-					position[]={2426.0125,5.1999998,3479.8306};
-					azimut=86.095879;
-					class args
-					{
-						items=4;
-						class Item0
-						{
-							value="1";
-							parentCls="mcc_sandbox_moduleCover";
-							typeName="cover";
-						};
-						class Item1
-						{
-							value="1";
-							parentCls="mcc_sandbox_moduleCover";
-							typeName="coverUI";
-						};
-						class Item2
-						{
-							value="1";
-							parentCls="mcc_sandbox_moduleCover";
-							typeName="";
-						};
-						class Item3
-						{
-							value="1";
-							parentCls="mcc_sandbox_moduleCover";
-							typeName="coverVault";
-						};
-					};
-					id=150;
-					side="LOGIC";
-					vehicle="mcc_sandbox_moduleCover";
-					leader=1;
-					lock="UNLOCKED";
-					skill=0.60000002;
-				};
-			};
-		};
-		class Item56
-		{
-			side="LOGIC";
-			class Vehicles
-			{
 				items=2;
 				class Item0
 				{
@@ -2797,43 +2748,43 @@ class Mission
 						class Item0
 						{
 							value="1";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="medicComplex";
 						};
 						class Item1
 						{
 							value="1";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="medicBleedingEnabled";
 						};
 						class Item2
 						{
 							value="200";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="BleedingTime";
 						};
 						class Item3
 						{
 							value="0.8";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="DamageCoef";
 						};
 						class Item4
 						{
 							value="1";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="medicXPmesseges";
 						};
 						class Item5
 						{
 							value="1";
-							parentCls="mcc_sandbox_moduleMedicSystem";
+							parentCls="MCC_Module_settingsMedicSystem";
 							typeName="medicPunishTK";
 						};
 					};
 					id=151;
 					side="LOGIC";
-					vehicle="mcc_sandbox_moduleMedicSystem";
+					vehicle="MCC_Module_settingsMedicSystem";
 					leader=1;
 					lock="UNLOCKED";
 					skill=0.60000002;
@@ -2851,7 +2802,7 @@ class Mission
 				};
 			};
 		};
-		class Item57
+		class Item56
 		{
 			side="LOGIC";
 			class Vehicles
@@ -2894,7 +2845,7 @@ class Mission
 				};
 			};
 		};
-		class Item58
+		class Item57
 		{
 			side="LOGIC";
 			class Vehicles
@@ -2937,7 +2888,7 @@ class Mission
 				};
 			};
 		};
-		class Item59
+		class Item58
 		{
 			side="LOGIC";
 			class Vehicles
@@ -2984,7 +2935,7 @@ class Mission
 				};
 			};
 		};
-		class Item60
+		class Item59
 		{
 			side="LOGIC";
 			class Vehicles
@@ -3031,7 +2982,7 @@ class Mission
 				};
 			};
 		};
-		class Item61
+		class Item60
 		{
 			side="LOGIC";
 			class Vehicles
@@ -3081,14 +3032,12 @@ class Mission
 };
 class Intro
 {
-	addOns[]=
-	{
+	addOns[]={
 		"a3_map_stratis",
 		"a3_map_altis",
 		"a3_map_panthera3"
 	};
-	addOnsAuto[]=
-	{
+	addOnsAuto[]={
 		"a3_map_panthera3"
 	};
 	randomSeed=8428644;
@@ -3113,14 +3062,12 @@ class Intro
 };
 class OutroWin
 {
-	addOns[]=
-	{
+	addOns[]={
 		"a3_map_stratis",
 		"a3_map_altis",
 		"a3_map_panthera3"
 	};
-	addOnsAuto[]=
-	{
+	addOnsAuto[]={
 		"a3_map_panthera3"
 	};
 	randomSeed=4674277;
@@ -3145,14 +3092,12 @@ class OutroWin
 };
 class OutroLoose
 {
-	addOns[]=
-	{
+	addOns[]={
 		"a3_map_stratis",
 		"a3_map_altis",
 		"a3_map_panthera3"
 	};
-	addOnsAuto[]=
-	{
+	addOnsAuto[]={
 		"a3_map_panthera3"
 	};
 	randomSeed=6586695;

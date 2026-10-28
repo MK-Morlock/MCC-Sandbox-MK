@@ -20,7 +20,7 @@ class RscHcamDialog {
 			h = 0.17 * safezoneH;
 			colorText[] = {1,1,1,1};
 			colorBackground[] = {0, 0, 0, 0};
-			font = "TahomaB";
+			font = "RobotoCondensedBold";
 				sizeEx = 0;
 				lineSpacing = 0;
 				fixedWidth = 0;
@@ -37,7 +37,7 @@ class RscHcamDialog {
 			h = 0.15 * safezoneH;
 			colorText[] = {1,1,1,1};
 			colorBackground[] = {0, 0, 0, 0.3};
-			font = "TahomaB";
+			font = "RobotoCondensedBold";
 				sizeEx = 0;
 				lineSpacing = 0;
 				fixedWidth = 0;
@@ -54,7 +54,7 @@ class RscHcamDialog {
 			h = 0.02 * safezoneH;
 			colorText[]       = {0,0,0,0.75};
 			colorBackground[] = {1, 1, 1, 0.2}; // kein Hintergrund
-			font = "TahomaB";
+			font = "RobotoCondensedBold";
 				sizeEx = 0.02;
 				text="";
 		};
@@ -70,7 +70,7 @@ class RscHcamDialog {
 			h = 0.15 * safezoneH;
 			colorText[] = {1,1,1,1};
 			colorBackground[] = {0, 0, 0, 0};
-			font = "TahomaB";
+			font = "RobotoCondensedBold";
 				sizeEx = 0;
 				lineSpacing = 0;
 				fixedWidth = 0;

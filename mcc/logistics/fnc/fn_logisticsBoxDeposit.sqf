@@ -14,7 +14,10 @@
 ========================================================================================================================================================================*/
 #include "..\defines.sqf"
 
-private ["_cratesType","_res","_str","_cost"];
+private "_cratesType";
+private "_res";
+private _str = "";
+private "_cost";
 
 params [
 	["_object",objNull,[objNull]],
@@ -56,7 +59,7 @@ switch (_cratesType mod 3) do
 	case 0:
 	{
 		//Add cost
-		_str = format ["+%1 <img image='%2' />",_cost, MCC_ICONAMMO];
+		_str = format ["+%1 <img color='#E60000' image='%2' />",_cost, MCC_ICONAMMO];
 		_res set [0, (_res select 0) + _cost];
 	};
 
@@ -64,7 +67,7 @@ switch (_cratesType mod 3) do
 	case 1:
 	{
 		//Add cost
-		_str = format ["+%1 <img image='%2' />",_cost, MCC_ICONMETERIALS];
+		_str = format ["+%1 <img color='#0080E6' image='%2' />",_cost, MCC_ICONMETERIALS];
 		_res set [1, (_res select 1) + _cost];
 	};
 
@@ -72,7 +75,7 @@ switch (_cratesType mod 3) do
 	case 2:
 	{
 		//Add cost
-		_str = format ["+%1 <img image='%2' />",_cost, MCC_ICONFUEL];
+		_str = format ["+%1 <img color='#00E680' image='%2' />",_cost, MCC_ICONFUEL];
 		_res set [2, (_res select 2) + _cost];
 	};
 };

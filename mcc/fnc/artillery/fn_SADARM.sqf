@@ -4,9 +4,13 @@
 // _planepos = position,  plane position
 // _pilot = unit, plane's pilot
 //===========================================================================================================================================================================
-private ["_pos","_pilot","_para","_bomb","_split", "_targets", "_targetpos", "_x"];
-_pos = _this select 0;
-_pilot = _this select 1;
+private _para = "";
+private _bomb = "";
+private _split = "";
+private _targets = objNull;
+private _targetpos = [];
+private "_x";
+params ["_pos", "_pilot"];
 
 _para = "ParachuteC" createVehicle [_pos select 0,_pos select 1,3000];		//Make the bomb and the parachute
 _para setpos [_pos select 0,_pos select 1,(_pos select 2) -10];

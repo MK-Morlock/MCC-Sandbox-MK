@@ -40,7 +40,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 		{
 			idc = -1;
 			text = "";
-			colorBackground[] = { 0.150, 0.150, 0.150,1};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 
 			w = 0.538542 * safezoneW;
 			h = 0.32 * safezoneH;
@@ -55,28 +55,29 @@ class MCC_MWControls: MCC_RscControlsGroup
 			y = 0.0109958 * safezoneH;
 			w = 0.15 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			colorText[] = {0,1,1,1};
+			colorText[] = {0.89,0.90,0.91,1};
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
 		};
 
 		//Faction
 		class MCC_MWRivalFactionTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Rival Faction:"; //--- ToDo: Localize;
+			text = "Rival Faction"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
 			y = 0.0549788 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_factionCombo: MCC_RscCombo
 		{
 			idc = FACTIONCOMBO;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
-			onLBSelChanged = __EVAL("[0] execVM '"+MCCPATH+"mcc\pop_menu\mcc_guiTab1Change.sqf'");
+			onLBSelChanged = "if ((_this select 1) >= 0) then {MCC_MWEnemyFaction = (U_FACTIONS select (_this select 1)) select 2; ['apply', [MCC_MWEnemyFaction]] call MCC_fnc_assetsData}";	//the Mission Generator enemy only (not the console faction)
 			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Who are we fighting here'";
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
@@ -89,14 +90,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Civilian
 		class MCC_MWCivilianFactionTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Civilians Faction:"; //--- ToDo: Localize;
+			text = "Civilians Faction"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
 			y = 0.0879658 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_CivilianfactionCombo: MCC_RscCombo
@@ -115,14 +117,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Players
 		class MCC_MWPlayersTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "# Players:"; //--- ToDo: Localize;
+			text = "# Players"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
 			y = 0.120953 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		/*
@@ -144,7 +147,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 		class MCC_MWPlayersCombo: MCC_RscSlider
 		{
 			idc = MCC_MWPlayersIDC;
-			onSliderPosChanged = "(_this select 0) ctrlSetTooltip str floor (_this select 1);(profileNamespace setVariable ['MCC_MWPlayersIndex',(_this select 1)]);";
+			onSliderPosChanged = "(_this select 0) ctrlSetTooltip str floor (_this select 1);(profileNamespace setVariable ['MCC_MWPlayersIndex',(_this select 1)]);MCC_MWPlayersSession = _this select 1;((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText format ['Players: %1 (more players = more enemies and a larger mission area)', floor (_this select 1)];";
 			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'More players = more enemies and larger mission area';";
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
@@ -158,14 +161,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Difficulty
 		class MCC_MWDifficultyTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Difficulty:"; //--- ToDo: Localize;
+			text = "Difficulty"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
 			y = 0.15394 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWDifficultyCombo: MCC_CheckBoxes
@@ -190,14 +194,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//CQB
 		class MCC_MWCQBTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "CQB:"; //--- ToDo: Localize;
+			text = "CQB"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
 			y = 0.186927 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWCQBCombo: MCC_RscCombo
@@ -217,14 +222,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Stealth
 		class MCC_MWStealthTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Stealth:"; //--- ToDo: Localize;
+			text = "Stealth"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
 			y = 0.219914 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWStealthCombo: MCC_CheckBoxes
@@ -250,14 +256,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Precise Markers
 		class MCC_MWPreciseMarkersText: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Objectives Markers:"; //--- ToDo: Localize;
+			text = "Objectives Markers"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
 			y = 0.252902 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWPreciseMarkersCombo: MCC_CheckBoxes
@@ -282,14 +289,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Debug
 		class MCC_MWDebugText: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "General Markers:"; //--- ToDo: Localize;
+			text = "General Markers"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
 			y = 0.28589 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_MWDebugCombo: MCC_CheckBoxes
 		{
@@ -315,14 +323,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Objective 1
 		class MCC_MWObjective1Tittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Objective 1:"; //--- ToDo: Localize;
+			text = "Objective 1"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
 			y = 0.0549788 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWObjective1Combo: MCC_RscCombo
@@ -343,14 +352,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Objective 2
 		class MCC_MWObjective2Tittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Objective 2:"; //--- ToDo: Localize;
+			text = "Objective 2"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
 			y = 0.0879658 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWObjective2Combo: MCC_RscCombo
@@ -371,14 +381,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Objective 3
 		class MCC_MWObjective3Tittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Objective 3:"; //--- ToDo: Localize;
+			text = "Objective 3"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
 			y = 0.120953 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWObjective3Combo: MCC_RscCombo
@@ -398,14 +409,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Cars
 		class MCC_MWVehiclesTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Vehicles:"; //--- ToDo: Localize;
+			text = "Vehicles"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
 			y = 0.15394 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWVehiclesCombo: MCC_CheckBoxes
@@ -432,14 +444,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Armor
 		class MCC_MWArmorTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Armor:"; //--- ToDo: Localize;
+			text = "Armor"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
 			y = 0.186927 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWArmorCombo: MCC_CheckBoxes
@@ -466,14 +479,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Reonforcment
 		class MCC_MWReinforcementTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Reinforcement:"; //--- ToDo: Localize;
+			text = "Reinforcement"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
 			y = 0.219914 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_MWReinforcementCombo: MCC_RscCombo
 		{
@@ -494,14 +508,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Artilllery
 		class MCC_MWArtilleryTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Artillery:"; //--- ToDo: Localize;
+			text = "Artillery"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
 			y = 0.252902 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWArtilleryCombo: MCC_RscCombo
@@ -521,14 +536,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Music
 		class MCC_MWMusicText: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Intro:"; //--- ToDo: Localize;
+			text = "Intro"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
 			y = 0.28589 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_MWMusicCombo: MCC_CheckBoxes
 		{
@@ -553,14 +569,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//IED
 		class MCC_MWIEDTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "IEDs:"; //--- ToDo: Localize;
+			text = "IEDs"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
 			y = 0.0549788 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWIEDCombo: MCC_CheckBoxes
@@ -586,14 +603,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Suicide Bomber
 		class MCC_MWSBTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Suicide Bombers:"; //--- ToDo: Localize;
+			text = "Suicide Bombers"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
 			y = 0.0879658 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWSBCombo: MCC_CheckBoxes
@@ -618,14 +636,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Armmed Civilian
 		class MCC_MWArmedCiviliansTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Armed Civilians:"; //--- ToDo: Localize;
+			text = "Armed Civilians"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
 			y = 0.120953 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWArmedCiviliansCombo: MCC_CheckBoxes
@@ -650,14 +669,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//RoadBlock
 		class MCC_MWRoadBlockTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Roadblocks:"; //--- ToDo: Localize;
+			text = "Roadblocks"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
 			y = 0.15394 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWRoadBlockCombo: MCC_CheckBoxes
@@ -682,14 +702,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Animals
 		class MCC_MWAnimalsText: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Animals:"; //--- ToDo: Localize;
+			text = "Animals"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
 			y = 0.186927 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 
 		class MCC_MWAnimalsCombo: MCC_CheckBoxes
@@ -714,14 +735,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Weather
 		class MCC_MWWeatherText: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Time/Weather:"; //--- ToDo: Localize;
+			text = "Time/Weather"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
 			y = 0.219914 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_MWWeatherCombo: MCC_RscCombo
 		{
@@ -740,14 +762,15 @@ class MCC_MWControls: MCC_RscControlsGroup
 		//Area
 		class MCC_MWAreaText: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Area:"; //--- ToDo: Localize;
+			text = "Area"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
 			y = 0.252902 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_MWAreaCombo: MCC_CheckBoxes
 		{

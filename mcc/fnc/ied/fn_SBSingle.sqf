@@ -10,15 +10,12 @@
 //=================================================================================================================================================================================
 
 //Made by Shay_Gman (c) 09.10
-private ["_pos", "_trapkind", "_trapvolume", "_IEDExplosionType", "_group", "_iedside","_sb"];
+private _group = grpNull;
+private _sb = objNull;
 
  if (!isServer) exitWith {};
 
-_pos 				= _this select 0;
-_trapkind 			= _this select 1;
-_trapvolume 		= _this select 2;
-_IEDExplosionType 	= _this select 3;
-_iedside 			= _this select 4;
+params ["_pos", "_trapkind", "_trapvolume", "_IEDExplosionType", "_iedside"];
 
 _group = creategroup civilian;
 _sb	= _group createunit [_trapkind, _pos, [], 0, "NONE"];
@@ -29,7 +26,7 @@ _init = FORMAT [";[_this,' %1','%2',%3] spawn MCC_fnc_manageSB;"
 				, _IEDExplosionType
 				];
 
-[[[netid _sb,_sb], _init], "MCC_fnc_setVehicleInit", false, false] spawn BIS_fnc_MP;
+[[netid _sb,_sb], _init] remoteExec ["MCC_fnc_setVehicleInit", 2, false];
 
 {_x addCuratorEditableObjects [[_sb],false]} forEach allCurators;
 

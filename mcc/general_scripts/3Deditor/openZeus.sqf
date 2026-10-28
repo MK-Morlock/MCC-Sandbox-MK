@@ -1,8 +1,6 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_pos","_target"];
-
-_pos 	= getpos MCC_3D_CAM; 
-_target = getpos MCC_dummyObject; 
+private _pos = getpos MCC_3D_CAM;
+private _target = getpos MCC_dummyObject; 
 
 cutText ["","BLACK",0.1];
 

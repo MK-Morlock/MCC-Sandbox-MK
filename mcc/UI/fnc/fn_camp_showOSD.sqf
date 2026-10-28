@@ -15,12 +15,18 @@
 	- nothing -
 */
 
-private["_fn_getSector"];
-
-_fn_getSector =
-{
-	private["_map","_posX","_posY","_gridX","_gridY","_secWidth","_secHeight"];
-	private["_bottomLeftX","_bottomLeftY","_topRightX","_topRightY"];
+private _fn_getSector = {
+	private "_map";
+	private "_posX";
+	private "_posY";
+	private _gridX = 0;
+	private _gridY = 0;
+	private "_secWidth";
+	private "_secHeight";
+	private _bottomLeftX = 0;
+	private _bottomLeftY = 0;
+	private _topRightX = 0;
+	private _topRightY = 0;
 
 	_map = toLower worldName;
 
@@ -67,8 +73,21 @@ _fn_getSector =
 };
 
 
-private["_position","_date","_output","_showDate","_showLocation","_showMap"];
-private["_tLoc","_tMap","_tDate","_tTime","_tTimeH","_tTimeM","_tDay","_tMonth","_tYear"];
+private "_position";
+private "_date";
+private _output = [];
+private _showDate = false;
+private _showLocation = false;
+private _showMap = false;
+private _tLoc = "";
+private _tMap = "";
+private _tDate = "";
+private _tTime = "";
+private "_tTimeH";
+private "_tTimeM";
+private "_tDay";
+private "_tMonth";
+private "_tYear";
 
 _showDate 	= true;
 
@@ -99,7 +118,9 @@ else
 //get map text
 if (_showMap && _tMap == "auto") then
 {
-	private["_sector","_map","_template"];
+	private "_sector";
+	private _map = nil;
+	private "_template";
 
 	_sector = _position call _fn_getSector;
 
@@ -142,7 +163,8 @@ if (_showMap && _tMap == "auto") then
 //get current location text
 if (_showLocation && _tLoc == "auto") then
 {
-	private["_locations","_loc"];
+	private "_locations";
+	private "_loc";
 
 	_locations = nearestLocations [getPos player, ["NameCity","NameCityCapital","NameLocal","NameMarine","NameVillage"], 2000];
 

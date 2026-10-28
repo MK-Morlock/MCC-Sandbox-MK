@@ -9,8 +9,13 @@
 //					1 - door locked
 //					2 - door unlocked
 //===========================================================================================================================================================================
-private ["_object","_doorTypes","_loadName","_optionalDoors","_door","_typeOfSelected","_return"];
-_object = _this select 0;
+private _doorTypes = [];
+private _loadName = "";
+private _optionalDoors = [];
+private _door = "";
+private "_typeOfSelected";
+private _return = 0;
+params ["_object"];
 
 if !(_object isKindof "house" || _object isKindof "wall") exitWith {""};
 

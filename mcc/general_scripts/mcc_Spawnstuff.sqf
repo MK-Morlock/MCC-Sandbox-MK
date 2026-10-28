@@ -1,5 +1,7 @@
 #define DEBUG
-private ["_ar","_diaryrecord","_behavior","_safepos"];
+private _ar = [];
+private _diaryrecord = "";
+private _behavior = "";
 
 //time to request something so lets number it
 mcc_request= (missionNamespace getVariable ["mcc_request",0])+1;
@@ -28,7 +30,7 @@ switch (mcc_classtype) do
 
 	case "Reinforcement":
 	{
-		mcc_safe_pos     =[_p_mcc_zone_markposition,1,_p_maxrange,2,1,100,0,[],[[-500,-500,0],[-500,-500,0]]] call BIS_fnc_findSafePos;
+		mcc_safe_pos     =[_p_mcc_zone_markposition,1,_p_maxrange,2,0,100,0,[],[[-500,-500,0],[-500,-500,0]]] call BIS_fnc_findSafePos;
 	};
 
 	case "DIVER":
@@ -49,6 +51,23 @@ switch (mcc_classtype) do
 	default
 	{
 		mcc_safe_pos     =[_p_mcc_zone_markposition,1,_p_maxrange,2,0,100,0,[],[[-500,-500,0],[-500,-500,0]]] call BIS_fnc_findSafePos;
+	};
+};
+
+if !(mcc_classtype in ["WATER", "DIVER"] || {mcc_classtype == "AIR" && {mcc_spawnwithcrew}}) then {
+	private _tries = 0;
+	if (!(mcc_safe_pos isEqualTo [-500,-500,0]) && {[mcc_safe_pos] call MCC_fnc_posOnBuilding}) then {
+		private _near = [mcc_safe_pos, _p_mcc_zone_markposition, _p_maxrange] call MCC_fnc_openSpotNear;
+		if (count _near > 0) then {
+			["INFO", "mcc_Spawnstuff", "spawn spot was on a building - moved to open ground nearby for %1: %2", [mcc_spawnname, _near]] call MCC_fnc_log;
+			mcc_safe_pos = _near;
+		} else {
+			while {_tries < 12 && {!(mcc_safe_pos isEqualTo [-500,-500,0])} && {[mcc_safe_pos] call MCC_fnc_posOnBuilding}} do {
+				_tries = _tries + 1;
+				mcc_safe_pos = [_p_mcc_zone_markposition,1,_p_maxrange,2,0,100,0,[],[[-500,-500,0],[-500,-500,0]]] call BIS_fnc_findSafePos;
+			};
+			["INFO", "mcc_Spawnstuff", "spawn spot was on a building - no open ground nearby, searched the zone again %1 time(s) for %2: %3", [_tries, mcc_spawnname, mcc_safe_pos]] call MCC_fnc_log;
+		};
 	};
 };
 //safe that string man!
@@ -298,6 +317,7 @@ else
 				, mcc_safe_pos
 				, mcc_caching
 				, mcc_delayed_spawn
+				, missionNamespace getVariable ["MCC_spawnCommandable", false]
 				];
 
 		if (missionNamespace getVariable ["MCC_Chat",true]) then {systemchat str _ar};
@@ -305,30 +325,30 @@ else
 
 				if ( (isServer) && ( (mcc_hc == 0) || !(MCC_isHC) ) ) then
 				{
-					[_ar, "mcc_setup", false, false] spawn BIS_fnc_MP;
+					_ar remoteExec ["mcc_setup", 2, false];
 
-					diag_log "MCC: attemping to spawn";
+					if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: attempting to spawn"};
 
 					if ( ( mcc_hc == 1 ) && (MCC_isHC) ) then
 					{
 						// mcc_hc zone defined but no HC found
-						diag_log format ["Called 'mcc_setup' Local Event on Server - isServer [%1] - isHC: [%2] - MCC_HC: [%3]", isServer, MCC_isHC, mcc_hc];
+						if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["Called 'mcc_setup' Local Event on Server - isServer [%1] - isHC: [%2] - MCC_HC: [%3]", isServer, MCC_isHC, mcc_hc]};
 					};
 				}
 				else
 				{
 					if ( ( mcc_hc == 0 ) || !(MCC_isHC) ) then
 					{
-						//[_ar, "mcc_setup", true, false] spawn BIS_fnc_MP;
-						[_ar, "mcc_setup", false, false] spawn BIS_fnc_MP;
-						diag_log format ["Called 'mcc_setup' Remote Event on Server - isServer [%1] - isHC: [%2] - MCC_HC: [%3]", isServer, MCC_isHC, mcc_hc];
+						//_ar remoteExec ["mcc_setup", true, false];
+						_ar remoteExec ["mcc_setup", 2, false];
+						if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["Called 'mcc_setup' Remote Event on Server - isServer [%1] - isHC: [%2] - MCC_HC: [%3]", isServer, MCC_isHC, mcc_hc]};
 					};
 
 					if (( mcc_hc == 1 ) && (MCC_isHC)) then
 					{
-						//[_ar, "mcc_setup_hc", true, false] spawn BIS_fnc_MP;
-						[_ar, "mcc_setup_hc", MCC_ownerHC, false] spawn BIS_fnc_MP;
-						diag_log format ["Called 'mcc_setup_hc' Remote Event on Headless Client - isServer [%1] - isHC: [%2] - MCC_HC: [%3] - MCC_HC_Owner: [%4]", isServer, MCC_isHC, mcc_hc, MCC_ownerHC];
+						//_ar remoteExec ["mcc_setup_hc", true, false];
+						_ar remoteExec ["mcc_setup_hc", MCC_ownerHC, false];
+						if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["Called 'mcc_setup_hc' Remote Event on Headless Client - isServer [%1] - isHC: [%2] - MCC_HC: [%3] - MCC_HC_Owner: [%4]", isServer, MCC_isHC, mcc_hc, MCC_ownerHC]};
 					};
 				};
 

@@ -117,7 +117,7 @@ class MCC_rts_scanResourcesCancel
 	#endif
 
 	displayName = "Abort Mission";
-	descriptionShort = "Abort the mission and delete all units and crates";
+	descriptionShort = "Abort the HQ mission and delete all units and crates";
 	condition = "(missionNamespace getVariable [format ['MCC_rtsMissionOn_%1', playerSide],false]);";
 	requiredBuildings[] = {{"hq",1}};
 	needelectricity = 0;
@@ -174,6 +174,7 @@ class MCC_rts_ammo2Food
 	needelectricity = 0;
 	actionFNC = "MCC_fnc_rtsTradeforFood";
 	resources[] = {{"ammo",200},{"time",5}};
+	gain[] = {{"food",50}};
 };
 
 class MCC_rts_fuel2Food
@@ -191,6 +192,7 @@ class MCC_rts_fuel2Food
 	needelectricity = 0;
 	actionFNC = "MCC_fnc_rtsTradeforFood";
 	resources[] = {{"fuel",200},{"time",5}};
+	gain[] = {{"food",50}};
 };
 
 class MCC_rts_repair2Food
@@ -201,13 +203,14 @@ class MCC_rts_repair2Food
 	picture = "mcc\rts\data\repair2Food.paa";
 	#endif
 
-	displayName = "Trade Materials";
+	displayName = "Trade Supplies";
 	descriptionShort = "Trade supplies with the locals for food";
 	condition = "";
 	requiredBuildings[] = {{"tradePost",1}};
 	needelectricity = 0;
 	actionFNC = "MCC_fnc_rtsTradeforFood";
 	resources[] = {{"repair",200},{"time",5}};
+	gain[] = {{"food",50}};
 };
 
 class MCC_rts_destroyLogic
@@ -282,6 +285,22 @@ class MCC_rts_rtsBuildUIContainer
 };
 
 class MCC_rts_rtsBuildUIContainerBack
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\back.paa";
+	#else
+	picture = "mcc\rts\data\back.paa";
+	#endif
+
+	displayName = "Exit";
+	descriptionShort = "Exit Build Menu";
+	condition = "";
+	requiredBuildings[] = {};
+	needelectricity = 0;
+	actionFNC = "MCC_fnc_rtsBuildUIContainerBack";
+	resources[] = {};
+};
+class MCC_rts_rtsFortUIContainerBack
 {
 	#ifdef MCCMODE
 	picture = "\mcc_sandbox_mod\mcc\rts\data\back.paa";

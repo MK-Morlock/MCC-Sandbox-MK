@@ -3,7 +3,9 @@
 //  Parameter(s):
 //     _ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_group","_vehicle","_vehicles"];
+private "_group";
+private "_vehicle";
+private _vehicles = [];
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 
@@ -20,5 +22,5 @@ _vehicles = [];
 player globalRadio "CuratorWaypointPlaced";
 {
 	_vehicle = _x;
-	[[1,getpos _vehicle,[17,"YELLOW","NO CHANGE","FULL","AWARE","true","",0],[group _x],true],"MCC_fnc_manageWp", leader group _x, false] spawn BIS_fnc_MP;
+	[1,getpos _vehicle,[17,"YELLOW","NO CHANGE","FULL","AWARE","true","",0],[group _x],true] remoteExec ["MCC_fnc_manageWp", leader group _x, false];
 } forEach _vehicles;

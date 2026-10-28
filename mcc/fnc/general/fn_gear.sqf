@@ -2,9 +2,39 @@
 	sets default gear.
 ========================================================================================================================================== */
 
-private ["_unit","_role","_sideId","_isSF","_uniform","_uniformLight","_vest","_vestLight","_backPack","_backPackLight","_helmet","_helmetLight",
-         "_GPS","_medPack","_medKit","_goggles","_primaryWeapon","_primaryWeaponMag","_primaryWeaponTracer","_hGrenade","_hsmokeW","_hsmokeR","_hsmokeG",
-		 "_attach","_mags","_light","_nvg","_seconderyWeapon","_seconderyWeaponMags","_extraAmmo","_extraGear","_extraItems","_binos"];
+private _unit = objNull;
+private _role = "";
+private "_sideId";
+private _isSF = [];
+private _uniform = [];
+private _uniformLight = [];
+private _vest = [];
+private _vestLight = [];
+private _backPack = [];
+private _backPackLight = [];
+private _helmet = [];
+private _helmetLight = [];
+private _GPS = "";
+private _medPack = "";
+private _medKit = "";
+private _goggles = [];
+private _primaryWeapon = [];
+private _primaryWeaponMag = [];
+private _primaryWeaponTracer = [];
+private _hGrenade = "";
+private _hsmokeW = "";
+private _hsmokeR = "";
+private _hsmokeG = "";
+private _attach = [];
+private _mags = [];
+private _light = false;
+private _nvg = [];
+private _seconderyWeapon = "";
+private _seconderyWeaponMags = [];
+private _extraAmmo = [];
+private _extraGear = [];
+private _extraItems = [];
+private _binos = "";
 _unit = param [0, objNull, [objNull,""]];
 _role =  param [1, "", [""]];
 

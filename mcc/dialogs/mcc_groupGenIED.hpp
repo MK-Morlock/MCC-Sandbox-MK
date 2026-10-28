@@ -12,278 +12,294 @@
 class MCC_IEDDialogControls:MCC_RscControlsGroup
 {
 	idc = 508;
-	x = 0.186 * safezoneW + safezoneX;
-	y = 0.18 * safezoneH + safezoneY;
+	x = 0.196625 * safezoneW + safezoneX;
+	y = 0.134000 * safezoneH + safezoneY;
 	w = 0.303646 * safezoneW;
-	h = 0.43 * safezoneH;
+	h = 0.380000 * safezoneH;
 
 	class Controls
 	{
 		class MCC_IEDDialogFrame: MCC_RscText
 		{
+			colorText[] = {0.11,0.12,0.13,0.96};
+			text = "\mcc_sandbox_mod\data\panel_round_ca.paa";
+			style = 48;
 			idc = -1;
-			colorBackground[] = {0,0,0,0.9};
+			colorBackground[] = {0,0,0,0};
 
-			w = 0.303646 * safezoneW;
-			h = 0.30788 * safezoneH;
+			w = 0.303646* safezoneW;
+			h = 0.380000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";	//same text size as the Spawn panel
 		};
 
 		class MCC_trapsTittle: MCC_RscText
 		{
+			font = "RobotoCondensedBold";
+			style = 0;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
 			idc = -1;
 
-			text = "IED & Ambush:"; //--- ToDo: Localize;
-			x = 0.114584 * safezoneW;
-			y = 0.0109958 * safezoneH;
-			w = 0.09 * safezoneW;
-			h = 0.0340016 * safezoneH;
-			colorText[] = {0,1,1,1};
+			text = "IED & Ambush"; //--- ToDo: Localize;
+			x = 0.008000* safezoneW;
+			y = 0.008000* safezoneH;
+			w = 0.287646* safezoneW;
+			h = 0.030000* safezoneH;
+			colorText[] = {0.89,0.90,0.91,1};
 		};
 		class MCC_trapsTypeTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Type:"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.0989618 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Type"; //--- ToDo: Localize;
+			x = 0.008000* safezoneW;
+			y = 0.106000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsObjectTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Object:"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.131949 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Object"; //--- ToDo: Localize;
+			x = 0.008000* safezoneW;
+			y = 0.154000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsExplosionSizeTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Explosion Size:"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.164936 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Explosion Size"; //--- ToDo: Localize;
+			x = 0.008000* safezoneW;
+			y = 0.202000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsExplosionTypeTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Explosion Type:"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.197923 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Explosion Type"; //--- ToDo: Localize;
+			x = 0.008000* safezoneW;
+			y = 0.250000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsDisarmDurationTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Disarm Duration:"; //--- ToDo: Localize;
-			x = 0.160417 * safezoneW;
-			y = 0.131949 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Disarm Duration"; //--- ToDo: Localize;
+			x = 0.155823* safezoneW;
+			y = 0.154000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsJammableTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Jammable:"; //--- ToDo: Localize;
-			x = 0.160417 * safezoneW;
-			y = 0.0989618 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Jammable"; //--- ToDo: Localize;
+			x = 0.155823* safezoneW;
+			y = 0.106000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsTargetFactionTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Target Faction:"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.23091 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Target Faction"; //--- ToDo: Localize;
+			x = 0.008000* safezoneW;
+			y = 0.298000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsTriggerTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Trigger Type:"; //--- ToDo: Localize;
-			x = 0.160417 * safezoneW;
-			y = 0.164936 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Trigger Type"; //--- ToDo: Localize;
+			x = 0.155823* safezoneW;
+			y = 0.202000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsProximityTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Proximity:"; //--- ToDo: Localize;
-			x = 0.160417 * safezoneW;
-			y = 0.197923 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Proximity"; //--- ToDo: Localize;
+			x = 0.155823* safezoneW;
+			y = 0.250000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsAmbushGroupTittle: MCC_RscText
 		{
+			colorText[] = {0.62,0.65,0.68,1};
 			idc = -1;
 
-			text = "Ambush Group:"; //--- ToDo: Localize;
-			x = 0.160417 * safezoneW;
-			y = 0.23091 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			text = "Ambush Group"; //--- ToDo: Localize;
+			x = 0.155823* safezoneW;
+			y = 0.298000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 		class MCC_trapsType: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_TYPE;
 			onLBSelChanged = __EVAL("[0] execVM '"+MCCPATH+"mcc\fnc\ied\scripts\trap_change.sqf'");
 
-			x = 0.0802087 * safezoneW;
-			y = 0.0989618 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.008000* safezoneW;
+			y = 0.124000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsObject: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_OBJECT;
 
-			x = 0.0802087 * safezoneW;
-			y = 0.131949 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.008000* safezoneW;
+			y = 0.172000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsExplosionSize: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_EXPLOSIN_SIZE;
 
-			x = 0.0802087 * safezoneW;
-			y = 0.164936 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.008000* safezoneW;
+			y = 0.220000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsExplosionType: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_EXPLOSIN_TYPE;
 
-			x = 0.0802087 * safezoneW;
-			y = 0.197923 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.008000* safezoneW;
+			y = 0.268000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsTargetFaction: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_TARGET_FACTION;
 
-			x = 0.0802087 * safezoneW;
-			y = 0.23091 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.008000* safezoneW;
+			y = 0.316000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsJammable: MCC_RscCheckBox
 		{
+			w = 0.017000 * safezoneW;
 			idc = MCC_TRAPS_JAMMABLE;
 
-			x = 0.234896 * safezoneW;
-			y = 0.0989618 * safezoneH;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.155823* safezoneW;
+			y = 0.124000* safezoneH;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsDisarm: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_DISARM;
 
-			x = 0.234896 * safezoneW;
-			y = 0.131949 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.155823* safezoneW;
+			y = 0.172000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsTrigger: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_TRIGGER;
 
-			x = 0.234896 * safezoneW;
-			y = 0.164936 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.155823* safezoneW;
+			y = 0.220000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsProximity: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_PROXIMITY;
 
-			x = 0.234896 * safezoneW;
-			y = 0.197923 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.155823* safezoneW;
+			y = 0.268000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
 		class MCC_trapsAmbushGroup: MCC_RscCombo
 		{
 			idc = MCC_TRAPS_AMBUSH;
 
-			x = 0.234896 * safezoneW;
-			y = 0.23091 * safezoneH;
-			w = 0.0630208 * safezoneW;
-			h = 0.0219914 * safezoneH;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.155823* safezoneW;
+			y = 0.316000* safezoneH;
+			w = 0.139823* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
-		class MCC_trapsCreateIED: MCC_RscButton
+		class MCC_trapsCreateIED: MCCBTN_S
 		{
 			idc = -1;
-			onButtonClick =  __EVAL("[0] execVM '"+MCCPATH+"mcc\fnc\ied\scripts\trap_request.sqf'");
+			onButtonClick = "[0] execVM ((missionNamespace getVariable ['MCC_path','\mcc_sandbox_mod\']) + 'mcc\fnc\ied\scripts\trap_request.sqf'); ((uiNamespace getVariable 'MCC_groupGen_Dialog') displayCtrl 508) ctrlShow false";	//hides the panel so the map can be clicked
 
 			text = "Create IED"; //--- ToDo: Localize;
-			x = 0.154688 * safezoneW;
-			y = 0.263897 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0329871 * safezoneH;
-			tooltip = "Create an IED on the given position"; //--- ToDo: Localize;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.177046* safezoneW;
+			y = 0.350000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
+			tooltip = "Create an IED at the given position"; //--- ToDo: Localize;
 		};
-		class MCC_trapsCreateAmbush: MCC_RscButton
+		class MCC_trapsCreateAmbush: MCCBTN_S
 		{
 			idc = -1;
-			onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\fnc\ied\scripts\trap_request.sqf'");
+			onButtonClick = "[1] execVM ((missionNamespace getVariable ['MCC_path','\mcc_sandbox_mod\']) + 'mcc\fnc\ied\scripts\trap_request.sqf'); ((uiNamespace getVariable 'MCC_groupGen_Dialog') displayCtrl 508) ctrlShow false";	//hides the panel so the map can be clicked
 
 			text = "Create Ambush"; //--- ToDo: Localize;
-			x = 0.229167 * safezoneW;
-			y = 0.263897 * safezoneH;
-			w = 0.06875 * safezoneW;
-			h = 0.0329871 * safezoneH;
-			tooltip = "Place an ambush group on the map (Hold Shift and drag a line between a group or IED to sync it with each other) "; //--- ToDo: Localize;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.65)";
+			x = 0.238346* safezoneW;
+			y = 0.350000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
+			tooltip = "Place an ambush group on the map (hold Shift and drag a line between a group and an IED to sync them) "; //--- ToDo: Localize;
 		};
 		class MCC_trapsExplainTittle: MCC_RscText
 		{
 			idc = -1;
 
 			text = "*Press Ctrl + left mouse button to trigger an IED or ambushing party"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.0301928 * safezoneH;
-			w = 0.3 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			x = 0.008000* safezoneW;
+			y = 0.046000* safezoneH;
+			w = 0.287646* safezoneW;
+			h = 0.020000* safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.58)";
 		};
 		class MCC_trapsExplainTittle2: MCC_RscText
@@ -291,22 +307,22 @@ class MCC_IEDDialogControls:MCC_RscControlsGroup
 			idc = -1;
 
 			text = "*Hold Shift + left click and draw a line to link IEDs and/or ambush parties"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.0548928 * safezoneH;
-			w = 0.3 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			x = 0.008000* safezoneW;
+			y = 0.076000* safezoneH;
+			w = 0.287646* safezoneW;
+			h = 0.020000* safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.58)";
 		};
-		class MCC_trapsCloseButton: MCC_RscButtonMenu
+		class MCC_trapsCloseButton: MCCBTN_S
 		{
 			idc = -1;
 			onButtonClick = "((uiNamespace getVariable 'MCC_groupGen_Dialog') displayCtrl 508) ctrlShow false";
 
 			text = "Close"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.263897 * safezoneH;
-			w = 0.06799 * safezoneW;
-			h = 0.0340016 * safezoneH;
+			x = 0.008000* safezoneW;
+			y = 0.350000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
 		};
 	};
 };

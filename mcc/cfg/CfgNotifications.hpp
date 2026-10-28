@@ -10,6 +10,7 @@ class MCCNotifications
 
 class MCCNotificationBad
 {
+	duration = 5;
 	title = "%1";
 	iconPicture = "\a3\Ui_f\data\GUI\Cfg\Notifications\tridentEnemy_ca.paa";
 	description = "%2";

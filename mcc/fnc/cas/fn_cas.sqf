@@ -23,7 +23,7 @@ params [
 if (!isServer) exitWith {};
 
 _planeCfg = configfile >> "cfgvehicles" >> _planeClass;
-if !(isclass _planeCfg) exitwith {diag_log format ["MCC ERROE: MCC_fnc_cas Vehicle class '%1' not found", _planeClass], false};
+if !(isclass _planeCfg) exitwith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC ERROE: MCC_fnc_cas Vehicle class '%1' not found", _planeClass]}; false};
 
 //--- Detect gun
 _weaponTypes = switch _casType do {
@@ -32,6 +32,26 @@ _weaponTypes = switch _casType do {
 	case 2: {["machinegun","missilelauncher","cannon","horn","rocketlauncher"]};
 	case 3: {["bomblauncher"]};
 	default {[]};
+};
+
+if !([_planeClass, _casType] call MCC_fnc_casCanRun) then {
+	if (isNil "MCCMK_casSwap") then {MCCMK_casSwap = createHashMap};
+	private _fac = getText (_planeCfg >> "faction");
+	private _key = format ["%1|%2|%3", _fac, _casType, _planeClass isKindOf "Plane"];
+	private _new = MCCMK_casSwap getOrDefault [_key, ""];
+	if (_new == "") then {
+		private _isPlane = _planeClass isKindOf "Plane";
+		private _cands = (("getNumber (_x >> 'scope') == 2 && {getText (_x >> 'faction') == '" + _fac + "'}") configClasses (configFile >> "CfgVehicles")) apply {configName _x};
+		_cands = _cands select {(_x isKindOf "Plane" || {_x isKindOf "Helicopter"}) && {[_x, _casType] call MCC_fnc_casCanRun}};
+		_new = ((_cands select {(_x isKindOf "Plane") isEqualTo _isPlane}) + _cands) param [0, ""];
+		if (_new == "") then {
+			_new = switch ((getNumber (_planeCfg >> "side")) call BIS_fnc_sideType) do {case east: {"O_Plane_CAS_02_F"}; case resistance: {"I_Plane_Fighter_03_CAS_F"}; default {"B_Plane_CAS_01_F"}};
+		};
+		MCCMK_casSwap set [_key, _new];
+	};
+	["DEBUG", "cas", "%1 cannot fly CAS run type %2 with its own weapons: %3 flies it instead", [_planeClass, _casType, _new]] call MCC_fnc_log;
+	_planeClass = _new;
+	_planeCfg = configfile >> "cfgvehicles" >> _planeClass;
 };
 
 _weapons = [];
@@ -75,6 +95,19 @@ _plane setvectordir _vectorDir;
 [_plane,-90 + atan (_dis / _alt),0] call bis_fnc_setpitchbank;
 _vectorUp = vectorup _plane;
 
+private _seatWeapons = [];
+{
+	_x params ["_path", "_unit"];
+	if (!isNull _unit) then {
+		{
+			if ((toLower ((_x call BIS_fnc_itemType) select 1)) in _weaponTypes) then {_seatWeapons pushBack [_x, "", _unit]};
+		} forEach (_plane weaponsTurret _path);
+	};
+} forEach ([[[-1], driver _plane]] + ((allTurrets [_plane, false]) select {private _tc = [_plane, _x] call BIS_fnc_turretConfig; getNumber (_tc >> "minTurn") <= 0 && {getNumber (_tc >> "maxTurn") >= 0}} apply {[_x, _plane turretUnit _x]}));
+if (count _seatWeapons > 0) then {_weapons = _seatWeapons};
+{_x disableAI "AUTOTARGET"; _x disableAI "TARGET"; if (_x != driver _plane) then {_x doWatch _pos}} forEach (crew _plane);
+["DEBUG", "cas", "%1 strike weapons: %2", [_planeClass, _weapons apply {[_x select 0, if ((_x param [2, ""]) isEqualType objNull) then {["gunner", "pilot"] select ((_x select 2) == driver _plane)} else {"pilot"}]}]] call MCC_fnc_log;
+
 //--- Remove all other weapons;
 _currentWeapons = weapons _plane;
 {
@@ -83,53 +116,7 @@ _currentWeapons = weapons _plane;
 	};
 } foreach _currentWeapons;
 
-//The plane doesn't have a weapon lets add it one
-if (count _weapons == 0) then {
-
-	switch (_casType) do
-	{
-		case 0:	//-- Cannon
-		{
-			_plane addMagazineGlobal "1000Rnd_Gatling_30mm_Plane_CAS_01_F";
-			_plane addWeaponGlobal "Gatling_30mm_Plane_CAS_01_F";
-
-			_weapons pushBack ["Gatling_30mm_Plane_CAS_01_F"];
-		};
-
-		case 1:	//-- Rockets
-		{
-			_plane addMagazineGlobal "7Rnd_Rocket_04_HE_F";
-			_plane addWeaponGlobal "Rocket_04_HE_Plane_CAS_01_F";
-
-			_plane addMagazineGlobal "7Rnd_Rocket_04_AP_F";
-			_plane addWeaponGlobal "Rocket_04_AP_Plane_CAS_01_F";
-
-			_weapons pushBack ["Rocket_04_HE_Plane_CAS_01_F","Rocket_04_AP_Plane_CAS_01_F"];
-		};
-
-		case 2:	//-- Cannon and rockets
-		{
-			_plane addMagazineGlobal "1000Rnd_Gatling_30mm_Plane_CAS_01_F";
-			_plane addWeaponGlobal "Gatling_30mm_Plane_CAS_01_F";
-
-			_plane addMagazineGlobal "7Rnd_Rocket_04_HE_F";
-			_plane addWeaponGlobal "Rocket_04_HE_Plane_CAS_01_F";
-
-			_plane addMagazineGlobal "7Rnd_Rocket_04_AP_F";
-			_plane addWeaponGlobal "Rocket_04_AP_Plane_CAS_01_F";
-
-			_weapons pushBack ["Rocket_04_HE_Plane_CAS_01_F","Rocket_04_AP_Plane_CAS_01_F","Gatling_30mm_Plane_CAS_01_F"];
-		};
-
-		case 3:	//- bombs
-		{
-			_plane addMagazineGlobal "4Rnd_Bomb_04_F";
-			_plane addWeaponGlobal "Bomb_04_Plane_CAS_01_F";
-
-			_weapons pushBack ["Bomb_04_Plane_CAS_01_F"];
-		};
-	};
-};
+if (count _weapons == 0) then {["DEBUG", "cas", "%1 has no weapon for this run: no shots", [_planeClass]] call MCC_fnc_log};
 
 //--- Play radio
 [_plane,"CuratorModuleCAS"] call bis_fnc_curatorSayMessage;
@@ -170,6 +157,7 @@ waituntil {
 		_plane reveal lasertarget _target;
 		_plane dowatch lasertarget _target;
 		_plane dotarget lasertarget _target;
+		{if (_x != driver _plane) then {_x reveal lasertarget _target; _x doWatch lasertarget _target; _x doTarget lasertarget _target}} forEach (crew _plane);
 
 		_fireNull = false;
 		terminate _fire;
@@ -187,7 +175,9 @@ waituntil {
 
 			waituntil {
 				{
-					_planeDriver fireattarget [_target,(_x select 0)];
+					private _u = _x param [2, _planeDriver];
+					if !(_u isEqualType objNull) then {_u = _planeDriver};
+					_u fireattarget [_target,(_x select 0)];
 				} foreach _weapons;
 				_plane setvariable ["fireProgress",(1 - ((_time - time) / _duration)) max 0 min 1];
 				sleep _sleep;

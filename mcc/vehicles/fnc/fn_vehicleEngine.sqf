@@ -14,7 +14,7 @@ params [
 	["_entity",objNull,[objNull]],
 	["_mode",0,[0]]
 ];
-private ["_engine"];
+private _engine = false;
 
 if (isNull _entity || !local _entity) exitWith {};
 

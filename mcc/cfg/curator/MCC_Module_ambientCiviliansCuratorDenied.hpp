@@ -18,7 +18,7 @@ class MCC_Module_ambientCiviliansCuratorDenied : MCC_Module_Base
 			displayName = "Radius";
 			typeName = "NUMBER";
 			defaultValue = 500;
-			property = "radius";
+			property = "MCC_Module_ambientCiviliansCuratorDenied_radius";
 		};
 
 		class ModuleDescription: ModuleDescription{};

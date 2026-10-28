@@ -8,11 +8,28 @@
                    3. BOOLEAN will create a checkbox example: ["question1",flase]
                    4. INTEGER will create a slider with max number as given example ["question1",10] wiil create a slider with up to 10
                    5. STRING will create an open text box
+                   Optional 3rd element: tooltip. Optional 4th element (combo boxes): index selected when the dialog opens (default 0)
 
      Example ["My dialog",[["question1",["Option1","option2"]],["question2",["Option1","option2"]],["question3",["Option1","option2"]]],"MCC_fnc_artillery"] call MCC_fnc_initDynamicDialog
 */
 
-private ["_ok","_display","_ctrlBackground","_ctrlTitle","_ctrlButtonOK","_ctrlButtonCancel","_ctrlButtonCustom","_ctrlBackgroundPos","_ctrlTitlePos","_ctrlButtonOKPos","_ctrlButtonCancelPos","_ctrlButtonCustomPos","_ctrlTitleOffsetY","_ctrlContent","_ctrlContentPos","_ctrlContentOffsetY","_posY"];
+private _ok = false;
+private _display = controlNull;
+private _ctrlBackground = controlNull;
+private _ctrlTitle = controlNull;
+private _ctrlButtonOK = controlNull;
+private _ctrlButtonCancel = controlNull;
+private _ctrlButtonCustom = controlNull;
+private _ctrlBackgroundPos = [];
+private _ctrlTitlePos = [];
+private _ctrlButtonOKPos = [];
+private _ctrlButtonCancelPos = [];
+private _ctrlButtonCustomPos = [];
+private _ctrlTitleOffsetY = 0;
+private _ctrlContent = controlNull;
+private _ctrlContentPos = [];
+private _ctrlContentOffsetY = 0;
+private _posY = 0;
 disableSerialization;
 
 #define IDC_OK  10007
@@ -30,7 +47,7 @@ params [
 //avoid double
 if (tolower str (findDisplay 1031982) != "no display") exitWith {[]};
 
-_ok = createDialog "MCC_DynamicDialog";
+_ok = createDialog ("MCC_DynamicDialog" call MCC_fnc_dialogName);
 waitUntil {dialog};
 
 _display = findDisplay 1031982;
@@ -61,17 +78,23 @@ _ctrlTitle ctrlSetText _title;
 _ctrlTitle ctrlCommit 0;
 
 //Set the control groups
-private ["_controlTittle","_control","_index","_ctrls"];
+private _controlTittle = controlNull;
+private _control = controlNull;
+private _index = 0;
+private _ctrls = [];
 _ctrls = [];
 {
     _x params [
         ["_question","",[""]],
         ["_options","",[[],true,0,""]],
-        ["_tooltip","",[""]]
+        ["_tooltip","",[""]],
+        ["_default",0,[0,true,""]]
     ];
+    if (_default isEqualType true) then {_default = [0, 1] select _default};
+    if (_default isEqualType "") then {_default = parseNumber _default};
 
     //tittle
-    _controlTittle = _display ctrlCreate ["RscText", -1,_ctrlContent];
+    _controlTittle = _display ctrlCreate ["MCC_RscText", -1,_ctrlContent];
     _controlTittle ctrlSetPosition [0, _posY, DEFAULT_WIDTH, DEFAULT_HEIGHT];
     _controlTittle ctrlSetText _question;
     _controlTittle ctrlCommit 0;
@@ -79,7 +102,7 @@ _ctrls = [];
     //If the option is an array then create a combobox
     if (typeName _options == typeName []) then {
         //combo
-        _control = _display ctrlCreate ["RscCombo", IDC_BASE + _forEachIndex,_ctrlContent];
+        _control = _display ctrlCreate ["MCC_RscCombo", IDC_BASE + _forEachIndex,_ctrlContent];
         _control ctrlSetPosition [DEFAULT_WIDTH*1.1, _posY, DEFAULT_WIDTH, DEFAULT_HEIGHT];
         _control ctrlCommit 0;
 
@@ -94,14 +117,19 @@ _ctrls = [];
 
         } forEach _options;
 
-        _control lbSetCurSel 0;
+        _control lbSetCurSel ((_default max 0) min ((lbSize _control) - 1));
     };
 
     //If the option is boolean
     if (typeName _options == typeName true) then {
         //combo
-        _control = _display ctrlCreate ["RscCheckbox", IDC_BASE + _forEachIndex,_ctrlContent];
-        _control ctrlSetPosition [DEFAULT_WIDTH*1.5, _posY, DEFAULT_WIDTH/4, DEFAULT_HEIGHT];
+        //Standard Arma checkbox (the editor one), kept square: the old one was stretched to a wide box, which made its
+        //picture blurry
+        _control = _display ctrlCreate ["ctrlCheckbox", IDC_BASE + _forEachIndex,_ctrlContent];
+        if (isNull _control) then {_control = _display ctrlCreate ["RscCheckbox", IDC_BASE + _forEachIndex,_ctrlContent]};
+        private _cbH = DEFAULT_HEIGHT;
+        private _cbW = _cbH * (pixelW / pixelH);
+        _control ctrlSetPosition [DEFAULT_WIDTH*1.1, _posY, _cbW, _cbH];
         _control cbSetChecked  _options;
         _control ctrlCommit 0;
     };
@@ -109,10 +137,10 @@ _ctrls = [];
     //If the option is number create slider
     if (typeName _options == typeName 1) then {
         //combo
-        _control = _display ctrlCreate ["RscXSliderH", IDC_BASE + _forEachIndex,_ctrlContent];
+        _control = _display ctrlCreate ["MCC_RscXSliderH", IDC_BASE + _forEachIndex,_ctrlContent];
         _control ctrlSetPosition [DEFAULT_WIDTH*1.1, _posY, DEFAULT_WIDTH, DEFAULT_HEIGHT];
         _control sliderSetRange [0, _options];
-        _control sliderSetPosition (_options/2);
+        _control sliderSetPosition (if (count _x > 3) then {(_default max 0) min _options} else {_options/2});	//optional 4th element: start value
         _control ctrlSetEventHandler ["SliderPosChanged", "(_this select 0) ctrlSetTooltip str floor (_this select 1)"];
         _control ctrlCommit 0;
     };
@@ -177,11 +205,26 @@ if (_infoText != "") then {
     _ctrlInfoText ctrlCommit 0;
 };
 
+//MCC look: settings pages, campaign and Zeus dialogs
+private _winTop = (_ctrlTitlePos select 1) - 0.012;
+private _winBottom = (_ctrlButtonOKPos select 1) + (_ctrlButtonOKPos select 3) + 0.015;
+private _winPos = +_ctrlBackgroundPos;
+_winPos set [0, (_winPos select 0) - 0.006];
+_winPos set [2, (_winPos select 2) + 0.012];
+_winPos set [1, _winTop];
+_winPos set [3, _winBottom - _winTop];
+_ctrlBackground ctrlSetPosition _winPos;
+_ctrlBackground ctrlCommit 0;
+_ctrlTitle ctrlSetBackgroundColor [0, 0, 0, 0];
+
+[_display] call MCC_fnc_applyTheme;
+
 //wait till the dialog is canceled or confirmed
 waitUntil {(missionNamespace getVariable ["MCC_DynamicDialogOK",false]) || (tolower str (findDisplay 1031982) == "no display")};
 
 //get the resaults
-private ["_resaults","_ctrl"];
+private _resaults = [];
+private _ctrl = controlNull;
 _resaults = [];
 
 //if cancel exit
@@ -189,13 +232,17 @@ if !(missionNamespace getVariable ["MCC_DynamicDialogOK",false]) exitWith {_resa
 
 {
     _ctrl = _x;
-    if (ctrlClassName _ctrl == "RscCombo") then {_resaults pushBack (lbCurSel _ctrl)};
-    if (ctrlClassName _ctrl == "RscCheckbox") then {_resaults pushBack (cbChecked _ctrl)};
-    if (ctrlClassName _ctrl == "RscXSliderH") then {_resaults pushBack (sliderPosition _ctrl)};
-    if (ctrlClassName _ctrl == "RscEdit") then {_resaults pushBack (ctrlText _ctrl)};
+    //class name dropped every yes/no answer (Mission Settings then failed with "3 elements provided, 5 expected")
+    switch (ctrlType _ctrl) do {
+        case 4: {_resaults pushBack (lbCurSel _ctrl)};          //combo
+        case 77: {_resaults pushBack (cbChecked _ctrl)};        //checkbox
+        case 43: {_resaults pushBack (sliderPosition _ctrl)};   //slider
+        case 3: {_resaults pushBack (sliderPosition _ctrl)};
+        case 2: {_resaults pushBack (ctrlText _ctrl)};          //edit
+    };
 } forEach _ctrls;
 
 //if ok
-closeDialog 0;
+if (!isNull (findDisplay 1031982)) then {(findDisplay 1031982) closeDisplay 1};	//only this page (closeDialog 0 also closed the window under it after Cancel)
 
 _resaults;

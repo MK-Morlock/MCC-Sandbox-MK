@@ -47,7 +47,7 @@ class MCC_Module_settingsRadio : Module_F
 		class kickIdle
 		{
 			displayName = "Kick Hot Mic";
-			description = "Will kick player with hot mic after some time";
+			description = "Kicks a player with a hot mic after some time";
 			typeName = "NUMBER";
 			class values
 			{

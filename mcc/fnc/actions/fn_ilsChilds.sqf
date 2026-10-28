@@ -2,7 +2,27 @@
 // ILS for aircrafts based on ILS Pro II 1.0 (by TiGGa)
 //Call from an ILS logic
 //===========================================================================================================================================================================
-private ["_counter","_glideslope","_loc","_arrestingear","_runwayname","_vectorglide","_rwydirection","_angle","_numberofcircles","_landPos","_distanceofcircles","_ringarray","_rwydirection2","_devhor","_ycord","_xcord","_zcord","_horizontal","_vertical","_circlepos","_ring","_helpers"];
+private _glideslope = "";
+private _loc = objNull;
+private _arrestingear = objNull;
+private _runwayname = "";
+private "_vectorglide";
+private "_rwydirection";
+private _angle = 0;
+private _numberofcircles = 0;
+private _landPos = 0;
+private _distanceofcircles = 0;
+private _ringarray = [];
+private _rwydirection2 = 0;
+private _devhor = 0;
+private "_ycord";
+private "_xcord";
+private "_zcord";
+private _horizontal = "";
+private _vertical = "";
+private _circlepos = [];
+private _ring = "";
+private _helpers = false;
 
 //If we came here from ACE get the airport
 if (typeName _this == typeName 0) then {

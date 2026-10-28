@@ -1,4 +1,11 @@
-private ["_comboBox","_spawnArray","_pos","_spawn","_nearObjects","_spawnErrorCode","_targets","_target","_groups","_countRole","_roleLimit","_role","_spawnPos","_playerDeployPos"];
+private "_nearObjects";
+private _spawnErrorCode = 0;
+private _targets = [];
+private "_target";
+private "_groups";
+private "_role";
+private _spawnPos = [];
+private "_playerDeployPos";
 disableSerialization;
 
 #define	MWinitMissionMusic	["LeadTrack01a_F","LeadTrack03_F","LeadTrack04a_F","BackgroundTrack03_F","BackgroundTrack01_F","BackgroundTrack01a_F","BackgroundTrack02_F","LeadTrack01_F_EPA","LeadTrack02_F_EPA","EventTrack01_F_EPA","EventTrack01a_F_EPA","EventTrack03_F_EPA"]
@@ -24,11 +31,11 @@ _spawnErrorCode = 0;
 */
 
 //==================================================Deploy pressed============================================================
-private ["_activeSpawn"];
+private _activeSpawn = objNull;
 
 //Find spawn pos or use the default one
 if (isNull (missionNamespace getVariable ["CP_activeSpawn",objNull])) then {
-	_spawnPos = [player] call BIS_fnc_getRespawnPositions;
+	_spawnPos = [player] call MCC_fnc_respawnObjects;
 	if (count _spawnPos > 0) then {
 		missionNamespace setVariable ["CP_activeSpawn",(_spawnPos select 0)];
 	};
@@ -37,12 +44,12 @@ if (isNull (missionNamespace getVariable ["CP_activeSpawn",objNull])) then {
 _activeSpawn = missionNamespace getVariable ["CP_activeSpawn",objNull];
 
 //Check if alive
-if (isnull _activeSpawn) exitWith {[9999,"Select spawn point!",3,true] spawn MCC_fnc_setIDCText};
+if (isnull _activeSpawn) exitWith {["Select spawn point!"] spawn MCC_fnc_rsMessage};
 if (typeName _activeSpawn == "GROUP") then {_activeSpawn = leader CP_activeSpawn};
 
 if (!alive _activeSpawn) exitWith {
 	_activeSpawn setVariable ["dead",true,true];
-	[9999,"Spawn Point destroyed, select another!",3,true] spawn MCC_fnc_setIDCText
+	["Spawn Point destroyed, select another!"] spawn MCC_fnc_rsMessage
 };
 
 
@@ -72,8 +79,7 @@ if (_activeSpawn == leader player) then {
 	_nearObjects = (getpos _activeSpawn) nearObjects 50;
 
 	if ((count _nearObjects) > 0) then {
-		private ["_enemySides"];
-		_enemySides = [player] call BIS_fnc_enemySides;
+		private _enemySides = [player] call BIS_fnc_enemySides;
 
 		{
 			_target = _x;
@@ -93,17 +99,16 @@ if (_activeSpawn == leader player) then {
 if (_spawnErrorCode > 0) exitWith {
 	switch (_spawnErrorCode) do
 	{
-		case 1: {[9999,"You must join a squad first!",3,true] spawn MCC_fnc_setIDCText};
-		case 2: {[9999,"You must select a role first!",3,true] spawn MCC_fnc_setIDCText};
-		case 3: {[9999,"Enemies nearby can't spawn select another spawn point!",3,true] spawn MCC_fnc_setIDCText};
-		case 4: {[9999,"Can't respawn no free space in leader vehicle!",3,true] spawn MCC_fnc_setIDCText};
+		case 1: {["You must join a squad first!"] spawn MCC_fnc_rsMessage};
+		case 2: {["You must select a role first!"] spawn MCC_fnc_rsMessage};
+		case 3: {["Enemies nearby can't spawn select another spawn point!"] spawn MCC_fnc_rsMessage};
+		case 4: {["Can't respawn no free space in leader vehicle!"] spawn MCC_fnc_rsMessage};
 	};
 };
 
 //looking for a spawn point
-private ["_maxPos","_cpPos"];
-_maxPos = 1;
-_cpPos = getpos _activeSpawn;
+private _maxPos = 1;
+private _cpPos = getpos _activeSpawn;
 
 if (_activeSpawn getVariable ["MCC_isLHD",false]) then {
 	_playerDeployPos  =_cpPos;
@@ -116,7 +121,7 @@ if (_activeSpawn getVariable ["MCC_isLHD",false]) then {
 };
 
 if (format["%1",_playerDeployPos] == "[-500,-500,0]" ) exitWith {
-	[9999,"No good position found! Try again.",3,true] spawn MCC_fnc_setIDCText
+	["No good position found! Try again."] spawn MCC_fnc_rsMessage
 };
 
 //Mark as deoployed
@@ -203,7 +208,8 @@ switch (true) do
 			if (_teleportAtStart == 1) then {
 				player setpos _playerDeployPos;
 			} else {
-				private ["_helo","_height"];
+				private _helo = false;
+				private _height = 0;
 
 				if (_teleportAtStart ==3) then {
 					_helo = true;
@@ -247,7 +253,8 @@ if (_activeSpawn == leader player && (vehicle _activeSpawn != _activeSpawn)) the
 
 //Start respawn cinematic
 if ((missionNamespace getVariable ["MCC_respawnCinematic",true]) && _teleportAtStart == 1) then {
-	private ["_camera","_relPos","_relDir","_music"];
+	private _camera = "";
+	private "_music";
 
 	//Play music
 	_music = MWinitMissionMusic call BIS_fnc_selectRandom;
@@ -276,8 +283,7 @@ if ((missionNamespace getVariable ["MCC_respawnCinematic",true]) && _teleportAtS
 	sleep 1;
 
 	//Dissolve effect
-	private ["_blur"];
-	_blur = ppEffectCreate ["DynamicBlur", 474];
+	private _blur = ppEffectCreate ["DynamicBlur", 474];
 	_blur ppEffectEnable true;
 	_blur ppEffectAdjust [10];
 	_blur ppEffectCommit 0.5;

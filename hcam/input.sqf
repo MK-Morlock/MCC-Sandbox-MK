@@ -4,13 +4,11 @@
 #define HCAM_CTRL_BACK (uiNamespace getVariable "hcam_ctrl_back")
 #define HCAM_CTRL_FRONT (uiNamespace getVariable "hcam_ctrl_front")
 
-private ["_key","_shift","_ctrl","_alt","_units","_hcam_key"];
+private "_units";
+private "_hcam_key";
 
 
-_key = _this select 0;
-_shift = _this select 1;
-_ctrl = _this select 2;
-_alt = _this select 3;
+params ["_key", "_shift", "_ctrl", "_alt"];
 _hcam_key = actionKeys (format ["User%1",hcam_Key]);
 
 //_units = synchronizedObjects (player getVariable ["MCC_fnc_SFLogic",objNull]);

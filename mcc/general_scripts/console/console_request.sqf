@@ -9,10 +9,21 @@
 #define MCC_ConsoleAirdropAvailableTextBox_IDD 9104
 
 disableSerialization;
-private ["_type","_mccdialog","_comboBox","_counter","_displayname","_index","_array","_arrayName","_cost","_selected","_available"];
-_type = _this select 0;
+private _mccdialog = controlNull;
+private _comboBox = controlNull;
+private _counter = 0;
+private _displayname = "";
+private "_index";
+private "_array";
+private _arrayName = "";
+private "_cost";
+private "_selected";
+private _available = false;
+params ["_type"];
 _mccdialog = findDisplay mcc_playerConsole_IDD;
 _available = false;
+//Slide the folder back in so the map can be clicked (Supply Drop 2020, CAS 2010)
+[[2020, 2010] select (_type == 1)] call MCC_fnc_consoleFolderClose;
 
 switch (_type) do {
 	//AirDrop
@@ -37,12 +48,6 @@ switch (_type) do {
 					if (!_available) exitWith {hint "Not Enough Resources"; sleep 5; hintSilent ""};
 				} foreach _cost;
 			} else {
-				//Remove the action we just used
-				_array set  [_index,-1];
-				_array = _array - [-1];
-				missionNameSpace setVariable [_arrayName,_array];
-				publicvariable _arrayName;
-
 				_available = true;
 			};
 
@@ -50,11 +55,11 @@ switch (_type) do {
 			if (_available) exitWith {
 
 				//remove resources
-				[_cost] spawn MCC_fnc_baseResourceReduce;
+				MCCMK_consolePending = [_cost, _arrayName, +_selected];
 
 				//supply drop with no helicopter simulation
 				if ((toLower (MCC_planeType select 0)) == "") then {
-					hint "Left click on the map to call support";
+					hint "Left click on the map, hold and drag the cursor to mark the target and the direction it comes in from";
 				} else {
 					hint "Left click on the map,hold and drag the cursor to mark the area and direction of the Air Support";
 				};
@@ -67,10 +72,7 @@ switch (_type) do {
 				_counter = 0;
 				{
 					_counter = _counter + 1;
-					_displayname = format ["%1: ",_counter];
-					{
-						_displayname = format ["%1 %2, ",_displayname, getText(configFile >> "CfgVehicles" >> _x >> "displayname")];
-					} foreach ((_x select 0) select 0);
+					_displayname = format ["%1: %2", _counter, ((((_x select 0) select 0) apply {getText (configFile >> "CfgVehicles" >> _x >> "displayname")}) joinString ", ")];
 					_displayname = _displayname;
 					_pic = if (!(_x select 2 isEqualTo 1) || (_x isEqualTo true)) then {"\a3\ui_f\data\gui\cfg\CommunicationMenu\supplydrop_ca.paa"} else {"\A3\ui_f\data\map\markers\handdrawn\pickup_CA.paa"};
 					_index = _comboBox lbAdd _displayname;
@@ -81,7 +83,7 @@ switch (_type) do {
 					if (count _cost > 0) then {
 						private _str = "";
 						{
-							_str = _str + (_x select 0) + " x " + str (_x select 1) + " ";
+							_str = _str + (toUpper ((_x select 0) select [0, 1])) + ((_x select 0) select [1]) + " x " + str (_x select 1) + " ";
 						} forEach _cost;
 
 						_comboBox lbSetTooltip [_index, _str];
@@ -108,6 +110,7 @@ switch (_type) do {
 			_index = lbCurSel MCC_ConsoleCASAvailableTextBox_IDD;
 			_selected = _array select _index;
 
+			if ((toLower ((_selected select 0) select 0)) == "ac-130" && {alive (missionNamespace getVariable ["MCC_ACConsoleUp", objNull])}) exitWith {[3] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf", MCC_path]};
 			MCC_spawnkind	= [(_selected select 0) select 0];
 			MCC_planeType 	= [(_selected select 1) select 0];
 
@@ -120,23 +123,19 @@ switch (_type) do {
 					if (!_available) exitWith {hint "Not Enough Resources"; sleep 5; hintSilent ""};
 				} foreach _cost;
 			} else {
-				//Remove the action we just used
-				_array set  [lbCurSel MCC_ConsoleCASAvailableTextBox_IDD,-1];
-				_array = _array - [-1];
-				missionNameSpace setVariable [_arrayName,_array];
-				publicvariable _arrayName;
-
 				_available = true;
 			};
 
 			if (_available) exitWith {
 				//remove resources
-				[_cost] spawn MCC_fnc_baseResourceReduce;
-				if ((toLower (MCC_spawnkind select 0)) in ["cruise missile","uav","ac-130"]) then {
-					hint "Left click on the map to call support";
+				MCCMK_consolePending = [_cost, _arrayName, +_selected];
+				if ((toLower (MCC_spawnkind select 0)) == "cruise missile") then {
+					["Left click on the map at the target, hold and drag towards where the missile comes from"] call MCC_fnc_hintBrief;
+				} else {if ((toLower (MCC_spawnkind select 0)) in ["uav","ac-130"]) then {
+					hint "Left click on the map, hold and drag the cursor to mark the target and the direction it comes in from";
 				} else {
 					hint "Left click on the map,hold and drag the cursor to mark the area and direction of the Air Support";
-				};
+				};};
 
 				MCC_CASrequestMarker = true;
 
@@ -155,7 +154,7 @@ switch (_type) do {
 					if (count _cost > 0) then {
 						private _str = "";
 						{
-							_str = _str + (_x select 0) + " x " + str (_x select 1) + " ";
+							_str = _str + (toUpper ((_x select 0) select [0, 1])) + ((_x select 0) select [1]) + " x " + str (_x select 1) + " ";
 						} forEach _cost;
 
 						_comboBox lbSetTooltip [_index, _str];

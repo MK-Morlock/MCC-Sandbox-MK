@@ -1,4 +1,4 @@
-private ["_string","_group","_weapon","_weaponAttachments"];
+private _group = nil;
 
 if (missionNamespace getVariable ["MCC_debug",false]) then {diag_log "CP server init started"};
 

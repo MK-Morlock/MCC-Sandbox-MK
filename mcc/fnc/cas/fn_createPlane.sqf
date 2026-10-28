@@ -7,11 +7,15 @@
 // _flyHight = integer, the fly hight for the plane
 // _captive = boolean, true - to set the plane captive, false - for not.
 //===========================================================================================================================================================================
-private ["_planeType", "_spawn", "_pos", "_flyHight", "_captive", "_heading","_plane","_side","_planeArray","_vehicleClass"];
+private _flyHight = 0;
+private _captive = false;
+private _heading = 0;
+private _plane = objNull;
+private _side = nil;
+private _planeArray = [];
+private _vehicleClass = "";
 
-_planeType = _this select 0;
-_spawn = _this select 1;
-_pos = _this select 2;
+params ["_planeType", "_spawn", "_pos"];
 _flyHight = param [3,300,[0]];
 _captive = param [4,false,[false]];
 _side = param [5,nil,[sideLogic,missionNamespace]];
@@ -45,10 +49,9 @@ _plane setcaptive _captive;
 
 if !(_plane isKindOf "Helicopter") then {
 	_plane setpos [(getPos _plane select 0),(getPos _plane select 1),(getPos _plane select 2)+100];
-	private ["_vel","_dir","_speed"];
-	_vel = velocity _plane;
-	_dir = direction _plane;
-	_speed = 10;
+	private _vel = velocity _plane;
+	private _dir = direction _plane;
+	private _speed = 10;
 	//_plane setVelocity [(_vel select 0)+(sin _dir*_speed),(_vel select 1)+(cos _dir*_speed),45];
 	_plane setVelocity [0,0,65];
 };

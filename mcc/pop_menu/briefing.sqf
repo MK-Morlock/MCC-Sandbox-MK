@@ -1,11 +1,12 @@
 #define MCC_BRIEFING_TEXT 3055
 disableSerialization;
-private ["_type","_dlg","_string"];
+private "_dlg";
+private _string = controlNull;
 hint "Diary updated";
 
-_type = _this select 0;
+params ["_type"];
 
 _dlg = (uiNamespace getVariable "MCC_groupGen_Dialog");
 _string = ctrlText (_dlg displayCtrl MCC_BRIEFING_TEXT);
 
-[[_string, _type],"MCC_fnc_makeBriefing",false,false] spawn BIS_fnc_MP;
+[_string, _type] remoteExec ["MCC_fnc_makeBriefing", 2, false];

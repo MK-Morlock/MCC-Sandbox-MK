@@ -3,17 +3,28 @@
 	Example:[_totalEnemyUnits,_missionCenter,_radius,_arrayUnits,_priceGroup,_priceUnit,_side,_artillery] call MCC_fnc_MWSpawnStatic;
 	Return - handler
 ================================================================================================================================================================================*/
-private ["_side","_unitPlaced","_totalEnemyUnits","_radius","_arrayUnits","_group","_init","_perSpawn","_spawnPos","_zone","_marker","_priceGroup","_priceUnit","_price","_artillery","_pos","_missionCenter","_availablePos","_vehicleClass","_vehicle","_time","_enableMarkers"];
-_totalEnemyUnits	= _this select 0;
-_missionCenter		= _this select 1;
-_radius				= _this select 2;
-_arrayUnits			= _this select 3;
-_priceGroup			= _this select 4;
-_priceUnit			= _this select 5;
-_side				= _this select 6;
-_artillery			= _this select 7;	///0 - none, 1 - mortar, 2 - self propelled artillery, 3 - Random, 999 - not artillery piece
-_zone				= _this select 8;
-_enableMarkers 			= param [9,false,[false]];
+private _unitPlaced = 0;
+private _group = grpNull;
+private _perSpawn = 0;
+private _spawnPos = [];
+private _marker = "";
+private _pos = [];
+private _availablePos = [];
+private _vehicleClass = "";
+private _vehicle = [];
+private _time = 0;
+params [
+	["_totalEnemyUnits", 0, [0]],
+	["_missionCenter", [0,0,0], [[]]],
+	["_radius", 0, [0]],
+	["_arrayUnits", [], [[]]],
+	["_priceGroup", 0, [0]],
+	["_priceUnit", 0, [0]],
+	["_side", sideUnknown, [sideUnknown]],
+	["_artillery", 0, [0]],	///0 - none, 1 - mortar, 2 - self propelled artillery, 3 - Random, 999 - not artillery piece
+	["_zone", 0, [0, ""]],
+	["_enableMarkers", false, [false]]
+];
 
 _unitPlaced = 0;
 
@@ -68,7 +79,7 @@ if (count _arrayUnits > 0) then {
 			private _markers = [];
 			private _range = 50 + (random 200);
 			_pos = (_pos getPos [_range,random 360]);
-			_marker = createMarker [format ["MCC_MWArtillery_%1",(["MCC_MWArtillery",1] call BIS_fnc_counter)],_pos];
+			_marker = createMarker [format ["MCC_MWArtillery_%1",(["MCC_MWArtilleryMarkerCounter",1] call BIS_fnc_counter)],_pos];
 			_marker setMarkerShape "ICON";
 			_marker setMarkerType "mil_warning";
 			_marker setMarkerColor "ColorRed";
@@ -76,7 +87,7 @@ if (count _arrayUnits > 0) then {
 
 			_markers pushBack _marker;
 
-			_marker = createMarker [format ["MCC_MWArtillery_%1",(["MCC_MWArtillery",1] call BIS_fnc_counter)],_pos];
+			_marker = createMarker [format ["MCC_MWArtillery_%1",(["MCC_MWArtilleryMarkerCounter",1] call BIS_fnc_counter)],_pos];
 			_marker setMarkerShape "ELLIPSE";
 			_marker setMarkerType "hd_marker";
 			_marker setMarkerColor "ColorRed";
@@ -97,7 +108,7 @@ if (count _arrayUnits > 0) then {
 		_unitPlaced = _unitPlaced + (_priceUnit*_perSpawn);
 	};
 } else {
-	diag_log "MCC: Mission Wizard Error: No vehicles available in the selected enemy faction";
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: Mission Wizard Error: No vehicles available in the selected enemy faction"};
 };
 _unitPlaced;
 

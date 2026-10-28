@@ -1,8 +1,14 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params", "_ctrl", "_pressed", "_posX", "_posY", "_shift", "_ctrlKey", "_alt", "_eib_marker","_pointB","_nearObjectsA","_nearObjectsB"];
+private "_ctrl";
+private "_pressed";
+private "_posX";
+private "_posY";
+private "_shift";
+private "_ctrlKey";
+private "_alt";
 disableSerialization;
  
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _pressed = _params select 1;

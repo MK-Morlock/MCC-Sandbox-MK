@@ -1,8 +1,14 @@
+//Cruise missile feed: the mouse does not steer or fire (MCC_consoleCruise)
+if (missionNamespace getVariable ["MCC_consoleCruise", false]) exitWith {};
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params","_ctrl","_posX","_posY","_posNew","_fakeUav"];
+private "_ctrl";
+private "_posX";
+private "_posY";
+private _posNew = [];
+private _fakeUav = objNull;
 disableSerialization;
 
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _posX = _params select 1;

@@ -1,6 +1,4 @@
-private ["_unit"];
-
-_unit = _this;
+private _unit = _this;
 
 createMarkerLocal [format["%1", _unit],getpos _unit];
 format["%1", _unit] setMarkerTypelocal "waypoint";

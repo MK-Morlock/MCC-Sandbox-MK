@@ -56,9 +56,10 @@ switch (_HQ_side) do
 // Do create a CA on each position of a target that is not in range of 200 within the next the CA
 {
 	_TargetInfo = _x getVariable ["GAIA_TargetInfo",[]];
-	if !((count([_ca, {((_x distance (_TargetInfo select 1))<(MCC_GAIA_CA_SIZE*2))}] call BIS_fnc_conditionalSelect))>0)
-	then
-		{_ca  = _ca + [(_TargetInfo select 1)];	};
+	if (count _TargetInfo > 1 && {(_TargetInfo select 1) isEqualType []}) then {
+		private _tPos = _TargetInfo select 1;
+		if !((count([_ca, {((_x distance _tPos)<(MCC_GAIA_CA_SIZE*2))}] call BIS_fnc_conditionalSelect))>0) then {_ca = _ca + [_tPos]};
+	};
 }forEach _Targets;
 
 // Order the CA's. The one who is the closest to any zone wins

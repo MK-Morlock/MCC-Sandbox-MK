@@ -1,15 +1,7 @@
 disableSerialization;
-private ["_case","_color","_size","_shape","_brush","_type","_text","_pos","_dir"];
 
-_case = _this select 0;
-_color = _this select 1;
-_size = _this select 2;
-_shape = _this select 3;
-_brush = _this select 4;
-_type = _this select 5;
-_text = _this select 6; 
-_pos = _this select 7; 
-_dir = _this select 8; 
+
+params ["_case", "_color", "_size", "_shape", "_brush", "_type", "_text", "_pos", "_dir"]; 
 
 if (isnil "_text") exitWith {};
 if (_text == "") exitWith {};

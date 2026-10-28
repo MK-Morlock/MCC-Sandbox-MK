@@ -36,7 +36,10 @@
 	NOTHING
 */
 
-private ["_logic","_units","_activated","_markerIcon"];
+private _logic = objNull;
+private _units = [];
+private _activated = false;
+private _markerIcon = "";
 _logic = param [0,objnull];
 _units = param [1,[]];
 _activated = param [2,true,[true]];
@@ -51,9 +54,8 @@ if (typename _logic == typename true) exitwith {
 
 //--- Return all capture points belonging to a side
 if (typename _logic == typename sideunknown) exitwith {
-	private ["_side","_sideID"];
-	_side = _logic;
-	_sideID = _side call bis_fnc_sideID;
+	private _side = _logic;
+	private _sideID = _side call bis_fnc_sideID;
 	_sectors = [];
 	{
 		if ((_x getvariable ["owner",sideUnknown])==_side) then {_sectors pushBack _x};
@@ -103,7 +105,7 @@ switch _mode do {
 		//Enable HUD
 		if (_enableHUD) then {
 			{
-				[[_logic,[],true,"initHUDLocal",false],"MCC_fnc_moduleCapturePoint",_x,true] call bis_fnc_mp;
+				[_logic,[],true,"initHUDLocal",false] remoteExec ["MCC_fnc_moduleCapturePoint", _x, true];
 			} forEach _sides;
 		};
 
@@ -269,7 +271,7 @@ switch _mode do {
 
 					if (isPlayer _x) then {
 						if !(_x in _playersInList) then {_playersInList pushBack _x};
-						[[_logic,[],true,"player",true],"MCC_fnc_moduleCapturePoint",_x] call bis_fnc_mp;
+						[_logic,[],true,"player",true] remoteExec ["MCC_fnc_moduleCapturePoint", _x, false];
 					};
 				} foreach list _x;
 
@@ -278,12 +280,11 @@ switch _mode do {
 
 			//Disable Progress Bar
 			for "_i" from 0 to (count _playersInList)-1 do {
-				private ["_player"];
-				_player = _playersInList select _i;
+				private _player = _playersInList select _i;
 				if !(isNil "_player") then {
 					if ({_player in list _x} count _areas <= 0) then {
 						_playersInList set [_i,-1];
-						[[_logic,[],true,"player",false],"MCC_fnc_moduleCapturePoint",_player] call bis_fnc_mp;
+						[_logic,[],true,"player",false] remoteExec ["MCC_fnc_moduleCapturePoint", _player, false];
 					};
 				};
 			};
@@ -322,8 +323,7 @@ switch _mode do {
 
 				//---- Respawn
 				if (_addRespawn) then {
-					private ["_respawnId"];
-					_respawnId = _logic getvariable ["respawnID",-1];
+					private _respawnId = _logic getvariable ["respawnID",-1];
 
 					//Remove previous respawn
 					if (_respawnId != -1) then {
@@ -388,8 +388,8 @@ switch _mode do {
 				//--- Show notification
 				_ownerName = _owner call bis_fnc_sidename;
 				if (_owner != sideunknown) then {
-					[[format ["sectorCaptured%1",_owner],[_name,_ownerName,_iconTexture,_designation]],"BIS_fnc_showNotification",_sides - [_ownerOld]] call bis_fnc_mp;
-					[[format ["sectorLost%1",_owner],[_name,_ownerName,_iconTexture,_designation]],"BIS_fnc_showNotification",_ownerOld] call bis_fnc_mp;
+					[format ["sectorCaptured%1",_owner],[_name,_ownerName,_iconTexture,_designation]] remoteExec ["BIS_fnc_showNotification", _sides - [_ownerOld], false];
+					[format ["sectorLost%1",_owner],[_name,_ownerName,_iconTexture,_designation]] remoteExec ["BIS_fnc_showNotification", _ownerOld, false];
 				};
 			};
 
@@ -399,7 +399,9 @@ switch _mode do {
 
 			//Add resources
 			if (_step mod 5 == 0 && _owner != sideUnknown && _type <3) then {
-				private ["_array","_res","_resources"];
+				private _array = [];
+				private _res = 0;
+				private _resources = [];
 				_array = call compile format ["MCC_res%1",_owner];
 
 				//get number of storage
@@ -419,9 +421,8 @@ switch _mode do {
 
 		//Disable Progress Bar
 		for "_i" from 0 to (count _playersInList)-1 do {
-			private ["_player"];
-			_player = _playersInList select _i;
-			[[_logic,[],true,"player",false],"MCC_fnc_moduleCapturePoint",_player] call bis_fnc_mp;
+			private _player = _playersInList select _i;
+			[_logic,[],true,"player",false] remoteExec ["MCC_fnc_moduleCapturePoint", _player, false];
 			sleep 0.01;
 		};
 
@@ -458,7 +459,8 @@ switch _mode do {
 	};
 
 	case "player": {
-		private ["_progress","_logic"];
+		private _progress = 0;
+		private _logic = objNull;
 		disableSerialization;
 		_logic = _this select 0;
 		_progress = (_logic getvariable ["sideScore",[0,0,0,0,0]]) select ((playerSide call bis_fnc_sideID) min 2);
@@ -507,7 +509,11 @@ switch _mode do {
 		//Create structures Icons
 		["MCC_capturePointsHudID", "onEachFrame",
 		{
-			private ["_obj","_text","_color","_texture","_pos"];
+			private _obj = objNull;
+			private _text = "";
+			private _color = [];
+			private _texture = "";
+			private _pos = [];
 			{
 				_obj 	= _x;
 				_pos = position ((_obj getvariable ["areas",[objNull]]) select 0);
@@ -540,7 +546,12 @@ switch _mode do {
 		if (missionNamespace getVariable ["MCC_capturePointsinitTickets",false]) exitWith {};
 		missionNamespace setVariable ["MCC_capturePointsinitTickets",true];
 
-		private ["_scoreWest","_scoreEast","_scoreReistance","_winingSide","_sides","_side"];
+		private _scoreWest = 0;
+		private _scoreEast = 0;
+		private _scoreReistance = 0;
+		private _winingSide = sideUnknown;
+		private _sides = [];
+		private _side = sideUnknown;
 
 		while {true} do {
 		    _scoreEast = 0;

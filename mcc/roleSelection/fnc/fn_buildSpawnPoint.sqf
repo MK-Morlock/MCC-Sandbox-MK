@@ -1,6 +1,6 @@
 //================================================================MCC_fnc_buildSpawnPoint=============================================================================
 //Create a spawn point to the given side - SERVER ONLY
-// Example: [[pos, dir, side,size,destructable], "MCC_fnc_buildSpawnPoint", false, false] spawn BIS_fnc_MP;
+// Example: [pos, dir, side,size,destructable] remoteExec ["MCC_fnc_buildSpawnPoint", false, false];
 // pos: Array, position
 // dir; number, direction
 // side: string, "west", "east" or "GUER"
@@ -9,7 +9,23 @@
 // animate: Boolean
 // construct: Boolean
 //======================================================================================================================================================================
-private ["_side","_size","_destructable","_building","_dummy","_sphere","_dir","_animate","_flag","_flagTex","_name","_logic","_pos","_construct","_teleport","_enableHud","_mode"];
+private "_side";
+private _size = "";
+private _destructable = false;
+private "_building";
+private _dummy = objNull;
+private _sphere = objNull;
+private "_dir";
+private _animate = false;
+private _flag = nil;
+private "_flagTex";
+private _name = "";
+private "_logic";
+private "_pos";
+private _construct = false;
+private _teleport = 0;
+private _enableHud = false;
+private _mode = "";
 
 #define	MCC_ANCHOR	"Box_FIA_Support_F"
 
@@ -18,13 +34,19 @@ if ((typeName (_this select 0)) == "OBJECT") then {
 	_pos			= getpos _logic;
 	_dir			= getdir _logic;
 
-	_side 			= (_logic getvariable ["side",0]) call bis_fnc_sideType;
-	_size 			= toupper (_logic getvariable ["size","FOB"]);
-	_destructable	= _logic getvariable ["distractable",true];
+	// Module values can arrive as text ("1") or booleans depending on how the mission stores them
+	private _fnc_num = {params ["_v", "_d"]; if (_v isEqualType "") then {_v = parseNumber _v}; if (_v isEqualType true) then {_v = [0, 1] select _v}; if !(_v isEqualType 0) then {_v = _d}; _v};
+	private _fnc_bool = {params ["_v", "_d"]; if (_v isEqualType "") then {_v = (toLower _v) in ["true", "1"]}; if (_v isEqualType 0) then {_v = _v != 0}; if !(_v isEqualType true) then {_v = _d}; _v};
+
+	_side 			= ([_logic getvariable ["side",1], 1] call _fnc_num) call bis_fnc_sideType;	//default BLUFOR, like the module
+	_size 			= _logic getvariable ["size","FOB"];
+	if !(_size isEqualType "") then {_size = "FOB"};
+	_size 			= toUpper _size;
+	_destructable	= [_logic getvariable ["distractable",true], true] call _fnc_bool;
 	_animate		= false;
-	_construct 		= (_logic getvariable ["construct",0]) ==1;
-	_teleport 		= _logic getVariable ["teleportAtStart",1];
-	_enableHud		= _logic getVariable ["hud",false];
+	_construct 		= ([_logic getvariable ["construct",0], 0] call _fnc_num) == 1;
+	_teleport 		= [_logic getVariable ["teleportAtStart",1], 1] call _fnc_num;
+	_enableHud		= [_logic getVariable ["hud",false], false] call _fnc_bool;
 	_mode			= _logic getVariable ["mode","init"];
 
 } else {
@@ -71,7 +93,10 @@ switch (_mode) do
 			//Create structures Icons
 			["MCC_HQhud", "onEachFrame",
 			{
-				private ["_text","_color","_texture","_pos"];
+				private _text = "";
+				private _color = [];
+				private _texture = "";
+				private "_pos";
 				_pos = missionNamespace getVariable [format ["MCC_START_%1",playerSide],[0,0,0]];
 				_text 	= "HQ";
 				_texture = "n_installation" call bis_fnc_textureMarker;;
@@ -107,7 +132,15 @@ switch (_mode) do
 		//animate the process of building a FOB
 		if (_animate) then {
 			//Phase 1
-			private ["_anchor","_prop","_class","_modelWorld","_objects","_propPos","_newObjects","_anchorPos","_time"];
+			private _anchor = "";
+			private _prop = objNull;
+			private "_class";
+			private "_modelWorld";
+			private _objects = [];
+			private "_propPos";
+			private _newObjects = [];
+			private "_anchorPos";
+			private "_time";
 			_anchor = "Land_PaperBox_closed_F" createvehicle _pos;
 
 			_objects = [];
@@ -216,13 +249,16 @@ switch (_mode) do
 			_dummy addEventHandler ["handledamage",{
 											if ((_this select 4) in ["SatchelCharge_Remote_Ammo","DemoCharge_Remote_Ammo","DemoCharge_Remote_Ammo_Scripted","SatchelCharge_Remote_Ammo_Scripted"]) then
 											{
-												private ["_obj","_mark","_flag","_side"];
+												private "_obj";
+												private _mark = "";
+												private _flag = nil;
+												private "_side";
 												_obj = _this select 0;
 												_obj setVariable ["dead",true,true];
 												_mark = _obj getVariable ["mcc_fob_name",""];
 												_side = _obj getVariable ["side",civilian];
 
-												[compile format ['deleteMarker "%1";',_mark],"BIS_fnc_spawn", _side,false] call BIS_fnc_MP;
+												[[], compile format ['deleteMarker "%1";',_mark]] remoteExec ["call", _side, false];
 
 												_flag = _obj getVariable ["mcc_flag",objnull];
 												if (!isnil "_flag") then
@@ -238,15 +274,29 @@ switch (_mode) do
 			_dummy setvariable ["mcc_fob_name",_name, true];
 
 			//Create marker
-			[[[_name], _pos, "colorGreen", "loc_Bunker",_name,false],"BIS_fnc_markerCreate", _side,false] call BIS_fnc_MP;
+			[[_name], _pos, "colorGreen", "loc_Bunker",_name,false] remoteExec ["BIS_fnc_markerCreate", _side, false];
 		} else {
 			//Not destroyable
 			_dummy addEventHandler ["handledamage",{0}];
-			missionNameSpace setVariable [format ["MCC_START_%1",_side],_pos];
-			publicVariable format ["MCC_START_%1",_side];
 
 			//Make it as  medic area
 			_dummy spawn MCC_fnc_medicArea;
+		};
+
+		// Side start position (MCC_START_<SIDE>) - used by Mission Wizard, RTS, logistics, HUD, respawn.
+		// A MAIN start location always sets it. An F.O.B sets it only if the side has no start position yet,
+		// so a mission with just one F.O.B-type Start Location module (the module's default Type) still works.
+		private _startVar = format ["MCC_START_%1",_side];
+		if (_side in [west, east, resistance] && {_size != "FOB" || {isNil {missionNamespace getVariable _startVar}}}) then {
+			missionNameSpace setVariable [_startVar,_pos];
+			publicVariable _startVar;
+			["INFO", "fn_buildSpawnPoint", "%1 start position set from %2 start location at %3", [_side, _size, _pos]] call MCC_fnc_log;
+		} else {
+			if !(_side in [west, east, resistance]) then {
+				["WARN", "fn_buildSpawnPoint", "start location at %1 has an unrecognised side (%2) - not used as a start position", [_pos, _side]] call MCC_fnc_log;
+			} else {
+				["INFO", "fn_buildSpawnPoint", "%1 %2 added at %3 (side start position already set)", [_side, _size, _pos]] call MCC_fnc_log;
+			};
 		};
 
 		if (!_destructable) then {

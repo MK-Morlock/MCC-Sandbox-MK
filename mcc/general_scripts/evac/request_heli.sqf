@@ -6,8 +6,15 @@
 #define MCC_EVAC_FLIGHTHIGHT 44
 
 disableSerialization;
-private ["_evacArray","_insetionArray","_mccdialog","_option","_type","_class","_comboBox",
-		 "_vehicleDisplayName","_displayname","_index","_countVehicles"];
+private _evacArray = [];
+private _mccdialog = 0;
+private _option = 0;
+private _type = 0;
+private _comboBox = controlNull;
+private _vehicleDisplayName = "";
+private _displayname = "";
+private _index = 0;
+private _countVehicles = 0;
 _mccdialog = MCC_SANDBOX2_IDD;
 
 
@@ -37,8 +44,9 @@ if !mcc_isloading then
 			};
 		};
 
-		if ((lbCurSel MCC_EVAC_CLASS) == -1) exitWith {};
-		MCCEvacHeliType = (_evacArray select (lbCurSel MCC_EVAC_CLASS)) select 1;
+		MCCEvacHeliType = (_mccdialog displayCtrl MCC_EVAC_CLASS) lbData (lbCurSel MCC_EVAC_CLASS);
+		MCCEvacSide = call MCC_fnc_evacSide;
+		if (MCCEvacHeliType == "") exitWith {hint "No vehicle of this type for that faction"};
 
 		//Spawn on LHD
 		if (_option == 0) then
@@ -47,12 +55,13 @@ if !mcc_isloading then
 			{
 				hint "Evac Vehicle spawned on LHD";
 				_pos = getmarkerpos "pos4";
-				[[MCCEvacHeliType, _pos],"MCC_fnc_evacSpawn",false,false] spawn BIS_fnc_MP;
+				[MCCEvacHeliType, _pos, false, 0, MCCEvacSide] remoteExec ["MCC_fnc_evacSpawn", 2, false];
 				mcc_safe = mcc_safe + FORMAT ["
-											[['%1',%2],'MCC_fnc_evacSpawn',false,false] spawn BIS_fnc_MP;
+											['%1',%2, false, 0, %3] remoteExec ['MCC_fnc_evacSpawn', 2, false];
 											"
 											, MCCEvacHeliType
 											, _pos
+											, MCCEvacSide call BIS_fnc_sideID
 											];
 			}
 			else
@@ -64,42 +73,23 @@ if !mcc_isloading then
 		//Spawn on land
 		if (_option == 1) then
 		{
-			hint "click on map to spawn evac vechicle";
+			if (missionNamespace getVariable ["MCC_evacSpawnPending", false]) exitWith {onMapSingleClick ""; MCC_evacSpawnPending = false; hint "Evac spawn cancelled"};
+			MCC_evacSpawnPending = true;
+			hint "Click on the map to spawn the evac vehicle (right-click to cancel)";
 			onMapSingleClick " 	hint ""Evac Vehicle spawned."";
-								[[MCCEvacHeliType, _pos],""MCC_fnc_evacSpawn"",false,false] spawn BIS_fnc_MP;
+								MCC_evacSpawnPending = false;
+								[MCCEvacHeliType, _pos, false, 0, MCCEvacSide] remoteExec [""MCC_fnc_evacSpawn"", 2, false];
 								mcc_safe=mcc_safe + FORMAT ['
-									[[""%1"",%2],""MCC_fnc_evacSpawn"",false,false] spawn BIS_fnc_MP;
+									[""%1"",%2, false, 0, %3] remoteExec [""MCC_fnc_evacSpawn"", 2, false];
 									sleep 1;'
 									, MCCEvacHeliType
 									, _pos
+									, MCCEvacSide call BIS_fnc_sideID
 									];
 								onMapSingleClick """";
 								";
 		};
 
-	private ["_evacVehicles"];
-	_evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1",playerSide],[]];
-	_countVehicles = count _evacVehicles; 					//Wait until the vehicle is spawned
-
-	waituntil {_countVehicles != count _evacVehicles};
-	_comboBox = _mccdialog displayCtrl MCC_EVAC_SELECTED;		//fill combobox Fly in Hight
-
-	lbClear _comboBox;
-	{
-		if (alive _x) then
-		{
-			_vehicleDisplayName 	= getText(configFile >> "CfgVehicles" >> typeof _x >> "displayname");
-			_displayname 			= format ["%1, %2",_x,_vehicleDisplayName];
-			_index 					= _comboBox lbAdd _displayname;
-		}
-		else
-		{
-			_displayname 			= "N/A";
-			_index 					= _comboBox lbAdd _displayname;
-		};
-	} foreach _evacVehicles;
-
-	_comboBox lbSetCurSel (missionNameSpace getvariable ["MCC_evacVehicles_index",0]);
 	}
 	else
 	{

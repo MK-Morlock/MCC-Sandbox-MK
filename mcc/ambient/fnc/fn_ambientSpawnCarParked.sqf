@@ -12,7 +12,27 @@
 #define MAX_PARKED_CARS 15
 #define MAX_PARKED_CARS_PER_AREA 5
 
-private ["_pos","_nearHouses","_houseConuter","_counter","_carSpawnDistance","_vehiclesArray","_locked","_carArray","_carInArea","_house","_road","_roadConnectedTo","_connectedRoad","_dir","_spawnPos","_vehicleClass","_vehicle","_civRelations","_sidePlayer","_roadPos","_radius"];
+private _pos = [];
+private _nearHouses = [];
+private "_houseConuter";
+private _counter = 0;
+private _carSpawnDistance = 0;
+private _vehiclesArray = [];
+private _locked = false;
+private _carArray = [];
+private "_carInArea";
+private "_house";
+private _road = [];
+private "_roadConnectedTo";
+private "_connectedRoad";
+private _dir = nil;
+private _spawnPos = [];
+private "_vehicleClass";
+private _vehicle = objNull;
+private _civRelations = 0;
+private "_sidePlayer";
+private "_roadPos";
+private _radius = 0;
 _pos = param [0, [], [[]]];
 _counter = param [1, 1,[1]];
 _carSpawnDistance = param [2, 250, [250]];
@@ -46,11 +66,13 @@ for "_i" from 1 to (_houseConuter min _counter) do {
 
 
 	//Are we inside denied zone
-	private ["_spawn","_isIED"];
+	private _spawn = false;
+	private _isIED = false;
 	_spawn = true;
 	{
 		if (_x distance _road < (_x getVariable ["radius",100])) exitWith {_spawn = false};
 	} forEach _deniedZones;
+	if (_spawn && {[getPosATL _road, civilian] call MCCMK_fnc_inKeepOutZone}) then {_spawn = false};
 
 	if (_spawn) then {_spawn = !([getpos _road, 200] call MCC_fnc_isVisableToPlayers)};
 

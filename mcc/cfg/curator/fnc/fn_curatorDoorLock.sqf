@@ -1,8 +1,10 @@
 //==========================================================MCC_fnc_curatorDoorLock========================================================================================
 // Manage doors status
 //===========================================================================================================================================================================
-private ["_pos","_module","_resualt"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private "_pos";
+private _module = objNull;
+private _resualt = [];
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 //Not curator exit
@@ -17,9 +19,8 @@ _resualt = ["Lock/Unlock Doors",[
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};
 
-private ["_radius"];
-_radius = _resualt select 0;
+private _radius = _resualt select 0;
 
-[[_pos, _radius, (_resualt select 1)+10], "MCC_fnc_deleteBrush", false, false] call BIS_fnc_MP;
+[_pos, _radius, (_resualt select 1)+10] remoteExec ["MCC_fnc_deleteBrush", 2, false];
 
 deleteVehicle _module;

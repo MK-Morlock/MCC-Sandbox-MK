@@ -4,14 +4,15 @@
 //     	_ctrl: CONTROL
 //		_res: resources Needed
 //==============================================================================================================================================================================
-private ["_ctrl","_res","_side","_varName"];
+private _res = [];
+private "_side";
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _res = param [1, [], [[]]];
 _side = playerSide;
 
 //Start building time
-private ["_obj","_BuildTime"];
+private "_obj";
 playsound "click";
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 _obj = MCC_ConsoleGroupSelected select 0;

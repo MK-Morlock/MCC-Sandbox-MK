@@ -1,7 +1,24 @@
 //==================================================================MCC_fnc_interaction=========================================================================================
 // Interaction perent
 //==============================================================================================================================================================================
-private ["_targets","_null","_selected","_objects","_dir","_target","_vehiclePlayer","_airports","_counter","_searchArray","_sides","_positionStart","_positionEnd","_pointIntersect","_break","_interactiveObjects","_objArray","_keyName","_key","_text","_objects","_headPos","_upFront","_closeObject","_array"];
+private _null = [];
+private "_selected";
+private "_objects";
+private _dir = [];
+private _target = objNull;
+private "_vehiclePlayer";
+private _airports = [];
+private _counter = 0;
+private "_searchArray";
+private _sides = 0;
+private _break = false;
+private _keyName = "";
+private _key = [];
+private _text = "";
+private "_objects";
+private "_headPos";
+private "_upFront";
+private _array = [];
 disableSerialization;
 _break = false;
 _text = "";
@@ -57,7 +74,10 @@ if (missionNamespace getVariable ["MCC_isACE",false]) exitWith {
 
 		//Handle house
 		if (_target isKindof "house" || _target isKindof "wall") then {
-			private ["_door","_animation","_phase","_tempArray"];
+			private "_door";
+			private "_animation";
+			private "_phase";
+			private _tempArray = [];
 
 			_tempArray = [_target]  call MCC_fnc_isDoor;
 			_door = _tempArray select 0;
@@ -146,8 +166,8 @@ if (vehicle player == player) then {
 		_selected = _pointIntersect select ((count _pointIntersect)-1);
 
 		if (player distance _selected < 20) exitWith {
-			if (missionNamespace getVariable ["MCC_debug",false]) then {systemChat str _selected; copyToClipboard "MCC Items Name: " + str _selected};
-			if ((({[_x , str _selected] call BIS_fnc_inString} count _objArray)>0) && (isNull attachedTo _selected)) then {
+			if (missionNamespace getVariable ["MCC_debug",false]) then {systemChat str _selected; copyToClipboard ("MCC Items Name: " + str _selected)};
+			if ((([_selected] call MCC_fnc_survivalObjectType) != "") && (isNull attachedTo _selected)) then {
 				missionNameSpace setVariable ["MCC_interactionObjects", [[getpos _selected, format ["Hold %1 to search",_keyName]]]];
 
 				[_selected] call MCC_fnc_interactObject;
@@ -161,7 +181,12 @@ if (vehicle player == player) then {
 	if (!(missionNamespace getVariable ["MCC_interactionKey_holding",false])) exitWith {};
 
 	MCC_fnc_vehicleCargoMenuClicked = {
-		private ["_ctrl","_index","_ctrlData","_object","_animation","_phase","_door","_locked"];
+		private _ctrlData = "";
+		private "_object";
+		private "_animation";
+		private "_phase";
+		private "_door";
+		private "_locked";
 		disableSerialization;
 
 		_ctrlData	= param [0,"",[""]];
@@ -223,17 +248,20 @@ if (vehicle player == player) then {
 	} foreach ["commander","driver","cargo"];
 
 	//turrets
-	private ["_i","_entry","_turrets","_path","_count"];
+	private _i = 0;
+	private _entry = configNull;
+	private _turrets = [];
+	private _path = [];
+	private _count = 0;
 	_entry = configFile >> "CfgVehicles" >> typeof _vehiclePlayer;
 	_turrets = [_entry >> "turrets"] call BIS_fnc_returnVehicleTurrets;
 	_path = [];
 	_i = 0;
 	_count 	= 0;
 	while {_i < (count _turrets)} do {
-		private ["_turretIndex", "_thisTurret","_unit"];
-		_turretIndex 	= _turrets select _i;
-		_thisTurret 	= _path + [_turretIndex];
-		_unit 			= _vehiclePlayer turretUnit _thisTurret;
+		private _turretIndex = _turrets select _i;
+		private _thisTurret = _path + [_turretIndex];
+		private _unit = _vehiclePlayer turretUnit _thisTurret;
 
 		if ((isNull _unit || (!isNull _unit && !isPlayer _unit)) && !(_vehiclePlayer lockedTurret _thisTurret) && (locked _vehiclePlayer <2)) then {
 			_array pushBack [format ["['gunner%1'] spawn MCC_fnc_vehicleCargoMenuClicked",_thisTurret],format ["Move to %1",configName ((_entry >> "turrets") select _count)],"\A3\ui_f\data\igui\cfg\actions\getingunner_ca.paa"];

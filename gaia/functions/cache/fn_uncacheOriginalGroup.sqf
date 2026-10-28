@@ -6,7 +6,7 @@ _respawn    = _this select 1;
 _cache			= _this select 2;
 _zoneIntend	= _this select 3;
 
-if (_respawn >=0)  then
+if (_respawn > 0)  then	// >= 0 gave one extra respawn
 {
 			_uv 				= [];
 			_crew 			= [];
@@ -52,12 +52,13 @@ if (_respawn >=0)  then
 			{
 				//player globalchat format [" going  %1",(_x select 0)];
 				//_un=(_x select 0) createUnit [(_x select 1), _group,"",(_x select 3),(_x select 4)];
-				_un = _group createUnit [(_x select 0), (_x select 1), [], 0, "CAN_COLLIDE"] ;
+				// on the ground in formation around the stored point (all units share the respawn point; CAN_COLLIDE stacked them)
+				_un = _group createUnit [(_x select 0), ASLToAGL (_x select 1), [], 5, "FORM"] ;
 
 				_un setdamage 		(_x select 2);
 				_un setskill  		(_x select 3);
 				_un setrank   		(_x select 4);
-				_un setPosasl 		(_x select 1);
+				
 
 				_un setdir			 	(_x select 5);
 

@@ -1,13 +1,13 @@
 // Credit to ACE 3 for Dialog Button
 class MCC_Open_SettingsMenu_BtnBase : MCC_gui_buttonBase {
     class Attributes {
-        font = "PuristaMedium";
+        font = "RobotoCondensed";
         color = "#E5E5E5";
         align = "left";
         shadow = "true";
     };
     class AttributesImage {
-        font = "PuristaMedium";
+        font = "RobotoCondensed";
         color = "#E5E5E5";
         align = "left";
     };
@@ -39,14 +39,14 @@ class MCC_Open_SettingsMenu_BtnBase : MCC_gui_buttonBase {
     color[] = {1,1,1,1};
     //colorBackground2[] = {0.75,0.75,0.75,1};
     //colorBackground[] = {0,0,0,0.8};
-    colorBackground[] = {1, 0.647, 0, 0.5};
-    colorBackground2[] = {1, 0.647, 0, 0.5};
+    colorBackground[] = {0.77, 0.51, 0.08, 0.5};
+    colorBackground2[] = {0.77, 0.51, 0.08, 0.5};
     colorBackgroundFocused[] = {1, 1, 1, 0};
     colorDisabled[] = {1,1,1,0.25};
     colorFocused[] = {0,0,0,1};
     colorText[] = {1,1,1,1};
     default = 0;
-    font = "PuristaMedium";
+    font = "RobotoCondensed";
     idc = -1;
     period = 1.2;
     periodFocus = 1.2;
@@ -71,7 +71,7 @@ class MCC_Open_SettingsMenu_BtnBase : MCC_gui_buttonBase {
     y = "2.1 * ((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) + safezoneY";
     w = "15 * (((safezoneW / safezoneH) min 1.2) / 40)";
     h = "1 * ((((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
-    action = "(findDisplay 49) closeDisplay 0; createDialog 'mcc_rscKeyBinds';";
+    action = "(findDisplay 49) closeDisplay 0; createDialog ('mcc_rscKeyBinds' call MCC_fnc_dialogName);";
 };
 
 class RscStandardDisplay;

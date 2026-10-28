@@ -29,20 +29,37 @@
 #define MCC_MWBriefingsTooltip_IDC 9511
 #define MCC_MWBriefingText_IDC 9512
 
-private ["_mapCenter","_missions","_ok","_markers","_images","_overcast","_scale","_defaultScale","_simulationEnabled","_colorOutside","_maxSatelliteAlpha","_displayClass","_display","_playerIcon","_playerColor","_cloudTextures","_cloudsGrid","_cloudsMax","_cloudsSize","_map","_fade","_brief","_sounds","_music","_plainText","_playMusic","_preciseMarkers"];
+private _ok = false;
+private "_overcast";
+private "_scale";
+private _simulationEnabled = false;
+private _colorOutside = configNull;
+private _maxSatelliteAlpha = 0;
+private _display = controlNull;
+private _playerIcon = "";
+private _playerColor = configNull;
+private _cloudTextures = [];
+private _cloudsGrid = 0;
+private "_cloudsMax";
+private "_cloudsSize";
+private _map = controlNull;
+private _preciseMarkers = false;
 
 disableserialization;
 
 if (isDedicated) exitWith {};
 
-_mapCenter 			= _this select 0;
-_missions 			= _this select 1;
-_defaultScale 		= _this select 2;
-_brief 				= _this select 3;
-_sounds				= param [4, [], [[]]];
-_music				= param [5, "", [""]];
-_plainText			= param [6, [], [[]]];
-_playMusic 			=  param [8, 0,[0]];
+params [
+	["_mapCenter", [0,0,0], [[]]],
+	["_missions", [], [[]]],
+	["_defaultScale", 1, [0]],
+	["_brief", "", [""]],
+	["_sounds", [], [[]]],
+	["_music", "", [""]],
+	["_plainText", [], [[]]],
+	["_sidePlayer", sideUnknown, [sideUnknown]],
+	["_playMusic", 0, [0]]
+];
 _preciseMarkers		=  param [9, false,[false]];
 
 _mapCenter 			= _mapCenter call bis_fnc_position;
@@ -82,7 +99,13 @@ MCC_fnc_isUnitInBuilsing = {
 
 //Cinematic
 if (_playMusic == 0) then {
-	private ["_module","_object","_taskDescription","_sfx","_zoomEnd","_specialIntro","_units"];
+	private "_module";
+	private "_object";
+	private "_taskDescription";
+	private _sfx = "";
+	private _zoomEnd = 0;
+	private _specialIntro = false;
+	private "_units";
 
 		_object = ((((missionNamespace getVariable format ["MCC_missionsInfo_%1", side player]) select 1) select 0) select 8);
 
@@ -151,17 +174,26 @@ if (count _missions > 0) then {
 	_playerColor = (getarray (configfile >> "cfgingameui" >> "islandmap" >> "colorMe")) call BIS_fnc_colorRGBAtoHTML;
 
 	{
-		private ["_pos","_code","_title","_description","_player","_picture","_iconSize","_infoText","_codeParams"];
-		_pos = [_x,0,player] call bis_fnc_paramIn;
+		private "_pos";
+		private _code = {};
+		private _title = "";
+		private _description = "";
+		private _player = "";
+		private _picture = "";
+		private _iconSize = 0;
+		private _infoText = "";
+		private _codeParams = [];
+		_pos = _x param [0, player];
 		_pos = _pos call bis_fnc_position;
 
-		_code = [_x,1,{},[{}]] call bis_fnc_paramIn;
-		_title = [_x,2,"ERROR: MISSING TITLE",[""]] call bis_fnc_paramIn;
-		_description = [_x,3,"",[""]] call bis_fnc_paramIn;
-		_player = [_x,4,"",[""]] call bis_fnc_paramIn;
-		_picture = [_x,5,"",[""]] call bis_fnc_paramIn;
-		_iconSize = [_x,6,1,[1]] call bis_fnc_paramIn;
-		_codeParams = [_x,7,[],[[]]] call bis_fnc_param;
+		_code = _x param [1, {}, [{}, ""]];		// objectives built by fn_MWCreateTask store "" here
+		if (_code isEqualType "") then {_code = if (_code == "") then {{}} else {compile _code}};
+		_title = _x param [2, "ERROR: MISSING TITLE", [""]];
+		_description = _x param [3, "", [""]];
+		_player = _x param [4, "", [""]];
+		_picture = _x param [5, "", [""]];
+		_iconSize = _x param [6, 1, [1]];
+		_codeParams = _x param [7, [], [[]]];
 
 		_infoText = format ["<t size='1' color='#a8e748'>%1</t>",_title];
 		if (_player != "") then {_infoText = _infoText + format ["<br /><t size='0.2' color='#00000000'>-<br /></t><img size='1' image='%2' color='%3'/><t size='0.8'> %1</t>",_player,_playerIcon,_playerColor];};
@@ -187,7 +219,7 @@ if (count _missions > 0) then {
 };
 
 //--- Create the control
-_ok = createdialog "MCCMW_briefingMap";
+_ok = createdialog ("MCCMW_briefingMap" call MCC_fnc_dialogName);
 waituntil {_ok};
 _display = finddisplay MCCMW_briefingMap_IDD;
 ctrlshow [MCC_MWBriefingsTooltip_IDC,false];
@@ -230,7 +262,7 @@ for "_i" from 1 to (_cloudsMax) do {
 };
 
 MCC_fnc_MWMapOpen_draw = {
-	_map = _this select 0;
+	params ["_map"];
 	_mapSize = MCC_MWMap_mapSize / 2;
 	_display = ctrlparent _map;
 	_time = diag_ticktime;

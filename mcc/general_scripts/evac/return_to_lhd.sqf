@@ -1,6 +1,7 @@
 #define FLY_HIGHT 6101
 
-private ["_point1", "_flyInHight"];
+private "_point1";
+private "_flyInHight";
 
 if !mcc_isloading then 
 	{
@@ -18,14 +19,14 @@ if !mcc_isloading then
 	if (MCC_capture_state) then
 		{
 		MCC_capture_var = MCC_capture_var + FORMAT ['
-							[[%1, %2, 2],"MCC_fnc_evacMove",true,false] spawn BIS_fnc_MP;
+							[%1, %2, 2] remoteExec ["MCC_fnc_evacMove", 0, false];
 							'
 							,[_point1]
 							,_flyInHight
 							];
 		} else
 			{
-			[[[_point1], _flyInHight, 2],"MCC_fnc_evacMove",true,false] spawn BIS_fnc_MP;
+			[[_point1], _flyInHight, 2] remoteExec ["MCC_fnc_evacMove", 0, false];
 			};
 	}	
 		else { player globalchat "Access Denied"};

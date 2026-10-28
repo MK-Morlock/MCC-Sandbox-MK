@@ -1,5 +1,16 @@
 
-	private ["_color","_shape","_Type","_timer","_life","_position","_weight","_vol","_rub","_size","_PS","_unit", "_unitPos"];
+	private "_color";
+	private _shape = "";
+	private _timer = 0;
+	private _life = 0;
+	private _position = [];
+	private _weight = 0;
+	private _vol = 0;
+	private _rub = 0;
+	private _size = [];
+	private "_PS";
+	private "_unit";
+	private "_unitPos";
 	
 	//_unit = _this select 0;
 	//_PS = _this select 1;

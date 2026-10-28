@@ -3,9 +3,13 @@
 //  Parameter(s):
 //     	_ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_ctrl","_obj","_consType","_constLevel","_constType","_spawnPad","_spawnType"];
+private "_obj";
+private _consType = "";
+private _constLevel = 0;
+private _spawnPad = objNull;
+private "_spawnType";
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 _obj = MCC_ConsoleGroupSelected select 0;

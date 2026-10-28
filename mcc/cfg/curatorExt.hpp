@@ -54,14 +54,14 @@ class MCC_RscDisplayAttributes
 			h = "5.5 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
 			class controls{};
 		};
-		class ButtonOK: RscButtonMenuOK
+		class ButtonOK: MCC_RscButtonMenuOK
 		{
 			x = "28.5 * 					(			((safezoneW / safezoneH) min 1.2) / 40) + 		(safezoneX + (safezoneW - 					((safezoneW / safezoneH) min 1.2))/2)";
 			y = "16.1 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) + 		(safezoneY + (safezoneH - 					(			((safezoneW / safezoneH) min 1.2) / 1.2))/2)";
 			w = "5 * 					(			((safezoneW / safezoneH) min 1.2) / 40)";
 			h = "1 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
 		};
-		class ButtonCustom: RscButtonMenu
+		class ButtonCustom: MCC_RscButtonMenuStd
 		{
 			idc = 10006;
 			x = "23.4 * 					(			((safezoneW / safezoneH) min 1.2) / 40) + 		(safezoneX + (safezoneW - 					((safezoneW / safezoneH) min 1.2))/2)";
@@ -69,7 +69,7 @@ class MCC_RscDisplayAttributes
 			w = "5 * 					(			((safezoneW / safezoneH) min 1.2) / 40)";
 			h = "1 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
 		};
-		class ButtonCancel: RscButtonMenuCancel
+		class ButtonCancel: MCC_RscButtonMenuCancel
 		{
 			x = "6.5 * 					(			((safezoneW / safezoneH) min 1.2) / 40) + 		(safezoneX + (safezoneW - 					((safezoneW / safezoneH) min 1.2))/2)";
 			y = "16.1 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) + 		(safezoneY + (safezoneH - 					(			((safezoneW / safezoneH) min 1.2) / 1.2))/2)";

@@ -6,11 +6,18 @@
 // _y_correction: 		Integer
 //===========================================================================================================================================================================
 
-private ["_requestor","_x_correction","_y_correction","_cannons_to_fireReal","_cannonsObjects","_cannonsetup","_cannon","_splashpos","_firedelay","_artitype","_nrshells","_spread","_modelpos"];
+private _cannons_to_fireReal = [];
+private _cannonsObjects = [];
+private "_cannonsetup";
+private "_cannon";
+private "_splashpos";
+private "_firedelay";
+private "_artitype";
+private "_nrshells";
+private "_spread";
+private "_modelpos";
 
-_requestor 				= _this select 0;
-_x_correction 			= _this select 1;
-_y_correction 			= _this select 2;
+params ["_requestor", "_x_correction", "_y_correction"];
 
 _cannons_to_fireReal 	= _requestor getVariable ["requesting_cannonsReal",[]];
 
@@ -37,7 +44,7 @@ _cannonsObjects = [];
 
 	if (isPlayer _cannon) then
 	{
-		[[_cannon,_splashpos,_firedelay,_artitype,_nrshells,_spread], "MCC_fnc_artyGetSolution", _cannon, false] spawn BIS_fnc_MP;
+		[_cannon,_splashpos,_firedelay,_artitype,_nrshells,_spread] remoteExec ["MCC_fnc_artyGetSolution", _cannon, false];
 	}
 	else
 	{
@@ -56,7 +63,7 @@ _cannonsObjects = [];
 
 				_cannon doArtilleryFire [_splashpos, _artitype, 1];
 				waituntil {canfire _cannon};
-				sleep 5 + _firedelay;
+				sleep (5 + _firedelay);
 			};
 		};
 	};

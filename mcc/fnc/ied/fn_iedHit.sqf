@@ -1,8 +1,11 @@
 //===================================================================MCC_fnc_iedHit======================================================================================
 // Handle damage when IED has been shoot or damaged
 //==============================================================================================================================================================================	
-private ["_damageType","_ied","_fakeIed","_dummyMarker","_damage","_return"];
-_ied 		= _this select 0;
+private "_damageType";
+private "_fakeIed";
+private "_damage";
+private _return = 0;
+params ["_ied"];
 _fakeIed 	= _ied getvariable "fakeIed";
 _damage		= _this select 2;
 _damageType	= _this select 4;

@@ -6,11 +6,36 @@
 // Returns:
 //     <Nothing>
 //==============================================================================================================================================================================
- private ["_arrayGroups","_triggersArray","_allItems","_simItems","_logicItems","_arrayVehicles","_mission","_br","_object","_side","_array","_pos","_count",
-          "_seed","_newString","_finalString","_checkedGroups","_isKindofUnit","_saveAll","_allCuratorObjectives","_class"];
+ private _arrayGroups = [];
+ private "_triggersArray";
+ private "_allItems";
+ private "_simItems";
+ private "_logicItems";
+ private _arrayVehicles = [];
+ private _mission = "";
+ private "_br";
+ private "_object";
+ private "_side";
+ private "_pos";
+ private _count = 0;
+ private _seed = "";
+ private "_newString";
+ private _finalString = [];
+ private _checkedGroups = [];
+ private _isKindofUnit = false;
+ private _allCuratorObjectives = [];
+ private "_class";
 
-_saveAll = _this select 0;
+params ["_saveAll"];
 _br = toString [0x0D, 0x0A];
+
+// Double every double-quote character so free text (marker text, names, trigger text) cannot break the sqm string it is written into.
+private _esc = {
+	private _out = [];
+	{_out pushBack _x; if (_x == 34) then {_out pushBack 34}} forEach (toArray (format ["%1", _this]));
+	toString _out
+};
+private _addons = [];
 
 _checkedGroups		= [];
 _arrayGroups 		= [];
@@ -37,7 +62,7 @@ if (_saveAll) then
 }
 else
 {
-	_allItems		= curatorEditableObjects MCC_curator;
+	_allItems		= []; {_allItems append (curatorEditableObjects _x)} forEach allCurators; _allItems = _allItems arrayIntersect _allItems;	// every Zeus, not just MCC\'s (players may keep their own Zeus)
 
 	{
 		if (typeOf _x in ["ModuleObjective_F","ModuleObjectiveGetIn_F","ModuleObjectiveMove_F","ModuleObjectiveNeutralize_F","ModuleObjectiveProtect_F","MCC_ModuleObjective_FCurator"]) then
@@ -47,7 +72,7 @@ else
 	} foreach _allItems;
 
 	_allItems = _allItems - _allCuratorObjectives;
-	_triggersArray 	= MCC_triggers;
+	_triggersArray 	= missionNamespace getVariable ["MCC_triggers", []];
 };
 
 //Sort the arrays
@@ -95,8 +120,8 @@ else
 _mission = "version=12;" + _br
 		+ "class Mission" + _br
 		+ "{" + _br
-		+ "    addOns[] = {}; " + _br
-		+ "    addOnsAuto[] = {}; " + _br
+		+ "    addOns[] = {MCC_ADDONS_PLACEHOLDER}; " + _br
+		+ "    addOnsAuto[] = {MCC_ADDONS_PLACEHOLDER}; " + _br
 		+ "    randomSeed = " + _seed + ";" + _br;
 
 _mission = _mission
@@ -130,13 +155,25 @@ _mission = _mission
 
 
 
+// A group whose units are all dead would be written with no vehicles, which Eden reports as an error
+_arrayGroups = _arrayGroups select {({alive _x} count units (_x select 0)) > 0};
+
 _mission = _mission
 		+ "    class Groups" + _br
 		+ "    {" + _br
 		+ format ["        items= %1;", (count _arrayGroups + count _allCuratorObjectives)] + _br;
 
 //Groups
-private ["_group","_groupCounter","_blackListVehicles","_refinedGroup","_attachedUnit","_attachedUnitInit","_newName","_init","_desc","_owners"];
+private "_group";
+private _groupCounter = 0;
+private _blackListVehicles = [];
+private _refinedGroup = [];
+private _attachedUnit = objNull;
+private _attachedUnitInit = "";
+private _newName = "";
+private _init = "";
+private _desc = [];
+private _owners = "";
 _count = 0;
 _countID = 0;
 
@@ -146,6 +183,7 @@ if (count _allCuratorObjectives > 0) then
 		_object 	= _x;
 		_class		= typeOf _x;
 		_pos		= getpos _object;
+		{_addons pushBackUnique _x} forEach (unitAddons _class);
 		_mission = _mission
 				 + format ["        class Item%1", _count] + _br
 				 +         "        {" + _br
@@ -166,7 +204,7 @@ if (count _allCuratorObjectives > 0) then
 		if (!isnil {_object getvariable "text"}) then
 		{
 			_mission = _mission
-				+ format ["                       text=""%1"";", (_object getvariable "text")] + _br;
+				+ format ["                       text=""%1"";", (_object getvariable "text") call _esc] + _br;
 		};
 
 		_attachedUnit = _object getvariable ["bis_fnc_curatorAttachObject_object",objnull];
@@ -294,6 +332,7 @@ if (count _arrayGroups > 0) then
 						 + format ["                       id=%1;", _countID] + _br
 						 + format ["                       side= ""%1"";", _side] + _br
 						 + format ["                       vehicle=""%1"";", typeof _object] + _br;
+			{_addons pushBackUnique _x} forEach (unitAddons typeOf _object);
 
 			if (count crew _object > 0) then
 			{
@@ -332,7 +371,7 @@ if (count _arrayGroups > 0) then
 					{
 						_newString = (_object getvariable ["vehicleinit",""]) + format ["group _this setVariable ['GAIA_ZONE_INTEND',%1]",group _object getvariable ["GAIA_ZONE_INTEND",[]]];
 						_object setvariable ["vehicleinit",_newString];
-						systemchat "string:" + _newString;
+						systemchat ("string:" + _newString);
 					};
 
 					if (_group getvariable ["mcc_gaia_cache",false]) then
@@ -350,7 +389,7 @@ if (count _arrayGroups > 0) then
 			};
 
 			_mission = _mission
-						 + format ["                       rank=%1;",rank _object] + _br
+						 + format ["                       rank=""%1"";",rank _object] + _br
 						 + format ["                       skill=%1;",skill _object] + _br
 						 + format ["                       health=%1;",1 - (damage _object)] + _br
 						 + format ["                       fuel=%1;",fuel vehicle _object] + _br
@@ -360,7 +399,7 @@ if (count _arrayGroups > 0) then
 			{
 				//Set variable for sqm save
 				_newString = [(_object getvariable "vehicleinit"), "_this", "this"] call MCC_fnc_replaceString;
-				_finalString = [_newString, '"', "'"] call MCC_fnc_replaceString;
+				_finalString = [_newString, (toString [34]), "'"] call MCC_fnc_replaceString;
 
 				_mission = _mission
 						+ format ["                       init=""%1"";", _finalString] + _br;
@@ -369,7 +408,7 @@ if (count _arrayGroups > 0) then
 			if (!isnil {_object getvariable "text"}) then
 			{
 				_mission = _mission
-						+ format ["                       text=""%1"";", (_object getvariable "text")] + _br;
+						+ format ["                       text=""%1"";", (_object getvariable "text") call _esc] + _br;
 			};
 
 			_mission = _mission
@@ -384,7 +423,8 @@ if (count _arrayGroups > 0) then
 						+         "              };" + _br;
 
 
-		private ["_wpCounter","_wp"];
+		private _wpCounter = 0;
+		private "_wp";
 		if ((count (waypoints _group) > 0) && (count (waypoints _group) > currentWaypoint _group)) then
 		{
 			_mission = _mission
@@ -441,6 +481,7 @@ if ((count _arrayVehicles) > 0) then
 		_object = _x select 0;
 		_side 	= _x select 1;
 		_pos = getPos _object;
+		{_addons pushBackUnique _x} forEach (unitAddons typeOf _object);
 
 		_mission = _mission
 				 + format ["        class Item%1", _count] + _br
@@ -456,7 +497,7 @@ if ((count _arrayVehicles) > 0) then
 		if (!isnil {_object getvariable "vehicleinit"}) then
 		{
 			_newString = [(_object getvariable "vehicleinit"), "_this", "this"] call MCC_fnc_replaceString;
-			_finalString = [_newString, '"', "'"] call MCC_fnc_replaceString;
+			_finalString = [_newString, (toString [34]), "'"] call MCC_fnc_replaceString;
 
 			_mission = _mission
 				 + format ["             init=""%1"";",_finalString] + _br;
@@ -465,7 +506,7 @@ if ((count _arrayVehicles) > 0) then
 		if (!isnil {_object getvariable "text"}) then
 		{
 			_mission = _mission
-				+ format ["              text=""%1"";", (_object getvariable "text")] + _br;
+				+ format ["              text=""%1"";", (_object getvariable "text") call _esc] + _br;
 		};
 
 		_mission = _mission
@@ -507,18 +548,20 @@ if (count _triggersArray >0) then
 				+ format ["             timeoutMin=%1;",((triggerTimeout _object) select 0)] + _br
 				+ format ["             timeoutMid=%1;",((triggerTimeout _object) select 1)] + _br
 				+ format ["             timeoutMax=%1;",((triggerTimeout _object) select 2)] + _br
-				+ format ["             type=""%1"";",((triggerActivation _object) select 1)] + _br
+				+ format ["             activationType=""%1"";",((triggerActivation _object) select 1)] + _br
+				+ format ["             repeating=%1;",[0,1] select ((triggerActivation _object) param [2,false])] + _br
+				+ format ["             type=""%1"";",(["NONE", triggerType _object] select (triggerType _object != ""))] + _br
 				+         "             age=""UNKNOWN"";" + _br
-				+ format ["             text=""%1"";", triggerText _object] + _br
-				+ format ["             expCond=""%1"";", [_newString select 0, '"', "'"] call MCC_fnc_replaceString] + _br
-				+ format ["             expActiv=""%1"";", [_newString select 1, '"', "'"] call MCC_fnc_replaceString] + _br
-				+ format ["             expDesactiv=""%1"";",[_newString select 2, '"', "'"] call MCC_fnc_replaceString] + _br;
+				+ format ["             text=""%1"";", (triggerText _object) call _esc] + _br
+				+ format ["             expCond=""%1"";", [_newString select 0, (toString [34]), "'"] call MCC_fnc_replaceString] + _br
+				+ format ["             expActiv=""%1"";", [_newString select 1, (toString [34]), "'"] call MCC_fnc_replaceString] + _br
+				+ format ["             expDesactiv=""%1"";",[_newString select 2, (toString [34]), "'"] call MCC_fnc_replaceString] + _br;
 
 
 		if (!isnil {_object getvariable "text"}) then
 		{
 			_mission = _mission
-				+ format ["             name=""%1"";", (_object getvariable "text")] + _br;
+				+ format ["             name=""%1"";", (_object getvariable "text") call _esc] + _br;
 		};
 
 		_mission = _mission
@@ -537,7 +580,8 @@ if (count _triggersArray >0) then
 
 if (count allMapMarkers > 0) then
 {
-	private ["_marker","_markerCounter"];
+	private "_marker";
+	private _markerCounter = 0;
 
 	_markerCounter = 0;
 	_mission = _mission
@@ -552,9 +596,9 @@ if (count allMapMarkers > 0) then
 					+ format ["                   	  class Item%1", _markerCounter] + _br
 					+         "                   	  {           " + _br
 					+ format ["                       	  position[]={%1,%3,%2};",(markerPos _marker) select 0, (markerPos _marker) select 1, (markerPos _marker) select 2] + _br
-					+ format ["                       	  name=""%1"";",_marker] + _br
-					+ format ["                       	  text=""%1"";",markerText _marker] + _br
-					+ format ["                       	  markerType=""%1"";",markerShape _marker] + _br
+					+ format ["                       	  name=""%1"";",_marker call _esc] + _br
+					+ format ["                       	  text=""%1"";",(markerText _marker) call _esc] + _br
+					+ (if (markerShape _marker in ["RECTANGLE","ELLIPSE"]) then {format ["                       	  markerType=""%1"";",markerShape _marker] + _br} else {""})
 					+ format ["                       	  type=""%1"";",markerType  _marker] + _br
 					+ format ["                       	  colorName=""%1"";",markerColor   _marker] + _br
 					+ format ["                       	  a=%1;",(markerSize _marker) select 0] + _br
@@ -589,6 +633,13 @@ _mission = _mission
 		+ "    randomSeed = " + _seed + ";" + _br
 		+ "    class Intel {}; " + _br
 		+ "};" + _br;
+
+// List the addons the saved classes come from (it used to be empty, so Eden could not tell which mods the file needs)
+private _addonList = (_addons apply {str _x}) joinString ",";
+{
+	private _i = _mission find "MCC_ADDONS_PLACEHOLDER";
+	if (_i >= 0) then {_mission = (_mission select [0, _i]) + _addonList + (_mission select [_i + 22])};
+} forEach [1,2];
 
 copyToClipboard _mission;
 systemchat "Objects saved to clipboard as sqm file";

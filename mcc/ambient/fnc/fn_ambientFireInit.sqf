@@ -8,11 +8,30 @@ Starts a Init ambient fire - MUST RUN ON SERVER
 ==============================================================================================================================================================*/
 _module = param [0, objNull, [objNull]];
 
-//If we came here from Zeus run on the server
-if (!isnull curatorcamera  && (local _module)) then {
+//If we came here from Zeus: ask for the chances, then run on the server
+if (!isNull _module && {!isnull curatorcamera} && {local _module}) exitWith {
+	private _result = ["Ambient Fire",[
+		["Vehicle fire chance %",100,"Chance a destroyed vehicle starts a fire",missionNamespace getVariable ["MCC_fnc_ambientFireInitVehicleBurnChance",50]],
+		["Explosives fire chance",100,"Chance an explosive round starts a fire (scaled by how explosive it is)",missionNamespace getVariable ["MCC_fnc_ambientFireInitExplosivesBurnChance",3]],
+		["Fire spread chance %",100,"Chance a burning tree/house starts a new fire around it",missionNamespace getVariable ["MCC_ambientFireSpreadChance",40]]
+	]] call MCC_fnc_initDynamicDialog;
+	deleteVehicle _module;
+	if (count _result == 0) exitWith {};
+
+	{
+		missionNamespace setVariable [_x, round (_result select _forEachIndex), true];
+	} forEach ["MCC_fnc_ambientFireInitVehicleBurnChance","MCC_fnc_ambientFireInitExplosivesBurnChance","MCC_ambientFireSpreadChance"];
 	[objNull, localize "STR_DISP_CURATOR_AMBIENTFIRE_SUCCESS"] call bis_fnc_showCuratorFeedbackMessage;
-	if (!isServer) then {[] remoteExec ["MCC_fnc_ambientFireInit", 2]};
-	deleteVehicle (param [0,objNull,[objNull]]);
+	[] remoteExec ["MCC_fnc_ambientFireInit", 2];
+};
+
+//Placed in Eden: the modules chance attributes override the CBA settings (-1 = keep the CBA setting)
+if (!isNull _module && {isServer}) then {
+	{
+		_x params ["_attr","_var"];
+		private _val = _module getVariable [_attr, -1];
+		if (_val isEqualType 0 && {_val >= 0}) then {missionNamespace setVariable [_var, _val min 100, true]};
+	} forEach [["vehicleChance","MCC_fnc_ambientFireInitVehicleBurnChance"],["explosivesChance","MCC_fnc_ambientFireInitExplosivesBurnChance"],["spreadChance","MCC_ambientFireSpreadChance"]];
 };
 
 if  (!isServer || (missionNamespace getVariable ["MCC_ambientFireInit",false])) exitWith {};
@@ -28,7 +47,8 @@ MCC_fnc_ambientFireEntityKilled = {
 	private ["_vehicle","_crewBurning"];
 	_vehicle = param [0,objNull,[objNull]];
 
-	if (random 100 < (missionNamespace getVariable ["MCC_fnc_ambientFireInitVehicleBurnChance",50]) || !(missionNamespace getVariable ["MCC_ambientFireSettingIndex",true])) exitWith {};
+	//  lowering "Vehicle fire chance" made vehicle fires more likely)
+	if (random 100 >= (missionNamespace getVariable ["MCC_fnc_ambientFireInitVehicleBurnChance",50]) || !(missionNamespace getVariable ["MCC_ambientFireSettingIndex",true])) exitWith {};
 
 	if ((_vehicle isKindOf "Landvehicle") or (_vehicle isKindOf "Air")) then {
 
@@ -44,7 +64,7 @@ MCC_fnc_ambientFireEntityKilled = {
 		waituntil {isTouchingGround _vehicle};
 
 		{
-			sleep 2 + (random 3);
+			sleep (2 + (random 3));
 
 			[_x,_vehicle] spawn {
 				#define	FIRE_OBJECTSMALL	"IncinerateShell"
@@ -77,7 +97,7 @@ MCC_fnc_ambientFireEntityKilled = {
 				_time = time + (3 + (random 2));
 				while {time < _time} do	{
 					[_unit,format ["MCC_manScream_%1",(floor (random 7))+1],"say3d"] remoteExec ["bis_fnc_sayMessage", 0];
-					sleep 1 + (random 1);
+					sleep (1 + (random 1));
 				};
 
 				_unit setDamage 1;
@@ -90,7 +110,7 @@ MCC_fnc_ambientFireEntityKilled = {
 
 
 				//Delte fire
-				sleep 20 + random 30;
+				sleep (20 + random 30);
 				while {!isnull (attachedTo _effect)} do {detach _effect};
 				_nearObjects =  (getpos _effect) nearObjects 5;
 				{
@@ -99,7 +119,7 @@ MCC_fnc_ambientFireEntityKilled = {
 			};
 		} forEach _crewBurning;
 
-		sleep 5 + (random 10);
+		sleep (5 + (random 10));
 		_pos = getpos _vehicle;
 
 		if !(surfaceIsWater _pos) then {
@@ -115,5 +135,5 @@ if ((missionNamespace getVariable ["MCC_fnc_ambientFireInitEH",-1]) <=0) then {
 };
 
 
-//Add explosive rounds fire
-[] remoteExec ["MCC_fnc_ambientFirePlayerFiredEH",0];
+//Add explosive rounds fire (JIP too - players joining later never got the handler)
+[] remoteExec ["MCC_fnc_ambientFirePlayerFiredEH",0,"MCC_ambientFireFiredEH"];

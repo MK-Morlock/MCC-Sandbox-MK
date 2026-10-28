@@ -6,10 +6,16 @@
 //_type = string, "city","mil","hill","marine","nature"
 // Return - _locationsArray - array [[location,name],[location,name],[location,name].....]
 //===============================================================================================================================================================================
-private ["_name","_type","_cityLocations","_militaryLocations","_natureLocations","_hillsLocations","_marineLocations","_pos","_radius","_type","_locations","_markerColor","_locationsArray"];
-_pos 	= _this select 0;
-_radius = _this select 1;
-_type 	= _this select 2;
+private _name = "";
+private _cityLocations = [];
+private _militaryLocations = [];
+private _natureLocations = [];
+private _hillsLocations = [];
+private _marineLocations = [];
+private _locations = nil;
+private _markerColor = "";
+private _locationsArray = [];
+params [["_pos", [0,0,0], [[]]], ["_radius", 0, [0]], ["_type", "", [""]]];
 
 _cityLocations = ["Airport","CityCenter","FlatAreaCity","FlatAreaCitySmall","NameCity","NameCityCapital","NameVillage"];
 _militaryLocations = ["BorderCrossing","Strategic","StrongpointArea"];
@@ -51,7 +57,7 @@ switch (tolower _type) do
 	};
 };
 
-if (isnil "_locations") exitWith (diag_log format["MCC MW: fn_MWbuildLocations %1 no type of location was selected",_type]);
+if (isnil "_locations") exitWith {["WARN", "fn_MWbuildLocations", "no type of location was selected (%1)", [_type]] call MCC_fnc_log; []};
 
 {
 	_type = type _x;
@@ -60,6 +66,8 @@ if (isnil "_locations") exitWith (diag_log format["MCC MW: fn_MWbuildLocations %
 	if (missionNamespace getVariable ["MCC_debug",false]) then
 	{
 		createmarkerlocal [_name ,getpos _x];
+		if (isNil "MCCMK_debugMarkers") then {MCCMK_debugMarkers = []};
+		MCCMK_debugMarkers pushBackUnique _name;
 		_name setmarkertypelocal "mil_box";
 		_name setMarkerTextLocal format ["%1: %2",_name, _type];
 		_name setmarkerColorlocal _markerColor;

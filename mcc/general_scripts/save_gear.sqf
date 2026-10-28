@@ -1,6 +1,22 @@
-private ["_unit","_goggles","_headgear","_uniform","_uniformItems","_vest","_magazines","_primMag","_secmMag","_handMag","_assigneditems","_side","_vestItems","_handgunWeapon","_backpack","_primaryWeapon","_secondaryWeapon","_null","_killer"];
+private _goggles = "";
+private _headgear = "";
+private _uniform = "";
+private _uniformItems = [];
+private _vest = "";
+private _magazines = [];
+private _primMag = [];
+private _secmMag = [];
+private _handMag = [];
+private _assigneditems = [];
+private _vestItems = [];
+private _handgunWeapon = "";
+private _backpack = "";
+private _primaryWeapon = "";
+private _secondaryWeapon = "";
+private _null = [];
+private _killer = objNull;
 
-_unit 	= _this select 0;
+params ["_unit"];
 _killer = if (count _this > 1) then {_this select 1} else {objnull};
 
 
@@ -45,15 +61,13 @@ player setVariable ["MCC_medicBleeding",0,true];
 player setvariable ["MCC_medicRemainBlood",(missionNamespace getvariable ["MCC_medicBleedingTime",200])];
 player setCaptive false;
 
-//Fatigue
-if (missionNamespace getVariable ["MCC_disableFatigue",false]) then {
-	player enableFatigue false;
-};
+//Fatigue / stamina - re-apply the current choice either way (a respawned unit starts with stamina on)
+player enableStamina !(missionNamespace getVariable ["MCC_disableFatigue",false]);
 
 //Delete dead body
 if (missionNameSpace getVariable ["MCC_deletePlayersBody",false]) then {deleteVehicle _unit};
 
-_null = [(compile format ["MCC_curator addCuratorEditableObjects [[objectFromNetId '%1'],false];",netid player]), "BIS_fnc_spawn", false, false] call BIS_fnc_MP;
+_null = [[], (compile format ["MCC_curator addCuratorEditableObjects [[objectFromNetId '%1'],false];",netid player])] remoteExec ["call", 2, false];
 
 if (missionNamespace getvariable ["MCC_saveGear",false]) then {
 	[	_goggles,
@@ -82,7 +96,7 @@ if (missionNamespace getvariable ["MCC_saveGear",false]) then {
 
 //if lost curator for some reason
 if (((missionNamespace getvariable ["mcc_missionmaker",""])== name player) && (player != getAssignedCuratorUnit MCC_curator)) then {
-	[player, "MCC_fnc_assignCurator", false, false] spawn BIS_fnc_MP;
+	player remoteExec ["MCC_fnc_assignCurator", 2, false];
 };
 
 if (isnil "MCC_TRAINING") then {

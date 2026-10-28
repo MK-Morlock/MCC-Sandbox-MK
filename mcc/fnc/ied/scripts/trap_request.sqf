@@ -13,7 +13,10 @@
 //Made by Shay_Gman (c) 09.10
 
 disableSerialization;
-private ["_spawnType","_IEDtype","_trapsArray","_mccdialog"];
+private _spawnType = 0;
+private _IEDtype = 0;
+private _trapsArray = [];
+private _mccdialog = displayNull;
 _mccdialog = (uiNamespace getVariable "MCC_groupGen_Dialog");
 
 
@@ -93,7 +96,7 @@ if (mcc_missionmaker == (name player)) then 	{
 						while {!MCC3DgotValue && MCC3DRuning} do {sleep 0.2};
 						if (MCC3DRuning) then {
 							MCC_capture_var=MCC_capture_var + FORMAT ["
-							[[%1 , %2 select 0, %3 select 0, %4, %5 , %6, %7, %8, %9, %10 select 0,%11,false],""MCC_fnc_trapSingle"",false,false] call BIS_fnc_MP;
+							[%1 , %2 select 0, %3 select 0, %4, %5 , %6, %7, %8, %9, %10 select 0,%11,false] remoteExec [""MCC_fnc_trapSingle"", 2, false];
 							"
 							, MCC3DValue select 0
 							, trapkind
@@ -110,9 +113,6 @@ if (mcc_missionmaker == (name player)) then 	{
 							MCC3DgotValue = false;
 						};
 
-						Object3D = (trapkind select 0) createVehicle [0,0,0];
-						Object3D enableSimulation false;
-						Object3D AddEventHandler ["HandleDamage", {False}];
 
 						sleep 0.1;
 					};
@@ -125,14 +125,11 @@ if (mcc_missionmaker == (name player)) then 	{
 						while {!MCC3DgotValue && MCC3DRuning} do {sleep 0.2};
 
 						if (MCC3DRuning) then {
-							[[MCC3DValue select 0 , trapkind select 0, MCC_trapvolume select 0, IEDExplosionType, IEDDisarmTime , IEDJammable, IEDTriggerType, trapdistance, iedside, IedName select 0, MCC3DValue select 1,false,east],"MCC_fnc_trapSingle",false,false] call BIS_fnc_MP;
+							[MCC3DValue select 0 , trapkind select 0, MCC_trapvolume select 0, IEDExplosionType, IEDDisarmTime , IEDJammable, IEDTriggerType, trapdistance, iedside, IedName select 0, MCC3DValue select 1,false,east] remoteExec ["MCC_fnc_trapSingle", 2, false];
 							sleep 0.1;
 							MCC3DgotValue = false;
 						};
 
-						Object3D = (trapkind select 0) createVehicle [0,0,0];
-						Object3D enableSimulation false;
-						Object3D AddEventHandler ["HandleDamage", {False}];
 
 						sleep 0.1;
 					};
@@ -151,7 +148,7 @@ if (mcc_missionmaker == (name player)) then 	{
 				waituntil {!MCC_drawMinefield};
 				if (MCC_capture_state) then {
 					MCC_capture_var=MCC_capture_var + FORMAT ['
-					[[%1 select 0, %2 select 0,%3,%4],"MCC_fnc_mineSingle",false,false] call BIS_fnc_MP;
+					[%1 select 0, %2 select 0,%3,%4] remoteExec ["MCC_fnc_mineSingle", 2, false];
 					'
 					, trapkind
 					, IedName
@@ -159,7 +156,7 @@ if (mcc_missionmaker == (name player)) then 	{
 					, MCC_drawBoxZoneSize
 					];
 				} else {
-					[[trapkind select 0,IedName select 0,MCC_drawBoxZonePos ,MCC_drawBoxZoneSize],"MCC_fnc_mineSingle",false,false] call BIS_fnc_MP;
+					[trapkind select 0,IedName select 0,MCC_drawBoxZonePos ,MCC_drawBoxZoneSize] remoteExec ["MCC_fnc_mineSingle", 2, false];
 				};
 			};
 
@@ -177,7 +174,7 @@ if (mcc_missionmaker == (name player)) then 	{
 
 						if (MCC3DRuning) then {
 							MCC_capture_var=MCC_capture_var + FORMAT ["
-							[[%1 , %2 select 0, %3 , %4 select 0, %5],""MCC_fnc_ACSingle"",false,false] call BIS_fnc_MP;
+							[%1 , %2 select 0, %3 , %4 select 0, %5] remoteExec [""MCC_fnc_ACSingle"", 2, false];
 							"
 							, MCC3DValue select 0
 							, trapkind
@@ -189,9 +186,6 @@ if (mcc_missionmaker == (name player)) then 	{
 							MCC3DgotValue = false;
 						};
 
-						Object3D = (trapkind select 0) createVehicle [0,0,0];
-						Object3D enableSimulation false;
-						Object3D AddEventHandler ["HandleDamage", {False}];
 
 						sleep 0.1;
 					};
@@ -202,13 +196,10 @@ if (mcc_missionmaker == (name player)) then 	{
 						MCC3DgotValue = false;
 						while {!MCC3DgotValue && MCC3DRuning} do {sleep 0.2};
 						if (MCC3DRuning) then {
-							[[MCC3DValue select 0 , trapkind select 0, iedside, IedName select 0, MCC3DValue select 1],"MCC_fnc_ACSingle",false,false] call BIS_fnc_MP;
+							[MCC3DValue select 0 , trapkind select 0, iedside, IedName select 0, MCC3DValue select 1] remoteExec ["MCC_fnc_ACSingle", 2, false];
 							MCC3DgotValue = false;
 						};
 
-						Object3D = (trapkind select 0) createVehicle [0,0,0];
-						Object3D enableSimulation false;
-						Object3D AddEventHandler ["HandleDamage", {False}];
 
 						sleep 0.1;
 					};
@@ -222,7 +213,7 @@ if (mcc_missionmaker == (name player)) then 	{
 				if (MCC_capture_state) then {
 						onMapSingleClick " 	hint ""trap captured."";
 								MCC_capture_var=MCC_capture_var + FORMAT ['
-								[[%1 , %2 select 0, %3 select 0, %4, %5],""MCC_fnc_SBSingle"",true,false] call BIS_fnc_MP;
+								[%1 , %2 select 0, %3 select 0, %4, %5] remoteExec [""MCC_fnc_SBSingle"", 0, false];
 								'
 								, _pos
 								, trapkind
@@ -233,7 +224,7 @@ if (mcc_missionmaker == (name player)) then 	{
 								onMapSingleClick """";";
 					} else {
 						onMapSingleClick " 	hint ""trap placed."";
-								[[_pos , trapkind select 0,MCC_trapvolume select 0, IEDExplosionType, iedside],""MCC_fnc_SBSingle"",true,false] call BIS_fnc_MP;
+								[_pos , trapkind select 0,MCC_trapvolume select 0, IEDExplosionType, iedside] remoteExec [""MCC_fnc_SBSingle"", 0, false];
 								onMapSingleClick """";";
 					};
 			};
@@ -249,7 +240,7 @@ if (mcc_missionmaker == (name player)) then 	{
 				MCC_IEDisSpotter = 0;															//Not a spotter
 				IEDAmbushspawnname = GEN_INFANTRY select (lbCurSel MCC_TRAPS_AMBUSH) select 2; 		//Group
 			};
-		hint "click, hold and then drag the cursor to place the ambushe group pointing the desired direction";
+		hint "click, hold and then drag the cursor to place the ambush group facing the desired direction";
 		MCC_ambushPlacing = true;
 		};
 	};

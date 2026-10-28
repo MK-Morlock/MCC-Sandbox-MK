@@ -17,43 +17,43 @@ class MCC_Module_createShopCurator : MCC_Module_Base
 			displayName = "Action Text";
 			typeName = "STRING";
 			defaultValue = """Open Shop""";
-			property = "tittle";
+			property = "MCC_Module_createShopCurator_tittle";
 		};
 
 		class prices : Combo
 		{
 			displayName = "Prices";
-			description = "How expensive the preices will be";
+			description = "How expensive the prices will be";
 			typeName = "NUMBER";
-			property = "prices";
+			property = "MCC_Module_createShopCurator_prices";
 
 			class values
 			{
 				class veryCheap
 				{
 					name = "Very Low";
-					value = 0.1;
+					value = 10;
 				};
 				class Cheap
 				{
 					name = "Low";
-					value = 0.3;
+					value = 30;
 				};
 				class fair
 				{
 					name = "Fair";
-					value = 0.5;
+					value = 50;
 					default = 1;
 				};
 				class expensive
 				{
 					name = "Expensive";
-					value = 0.7;
+					value = 70;
 				};
 				class veryExpensive
 				{
 					name = "Very Expensive";
-					value = 1;
+					value = 100;
 				};
 			};
 		};
@@ -62,8 +62,8 @@ class MCC_Module_createShopCurator : MCC_Module_Base
 		class persistent : Checkbox
 		{
 			displayName = "Persistent";
-			description = "items in the shop will be saved over mission's restarts";
-			property = "persistent";
+			description = "Items in the shop will be saved across mission restarts";
+			property = "MCC_Module_createShopCurator_persistent";
 		};
 
 		class persistentName : Edit
@@ -72,7 +72,7 @@ class MCC_Module_createShopCurator : MCC_Module_Base
 			description = "Unique seed name for the persistent shop file";
 			typeName = "STRING";
 			defaultValue = """testShop""";
-			property = "persistentName";
+			property = "MCC_Module_createShopCurator_persistentName";
 		};
 
 		class ModuleDescription: ModuleDescription{};
@@ -96,7 +96,7 @@ class MCC_Module_createShopCurator : MCC_Module_Base
 
 		class ReammoBox
 		{
-			description = "The context of the box will be displayed as the items sold in the shop";
+			description = "The contents of the box will be displayed as the items sold in the shop";
 			displayName = "Ammobox";
 			side = 4;
 			position = 1;

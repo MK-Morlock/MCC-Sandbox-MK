@@ -170,9 +170,9 @@
         </Container>
         <Container name="ambientCiviliansCurator">
             <Key ID="STR_CURATOR_Module_ambientCiviliansCurator_displayName">
-                <Original>Ambient Unis</Original>
-                <English>Ambient Unis</English>
-                <Italian>Unis Ambientale</Italian>
+                <Original>Ambient Units</Original>
+                <English>Ambient Units</English>
+                <Italian>Unità Ambientali</Italian>
             </Key>
             <Key ID="STR_CURATOR_Module_ambientCiviliansCurator_isCiv_displayName">
                 <Original>Ambient Patrols</Original>
@@ -254,7 +254,7 @@
                 <English>Good</English>
                 <Italian>Bene</Italian>
             </Key>
-            <Key ID="STR_CURATOR_Module_ambientCiviliansCurator_civRelations_Very Good">
+            <Key ID="STR_CURATOR_Module_ambientCiviliansCurator_civRelations_veryGood">
                 <Original>Very Good</Original>
                 <English>Very Good</English>
                 <Italian>Molto Bene</Italian>

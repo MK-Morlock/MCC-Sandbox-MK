@@ -13,7 +13,22 @@
         BOOLEAN - true - if the player succeed in the minigame
 */
 
-private ["_difficulty","_array","_ok","_display","_ctrlBackground","_ctrlTitle","_ctrlBackgroundPos","_ctrlTitlePos","_ctrlTitleOffsetY","_ctrlContent","_ctrlContentPos","_ctrlContentOffsetY","_posY","_posX","_serialNumbers","_serialNumber","_object"];
+private _difficulty = "";
+private _array = [];
+private _ok = false;
+private _display = controlNull;
+private _ctrlBackground = controlNull;
+private _ctrlTitle = controlNull;
+private "_ctrlBackgroundPos";
+private "_ctrlTitlePos";
+private "_ctrlTitleOffsetY";
+private _ctrlContent = controlNull;
+private "_ctrlContentPos";
+private "_ctrlContentOffsetY";
+private "_posY";
+private "_posX";
+private _serialNumbers = [];
+private "_serialNumber";
 disableSerialization;
 
 #define IDC_BASE 100
@@ -57,7 +72,10 @@ player setVariable ["MCC_bombDefuseSuccess",false];
 player setVariable ["MCC_bombDefuseStrikes",0];
 player setVariable ["MCC_bombDefuseReady",false];
 
-private ["_moduleType","_ctrlGroup","_controlTittle","_control","_index","_ctrls"];
+private "_moduleType";
+private _ctrlGroup = controlNull;
+private _control = controlNull;
+private _ctrls = [];
 
 //Set the control groups
 _ctrls = [];

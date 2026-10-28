@@ -6,28 +6,43 @@
 // Returns:
 //     <Nothing>
 //==============================================================================================================================================================================	
- private ["_obj","_type","_mission","_objPos", "_dX", "_dY", "_z", "_azimuth", "_fuel", "_damage", "_vehicleinit","_sim","_anchorPos","_br","_start"];
+ private "_obj";
+ private "_type";
+ private _mission = "";
+ private "_objPos";
+ private "_dX";
+ private "_dY";
+ private "_z";
+ private "_azimuth";
+ private "_fuel";
+ private "_damage";
+ private "_vehicleinit";
+ private _sim = "";
+ private "_br";
+ private _start = false;
  
-_anchorPos = _this select 0;
+params ["_anchorPos"];
 _br = toString [0x0D, 0x0A];
 _start = true; 
 
-diag_log "###########################################";
-diag_log "# Log: MCC_fnc_saveToComp : StartGrabbing #";
-diag_log "###########################################";
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "###########################################"};
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "# Log: MCC_fnc_saveToComp : StartGrabbing #"};
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "###########################################"};
 
 _mission = "[" + _br; 
 
-diag_log text "[";
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text "["};
+private _saveObjs = [];
 {
-	if (typeName _x == "ARRAY") then	//Vehicle
-	{
-		_obj = _x select 0; 
-	}
-	else
-	{
-		_obj = _x; 
+	if (_x isEqualType []) then {
+		_saveObjs pushBack (_x select 0);
+		_saveObjs append ((_x param [1, []]) select {_x isEqualType objNull});
+	} else {
+		_saveObjs pushBack _x;
 	};
+} forEach MCC_lastSpawn;
+{
+	_obj = _x;
 	
 
 	_type = typeOf _obj;
@@ -46,26 +61,26 @@ diag_log text "[";
 		_vehicleinit = if (isnil {_obj getvariable "vehicleinit"}) then {{}} else {_obj getvariable "vehicleinit";};
 		if (_start) then
 		{
-			diag_log text(format ["    %1", [_type, [_dX, _dY, _z], _azimuth, _fuel, _damage, _vehicleinit]]);
+			if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text(format ["    %1", [_type, [_dX, _dY, _z], _azimuth, _fuel, _damage, _vehicleinit]])};
 			_mission = _mission + (format ["    %1", [_type, [_dX, _dY, _z], _azimuth, _fuel, _damage, _vehicleinit]]) + _br;
 			_start = false; 
 		}
 		else
 		{
-			diag_log text(format ["    ,%1", [_type, [_dX, _dY, _z], _azimuth, _fuel, _damage, _vehicleinit]]);
+			if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text(format ["    ,%1", [_type, [_dX, _dY, _z], _azimuth, _fuel, _damage, _vehicleinit]])};
 			_mission = _mission + (format ["    ,%1", [_type, [_dX, _dY, _z], _azimuth, _fuel, _damage, _vehicleinit]]) + _br;
 		};
 	};
-} foreach MCC_lastSpawn; 
+} foreach _saveObjs;
 
 _mission = _mission + "]";
 
-diag_log text "];";
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text "];"};
 
-diag_log "###########################################";
-diag_log "# Log: MCC_fnc_saveToComp : EndGrabbing   #";
-diag_log "###########################################";
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "###########################################"};
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "# Log: MCC_fnc_saveToComp : EndGrabbing   #"};
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "###########################################"};
 
 copyToClipboard _mission;
-systemchat "Objects saved to clipboard and droped to rpt file in a composition's format";
+systemchat "Objects saved to the clipboard and written to the RPT file in composition format";
 _mission;

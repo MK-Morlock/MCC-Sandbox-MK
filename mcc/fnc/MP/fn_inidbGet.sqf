@@ -1,15 +1,23 @@
 //==================================================================MCC_fnc_LootGet======================================================================================
 // Global execute a command on server only  - SERVER ONLY
-// Example: [[varName,playerID,VarDefaultValue], "MCC_fnc_getVariable", false, false] spawn BIS_fnc_MP;
+// Example: [varName,playerID,VarDefaultValue] remoteExec ["MCC_fnc_getVariable", false, false];
 //==============================================================================================================================================================================
-private ["_varName1","_varName2","_varName3","_read","_id","_value","_player","_varType","_valueExist","_var"];
-_varName1 	=  [_this,0,"",[""]] call bis_fnc_param;
-_varName2 	=  [_this,1,"",[""]] call bis_fnc_param;
-_varName3 	=  [_this,2,"",[""]] call bis_fnc_param;
-_varType	=  [_this,3,"",[""]] call bis_fnc_param;
-_player		= [_this,4,objNull,[objNull]] call bis_fnc_param;
-_read		= [_this,5,true,[true]] call bis_fnc_param;
-_value		= [_this,6,[]] call bis_fnc_param;
+private _varName1 = "";
+private _varName2 = "";
+private _varName3 = "";
+private _read = false;
+private "_id";
+private _value = [];
+private _player = objNull;
+private _varType = "";
+private "_var";
+_varName1 	=  _this param [0, "", [""]];
+_varName2 	=  _this param [1, "", [""]];
+_varName3 	=  _this param [2, "", [""]];
+_varType	=  _this param [3, "", [""]];
+_player		= _this param [4, objNull, [objNull]];
+_read		= _this param [5, true, [true]];
+_value		= _this param [6, []];
 
 _var = switch (toupper _varType) do {
 			    case "ARRAY": {[]};
@@ -31,7 +39,7 @@ if (_read) exitWith {
 		};
 
 	//returns value
-	[[_value,_id], "MCC_fnc_inidbSet", _player, false] spawn BIS_fnc_MP;
+	[_value,_id] remoteExec ["MCC_fnc_inidbSet", _player, false];
 };
 
 

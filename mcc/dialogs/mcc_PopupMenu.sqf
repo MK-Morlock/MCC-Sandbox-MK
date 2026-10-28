@@ -1,6 +1,10 @@
 #define CP_RESPAWNPANEL_IDD (uiNamespace getVariable "CP_RESPAWNPANEL_IDD")
 
-private ["_ok","_key","_index","_commander","_screen"];
+private _ok = false;
+private _key = nil;
+private _index = 0;
+private _commander = false;
+private _screen = 0;
 disableSerialization;
 
 _key = _this;
@@ -35,22 +39,28 @@ if (_index == 0) exitWith {
 					while {dialog} do {closeDialog 0};
 				};
 
-				_ok = createDialog "mcc_loginDialog";
-				if !(_ok) exitWith { hint "createDialog failed" };
+				//No login screen: log in straight away (as its Login button did); MCC_fnc_loginDialog asks the server, then
+				//opens MCC again, which shows the console once this player is the mission maker. One try at a time, so a
+				//refused login (someone else is the mission maker) does not keep retrying.
+				if (time < (missionNamespace getVariable ["MCC_loginTryUntil", -1])) exitWith {
+					hint format ["MCC is in use by the mission maker %1", missionNamespace getVariable ["mcc_missionmaker", ""]];
+				};
+				MCC_loginTryUntil = time + 6;
+				[] spawn MCC_fnc_loginDialog;
 			};
 			case 1:
 			{
-				_ok = createDialog "MCC3D_Dialog";
+				_ok = createDialog ("MCC3D_Dialog" call MCC_fnc_dialogName);
 				if !(_ok) exitWith { hint "createDialog failed" };
 			};
 			case 2:
 			{
-				_ok = createDialog "mcc_groupGen";
+				_ok = createDialog (['mcc_groupGen', 'mcc_groupGenButtons'] select (profileNamespace getVariable ['MCC_consoleButtons', false]));
 				if !(_ok) exitWith { hint "createDialog failed" };
 			};
 			case 3:
 			{
-				_ok = createDialog "MCCMWDialog";
+				_ok = createDialog ("MCCMWDialog" + (['', 'Buttons'] select (profileNamespace getVariable ['MCC_consoleButtons', false])));
 				if !(_ok) exitWith { hint "createDialog failed" };
 			};
 		};
@@ -77,11 +87,11 @@ if ((_index == 1) && _commander && (missionNamespace getVariable ["MCC_allowCons
 //Squad Dialog
 if (_index == 2) exitWith {
 	while {dialog} do {closeDialog 0; sleep 0.01};
-	createDialog "CP_RESPAWNPANEL";
+	createDialog ("CP_RESPAWNPANEL" call MCC_fnc_dialogName);
 };
 
 //SQL PDA
 if (_index == 3 && ((count units player > 1) && (leader player == player)) && (missionNamespace getVariable ["MCC_allowsqlPDA",true])) exitWith {
 	while {dialog} do {closeDialog 0};
-	createDialog "MCC_SQLPDA";
+	createDialog ("MCC_SQLPDA" call MCC_fnc_dialogName);
 };

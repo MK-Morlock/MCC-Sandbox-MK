@@ -1,5 +1,11 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params","_ctrl","_pressed","_posX","_posY","_shift","_ctrlKey","_alt","_marker","_markerPos","_markerDir","_spawn","_away","_ammount","_dir"];
+private "_ctrl";
+private "_pressed";
+private "_posX";
+private "_posY";
+private "_shift";
+private "_ctrlKey";
+private "_alt";
 disableSerialization;
 #define MCC_sqlpdaMenu0 (uiNamespace getVariable "MCC_sqlpdaMenu0")
 #define MCC_sqlpdaMenu1 (uiNamespace getVariable "MCC_sqlpdaMenu1")
@@ -7,7 +13,7 @@ disableSerialization;
 #define MCC_CONSOLEINFOLIVEFEED (uiNamespace getVariable "MCC_CONSOLEINFOLIVEFEED")
 #define MCC_CONSOLEINFOTEXT (uiNamespace getVariable "MCC_CONSOLEINFOTEXT")
 
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _pressed = _params select 1;
@@ -27,4 +33,5 @@ if ((_pressed == 0 || _pressed == 1) && !MCC_doubleClicked) then 								//Close
 	{
 		_x ctrlshow false;
 	} foreach [MCC_sqlpdaMenu0,MCC_sqlpdaMenu1,MCC_sqlpdaMenu2,MCC_CONSOLEINFOLIVEFEED,MCC_CONSOLEINFOTEXT];
+	if (!isNil "MCC_fnc_SQLPDAMenuBg") then {[] call MCC_fnc_SQLPDAMenuBg};
 };

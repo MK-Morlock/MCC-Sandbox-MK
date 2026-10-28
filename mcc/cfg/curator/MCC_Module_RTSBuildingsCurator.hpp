@@ -16,7 +16,8 @@ class MCC_Module_RTSBuildingsCurator : MCC_Module_Base
 		{
 			displayName = "Building";
 			typeName = "STRING";
-			property = "building";
+			defaultValue = """MCC_rts_storage1""";
+			property = "MCC_Module_RTSBuildingsCurator_building";
 
 			class values
 			{
@@ -129,7 +130,8 @@ class MCC_Module_RTSBuildingsCurator : MCC_Module_Base
 		{
 			displayName = "Side";
 			typeName = "NUMBER";
-			property = "side";
+			defaultValue = "1";
+			property = "MCC_Module_RTSBuildingsCurator_side";
 
 			class values
 			{

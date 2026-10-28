@@ -10,12 +10,18 @@
 #define SPAWNAWARNESS 1025
 #define MCC_ZONE_LOC 1026
 
-private ["_type","_groupArray","_nul","_zonePos","_comboBox","_group","_mccdialog"];
+private "_type";
+private "_groupArray";
+private _nul = [];
+private "_zonePos";
+private _comboBox = controlNull;
+private "_group";
+private _mccdialog = controlNull;
 disableSerialization;
 if (mcc_missionmaker == (name player)) then 
 {
 	if (count mcc_zone_pos == 0) exitWith {hint "Create a zone first"};	//Failsafe incase we trying to spawn something without making a zone first
-	_zonePos = (mcc_zone_pos select (lbCurSel MCCZONENUMBER)+1);
+	_zonePos = mcc_zone_pos param [["number"] call MCC_fnc_zoneList, nil];
 	if (isnil "_zonePos") exitWith {hint "Create a zone first"};	//Failsafe incase we trying to spawn something without making a zone first
 	//Group
 	if ((lbCurSel SPAWNTYPE) == 1) then 
@@ -46,7 +52,11 @@ if (mcc_missionmaker == (name player)) then
 		 //Garrison
 		if (((MCC_groupTypes select (lbCurSel SPAWNBRANCH) select 0)) =="Garrison") exitWith 
 		{							
-			private ["_center","_radius","_action","_intanse","_faction"];
+			private "_center";
+			private "_radius";
+			private _action = 0;
+			private _intanse = 0;
+			private _faction = "";
 			_center = (mcc_zone_pos select (mcc_zone_number));
 			_radius = (((mcc_zone_size select (mcc_zone_number))select 0) + ((mcc_zone_size select (mcc_zone_number)) select 1))/2;
 			_faction = getText (configFile >> "CfgVehicles" >> (U_GEN_SOLDIER select 0 select 1) >> "faction");
@@ -80,7 +90,7 @@ if (mcc_missionmaker == (name player)) then
 			if (MCC_capture_state) then	
 			{
 				MCC_capture_var = MCC_capture_var + FORMAT ['
-					[[%1,%2,%3,%4,"%5","%6"],"MCC_fnc_garrison",true,false] call BIS_fnc_MP;;
+					[%1,%2,%3,%4,"%5","%6"] remoteExec ["MCC_fnc_garrison", 0, false];;
 					'
 					,_center
 					,_radius
@@ -93,7 +103,7 @@ if (mcc_missionmaker == (name player)) then
 			else 
 			{
 					mcc_safe = mcc_safe + FORMAT ['
-					[[%1,%2,%3,%4,"%5","%6"],"MCC_fnc_garrison",true,false] call BIS_fnc_MP;;
+					[%1,%2,%3,%4,"%5","%6"] remoteExec ["MCC_fnc_garrison", 0, false];;
 					'
 					,_center
 					,_radius
@@ -102,7 +112,7 @@ if (mcc_missionmaker == (name player)) then
 					,_faction
 					,mcc_sidename
 					];
-					[[_center,_radius,_action,_intanse,_faction,mcc_sidename],"MCC_fnc_garrison",true,false] call BIS_fnc_MP;;
+					[_center,_radius,_action,_intanse,_faction,mcc_sidename] remoteExec ["MCC_fnc_garrison", 0, false];;
 			};
 		};
 			

@@ -23,7 +23,7 @@
 
 disableSerialization;
 
-private ['_splashpos'];
+private "_splashpos";
 
 _requestor = player;
 _dlg = findDisplay BON_ARTY_DIALOG;

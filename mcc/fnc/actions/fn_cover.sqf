@@ -2,7 +2,45 @@
 //Manage cover mechanics
 // Example: [] call MCC_fnc_cover;
 //==================================================================================================================================================================*/
-private ["_center","_left","_right","_up","_cover","_centerFront","_leftFront","_rightFront","_upFront","_cover","_headPos","_currentAnim","_string","_centerFrontFarLeft","_centerFrontFarRight","_stance","_isWall","_pos","_leftFrontClose","_rightFrontClose","_rightClose","_leftClose","_pelvis","_pelvisFront","_pelvisFrontFarLeft","_pelvisFrontFarRight","_centerpelvis","_upFrontLeft","_upFrontRight","_obstacleLow","_obstacleMed","_obstacleHigh","_openingHigh","_openingMed","_openingLow","_centerpelvisDown","_pelvisDownFront","_pelvisDownFrontFarLeft","_pelvisDownFrontFarRight"];
+private "_center";
+private "_left";
+private "_right";
+private "_up";
+private _cover = false;
+private "_centerFront";
+private "_leftFront";
+private "_rightFront";
+private "_upFront";
+private _cover = false;
+private "_headPos";
+private "_currentAnim";
+private _string = "";
+private "_centerFrontFarLeft";
+private "_centerFrontFarRight";
+private "_stance";
+private _isWall = false;
+private "_pos";
+private "_leftFrontClose";
+private "_rightFrontClose";
+private "_rightClose";
+private "_leftClose";
+private "_pelvis";
+private "_pelvisFront";
+private "_pelvisFrontFarLeft";
+private "_pelvisFrontFarRight";
+private "_centerpelvis";
+private "_upFrontLeft";
+private "_upFrontRight";
+private "_obstacleLow";
+private "_obstacleMed";
+private "_obstacleHigh";
+private _openingHigh = false;
+private _openingMed = false;
+private _openingLow = false;
+private "_centerpelvisDown";
+private "_pelvisDownFront";
+private "_pelvisDownFrontFarLeft";
+private "_pelvisDownFrontFarRight";
 #define	 MCC_fnc_coverPELVISDOWN	-0.5
 
 if(alive player && vehicle player == player && (missionNamespace getVariable ["MCC_cover",false])) then {
@@ -139,11 +177,9 @@ if(alive player && vehicle player == player && (missionNamespace getVariable ["M
 		if (cameraView == "GUNNER" && _cover in ["up","left","right"] && speed player == 0 && !(player getVariable ["MCC_fnc_coverInCover",false])) exitWith {
 
 			[_cover] spawn {
-				private ["_cover","_currentAnim","_pos"];
-
-				_cover = _this select 0;
-				_currentAnim = animationState player;
-				_pos = getpos player;
+				private _cover = _this select 0;
+				private _currentAnim = animationState player;
+				private _pos = getpos player;
 
 				player setVariable ["MCC_fnc_coverInCover",true];
 

@@ -3,14 +3,10 @@
 //==================================================================================================================================================================================
 #define MCC_HELPER "UserTexture1m_F"
 
-private ["_markerName","_mark","_path","_pos","_type","_text","_time","_index","_color","_helpersArray","_helper"];
-_markerName =_this select 0;
-_path	 	=_this select 1;
-_pos	 	=_this select 2;
-_type	 	=_this select 3;
-_text	 	=_this select 4;
-_time	 	=_this select 5;
-_color	 	=_this select 6;
+private "_mark";
+private _helpersArray = [];
+private _helper = objNull;
+params ["_markerName", "_path", "_pos", "_type", "_text", "_time", "_color"];
 
 
 _mark = createmarkerlocal [_markerName,_pos];
@@ -28,7 +24,8 @@ missionNamespace setVariable ["MCC_knownTargetsTags",_helpersArray];
 
 
 [_markerName, _helper] spawn {
-	private ["_helper","_helpersArray"];
+	private "_helper";
+	private _helpersArray = [];
 	sleep 120;
 		//deleteMarker
 		deletemarkerlocal (_this select 0);

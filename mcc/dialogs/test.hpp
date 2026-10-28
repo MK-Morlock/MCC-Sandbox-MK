@@ -23,7 +23,7 @@ class mcc_test
 					y = 0 * safezoneH;
 					w = 0.273281 * safezoneW;
 					h = 0.154 * safezoneH;
-					colorBackground[] = {0,0,0,0.7};
+					colorBackground[] = {0.11,0.12,0.13,0.96};
 				};
 
 				class bckframe: MCC_RscFrame

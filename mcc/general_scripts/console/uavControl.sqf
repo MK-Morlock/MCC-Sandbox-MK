@@ -1,9 +1,8 @@
 #define MCC_CONSOLE_UAV_MISSILE 9109
 
-private ["_control","_action","_string","_uav"];
+private _uav = objNull;
 disableSerialization;
-_action = _this select 0;
-_control = _this select 1;
+params ["_action", "_control"];
 
 switch (_action) do
 {
@@ -13,7 +12,7 @@ switch (_action) do
 		if (!alive _uav) exitWith {};
 
 		(_control select 0) ctrlSetTooltip str (_control select 1);
-		[_uav,sliderPosition (_control select 0)] remoteExec ["flyInHeight",_uav];
+		[_uav,sliderPosition (_control select 0)] remoteExec ["MCC_fnc_uavSetHeight",_uav];
 	};
 
 	case 1:
@@ -22,7 +21,7 @@ switch (_action) do
 		if (!alive _uav) exitWith {};
 
 
-		[_uav,MCC_ConsoleUAVmissiles select 2] remoteExec ["fire",_uav];
+		[MCC_ConsoleUAVmissiles param [4, _uav], MCC_ConsoleUAVmissiles select 2] remoteExec ["fire",_uav];
 	};
 
 	case 2:

@@ -7,8 +7,16 @@
 // <OUT>
 //		nothing
 //===========================================================================================================================================================================
-private["_pos","_vehicle","_cargoNum","_fillSlots","_locGr","_convoyGroupArray","_group","_unitsArray","_type","_unit"];
-_vehicle = _this select 0;
+private _pos = [];
+private _cargoNum = [];
+private _fillSlots = 0;
+private _locGr = [];
+private _convoyGroupArray = [];
+private _group = [];
+private _unitsArray = [];
+private _type = "";
+private _unit = objNull;
+params ["_vehicle"];
 _pos = getPosATL _vehicle;
 
 //Define Stuff
@@ -44,7 +52,7 @@ if (_cargoNum > 2) then {
 
 				{
 					_unitsArray	set [ count _unitsArray, _x select 0];
-				} foreach ( [faction _vehicle,"soldier"] call MCC_fnc_makeUnitsArray );
+				} foreach ( [[faction _vehicle,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry );
 
 
 				if !( (count _unitsArray) == 0 ) then {
@@ -75,9 +83,8 @@ if (_cargoNum > 2) then {
 
 		[_vehicle, _group] spawn
 		{
-			private ["_vehicle","_group"];
-			_vehicle = _this select 0;
-			_group = _this select 1;
+			private _vehicle = _this select 0;
+			private _group = _this select 1;
 
 			sleep 15;
 			//Delete not needed units

@@ -14,14 +14,21 @@ params [
 	["_isTire",true,[true]]
 ];
 
-private ["_availableWheels","_vehicle","_success","_dummy","_sparePart","_str","_sparePartName","_workTime"];
+private "_availableWheels";
+private _vehicle = objNull;
+private _success = [];
+private _dummy = objNull;
+private _sparePart = "";
+private _str = "";
+private _sparePartName = "";
+private _workTime = 0;
 
 _vehicle = player getVariable ["interactWith",objNull];
 _sparePart = if (_isTire) then {"Tire_Van_02_Cargo_F"} else {"Land_TankTracks_01_long_F"};
 _sparePartName = if (_isTire) then {"Tire"} else {"Track"};
 _workTime = 3;
 
-if (isNull _vehicle || _hp == "") exitWith {diag_log "MCC_fnc_vehicleTireChange: Error can't replace null vehicle or null tire"};
+if (isNull _vehicle || _hp == "") exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC_fnc_vehicleTireChange: Error can't replace null vehicle or null tire"}};
 
 //Are we installing or removing part?
 if ((_vehicle getHitPointDamage _hp) >= 1) then {
@@ -44,8 +51,7 @@ if ((_vehicle getHitPointDamage _hp) >= 1) then {
 			_dummy setPos (player modelToworld [-2,0,1]);
 		};
 	} else {
-		_str = "<t size='1' t font = 'puristaLight' color='#FFFFFF'>" + format ["No Spare %1 Nearby",_sparePartName] + "</t>";
-		_0 = [_str,0,0.2,5,1,0.0] spawn bis_fnc_dynamictext;
+		[format ["No Spare %1 Nearby",_sparePartName], 5] spawn MCC_fnc_rsMessage;
 	};
 
 } else {

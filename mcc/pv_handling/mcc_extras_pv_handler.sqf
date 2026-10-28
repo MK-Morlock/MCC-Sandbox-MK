@@ -1,11 +1,11 @@
 //==============================================================================XEH================================================================================================
 MCC_3D_PLACER = compile preProcessFileLineNumbers format["%1mcc\pop_menu\3rd_placer.sqf",MCC_path];
+MCC_fnc_simpleSpawn = {_this execVM (MCC_path + "mcc\pop_menu\simple_spawn.sqf")};
 
 //------------------------------- SERVER FUNCTIONS------------------------------------------
 if ( (isServer) || (MCC_isLocalHC) ) then {
 	//mcc_patrol_switch = compile preProcessFileLineNumbers format["%1mcc\pop_menu\patrol_switch.sqf",MCC_path];
 	mcc_fps_running = false;
-	MCC_fnc_simpleSpawn = {[(_this select 0), (_this select 1), (_this select 2), (_this select 3), (_this select 4), (_this select 5), (_this select 6), (_this select 7), (_this select 8)] execVM MCC_path + "mcc\pop_menu\simple_spawn.sqf"};
 	MCC_fnc_FPS = {[(_this select 0)] execVM MCC_path + "mcc\pop_menu\fps_benchmark.sqf";};
 };
 
@@ -22,7 +22,7 @@ if (isServer) then {
 
 //===================================================================MCC_fnc_boxGenerator======================================================================================
 // Create an empty box with the given weapons and items
-// Example: [[_pos, _dir, _weapons, _magazines,_items,_rucks],"MCC_fnc_boxGenerator",true,false] spawn BIS_fnc_MP;
+// Example: [_pos, _dir, _weapons, _magazines,_items,_rucks] remoteExec ["MCC_fnc_boxGenerator", true, false];
 // Params:
 // 	_pos: array position
 // 	_dir: number - direction
@@ -35,7 +35,7 @@ if (isServer) then {
 
 //===================================================================MCC_fnc_placeConvoy======================================================================================
 // Place a convoy up to 5 cars facing the direction stated with ot without an HVT
-// Example:[[vehicle1, vehicle2, vehicle3, vehicle4, vehicle5,start, heading, side,VIPcalss,VIPcar],'MCC_fnc_placeConvoy',true,false] spawn BIS_fnc_MP;
+// Example:[vehicle1, vehicle2, vehicle3, vehicle4, vehicle5,start, heading, side,VIPcalss,VIPcar] remoteExec ['MCC_fnc_placeConvoy', true, false];
 // Params:
 // 	vehicle1, vehicle2, vehicle3, vehicle4, vehicle5: string, vehicle class leave "" to not spawn a vehicle
 // 	start: array, position, start location
@@ -48,7 +48,7 @@ if (isServer) then {
 
 //===================================================================MCC_fnc_startConvoy======================================================================================
 // Make the convoy drive through the specific waypoints
-// Example:[[[wp1, wp2, wp3], isVIP],'MCC_fnc_startConvoy',true,false] call BIS_fnc_MP;
+// Example:[[wp1, wp2, wp3], isVIP] remoteExec ['MCC_fnc_startConvoy', true, false];
 // Params:
 // 	[wp1, wp2, wp3]: array, waypoints positions
 // 	isVIP: string, if = "0" no vip else there is a vip

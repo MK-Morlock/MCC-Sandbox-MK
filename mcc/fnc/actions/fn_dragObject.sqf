@@ -3,8 +3,8 @@
 // Example: [_object] call MCC_fnc_dragObject;
 // _object :	 object. unit or object being dragged
 //===========================================================================================================================================================================
-private ["_object", "_worldPos"];
-_object = _this select 0;
+private "_worldPos";
+params ["_object"];
 _isMan = _object isKindOf "CAManBase";
 
 player setVariable ["mcc_dragAnimEH", player addEventHandler [
@@ -25,7 +25,7 @@ player playAction "grabDrag";
 player forceWalk true;
 _worldPos = player worldToModel getpos _object;
 _object attachTo [player,[_worldPos select 0, _worldPos select 1, 0.0 +((_object modelToWorld[0,0,0])select 2)-((getpos _object) select 2)]];
-[[[_object],{(_this select 0) setDir 180;}],"BIS_fnc_spawn", _object, false] spawn BIS_fnc_MP;
+[[_object], {(_this select 0) setDir 180;}] remoteExec ["call", _object, false];
 player setVariable ["mcc_draggedObject", _object];
 
 player setVariable ["mcc_draggedObjectID", player addAction ["<t color='#FF0000'>Release</t>", {_this call MCC_fnc_releaseObject},[],6,true,true,"","(vehicle _target == vehicle _this) && !isNull(_this getVariable ['mcc_draggedObject', objNull])"]];

@@ -4,7 +4,13 @@
 disableSerialization;
 
 params ["_listBoxCtrl","_unit","_index","_parentCtrl"];
-private ["_disp","_ctrl","_array","_class","_displayname","_pic","_index","_ctrlPos"];
+private "_disp";
+private _ctrl = controlNull;
+private _array = [];
+private "_class";
+private "_displayname";
+private "_pic";
+private _ctrlPos = controlNull;
 _unit = objectFromNetId _unit;
 _disp = ctrlParent _listBoxCtrl;
 _ctrlPos = ctrlPosition (_disp displayCtrl _parentCtrl);
@@ -17,7 +23,7 @@ if (player == leader _unit && _unit != player) then {
 };
 
 if (player == leader _unit && _unit != player) then {
-	_array pushBack ["commander","Promot to Leader","\A3\Ui_f\data\GUI\Cfg\Ranks\colonel_gs.paa"];
+	_array pushBack ["commander","Promote to Leader","\A3\Ui_f\data\GUI\Cfg\Ranks\colonel_gs.paa"];
 };
 
 if ((missionNamespace getVariable ["MCC_teleportToTeam",false]) && _unit in (units player) && _unit != player) then {

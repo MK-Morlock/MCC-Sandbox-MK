@@ -7,22 +7,35 @@
 //_faction = enemy Faction
 // Return - nothing
 //===========================================================================================================================================================*/
-private ["_objPos","_isCQB","_side","_faction","_preciseMarkers","_type","_objType","_typeSize","_spawnPos","_object","_dummyObject","_spawndir","_unitsArray","_group","_init","_range","_campaignMission","_sidePlayer","_vehiclesArray","_vehiclesArrayFlitered"];
+private _type = "";
+private _objType = "";
+private _typeSize = "";
+private _spawnPos = [];
+private _object = objNull;
+private _dummyObject = [];
+private _spawndir = nil;
+private _init = "";
+private _range = 0;
+private _vehiclesArray = [];
+private _vehiclesArrayFlitered = configNull;
 
-_objPos 		= _this select 0;
-_isCQB 			= _this select 1;
-_side 			= _this select 2;
-_faction 		= _this select 3;
-_preciseMarkers = _this select 4;
-_campaignMission = param [6, false, [false]];
-_sidePlayer = param [7, west];
+params [
+	["_objPos", [0,0,0], [[]]],
+	["_isCQB", false, [false]],
+	["_side", sideUnknown, [sideUnknown]],
+	["_faction", "", [""]],
+	["_preciseMarkers", false, [false]],
+	["_destroyType", "", [""]],
+	["_campaignMission", false, [false]],
+	["_sidePlayer", west, [west]]
+];
 
-_objType = switch (_this select 5) do
+_objType = switch (_destroyType) do
 			{
 				case "Destroy Vehicle": {["tanks","air"] call BIS_fnc_selectRandom};
 				case "Destroy AA": {"aa"};
 				case "Destroy Artillery": {"artillery"};
-				case "Destroy Weapon Cahce": {"cache"};
+				case "Destroy Weapon Cache": {"cache"};
 				case "Destroy Fuel Depot": {"fuel"};
 				case "Destroy Radar/Radio": {if (_campaignMission) then {"radio"} else {["radar","radio"] call BIS_fnc_selectRandom}};
 			};
@@ -42,8 +55,21 @@ _vehiclesArray = switch _objType do
 		default	{missionNamespace getVariable ["MCC_MWFuelTanks",["Land_dp_smallTank_F","Land_ReservoirTank_V1_F","Land_dp_bigTank_F"]]};
 	};
 
+//The enemy faction own tank, AA, artillery or aircraft first (MCC_fnc_factionVehicles); the lists above only when
+//the faction has none of that type
+//A list chosen on the console Assets page is used as it is (MCC_assetCustom_<variable>)
+private _listVar = switch (_objType) do {
+	case "fuel": {"MCC_MWFuelTanks"}; case "radio": {"MCC_MWRadio"}; case "tanks": {"MCC_MWTanks"}; case "aa": {"MCC_MWAA"};
+	case "artillery": {"MCC_MWArtillery"}; case "air": {"MCC_MWAir"}; case "cache": {"MCC_MWcache"}; case "radar": {"MCC_MWradar"};
+	default {"MCC_MWFuelTanks"};
+};
+private _customList = missionNamespace getVariable ["MCC_assetCustom_" + _listVar, false];
+private _factionRole = switch (_objType) do {case "tanks": {"tank"}; case "aa": {"aa"}; case "artillery": {"artillery"}; case "air": {"air"}; default {""}};
+private _factionOwn = if (_factionRole == "" || _customList) then {[]} else {[_faction, _factionRole] call MCC_fnc_factionVehicles};
+if (count _factionOwn > 0) then {_vehiclesArray = _factionOwn};
+
 //Find the objects from the enemy side
-_vehiclesArrayFlitered = _vehiclesArray select {([(getNumber (configFile >> "cfgVehicles" >> _x >> "side"))] call BIS_fnc_sideType) isEqualTo _side};
+_vehiclesArrayFlitered = if (_customList) then {+_vehiclesArray} else {_vehiclesArray select {([(getNumber (configFile >> "cfgVehicles" >> _x >> "side"))] call BIS_fnc_sideType) isEqualTo _side}};
 
 //Couldn't find any object just select all
 if (count _vehiclesArrayFlitered <= 0) then {
@@ -135,21 +161,75 @@ sleep 1;
 if (_objType in ["artillery","aa"]) then {
 	_object = ([_spawnPos,_spawndir,_type,_side] call MCC_fnc_spawnVehicle) select 0;
 } else {
-	_object = _type createvehicle _spawnPos;
-	_object setpos _spawnPos;
-	_object setdir _spawndir;
+	if (_objType == "air") then {
+		_object = createVehicle [_type, _spawnPos, [], 0, "CAN_COLLIDE"];
+		_object allowDamage false;
+		_object setDir _spawndir;
+		_object setPos _spawnPos;
+		_object setVelocity [0,0,0];
+		[_object, _spawnPos, _spawndir] spawn {
+			params ["_object", "_spawnPos", "_spawndir"];
+			sleep 15;
+			if (isNull _object) exitWith {};
+			private _moved = (_object distance2D _spawnPos) > 2;
+			if ((damage _object) > 0 || _moved) then {
+				["INFO", "fn_MWObjectiveDestroy", "air objective %1 was damaged (%2) or moved (%3 m) while settling - repaired and put back", [typeOf _object, damage _object, round (_object distance2D _spawnPos)]] call MCC_fnc_log;
+				_object setDamage 0;
+				_object setVelocity [0,0,0];
+				_object setDir _spawndir;
+				_object setPos _spawnPos;
+				{_object setHitPointDamage [_x, 0]} forEach ((getAllHitPointsDamage _object) param [0, []]);
+			};
+			sleep 5;
+			_object allowDamage true;
+		};
+	} else {
+		_object = _type createvehicle _spawnPos;
+		_object setpos _spawnPos;
+		_object setdir _spawndir;
+	};
 };
 
 //destroy only with satchel
 if (_objType in ["tanks","aa","artillery","air"]) then {
 		_init = '_this setVehicleLock "LOCKED";';
 	_init = '_this setVehicleLock "LOCKED";';
-	[[[netID _object,_object], _init, false], "MCC_fnc_setVehicleInit", false, false] spawn BIS_fnc_MP;
+	[[netID _object,_object], _init, false] remoteExec ["MCC_fnc_setVehicleInit", 2, false];
 
 	if (_objType isEqualTo "artillery") then {[0,_object] spawn MCC_fnc_amb_Art};
 	if (_objType isEqualTo "aa") then {[2,_object] spawn MCC_fnc_amb_Art};
 };
 
+
+if (isNull _object) then {
+	["WARN", "fn_MWObjectiveDestroy", "%1 objective: could not create %2 at %3", [_objType, _type, _spawnPos]] call MCC_fnc_log;
+} else {
+	// Check the objective is still standing shortly after spawning
+	[_object, _objType, _type, _spawnPos] spawn {
+		params ["_object", "_objType", "_type", "_spawnPos"];
+		sleep 15;
+		switch (true) do {
+			case (isNull _object): {["WARN", "fn_MWObjectiveDestroy", "%1 objective %2 spawned at %3 was deleted within 15 s", [_objType, _type, _spawnPos]] call MCC_fnc_log};
+			case (!alive _object): {["WARN", "fn_MWObjectiveDestroy", "%1 objective %2 at %3 was destroyed within 15 s of spawning", [_objType, _type, getPos _object]] call MCC_fnc_log};
+		};
+	};
+};
+
+if (_objType in ["fuel","radar","radio"] && {!isNull _object}) then {
+	private _cfg = configFile >> "CfgVehicles" >> _type;
+	["INFO", "fn_MWObjectiveDestroy", "DESTROY TEST %1 objective %2 at %3: armor %4, destrType %5, damage now %6", [_objType, _type, mapGridPosition _object, getNumber (_cfg >> "armor"), getText (_cfg >> "destrType"), damage _object]] call MCC_fnc_log;
+	_object addEventHandler ["Dammaged", {
+		params ["_obj", "", "_damage"];
+		["INFO", "fn_MWObjectiveDestroy", "DESTROY TEST %1 hit: total damage %2 (hit part %3), alive %4", [typeOf _obj, damage _obj, _damage, alive _obj]] call MCC_fnc_log;
+	}];
+	_object addEventHandler ["Killed", {
+		params ["_obj", "_killer"];
+		["INFO", "fn_MWObjectiveDestroy", "DESTROY TEST %1 destroyed (killer %2) - task completes", [typeOf _obj, _killer]] call MCC_fnc_log;
+	}];
+};
+
+//Cache props take no damage in Arma 3 - make the cache destroyable so the task can complete
+if (_objType == "cache" && {!isNull _object}) then {[_object] call MCC_fnc_MWCacheDestructible};
 
 //Add to curator
 {_x addCuratorEditableObjects [[_object],true]} forEach allCurators;

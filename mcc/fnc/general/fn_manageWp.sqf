@@ -14,25 +14,43 @@
 			2.8		WPtimeout: number, waiting time  between condition is made till the WP is set to complete
 	3 	SelectedGroups: Array containing all the groups to be effected
 //==========================================================================================================================================================*/
-private ["_wpArray","_wp","_wpType","_objects","_wpObject","_wp2","_groups","_wpLoc","_WPTypeIndecator","_wpTypes","_isShown"];
+private _wp = [];
+private _wpType = "";
+private _objects = objNull;
+private _wpObject = nil;
+private _wp2 = [];
+private _WPTypeIndecator = 0;
+private _wpTypes = [];
+private _isShown = false;
 
-_action 			= _this select 0;
-_wpLoc	 			= _this select 1;
-_wpArray			= _this select 2;
-_groups				= _this select 3;
-_isShown			= [_this,4,false,[false]] call bis_fnc_param;
+params ["_action", "_wpLoc", "_wpArray", "_groups"];
+_isShown			= _this param [4, false, [false]];
+
+// Waypoint condition/statement (indexes 5 and 6) must be strings for setWaypointStatements.
+// Several callers pass {} (code) - convert code to its text, anything else to "", and an empty condition to "true".
+if (count _wpArray > 6) then {
+	_wpArray = +_wpArray;
+	{
+		private _s = _wpArray select _x;
+		if (_s isEqualType {}) then {_s = str _s; _s = _s select [1, (count _s) - 2]};
+		if !(_s isEqualType "") then {_s = ""};
+		if (_x == 5 && {_s == ""}) then {_s = "true"};
+		_wpArray set [_x, _s];
+	} forEach [5, 6];
+};
 
 if (count _wpArray > 0) then
 {
 _WPTypeIndecator 	= _wpArray select 0;
 
-	_wpTypes = ["MOVE", "DESTROY", "GETIN", "SAD", "JOIN", "LEADER", "GETOUT", "CYCLE", "LOAD", "UNLOAD", "TR UNLOAD", "HOLD", "SENTRY","GUARD","SUPPORT","GETIN NEAREST","DISMISS","Helicopter - Land","Helicopter - Get in","Artillery - Fire Mission","Loiter"];
+	_wpTypes = ["MOVE", "DESTROY", "GETIN", "SAD", "JOIN", "LEADER", "GETOUT", "CYCLE", "LOAD", "UNLOAD", "TR UNLOAD", "HOLD", "SENTRY","GUARD","SUPPORT","GETIN NEAREST","DISMISS","Helicopter - Land","Helicopter - Get in","Artillery - Fire Mission","Loiter","Taru - Pick up pod","Taru - Winch drop pod","Taru - Parachute pod","Taru - Release pod"];
 	_wpType  = _wpTypes select _WPTypeIndecator;
 };
 
 
 {
-	if (_action != 0) then {while {(count (waypoints _x)) > 0} do {deleteWaypoint ((waypoints _x) select 0)}};	//Delete WP
+	if (isPlayer (leader _x)) then {["DEBUG", "console", "manageWp: %1 (player-led) action %2 to %3, type %4, had %5 waypoints (current %6)", [_x, _action, _wpLoc apply {round _x}, _wpType, count (waypoints _x), currentWaypoint _x]] call MCC_fnc_log};
+	if (_action != 0 || {isPlayer (leader _x)}) then {while {(count (waypoints _x)) > 0} do {deleteWaypoint ((waypoints _x) select 0)}};	//Delete WP
 	if (_action <2) then																						//Add or replace WP
 		{
 			switch _wpType do
@@ -219,14 +237,18 @@ _WPTypeIndecator 	= _wpArray select 0;
 
 				case "Artillery - Fire Mission":
 					{
-						private "_isArty";
+						private _isArty = 0;
 						_isArty= getNumber (configfile >> "CfgVehicles" >> typeof (vehicle leader _x) >> "artilleryScanner");
 						 if ((vehicle (leader _x) != leader _x) && (_isArty ==1)) then
 						 {
-							_x setVariable ["GAIA_MortarRound",6];
 							[_x, _wpLoc] call GAIA_fnc_doMortar;
 						 };
 					};
+
+				case "Taru - Pick up pod": {[_x, "pickup", _wpLoc] call MCC_fnc_taruWaypoint};
+				case "Taru - Winch drop pod": {[_x, "winch", _wpLoc] call MCC_fnc_taruWaypoint};
+				case "Taru - Parachute pod": {[_x, "parachute", _wpLoc] call MCC_fnc_taruWaypoint};
+				case "Taru - Release pod": {[_x, "release", _wpLoc] call MCC_fnc_taruWaypoint};
 
 				case "Loiter":
 					{
@@ -247,7 +269,11 @@ _WPTypeIndecator 	= _wpArray select 0;
 						_wp setWaypointStatements [(_wpArray select 5),(_wpArray select 6)];
 						_wp setWaypointTimeout [_wpArray select 7,_wpArray select 7,_wpArray select 7];
 						if (_isShown) then {_wp showWaypoint "ALWAYS"};
-						if (_action != 0) then {{_x doMove _wpLoc} forEach units _x};
+						if (isPlayer (leader _x)) then {
+							[_x, _wpLoc] remoteExec ["MCC_fnc_formationMove", leader _x];
+						} else {
+							if (_action != 0) then {private _ld = leader _x; {if (_x != _ld) then {_x doFollow _ld}} forEach units _x};
+						};
 					};
 			};
 		};

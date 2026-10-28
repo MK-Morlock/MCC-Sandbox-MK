@@ -1,8 +1,9 @@
-private ["_mode","_ctrl","_posX","_posY","_newY","_center","_position","_camLogic"];
+private "_ctrl";
+private "_posX";
+private "_position";
 
 disableSerialization;
-_mode = _this select 0;
-_input = _this select 1;
+params ["_mode", "_input"];
 
 _ctrl = _input select 0;
 

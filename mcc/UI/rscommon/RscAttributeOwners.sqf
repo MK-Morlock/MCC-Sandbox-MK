@@ -1,8 +1,6 @@
 #include "\A3\ui_f_curator\ui\defineResinclDesign.inc"
 
-_mode = _this select 0;
-_params = _this select 1;
-_unit = _this select 2;
+params ["_mode", "_params", "_unit"];
 
 _idcTabs = [
 	IDC_RSCATTRIBUTEOWNERS_TABSIDE,
@@ -133,7 +131,8 @@ switch _mode do {
 		RscAttributeOwners_units = _units;
 	};
 	case "switchTab": {
-		private ["_display","_add","_tab"];
+		private "_display";
+		private "_tab";
 		_display = _params select 0;
 		_tab = _params select 1;
 		

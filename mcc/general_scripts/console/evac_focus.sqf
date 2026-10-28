@@ -6,13 +6,22 @@
 #define MCC_ConsoleEvacFlyHightComboBox_IDD 9101
 
 disableSerialization;
-private ["_mccdialog","_type","_pos","_control","_markerType","_index","_comboBox","_insetionArray","_evacVehicles"];
+private _mccdialog = controlNull;
+private "_type";
+private _pos = [];
+private _control = controlNull;
+private _markerType = "";
+private "_index";
+private _comboBox = controlNull;
+private _insetionArray = [];
+private "_evacVehicles";
 _mccdialog = findDisplay mcc_playerConsole_IDD;
 _index = lbCurSel MCC_ConsoleEvacTypeText_IDD;
 _evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1",playerSide],[]];
 
 if ((missionNameSpace getvariable ["MCC_evacVehicles_index",0]) !=_index && (count _evacVehicles > 0)) then {
 	missionNameSpace setvariable ["MCC_evacVehicles_index",_index];
+	if (_index >= 0 && {_index < count _evacVehicles}) then {missionNamespace setVariable ["MCC_evacConsoleObj", _evacVehicles select _index]};
 	deletemarkerlocal "currentEvacSelected";
 	_type = _evacVehicles select (lbCurSel MCC_ConsoleEvacTypeText_IDD);
 	_pos = [(getpos _type) select 0, (getpos _type) select 1];

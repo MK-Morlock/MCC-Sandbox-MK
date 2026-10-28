@@ -1,19 +1,25 @@
 //===================================================================MCC_fnc_evacMove======================================================================================
 // Move a vehicle across to WP
-// Example:[[[wp1,wp2,wp3], flyInHight, insertion, [netid vehicle,vehicle],assignedCargo  _evac],"MCC_fnc_evacMove",true,false] spawn BIS_fnc_MP;
+// Example:[[wp1,wp2,wp3], flyInHight, insertion, [netid vehicle,vehicle],assignedCargo  _evac] remoteExec ["MCC_fnc_evacMove", true, false];
 // Params:
 // 	[wp1,wp2,wp3]: array, waypoint positions
 // 	flyInHight: number, if evac is a chopper flight hight, set to 5000 for land or sea vehicle
 //	insertion: number, for vehicles: 0 - engine on, 1 - engine off. For helicopters: 0 - engine on, 1 - engine off, 2 - hover, 3 - Helocasting, 4 - Smoke, 5 - Fast Rope
 //	vehicle: object, the evac vehicle
 //==============================================================================================================================================================================
-private["_heli", "_route", "_endpos", "_height", "_landing ", "_pilot", "_i", "_j", "_pos", "_dist", "_distold", "_angh", "_dir","_startPos","_class",
-		"_accel", "_speed", "_steps", "_inipos", "_offset","_nearSmokes","_wp","_wp2","_distance","_relDirHor","_velocityX","_velocityY","_cargoUnits"];
+private _endpos = [];
+private _landing = 0;
+private _pilot = objNull;
+private _j = configNull;
+private _pos = [];
+private _startPos = nil;
+private _class = "";
+private _nearSmokes = [];
+private _wp = [];
+private _wp2 = [];
+private _cargoUnits = [];
 
-_route         = _this select 0;
-_height        = _this select 1;
-_landing       = _this select 2;
-_heli          = _this select 3;
+params ["_route", "_height", "_landing", "_heli"];
 
 if (typeName _heli == typeName []) then {
 	 _heli = if (isMultiplayer) then {objectFromNetId (_heli select 0)} else {(_heli select 1)};
@@ -29,6 +35,21 @@ _cargoUnits	   = [];
 } foreach (fullCrew _heli);
 
 if (!local _heli) exitWith {hint "vehicle must be local";};
+
+//A new order replaces the previous one. Before, waypoints were only appended and the previous order kept running:
+//after an engine-off landing the vehicle stayed in land mode and ignored new waypoints, and the queued waypoints and
+//the automatic return trip from older orders made it take off on its own later.
+private _orderId = (_heli getVariable ["MCC_evacOrder", 0]) + 1;
+_heli setVariable ["MCC_evacOrder", _orderId];
+private _current = {(_heli getVariable ["MCC_evacOrder", 0]) == _orderId};
+{
+	private _grp = _x;
+	if (!isNull _grp) then {
+		for "_i" from (count waypoints _grp) - 1 to 1 step -1 do {deleteWaypoint [_grp, _i]};
+	};
+} forEach ([group driver _heli, group gunner _heli] arrayIntersect [group driver _heli, group gunner _heli]);
+_heli land "NONE";
+_heli engineOn true;
 
 if (_height == 5000) then //We got a vehicle
 {
@@ -49,6 +70,7 @@ if (_height == 5000) then //We got a vehicle
 		_wp2 setWaypointBehaviour "COMBAT";
 	};
 	if (_landing == 1) then {_wp setWaypointStatements ["true", " driver (vehicle this) action ['ENGINEOFF', (vehicle this)];"]};
+	(group driver _heli) setCurrentWaypoint [group driver _heli, 1];
 }
 else
 {
@@ -80,7 +102,10 @@ else
 	_wp setWaypointStatements ["true", " (vehicle this) setVariable ['wp_complete', true];"];
 
 	_heli setSpeedMode "FULL";
-	while {!(_heli getVariable "wp_complete")} do {sleep 1};
+	(group driver _heli) setCurrentWaypoint [group driver _heli, 1];
+	if (!isNull gunner _heli && {group gunner _heli != group driver _heli}) then {(group gunner _heli) setCurrentWaypoint [group gunner _heli, 1]};
+	while {!(_heli getVariable ["wp_complete", false]) && {call _current} && {alive _heli} && {alive driver _heli}} do {sleep 1};
+	if !(call _current) exitWith {};	//replaced by a newer order
 
 	[_heli,true] spawn MCC_fnc_heliOpenCloseDoor;
 
@@ -110,12 +135,12 @@ else
 			{
 				[_x] spawn
 					{
-						private "_unit";
+						private _unit = objNull;
 						_unit = _this select 0;
 
 						if (isMultiplayer) then
 						{
-							 [compile format ["unassignVehicle objectFromNetID '%1'; objectFromNetID '%1' action ['eject', vehicle objectFromNetID '%1']", netID _unit], "BIS_fnc_spawn", _unit, false] spawn BIS_fnc_MP;
+							 [[], compile format ["unassignVehicle objectFromNetID '%1'; objectFromNetID '%1' action ['eject', vehicle objectFromNetID '%1']", netID _unit]] remoteExec ["call", _unit, false];
 						}
 						else
 						{
@@ -136,9 +161,10 @@ else
 			{
 				_nearSmokes = (getPos _heli) nearObjects ["SmokeShell", 300];
 				sleep 1;
-				if (!(alive _pilot) || (damage _heli >= 0.5)) exitWith {};
+				if (!(alive _pilot) || (damage _heli >= 0.5) || !(call _current)) exitWith {};
 			};
 
+			if (count _nearSmokes == 0) exitWith {};
 			_endpos = getPosASL (_nearSmokes select 0);
 			_endpos = _endpos vectorAdd [0,0,_height];
 			[_heli,_endpos] call MCC_fnc_heliPreciseLanding;
@@ -149,7 +175,11 @@ else
 
 		case 5:			//Fast-rope
 		{
-			private ["_rope","_actualRopes","_ropes","_zc","_attachPoint"];
+			private _rope = objNull;
+			private _actualRopes = [];
+			private _ropes = [];
+			private _zc = 0;
+			private _attachPoint = [];
 			_actualRopes = [];
 
 			switch (typeOf _heli) do
@@ -207,7 +237,7 @@ else
 			_pos = (AGLToASL _pos) vectorAdd [0,0,_height];
 			[_heli, _pos] call MCC_fnc_heliPreciseLanding;
 
-			_heli setVelocity [0,0,0]; velocity
+			_heli setVelocity [0,0,0];
 			sleep 0.1;
 			_heli flyInHeight 20;
 			sleep 4;
@@ -233,13 +263,13 @@ else
 				sleep 0.5;
 			} forEach _ropes;
 
-			sleep 1+ random 2;
+			sleep (1+ random 2);
 
 
 			{
 				_rope = _actualRopes select (_forEachIndex % 2);
 
-				[[_x, _rope],"MCC_fnc_fastRopeLocal",_x,false] spawn BIS_fnc_MP;
+				[_x, _rope] remoteExec ["MCC_fnc_fastRopeLocal", _x, false];
 
 				sleep ( 1 + ((random 6)/10) );
 			} foreach _cargoUnits;
@@ -296,27 +326,30 @@ else
 	//Close doors
 	[_heli,false] spawn MCC_fnc_heliOpenCloseDoor;
 
-	//Do we have a return trip
-	if (count _cargoUnits > 0) then
+	//Do we have a return trip (only when it carried passengers when the order was given)
+	if (count _cargoUnits > 0 && {call _current}) then
 	{
-		private ["_crew","_empty"];
-		_timeOut = time + 30;
+		private _crew = [];
+		private _empty = false;
+		//Wait until it is actually down before checking for passengers. The land command does not wait, so the old 30 s
+		//limit used to start while it was still descending and often ran out first: no return trip.
+		if (_landing in [0, 1, 4, 6]) then {
+			private _t = time + 120;
+			waitUntil {sleep 1; isTouchingGround _heli || {((getPosATL _heli) select 2) < 2} || {time > _t} || {!alive _heli} || {!alive driver _heli} || {!(call _current)}};
+			_heli vehicleChat "Landed - leaving once all passengers are out";
+		};
+		//Leave as soon as every passenger is out. No time limit: if nobody gets out it stays (until a new order).
 		waitUntil
 		{
 			sleep 1;
-			_crew = crew _heli;
-			_empty = true;
-
-			{
-				if (vehicle _x == _heli) exitWith {_empty = false};
-			} foreach _cargoUnits;
-
-			_empty || (time > _timeOut)  || (!alive _heli) || (!alive (driver _heli));
+			_empty = (_cargoUnits findIf {alive _x && {vehicle _x == _heli}}) < 0;
+			_empty || (!alive _heli) || (!alive (driver _heli)) || !(call _current);
 		};
 
-		if (_empty && (!isnil "_startPos")) then
+		if (_empty && (!isnil "_startPos") && {call _current}) then
 		{
-			[[[_startPos], _height, 1, [netid _heli,_heli]],"MCC_fnc_evacMove",_heli,false] spawn BIS_fnc_MP;
+			_heli vehicleChat "Passengers out - returning to base";
+			[[_startPos], _height, 1, [netid _heli,_heli]] remoteExec ["MCC_fnc_evacMove", _heli, false];
 		};
 	};
 };

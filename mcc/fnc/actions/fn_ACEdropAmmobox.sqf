@@ -9,7 +9,10 @@
 //      <nothing>
 //
 //===========================================================================================================================================================================
-private ["_mag","_itemClass","_handPos","_utility"];
+private _mag = "";
+private _itemClass = "";
+private "_handPos";
+private _utility = objNull;
 _mag = param [0, "", [""]];
 _itemClass = param [1, "", [""]];
 
@@ -32,8 +35,7 @@ if (_itemClass in ["MCC_ammoBox"]) then {
 	};
 
 	_utility spawn	{
-		private ["_t"];
-		_t = time + 600;
+		private _t = time + 600;
 		while {alive _this && time < _t} do {sleep 5};
 		if (alive _this) exitWith {deleteVehicle _this};
 	};

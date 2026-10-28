@@ -10,10 +10,30 @@
 //		CAS Script by Shay_gman 08.01.12
 //==============================================================================================================================================================================
 
-private ["_ammount", "_spawnkind", "_pos", "_spawn", "_away", "_pilot1", "_pilotGroup1", "_wp", "_wp2", "_plane1", "_planepos","_missile", "_planeType", "_planeAltitude", "_target", "_fakeTarget", "_lasertargets", "_nukeType", "_bomb2", "_cas_name", "_poswp", "_distA","_distB", "_nul", "_loop","_x","_wp","_plane2","_pilot2","_pilotGroup2","_typeOfAircraft", "_distStart", "_distEngage", "_targetList", "_startTime", "_casMarker", "_casApproach","_isParachute","_planeClasss","_isHeliDLC","_object","_sling"];
+private _spawnkind = "";
+private _pos = [];
+private _spawn = [];
+private _away = [];
+private _pilot1 = objNull;
+private _pilotGroup1 = grpNull;
+private _wp = [];
+private _plane1 = [];
+private _planepos = [];
+private _missile = "";
+private _planeType = "";
+private _lasertargets = objNull;
+private _nukeType = "";
+private _nul = [];
+private _x = 0;
+private _wp = [];
+private _isParachute = 0;
+private _planeClasss = "";
+private _isHeliDLC = configNull;
+private _object = objNull;
+private _sling = false;
 #define mcc_playerConsole_IDD 2993
 
-_ammount				= _this select 0;
+params ["_ammount"];
 _spawnkind				= _this select 1 select 0;
 _pos					= _this select 2;
 _planeType				= _this select 3 select 0;
@@ -33,32 +53,56 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		for [{_x=0},{_x < count _spawnkind},{_x=_x+1}] do {
 			_pos = [_pos, [_pos,_away] call BIS_fnc_dirTo,20] call BIS_fnc_relPos;
 			[_pos, _spawnkind select _x, objNull,_isParachute == 3] spawn MCC_fnc_CreateAmmoDrop;
-			sleep 3 + random 3;
+			sleep (3 + random 3);
 		};
 	};
 
 	//Lets Spawn a plane
 	_isHeliDLC = isClass (configFile >> "CfgPatches" >> "A3_Air_F_Heli_Heli_Transport_03");
- 	_planeClasss = if (_isHeliDLC) then {
-		switch (tolower _planeType) do {
-		    case "east": {"O_Heli_Transport_04_F"};
-		    case "west": {"B_Heli_Transport_03_unarmed_F"};
-		    default {"I_Heli_Transport_02_F"};
-		};
-	} else {"I_Heli_Transport_02_F"};
+	_planeClasss = [_planeType] call MCCMK_fnc_supplyAutoHeli;
+	private _chosenAir = missionNamespace getVariable ["MCCMK_adAircraft", ""];
+	if (_chosenAir != "" && {isClass (configFile >> "CfgVehicles" >> _chosenAir)}) then {_planeClasss = _chosenAir};
+	private _isPlaneAir = _planeClasss isKindOf "Plane";
+	if (_isPlaneAir && {_isParachute == 1}) then {_isParachute = 0};
+	["DEBUG", "supplyDrop", "aircraft %1 (%2) | %3 | %4 item(s)", [_planeClasss, ["automatic", "chosen in the panel"] select (_planeClasss == _chosenAir), ["parachute", "slingload"] select (_isParachute == 1), count _spawnkind]] call MCC_fnc_log;
 
-	_plane1 			= [_planeClasss, _spawn, _pos, 100, true] call MCC_fnc_createPlane;		//Spawn plane 1
+	private _flyH = missionNamespace getVariable [["MCCMK_adHeightHeli", "MCCMK_adHeightPlane"] select _isPlaneAir, 75];
+	private _smokeOn = missionNamespace getVariable [["MCCMK_adSmokeHeli", "MCCMK_adSmokePlane"] select _isPlaneAir, true];
+	private _smokeVeh = missionNamespace getVariable [["MCCMK_adSmokeHeliVeh", "MCCMK_adSmokePlaneVeh"] select _isPlaneAir, true];
+	if (isNil "MCCMK_dropAir") then {MCCMK_dropAir = []};
+	MCCMK_dropAir = MCCMK_dropAir select {alive _x && {!(_x getVariable ["MCCMK_dropDone", false])}};
+	private _dropPos = +_pos;
+	private _near = MCCMK_dropAir select {((_x getVariable ["MCCMK_dropTgt", [0, 0, 0]]) distance2D _dropPos) < 1000};
+	private _inDir = _pos getDir _spawn;
+	if (_isParachute == 1) then {
+		private _nSling = {_x getVariable ["MCCMK_dropSling", false]} count _near;
+		_pos = _pos getPos [25 * _nSling, _inDir + 180];
+		_spawn = _pos getPos [2500, _inDir];
+		["DEBUG", "supplyDrop", "%1 other sling load(s) inbound to this area: set-down moved %2 m along the line", [_nSling, 25 * _nSling]] call MCC_fnc_log;
+	} else {
+		private _step = [500, 1000] select _isPlaneAir;
+		_spawn = _pos getPos [5000 + _step * (count _near), _inDir];
+		["DEBUG", "supplyDrop", "%1 other supply aircraft inbound to this area: spawning %2 m out", [count _near, round (_pos distance2D _spawn)]] call MCC_fnc_log;
+	};
+	_plane1 			= [_planeClasss, _spawn, _pos, _flyH, true] call MCC_fnc_createPlane;		//Spawn plane 1
 	_pilotGroup1		= group _plane1;
+	MCCMK_dropAir pushBack _plane1;
+	_plane1 setVariable ["MCCMK_dropTgt", _dropPos];
+	_plane1 setVariable ["MCCMK_dropSling", _isParachute == 1];
 	_pilot1				= driver _plane1;
+	_pilotGroup1 setVariable ["MCC_dropFor", switch (toLower _planeType) do {case "east": {east}; case "guer": {resistance}; case "civ": {civilian}; default {west}}, true];
+	if (_isPlaneAir) then {
+		_plane1 setVelocityModelSpace [0, ((getNumber (configFile >> "CfgVehicles" >> _planeClasss >> "maxSpeed")) * 0.6 max 250) / 3.6, 0];
+	};
 
-	if (tolower _planeType == "east" && !_isHeliDLC) then
+	if (tolower _planeType == "east" && !_isHeliDLC && {_planeClasss == "I_Heli_Transport_02_F"}) then
 	{
 		_plane1 setObjectTextureGlobal [0,'#(rgb,8,8,3)color(0.635,0.576,0.447,0.5)'];
 		_plane1 setObjectTextureGlobal [1,'#(rgb,8,8,3)color(0.635,0.576,0.447,0.5)'];
 		_plane1 setObjectTextureGlobal [2,'#(rgb,8,8,3)color(0.635,0.576,0.447,0.5)'];
 	};
 
-	if (tolower _planeType == "west" && !_isHeliDLC) then
+	if (tolower _planeType == "west" && !_isHeliDLC && {_planeClasss == "I_Heli_Transport_02_F"}) then
 	{
 		_plane1 setObjectTextureGlobal [0,'#(rgb,8,8,3)color(0.960,0.990,0.990,0.1)'];
 		_plane1 setObjectTextureGlobal [1,'#(rgb,8,8,3)color(0.960,0.990,0.990,0.1)'];
@@ -71,14 +115,14 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		_object setpos (_plane1 modeltoworld [0,0,-15]);
 		_sling = _plane1 setSlingload _object;
 
-		sleep 2;
 		_wp = (group _plane1) addWaypoint [[_pos select 0, _pos select 1, 0], 0];	//Add WP
 		_wp setWaypointType "MOVE";
 		_wp setWaypointStatements ["true", ""];
 		_wp setWaypointSpeed "FULL";
 		_wp setWaypointCombatMode "BLUE";
 		_wp setWaypointCompletionRadius 50;
-		_plane1 flyInHeight 100;
+		_plane1 flyInHeight _flyH;
+		sleep 2;
 
 		waitUntil {_plane1 distance2d _pos < 150 || (!alive _plane1)};
 
@@ -86,7 +130,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 
 		//workaround for some reason after vhicle is slingloaded it can't be driven
 		_object spawn {
-			private ["_pos","_dir","_class","_object"];
+			private _object = objNull;
 			_this allowDamage false;
 
 			waituntil {((isNull attachedTo _this) && ((getpos _this) select 2) < 2) || isTouchingGround _this};
@@ -109,39 +153,151 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		[_plane1, _pos] call MCC_fnc_heliPreciseLanding;
 
 		_plane1 setSlingLoad objNull;
+		_plane1 setVariable ["MCCMK_dropDone", true];
 
 		//Delete the plane when finished
-		[_pilotGroup1, _pilot1, _plane1, _away] spawn MCC_fnc_deletePlane;
+		_plane1 setVariable ["MCC_exitFull", true];
+		[_plane1, _flyH, true] spawn MCC_fnc_haloPlaneExit;
 
 	} else {
-		sleep 2;
-		_wp = (group _plane1) addWaypoint [[_pos select 0, _pos select 1, 0], 0];	//Add WP
+		private _gap = missionNamespace getVariable ["MCC_supplyDropGap", 1.5];
+		private _tgt = [_pos select 0, _pos select 1, 0];
+		private _lineDir = _spawn getDir _tgt;
+		if (_isPlaneAir) then {
+			private _lead = _tgt getPos [2750, _lineDir + 180];
+			private _wpLead = (group _plane1) addWaypoint [[_lead select 0, _lead select 1, 0], 0];
+			_wpLead setWaypointType "MOVE";
+			_wpLead setWaypointSpeed "FULL";
+			_wpLead setWaypointCombatMode "BLUE";
+			_wpLead setWaypointCompletionRadius 50;
+		};
+		_wp = (group _plane1) addWaypoint [_tgt, 0];
 		_wp setWaypointType "MOVE";
 		_wp setWaypointStatements ["true", ""];
 		_wp setWaypointSpeed "FULL";
 		_wp setWaypointCombatMode "BLUE";
-		_wp setWaypointCompletionRadius 200;
-		_plane1 flyInHeight 200;
-
-		waitUntil {((_plane1 distance [_pos select 0, _pos select 1, 200]) < 600) || (!alive _plane1)};
-		if (!alive _plane1) exitWith {};
-
-		//Opend doors
-		{_plane1 animateDoor [_x, 1]} foreach ["CargoRamp_Open"];
-
-		sleep 5;
-		//Make the drop
-
-		//Delete the plane when finished
-		[_pilotGroup1, _pilot1, _plane1, _away] spawn MCC_fnc_deletePlane;
-
-		for [{_x=0},{_x < count _spawnkind},{_x=_x+1}] do {
-			_planepos = getpos _plane1;
-			[_planepos, _spawnkind select _x, _pilot1] spawn MCC_fnc_CreateAmmoDrop;
-			sleep 3 + random 3;
+		_wp setWaypointCompletionRadius 30;
+		private _wpOut = (group _plane1) addWaypoint [[_away select 0, _away select 1, 0], 0];
+		_wpOut setWaypointType "MOVE";
+		_wpOut setWaypointSpeed "FULL";
+		_wpOut setWaypointCombatMode "BLUE";
+		_wpOut setWaypointCompletionRadius 300;
+		_plane1 flyInHeight _flyH;
+		if (_isPlaneAir) then {
+			[_plane1, _tgt, _lineDir] spawn {
+				params ["_pl", "_tg", "_ld"];
+				private _fw = [sin _ld, cos _ld, 0];
+				private _rt = [cos _ld, -(sin _ld), 0];
+				while {alive _pl && {!(_pl getVariable ["MCCMK_dropDone", false])}} do {
+					private _o = (getPosASL _pl) vectorDiff (AGLToASL _tg);
+					private _along = _o vectorDotProduct _fw;
+					if (_along > 300) exitWith {};
+					if (_along > -2500) then {
+						private _v = velocity _pl;
+						private _want = ((-(_o vectorDotProduct _rt)) * 0.12) max -8 min 8;
+						private _dv = ((_want - (_v vectorDotProduct _rt)) max -0.6) min 0.6;
+						_pl setVelocity (_v vectorAdd (_rt vectorMultiply _dv));
+					};
+					sleep 0.1;
+				};
+			};
 		};
-
-		{_plane1 animateDoor [_x, 0]} foreach ["CargoRamp_Open"];
+		private _hasBay = isClass (configFile >> "CfgVehicles" >> _planeClasss >> "VehicleTransport" >> "Carrier");
+		private _loads = [];
+		private _maxKg = getNumber (configFile >> "CfgVehicles" >> _planeClasss >> "VehicleTransport" >> "Carrier" >> "maxLoadMass");
+		private _usedKg = 0;
+		private _left = [];
+		{
+			private _cl = _x;
+			private _veh = objNull;
+			private _skip = "";
+			if (_hasBay) then {
+				private _kg = [_cl] call MCCMK_fnc_classMass;
+				if (_maxKg > 0 && {(_usedKg + _kg) > _maxKg}) then {_skip = "too heavy"} else {
+					if (_cl isKindOf "AllVehicles") then {
+						_veh = createVehicle [_cl, [10, 10, 0], [], 0, "CAN_COLLIDE"];
+						if (_plane1 setVehicleCargo _veh) then {
+							["DEBUG", "supplyDrop", "%1 loaded into %2 (vehicle in vehicle)", [_cl, _planeClasss]] call MCC_fnc_log;
+						} else {
+							deleteVehicle _veh;
+							_veh = objNull;
+							_skip = "bay full";
+						};
+					};
+					if (_skip == "") then {_usedKg = _usedKg + _kg};
+				};
+			};
+			if (_skip == "") then {_loads pushBack [_cl, _veh]} else {
+				["DEBUG", "supplyDrop", "%1 left out of %2: %3 (%4 of %5 kg loaded)", [_cl, _planeClasss, _skip, round _usedKg, _maxKg]] call MCC_fnc_log;
+				_left pushBack format ["%1 (%2)", getText (configFile >> "CfgVehicles" >> _cl >> "displayName"), _skip];
+			};
+		} forEach _spawnkind;
+		if (count _left > 0) then {
+			hint format ["Left out of the %1 drop:\n%2", getText (configFile >> "CfgVehicles" >> _planeClasss >> "displayName"), _left joinString "\n"];
+		};
+		private _bayLate = missionNamespace getVariable ["MCCMK_bayPushback", 30];
+		waitUntil {sleep 0.5; ((_plane1 distance2D _tgt) < ([600, 2000] select _isPlaneAir)) || (!alive _plane1)};
+		if (!alive _plane1) exitWith {};
+		[_plane1, true] call MCCMK_fnc_aircraftRamp;
+		private _tOpen = time;
+		waitUntil {
+			sleep 0.1;
+			private _ph = (_plane1 getVariable ["MCCMK_rampParts", []]) apply {
+				_x params ["_kind", "_nm"];
+				switch (_kind) do {case "anim": {_plane1 animationPhase _nm}; case "door": {_plane1 doorPhase _nm}; default {_plane1 animationSourcePhase _nm}}
+			};
+			private _moving = _ph select {_x > 0.02};
+			!alive _plane1 || {time > _tOpen + 10} || {count _ph == 0} || {count _moving > 0 && {(_moving findIf {_x < 0.95}) < 0}} || {count _moving == 0 && {time > _tOpen + 2}}
+		};
+		if (!alive _plane1) exitWith {};
+		private _n = count _loads;
+		private _tDrop = time + 90;
+		for "_k" from 0 to (_n - 1) do {
+			(_loads select _k) params ["_cl", "_veh"];
+			private _isVeh = (!isNull _veh) || {_cl isKindOf "AllVehicles"};
+			private _slot = -_k * _gap;
+			private _sp = 0;
+			private _h = 0;
+			private _carry = 0;
+			waitUntil {
+				sleep 0.05;
+				private _v = velocity _plane1;
+				private _vh = [_v select 0, _v select 1, 0];
+				_sp = vectorMagnitude _vh;
+				private _p = getPosASL _plane1;
+				_h = (_p select 2) - (getTerrainHeightASL _tgt);
+				_carry = if (!isNull _veh) then {-_bayLate} else {0};
+				private _ahead = if (_sp > 1) then {([_tgt select 0, _tgt select 1, 0] vectorDiff [_p select 0, _p select 1, 0]) vectorDotProduct (vectorNormalized _vh)} else {0};
+				!alive _plane1 || {time > _tDrop} || {_ahead <= (_slot * _sp) + _carry}
+			};
+			if (!alive _plane1) exitWith {};
+			_planepos = getpos _plane1;
+			private _info = [_tgt, _lineDir, _carry, _sp, _h];
+			if (missionNamespace getVariable ["MCC_debug", false]) then {
+				private _f = [sin _lineDir, cos _lineDir, 0];
+				private _o = [(_planepos select 0) - (_tgt select 0), (_planepos select 1) - (_tgt select 1), 0];
+				["DEBUG", "supplyDrop", "item %1 of %2 (%3, %4) released | along %5 m, side %6 m from the target | height %7 m | speed %8 km/h | heading %9 deg off the line | carry allowed %10 m", [_k + 1, _n, _cl, ["crate", ["vehicle", "vehicle from the bay"] select (!isNull _veh)] select _isVeh, round (_o vectorDotProduct _f), round (_o vectorDotProduct [_f select 1, -(_f select 0), 0]), round _h, round (speed _plane1), round ((((getDir _plane1) - _lineDir) + 540) mod 360 - 180), round _carry]] call MCC_fnc_log;
+			};
+			if (!isNull _veh) then {
+				objNull setVehicleCargo _veh;
+				[_veh, _smokeVeh, _info] spawn {
+					params ["_veh", "_smk", "_info"];
+					private _t = time + 180;
+					sleep 3;
+					waitUntil {sleep 0.2; !alive _veh || {time > _t} || {((getPos _veh) select 2) < 4}};
+					if (!alive _veh) exitWith {};
+					if (_smk) then {"SmokeShellGreen" createVehicle (getPos _veh)};
+					_info params ["_tgt", "_dir", "_carry", "_sp", "_h"];
+					private _o = (getPos _veh) vectorDiff [_tgt select 0, _tgt select 1, (getPos _veh) select 2];
+					["DEBUG", "supplyDrop", "%1 landed | along %2 m, side %3 m from the target | released at %4 km/h, %5 m above the target | carry allowed %6 m", [typeOf _veh, round (_o vectorDotProduct [sin _dir, cos _dir, 0]), round (_o vectorDotProduct [cos _dir, -(sin _dir), 0]), round (_sp * 3.6), round _h, round _carry]] call MCC_fnc_log;
+				};
+			} else {[_planepos, _cl, _pilot1, false, false, [_smokeOn, _smokeVeh] select _isVeh, _info] spawn MCC_fnc_CreateAmmoDrop};
+		};
+		_plane1 setVariable ["MCCMK_dropDone", true];
+		sleep 2;
+		[_plane1, false] call MCCMK_fnc_aircraftRamp;
+		_plane1 setVariable ["MCC_exitFull", true];
+		[_plane1, _flyH, true] spawn MCC_fnc_haloPlaneExit;
 	}
 } else {
 	//Case CAS
@@ -152,19 +308,39 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		//disable mouse control at start
 		MCC_ConsoleUAVMouseButtonDown = false;
 
-		_missile = "Bo_GBU12_LGB" createVehicle [_pos select 0, _pos select 1, 600];
+		//Arma's own cruise missile (the destroyer VLS missile: heavy warhead, explodes on impact); the GBU-12 bomb used
+		//before was created in mid-air and pushed at 80 m/s, and did very little damage. GBU-12 if the class is missing.
+		private _cmClass = ["Bo_GBU12_LGB", "ammo_Missile_Cruise_01"] select (isClass (configFile >> "CfgAmmo" >> "ammo_Missile_Cruise_01"));
+		_missile = _cmClass createVehicle [_pos select 0, _pos select 1, 600];
 		waituntil {alive _missile};
 		missionNamespace setVariable ["MCC_ConolseUAV",_missile];
 
-		//Switch to thermal
-		missionNamespace setVariable ["MCC_ConsoleUAVCameraMod",2];
+		//The feed opens in the view mode last chosen for it (MCC_fnc_feedVision; Regular the first time)
+		missionNamespace setVariable ["MCC_ConsoleUAVCameraMod", profileNamespace getVariable ["MCC_feedVision_uav", 0]];
+		//Cruise mode for the console: chase camera behind the missile, mouse does not move the aim
+		MCC_consoleCruise = true;
+		//Fixed aim point at the target: the missile used to home on the console's aim sphere, which the mouse moves
+		private _cmAim = "Land_HelipadEmpty_F" createVehicle [_pos select 0, _pos select 1, 0];
+		[_missile, _cmAim] spawn {
+			params ["_m", "_aim"];
+			waitUntil {sleep 0.5; !alive _m};
+			deleteMarkerLocal (missionNamespace getVariable ["MCCMK_cruiseMarker", ""]);
+			sleep 3;
+			deleteVehicle _aim;
+			MCC_consoleCruise = false;
+		};
 
-		createDialog "MCC_playerConsole2";
+		createDialog ("MCC_playerConsole2" call MCC_fnc_dialogName);
 		waitUntil {!isNull (missionNamespace getVariable ["MCC_fakeUAV",objNull]) && !isNull (missionNamespace getVariable ["MCC_fakeUAVCenter",objNull])};
 
 		playSound "missileLunch";
-		[[[netid _missile,_missile], "missileLunch"], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
-		[(missionNamespace getVariable ["MCC_fakeUAVCenter",objNull]), [ getpos _missile, 100, random 360] call BIS_fnc_relPos, _missile,80,true,""] execVM MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf";
+		[[netid _missile,_missile], "missileLunch"] remoteExec ["MCC_fnc_globalSay3D", 0, false];
+		//Start 2 - 5 km away, low (about 120 m), and fly in, from the direction of the line drawn on the map (it comes
+		//from where the line starts, like a ship off the coast or a VLS site); a random direction only without a line
+		private _cmDir = if (_spawn isEqualType [] && {count _spawn >= 2} && {(_pos distance2D _spawn) > 50}) then {_pos getDir _spawn} else {random 360};
+		private _cmStart = _pos getPos [2000 + random 3000, _cmDir];
+		_cmStart set [2, 120];
+		[_cmAim, _cmStart, _missile,250,true,"",true] execVM MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf";
 	};
 
 	//ac-130
@@ -174,21 +350,93 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		//If we pressed the AC 130 when we have one retired the last one.
 		if (alive(missionNamespace getVariable ["MCC_ACConsoleUp",objNull])) then {
 			private _uav = (missionNamespace getVariable ["MCC_ACConsoleUp",objNull]);
+			_uav setVariable ["MCC_supportDone", true, true];
 			[group driver _uav, driver _uav, _uav, _away] call MCC_fnc_deletePlane;
 			missionNamespace setVariable ["MCC_ACConsoleUp",objNull];
 			publicVariable "MCC_ACConsoleUp";
 
-			[[2,compile format ['["MCCNotifications",["AC-130 Left the scene","%1data\AC130_icon.paa",""]] call bis_fnc_showNotification;',MCC_path]], "MCC_fnc_globalExecute", playerSide, false] spawn BIS_fnc_MP;
+			[_uav, "leave", "Gunship", "Left the scene", format ["%1data\AC130_icon.paa", MCC_path], playerSide] call MCC_fnc_supportNotice;
 		} else {
 
-			[[2,compile format ['["MCCNotifications",["AC-130 Entered the scene","%1data\AC130_icon.paa",""]] call bis_fnc_showNotification;',MCC_path]], "MCC_fnc_globalExecute", playerSide, false] spawn BIS_fnc_MP;
+			[objNull, "", "Gunship", "Entered the scene", format ["%1data\AC130_icon.paa", MCC_path], playerSide] call MCC_fnc_supportNotice;
 
 			_pos set [2,(_pos select 2)+400];
 
 			//register AC-130
 			//==================================
-			_side =  (getNumber (configFile >> "CfgVehicles" >> _planeType >> "side")) call BIS_fnc_sideType;
-			_uav = [_planeType, _spawn, _pos, 500, false,_side] call MCC_fnc_createPlane;
+			_planeType = "B_T_VTOL_01_armed_F";
+			_side = if (missionNamespace getVariable ["MCC_cruiseFromCommander", false]) then {side group player} else {call MCC_fnc_evacSide};
+			_uav = [_planeType, _spawn, _pos, 400, false,_side] call MCC_fnc_createPlane;
+			if ((side group driver _uav) != _side) then {
+				private _old = group driver _uav;
+				(crew _uav) joinSilent (createGroup _side);
+				deleteGroup _old;
+			};
+			[_uav, [["Olive", "Blue"] select (_side isEqualTo west), 1], true] call BIS_fnc_initVehicle;
+			_uav setVariable ["MCC_acSide", _side];
+			[_uav, crew _uav] spawn {
+				params ["_v", "_crew"];
+				waitUntil {sleep 2; isNull _v || {!alive _v} || {(_crew findIf {alive _x && {vehicle _x == _x}}) >= 0}};
+				{
+					[_x] spawn {
+						params ["_u"];
+						waitUntil {sleep 1; isNull _u || {vehicle _u == _u && {isTouchingGround _u || {((getPosATL _u) select 2) < 1}}}};
+						sleep 10;
+						if (!isNull _u && {!isPlayer _u}) then {
+							private _g = group _u;
+							deleteVehicle _u;
+							if (!isNull _g && {count (units _g) == 0}) then {deleteGroup _g};
+						};
+					};
+				} forEach _crew;
+			};
+			MCC_consoleACgunReady1 = true;
+			MCC_consoleACgunReady2 = true;
+			MCC_consoleACgunReady3 = true;
+			MCC_acAmmoType40 = 0;
+			_uav addEventHandler ["HandleDamage", {
+				params ["_v", "_sel", "_dmg", "_src", "_proj", "", "_inst", "_hp"];
+				if (_dmg > 0.1 && {!isNull _src} && {!(_src isEqualTo _v)}) then {
+					private _kv = if (_src isKindOf "CAManBase") then {_src} else {vehicle _src};
+					private _n = getText (configFile >> "CfgVehicles" >> (typeOf _kv) >> "displayName");
+					if (_n == "") then {_n = typeOf _kv};
+					_v setVariable ["MCC_lastHit", [format ["%1 (%2)", _n, side group _src], time]];
+				};
+				if (missionNamespace getVariable ["MCC_debug", false] && {_dmg > 0.1} && {time > (_v getVariable ["MCC_dmgLogT", 0])}) then {
+					_v setVariable ["MCC_dmgLogT", time + 0.5];
+					["DEBUG", "support", "gunship damage: %1 (%2) %3 | source %4 | projectile %5 | instigator %6 | altitude %7", [_sel, _hp, _dmg toFixed 2, typeOf _src, _proj, typeOf _inst, round ((getPosATL _v) select 2)]] call MCC_fnc_log;
+				};
+				_dmg
+			}];
+			if (missionNamespace getVariable ["MCC_debug", false]) then {
+				{
+					_x addEventHandler ["Killed", {
+						params ["_u", "_k", "_i"];
+						["DEBUG", "support", "gunship crew member died: %1 | killer %2 | instigator %3 | vehicle damage %4", [typeOf _u, typeOf _k, typeOf _i, damage (vehicle _u)]] call MCC_fnc_log;
+					}];
+				} forEach (crew _uav);
+			};
+			_uav addEventHandler ["Killed", {
+				params ["_v", "_k"];
+				private _last = _v getVariable ["MCC_lastHit", []];
+				private _by = if (isNull _k || {_k == _v}) then {if (count _last > 0 && {time - (_last select 1) < 120}) then {format ["%1, crashed after the hit", _last select 0]} else {"no recorded attacker (crash or impact)"}} else {
+					private _kv = if (_k isKindOf "CAManBase") then {_k} else {vehicle _k};
+					private _n = getText (configFile >> "CfgVehicles" >> (typeOf _kv) >> "displayName");
+					if (_n == "") then {_n = typeOf _kv};
+					format ["%1 (%2)", _n, side group _k]
+				};
+				private _s = _v getVariable ["MCC_acSide", west];
+				["AC-130 destroyed", 5, format ["by %1", _by]] remoteExec ["MCC_fnc_consoleBanner", _s];
+				["DEBUG", "support", "AC-130 destroyed by %1", [_by]] call MCC_fnc_log;
+				missionNamespace setVariable ["MCC_ACConsoleUp", objNull];
+				publicVariable "MCC_ACConsoleUp";
+				[_v] spawn {
+					params ["_v"];
+					sleep 2;
+					{private _g = group _x; deleteVehicle _x; if (count (units _g) == 0) then {deleteGroup _g}} forEach ((crew _v) select {!isPlayer _x});
+				};
+			}];
+			{_uav setMagazineTurretAmmo [_x select 0, _x select 1, _x select 2]} forEach [["100Rnd_105mm_HEAT_MP", 12, [1]], ["4000Rnd_20mm_Tracer_Red_shells", 800, [1]], ["240Rnd_40mm_GPR_Tracer_Red_shells", 50, [2]], ["160Rnd_40mm_APFSDS_Tracer_Red_shells", 30, [2]]];
 
 			_grp = group driver _uav;
 			_grp setCombatMode "BLUE";
@@ -198,41 +446,53 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 			_wp setWaypointType "LOITER";
 			_wp setWaypointLoiterType "CIRCLE_L";
 			_wp setWaypointSpeed "LIMITED";
-			_wp setWaypointLoiterRadius 400;
+			_wp setWaypointLoiterRadius 1200;
 
 
 			missionNamespace setVariable ["MCC_ACConsoleUp",_uav];
 			missionNamespace setVariable ["MCC_consoleACpos",_pos];
-			missionNameSpace setVariable ["MCC_ConsoleACTime",9999];
-			publicVariable "MCC_ConsoleACTime";
+			[_uav, _pos, _side] spawn {
+				params ["_uav", "_pos", "_side"];
+				private _t = time + 120;
+				waitUntil {sleep 1; !alive _uav || {(_uav distance2D _pos) < 1500} || {time > _t}};
+				missionNameSpace setVariable ["MCC_ConsoleACTimeStart", time];
+				publicVariable "MCC_ConsoleACTimeStart";
+				["DEBUG", "support", "Gunship on station: its %1 s start now", [(missionNamespace getVariable ["MCC_ConsoleACTime", 360]) max 60]] call MCC_fnc_log;
+			[_uav, (missionNamespace getVariable ["MCC_ConsoleACTime", 360]) max 60, "Gunship", _side, format ["%1data\AC130_icon.paa", MCC_path],
+				{({((_x select 0) in ["100Rnd_105mm_HEAT_MP", "4000Rnd_20mm_Tracer_Red_shells", "240Rnd_40mm_GPR_Tracer_Red_shells", "160Rnd_40mm_APFSDS_Tracer_Red_shells"]) && {(_x select 2) > 0}} count (magazinesAllTurrets _this)) == 0},
+				{missionNamespace setVariable ["MCC_ACConsoleUp", objNull]; publicVariable "MCC_ACConsoleUp"}] call MCC_fnc_supportTimer;
+			};
 			publicVariable "MCC_ACConsoleUp";
 			publicVariable "MCC_consoleACpos";
 
 			//Make controlabel
 			_grp setvariable ["MCC_canbecontrolled",true,true];
 
-			//Delete projectiles
-			_uav addeventhandler["fired", {deletevehicle (nearestobject[_this select 0, _this select 4])}];
 
 			//Fire some flares
 			_uav spawn {
 				while {alive _this} do {
 					_plane = _this;
 					( driver _plane) forceweaponfire ["CMFlareLauncher","burst"];
-					_plane setAmmo ["CMFlareLauncher", 1];
-					sleep 30 + (random 30);
+					sleep (30 + (random 30));
 				};
 			};
 		};
 	};
 
+	private _uavArmed = tolower _spawnkind == "uav armed";
+	if (_uavArmed) then {_spawnkind = "controllable"};
+
 	//UAV
 	if (tolower _spawnkind in ["uav","controllable"]) exitWith {
 		//UAV
 
-		[_pos,_planeType,360,_spawnkind,_spawn] spawn {
-			private ["_uav","_time","_grp","_wp","_flyHight","_side"];
-			params ["_pos","_planeType","_time","_spawnkind","_spawn"];
+		[_pos,_planeType,360,_spawnkind,_spawn,_uavArmed] spawn {
+			private _uav = [];
+			private _grp = grpNull;
+			private _wp = [];
+			private _side = configNull;
+			params ["_pos","_planeType","_time","_spawnkind","_spawn",["_uavArmed", false]];
 
 			_pos set [2,(_pos select 2)+500];
 			_side =  (getNumber (configFile >> "CfgVehicles" >> _planeType >> "side")) call BIS_fnc_sideType;
@@ -256,7 +516,14 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 
 			//Spawn detection
 			if (_spawnkind == "uav") then {
-				[_uav,_time] spawn MCC_fnc_uavDetect;
+				[_uav,_time + 120] spawn MCC_fnc_uavDetect;
+			};
+			[_uav, _pos, _time, _side, _uavArmed] spawn {
+				params ["_uav", "_pos", "_time", "_side", "_uavArmed"];
+				private _t = time + 120;
+				waitUntil {sleep 1; !alive _uav || {(_uav distance2D _pos) < 1500} || {time > _t}};
+			[_uav, _time, "UAV", _side, "\A3\ui_f\data\map\markers\nato\b_uav.paa",
+				if (_uavArmed) then {{({(_x select 2) > 0 && {((toLower (_x select 0)) find "laser") < 0} && {((toLower (_x select 0)) find "flare") < 0} && {((toLower (_x select 0)) find "chaff") < 0}} count (magazinesAllTurrets _this)) == 0}} else {{false}}] call MCC_fnc_supportTimer;
 			};
 		};
 	};
@@ -276,7 +543,35 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		[_planeType, _casType, _dir, _pos] remoteExec ["MCC_fnc_cas",2];
 
 	} else {
-		private ["_dir","_dis","_alt","_pitch","_speed","_duration","_planePos","_planeSide","_planeArray","_vectorDir","_velocity","_vectorUp","_planeCfg","_time"];
+		private _dir = [];
+		private _dis = 0;
+		private _alt = 0;
+		private _pitch = 0;
+		private _speed = 0;
+		private _duration = 0;
+		private _planePos = [];
+		private _planeSide = sideUnknown;
+		private _planeArray = [];
+		private _vectorDir = [];
+		private _velocity = [];
+		private _vectorUp = [];
+		private _planeCfg = configNull;
+		private _time = 0;
+		if (_spawnkind in ["JDAM", "LGB", "Bombing-run", "Rockets-run", "AT run", "AA run"] && {!(_spawnkind in ([_planeType] call MCC_fnc_casAllowedTypes))}) then {
+			if (isNil "MCCMK_casSwap") then {MCCMK_casSwap = createHashMap};
+			private _oc = configFile >> "CfgVehicles" >> _planeType;
+			private _fac = getText (_oc >> "faction");
+			private _key = format ["ai|%1|%2", _fac, _spawnkind];
+			private _new = MCCMK_casSwap getOrDefault [_key, ""];
+			if (_new == "") then {
+				private _cands = ((("getNumber (_x >> 'scope') == 2 && {getText (_x >> 'faction') == '" + _fac + "'}") configClasses (configFile >> "CfgVehicles")) apply {configName _x}) select {(_x isKindOf "Plane" || {_x isKindOf "Helicopter"}) && {_spawnkind in ([_x] call MCC_fnc_casAllowedTypes)}};
+				_new = ((_cands select {_x isKindOf "Plane"}) + _cands) param [0, ""];
+				if (_new == "") then {_new = switch ((getNumber (_oc >> "side")) call BIS_fnc_sideType) do {case east: {"O_Plane_CAS_02_F"}; case resistance: {"I_Plane_Fighter_03_CAS_F"}; default {"B_Plane_CAS_01_F"}}};
+				MCCMK_casSwap set [_key, _new];
+			};
+			["DEBUG", "cas", "%1 cannot fly %2 with its own weapons: %3 flies it instead", [_planeType, _spawnkind, _new]] call MCC_fnc_log;
+			_planeType = _new;
+		};
 		_planeCfg = configfile >> "cfgvehicles" >> _planeType;
 		_pos set [2,(_pos select 2) + getterrainheightasl _pos];
 		_dir =[_spawn, _pos] call BIS_fnc_dirTo;
@@ -300,7 +595,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		[_plane1,"CuratorModuleCAS"] call bis_fnc_curatorSayMessage;
 
 		//Set WP behaviour for flat bombing
-		if (_spawnkind == "S&D") then	{
+		if (_spawnkind in ["S&D", "AA run"]) then	{
 
 			_wp = _pilotGroup1 addWaypoint [[_pos select 0, _pos select 1, 0], 0];	//Add WP
 			_wp setWaypointStatements ["true", ""];
@@ -361,88 +656,68 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 
 			case "JDAM":	//JDAM Bomb
 			{
-			   waitUntil {((_plane1 distance2D _pos) < 500) || (!alive _plane1)};
-			   _nul=[_pos, getpos _plane1,"Bo_GBU12_LGB",100,false,""] execVM MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf"
+				private _gp = [_pos select 0, _pos select 1, 0];
+				private _lt = createVehicle [(["LaserTargetE", "LaserTargetW"] select (((side _plane1) getFriend west) > 0.6)), _gp, [], 0, "CAN_COLLIDE"];
+				[_plane1, _gp] call MCC_fnc_casReleaseWait;
+				[_plane1, "bomb", [_lt], 1, 0.5] call MCC_fnc_casRealFire;
+				[_lt] spawn {sleep 60; deleteVehicle (_this select 0)};
 			};
 
 			case "LGB":    //LGB
 			{
-				waitUntil {((_plane1 distance2D _pos) < 1000) || (!alive _plane1)};
-				_lasertargets = nearestObjects[_pos,["LaserTarget"],1000];
-				if (!isnull (_lasertargets select 0)) then {
-					_pos = getpos (_lasertargets select 0);
-					waitUntil {((_plane1 distance2D _pos) < 300) || (!alive _plane1)};
-					_nul=[(_lasertargets select 0), getpos _plane1,"Bo_GBU12_LGB",100,false,""] execVM MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf"
-				};
+				waitUntil {((_plane1 distance2D _pos) < 1500) || (!alive _plane1)};
+				private _lt = (nearestObjects [_pos, ["LaserTarget"], 1000]) param [0, objNull];
+				private _own = isNull _lt;
+				if (_own) then {_lt = createVehicle [(["LaserTargetE", "LaserTargetW"] select (((side _plane1) getFriend west) > 0.6)), [_pos select 0, _pos select 1, 0], [], 0, "CAN_COLLIDE"]};
+				[_plane1, getPosATL _lt] call MCC_fnc_casReleaseWait;
+				[_plane1, "bomb", [_lt], 1, 0.5] call MCC_fnc_casRealFire;
+				if (_own) then {[_lt] spawn {sleep 60; deleteVehicle (_this select 0)}};
 			};
 
 			case "Bombing-run":	//Bombing run
 			{
-				private ["_offset"];
-				waitUntil {((_plane1 distance2D _pos) < 600) || (!alive _plane1)};
-				//Make the drop
-				for [{_i=1},{_i<=_ammount*2},{_i=_i+1}] do
-					{
-						_offset = if (_i mod 2 == 0) then {4} else {-4};
-						_bomb = "Bo_Mk82" createvehicle [getpos _plane1 select 0,getpos _plane1 select 1,3000]; 	//make the bomb
-						_bomb setpos (_plane1 modelToWorld [_offset,-3,-6]);
-						_bomb setdir getdir _plane1;
-						_bomb setVectorUp (vectorup _plane1);
-						_velocity = (velocity _plane1) apply {_x * 1.2};
-						_velocity set [2,-30];
-						_bomb setVelocity _velocity;
-
-						[[[netid _bomb,_bomb], format["bon_Shell_In_v0%1",[1,2,3,4,5,6,7] select round random 6]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
-						sleep 0.5;
-					};
+				[_plane1, [_pos select 0, _pos select 1, 0]] call MCC_fnc_casReleaseWait;
+				[_plane1, "bomb", [], _ammount * 2, 0.25] call MCC_fnc_casRealFire;
 			};
 
 			case "Rockets-run":	//Rockets run
 			{
-				waitUntil {((_plane1 distance2D _pos) < 500) || (!alive _plane1)};
-				//Make the drop
+				waitUntil {((_plane1 distance2D _pos) < 1200) || (!alive _plane1)};
 				if (!alive _plane1) exitWith {};
-
-				for [{_x=1},{_x<=_ammount*2},{_x=_x+1}] do
-					{
-						_nul=[[(_pos select 0)+50 - random 100,(_pos select 1)+50 - random 100,_pos select 2], getpos _plane1,"M_AT",200,true,""] execVM MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf";
-						[[[netid _plane1,_plane1], "missileLunch"], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP;
-						sleep 0.2;
-					};
-
+				if !([_plane1, "rocket", [], _ammount * 2, 0.15] call MCC_fnc_casRealFire) then {
+					private _lt = createVehicle [(["LaserTargetE", "LaserTargetW"] select (((side _plane1) getFriend west) > 0.6)), [_pos select 0, _pos select 1, 0], [], 0, "CAN_COLLIDE"];
+					[_plane1, "agm", [_lt], _ammount * 2, 0.6] call MCC_fnc_casRealFire;
+					[_lt] spawn {sleep 60; deleteVehicle (_this select 0)};
+				};
 				sleep 1;
 			};
 
 			case "AT run":	//SnD Armor
 			{
-				waitUntil {((_plane1 distance2D _pos) < 600) || (!canMove _plane1)};
-				_targets = nearestObjects [[_pos select 0,_pos select 1,0] ,["Car","Tank"],200];	//Find targets: cars or tanks
-				_i = 0;
-
-				{
-					if (([side _x, side _plane1] call BIS_fnc_sideIsEnemy) && _i <= _ammount) then {
-						_nul=[ _x, getpos _plane1,"M_PG_AT",200,true,""] execVM  MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf";
-						sleep 0.8;
-						_nul=[ _x, getpos _plane1,"M_PG_AT",200,true,""] execVM  MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf";
-						_i = _i +1;
-					};
-				} forEach _targets;
+				waitUntil {((_plane1 distance2D _pos) < 2000) || (!canMove _plane1)};
+				_targets = (nearestObjects [[_pos select 0,_pos select 1,0] ,["Car","Tank"],200]) select {alive _x && {[side _x, side _plane1] call BIS_fnc_sideIsEnemy}};
+				_targets resize ((count _targets) min (_ammount + 1));
+				if (count _targets > 0) then {[_plane1, "agm", _targets, (count _targets) * 2, 0.8] call MCC_fnc_casRealFire} else {["DEBUG", "cas", "AT run: no enemy vehicles within 200 m of the target", []] call MCC_fnc_log};
 			};
 
 			case "AA run":	//SnD Air
 			{
-				_plane1 flyInHeight 150;
-				waitUntil {((_plane1 distance2D _pos) < 600) || (!canMove _plane1)};
-				_targets = nearestObjects [[_pos select 0,_pos select 1,0] ,["Helicopter","Plane"],1000];	//Find targets: cars or tanks
-				_i = 0;
-				{
-					if (([side _x, side _plane1] call BIS_fnc_sideIsEnemy) && _i <= _ammount) then {
-						_nul=[_x, getpos _plane1,"M_PG_AT",200,true,""] execVM  MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf";
-						sleep 0.8;
-						_nul=[_x, getpos _plane1,"M_PG_AT",200,true,""] execVM  MCC_path + "mcc\general_scripts\CAS\missile_guide.sqf";
-						_i = _i +1;
+				waitUntil {((_plane1 distance2D _pos) < 4000) || (!canMove _plane1)};
+				_pilotGroup1 setCombatMode "RED";
+				_pilotGroup1 setBehaviour "COMBAT";
+				_plane1 enableAI "TARGET";
+				_plane1 enableAI "AUTOTARGET";
+				private _end = time + 180;
+				private _shots = 0;
+				while {alive _plane1 && {time < _end} && {_shots < ((_ammount + 1) * 2)}} do {
+					private _air = ((getSensorTargets _plane1) select {((_x select 1) == "air") && {(_x select 2) == "enemy"} && {alive (_x select 0)}}) apply {_x select 0};
+					if (count _air > 0) then {
+						private _tg = _air select 0;
+						{if ((_x distance _plane1) < (_tg distance _plane1)) then {_tg = _x}} forEach _air;
+						if ([_plane1, "aam", [_tg], 1, 0.5] call MCC_fnc_casRealFire) then {_shots = _shots + 1} else {_end = 0};
 					};
-				} forEach _targets;
+					sleep 3;
+				};
 			};
 
 			case "CBU-97(ACE)":	//MCC_fnc_CBU-97
@@ -506,7 +781,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 					{
 						_planepos = getpos _plane1;
 						[_planepos, _pilot1] spawn MCC_fnc_SADARM;
-						sleep 0.5 + random 0.5;
+						sleep (0.5 + random 0.5);
 					};
 			};
 
@@ -523,7 +798,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 						_bomb setdir getdir _plane1;
 						_bomb setVelocity [((velocity vehicle _pilot1) select 0)/2, ((velocity vehicle _pilot1) select 1)/2,((velocity vehicle _pilot1) select 2)];
 						[_bomb, CBU_type] spawn MCC_fnc_CBU;
-						sleep 0.5 + random 0.5;
+						sleep (0.5 + random 0.5);
 					};
 			};
 
@@ -540,7 +815,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 						_bomb setdir getdir _plane1;
 						_bomb setVelocity [((velocity vehicle _pilot1) select 0)/2, ((velocity vehicle _pilot1) select 1)/2,((velocity vehicle _pilot1) select 2)];
 						[_bomb, CBU_type] spawn MCC_fnc_CBU;
-						sleep 0.5 + random 0.5;
+						sleep (0.5 + random 0.5);
 					};
 			};
 
@@ -557,7 +832,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 						_bomb setdir getdir _plane1;
 						_bomb setVelocity [((velocity vehicle _pilot1) select 0)/2, ((velocity vehicle _pilot1) select 1)/2,((velocity vehicle _pilot1) select 2)];
 						[_bomb, CBU_type] spawn MCC_fnc_CBU;
-						sleep 0.5 + random 0.5;
+						sleep (0.5 + random 0.5);
 					};
 			};
 

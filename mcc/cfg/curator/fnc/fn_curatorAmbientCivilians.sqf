@@ -1,7 +1,12 @@
 //============================================================MCC_fnc_curatorAmbientCivilians====================================================================================
 // handles the add ambient civilians module
 //===========================================================================================================================================================================
-private ["_pos","_module","_factionArray","_resualt","_civRelations","_civRelationsIgnore"];
+private "_pos";
+private _module = objNull;
+private _factionArray = [];
+private _resualt = [];
+private _civRelations = 0;
+private _civRelationsIgnore = false;
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {deleteVehicle _module};
 
@@ -9,17 +14,17 @@ if (isNull _module) exitWith {deleteVehicle _module};
 if (typeName (_module getVariable ["isCiv",true]) == typeName 0) exitWith {
 
 	if (isServer) then {
-		private ["_isCiv","_isCar","_isParkedCar","_isLocked","_civSpawnDistance","_maxCivSpawn","_factionCiv","_factionCivCar"];
-
-		_isCiv = (_module getVariable ["isCiv",1])==1;
-		_isCar = (_module getVariable ["isCar",1])==1;
-		_isParkedCar = (_module getVariable ["isParkedCar",1])==1;
-		_isLocked  = (_module getVariable ["isLocked",1])==1;
-		_civSpawnDistance = 250;
-		_maxCivSpawn = 4;
-		_factionCiv	= _module getVariable ["factionCiv","CIV_F"];
-		_factionCivCar = _module getVariable ["factionCivCar","CIV_F"];
+		private _isCiv = (_module getVariable ["isCiv",1])==1;
+		private _isCar = (_module getVariable ["isCar",1])==1;
+		private _isParkedCar = (_module getVariable ["isParkedCar",1])==1;
+		private _isLocked = (_module getVariable ["isLocked",1])==1;
+		private _civSpawnDistance = 250;
+		private _maxCivSpawn = 4;
+		private _factionCiv = _module getVariable ["factionCiv","CIV_F"];
+		private _factionCivCar = _module getVariable ["factionCivCar","CIV_F"];
 		_civRelations = _module getVariable ["civRelations",0.5];
+		if (_civRelations > 1) then {_civRelations = _civRelations / 10};
+		if (_civRelations <= 0) then {_civRelations = 0.2};
 		_civRelationsIgnore = missionNamespace setVariable ["MCC_civRelationsIgnore",((_module getVariable ["civRelationsIgnore",0])==1)];
 		publicVariable "MCC_civRelationsIgnore";
 
@@ -38,7 +43,7 @@ _factionArray = [];
 	_factionArray pushBack (_x select 0);
 } forEach U_FACTIONS;
 
- _resualt = ["Ambient Civilians - runs on the server per player (CPU demanding)",[
+ _resualt = ["Ambient Civilians (place again to change - untick the first three to stop and remove them)",[
  						["Ambient Civilians",true],
  						["Ambient Driving Cars",true],
  						["Ambient Parked Cars",true],

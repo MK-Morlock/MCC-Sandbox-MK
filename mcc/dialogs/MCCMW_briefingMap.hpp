@@ -6,7 +6,7 @@
 #define MCC_MWBriefingsTooltip_IDC 9511
 #define MCC_MWBriefingText_IDC 9512
 
-class MCCMW_briefingMap {
+class MCCDLG_NAME {
 	  idd = MCCMW_briefingMap_IDD;
 	  movingEnable = false;
 	  onLoad ="";
@@ -64,7 +64,7 @@ class MCCMW_briefingMap {
 		y = 0.137141 * safezoneH + safezoneY;
 		w = 0.601563 * safezoneW;
 		h = 0.802687 * safezoneH;
-		colorBackground[] = {0,0,0,1};
+		colorBackground[] = {0.11,0.12,0.13,0.96};
 	};
 	
 	class MCC_backgroundFrame: MCC_RscFrame
@@ -86,7 +86,7 @@ class MCCMW_briefingMap {
 		w = 0.1 * safezoneW;
 		h = 0.1 * safezoneH;
 		sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.5)";
-		colorBackground[] = {0,0,0,0.9};
+		colorBackground[] = {0.11,0.12,0.13,0.96};
 	};
 	
 	class MCC_MWBriefingText: MCC_RscStructuredText
@@ -98,7 +98,7 @@ class MCCMW_briefingMap {
 		h = 0.23091 * safezoneH;
 	};
 	
-	class MCC_MWCloseDialog: MCC_RscButtonMenu
+	class MCC_MWCloseDialog: MCCBTN_S
 	{
 		idc = -1;
 		text = "Close";

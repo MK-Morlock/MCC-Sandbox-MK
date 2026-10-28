@@ -3,10 +3,13 @@
 		Example:[_pos,_radius] call MCC_fnc_findRoadsLeadingZone;
 		Return - handler
 ===============================================================================================================================================================================*/
-private ["_pos","_radius","_arrayOne","_arrayTwo","_goodArray","_current","_close"];
+private _arrayOne = [];
+private _arrayTwo = [];
+private _goodArray = [];
+private _current = objNull;
+private _close = false;
 
-_pos		= _this select 0;
-_radius		= _this select 1;
+params ["_pos", "_radius"];
 _goodArray 	= [];
 
 _arrayOne = [_pos, _radius, []] call MCC_fnc_nearestRoad;

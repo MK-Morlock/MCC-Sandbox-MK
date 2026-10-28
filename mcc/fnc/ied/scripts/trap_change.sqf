@@ -10,7 +10,10 @@
 #define MCC_TRAPS_PROXIMITY 2015
 #define MCC_TRAPS_AMBUSH 2016
 
-private ["_type", "_comboBox", "_mccdialog", "_trapsArray"];
+private _type = 0;
+private _comboBox = controlNull;
+private _mccdialog = displayNull;
+private _trapsArray = [];
 
 
 disableSerialization;

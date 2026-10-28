@@ -8,8 +8,14 @@
 
 disableSerialization;
 
-private ["_case","_dlg","_pos","_comboBox","_displayname","_index","_time","_count"];
-_case = _this select 0;
+private "_dlg";
+private _pos = [];
+private _comboBox = controlNull;
+private "_displayname";
+private "_index";
+private "_time";
+private _count = 0;
+params ["_case"];
 _dlg = (uiNamespace getVariable "MCC_groupGen_Dialog");
 _count = count (missionNamespace getVariable ["MCC_activeMarkers",[]]);
 MCC_Marker_dir = 0;
@@ -52,7 +58,7 @@ switch (_case) do
 		Mshape = (MCC_shapeMarker select (lbCurSel MCC_MARKER_SHAPE));
 		Mbrush = (MCC_brushesarray select (lbCurSel MCC_MARKER_BRUSH)) select 2;
 		Mtype = (MCC_markerarray select (lbCurSel MCC_MARKER_TYPE)) select 2;
-		Mtext = MCC_activeMarkers select (lbCurSel MCC_MARKER_AVAILABE);
+		Mtext = (missionNamespace getVariable ["MCC_activeMarkers",[]]) select (lbCurSel MCC_MARKER_AVAILABE);
 		_pos = [];
 		[Mcase, Mcolor, Msize, Mshape, Mbrush, Mtype, Mtext, _pos, 0] call MCC_fnc_makeMarker;
 	};
@@ -68,5 +74,5 @@ lbClear _comboBox;
 {
 	_displayname = _x;
 	_index = _comboBox lbAdd _displayname;
-} foreach MCC_activeMarkers;
+} foreach (missionNamespace getVariable ["MCC_activeMarkers",[]]);
 _comboBox lbSetCurSel 0;

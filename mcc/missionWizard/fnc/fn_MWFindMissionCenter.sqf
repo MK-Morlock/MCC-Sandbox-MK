@@ -12,12 +12,20 @@
 	<OUT>
  		Return - pos
 //===========================================================================================================================================================================*/
-private ["_pos","_minRadius","_centerFound","_buildingsArray","_newPos","_name","_type","_isBasedLocations","_locations","_location","_time","_radius"];
+private _centerFound = false;
+private _buildingsArray = objNull;
+private _newPos = nil;
+private _locations = [];
+private _location = nil;
+private _time = 0;
+private _radius = 0;
 
-_pos 				= _this select 0;
-_minRadius 			= _this select 1;
-_isCQB 				= _this select 2;
-_isBasedLocations 	= _this select 3;
+params [
+	["_pos", [0,0,0], [[]]],
+	["_minRadius", 0, [0]],
+	["_isCQB", false, [false]],
+	["_isBasedLocations", false, [false]]
+];
 
 _centerFound = false;
 _newPos = nil;

@@ -5,7 +5,16 @@
 #define MCC_EVAC_INSERTION 43
 #define MCC_EVAC_FLIGHTHIGHT 44
 
-private ["_point1", "_point2", "_point3","_convoy_wp1","_convoy_wp2","_convoy_wp3","_flyInHight","_landing","_evac","_evacVehicles"];
+private _point1 = [];
+private _point2 = [];
+private _point3 = [];
+private _convoy_wp1 = "";
+private _convoy_wp2 = "";
+private _convoy_wp3 = "";
+private _flyInHight = 0;
+private _landing = 0;
+private _evac = [];
+private _evacVehicles = [];
 
 if !mcc_isloading then	{
 
@@ -13,7 +22,7 @@ if !mcc_isloading then	{
 	deletemarkerlocal "evac_marker2";
 	deletemarkerlocal "evac_marker3";
 
-	hint  "Left click on the map to put 1st WP";
+	["Left click on the map to put the 1st WP"] call MCC_fnc_hintBrief;
 	click = false;
 	onMapSingleClick "point1 = _pos;
 	click = true;
@@ -30,7 +39,7 @@ if !mcc_isloading then	{
 	_point1 =getmarkerpos "evac_marker1";
 	sleep 0.5;
 
-	hint  "Left click on the map to put 2nd WP";
+	["Left click on the map to put the 2nd WP"] call MCC_fnc_hintBrief;
 
 	onMapSingleClick "point2 = _pos;
 	click = true;
@@ -47,7 +56,7 @@ if !mcc_isloading then	{
 	_point2 =getmarkerpos "evac_marker2";
 	sleep 0.5;
 
-	hint  "Left click on the map to put 3rd WP";
+	["Left click on the map to put the 3rd WP"] call MCC_fnc_hintBrief;
 
 	onMapSingleClick "point3 = _pos;
 	click = true;
@@ -67,7 +76,7 @@ if !mcc_isloading then	{
 	hint "Markers placed";
 	if ((lbCurSel MCC_EVAC_SELECTED) == -1) exitWith {};
 
-	_evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1",playerside],[]];
+	_evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1", call MCC_fnc_evacSide],[]];
 	_evac = _evacVehicles select (lbCurSel MCC_EVAC_SELECTED);
 	if (_evac iskindof "helicopter") then	{							//Incase we moving helicopter
 		_flyInHight =  MCC_evacFlyInHight_array select (lbCurSel MCC_EVAC_FLIGHTHIGHT) select 1;
@@ -78,7 +87,7 @@ if !mcc_isloading then	{
 	if (MCC_capture_state) then
 		{
 		MCC_capture_var = MCC_capture_var + FORMAT ['
-							[ [%1, %2, %3, [netid %4,%4]],"MCC_fnc_evacMove",false,false] spawn BIS_fnc_MP;
+							[%1, %2, %3, [netid %4,%4]] remoteExec ["MCC_fnc_evacMove", 2, false];
 							'
 							,[_point1, _point2, _point3]
 							,_flyInHight
@@ -87,6 +96,6 @@ if !mcc_isloading then	{
 							];
 		} else
 			{
-			[[[_point1, _point2, _point3], _flyInHight, _landing,[netid _evac,_evac]],"MCC_fnc_evacMove",_evac,false] spawn BIS_fnc_MP;
+			[[_point1, _point2, _point3], _flyInHight, _landing,[netid _evac,_evac]] remoteExec ["MCC_fnc_evacMove", _evac, false];
 			};
 };

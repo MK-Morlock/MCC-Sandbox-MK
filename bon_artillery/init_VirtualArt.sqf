@@ -1,6 +1,7 @@
-private ["_arti","_type","_dummypos"];
+private "_arti";
+private _dummypos = [];
 
-_type = _this select 0; 
+params ["_type"]; 
 
 if (!isserver) exitWith {}; 
 

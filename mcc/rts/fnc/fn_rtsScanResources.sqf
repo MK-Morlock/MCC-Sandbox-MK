@@ -5,7 +5,27 @@
 //		_dif: INTEGER - 10 basic 20 - advanced
 //		_delete: BOOLEAN - if true then delete
 //======================================================================================================================================================================
-private ["_side","_dif","_delete","_startLocation","_trg","_missionPos","_crateNumbers","_crateType","_crates","_missionItems","_object","_unitsArray","_enemyFaction","_enemySide","_counter","_totalPlayers","_scenario","_propObject","_missionText","_missionTittle","_effect"];
+private "_side";
+private _dif = 0;
+private _delete = false;
+private "_startLocation";
+private "_trg";
+private _missionPos = [];
+private "_crateNumbers";
+private _crateType = [];
+private "_crates";
+private "_missionItems";
+private "_object";
+private _unitsArray = [];
+private _enemyFaction = "";
+private _enemySide = [];
+private "_counter";
+private _totalPlayers = {};
+private _scenario = [];
+private _propObject = "";
+private _missionText = "";
+private _missionTittle = "";
+private _effect = "";
 
 _side = param [0, west, [west]];
 _dif = param [1, 10, [10]];
@@ -42,7 +62,7 @@ if (_delete) exitWith {
 					+ "____________________<br/><br/>";
 
 	//Send hint
-	[[_missionText,true],"MCC_fnc_globalHint",_side,false] spawn BIS_fnc_MP;
+	[_missionText,true] remoteExec ["MCC_fnc_globalHint", _side, false];
 };
 
 //Start mission
@@ -54,19 +74,19 @@ switch (_scenario) do {
     case "stash": {
     	_propObject = "CamoNet_INDP_open_Curator_F";
     	_missionText = _missionText	+"____________________<br/>"
-									+ "H.Q Found some enemy supply stash nearby.<br/>";
+									+ "HQ Found some enemy supply stash nearby.<br/>";
 	};
 
 	case "car": {
     	_propObject = ["Land_Wreck_HMMWV_F","Land_Wreck_Hunter_F","Land_Wreck_Offroad_F","Land_Wreck_Truck_dropside_F","Land_Wreck_Van_F"] call bis_fnc_selectRandom;
     	_missionText = _missionText	+"____________________<br/>"
-									+ "H.Q Located wrecked vehicle that might hold some supplies.<br/>";
+									+ "HQ Located wrecked vehicle that might hold some supplies.<br/>";
 	};
 
 	case "heli": {
     	_propObject = ["Land_Wreck_Heli_Attack_01_F","Land_Wreck_Plane_Transport_01_F","Land_Wreck_Heli_Attack_02_F"] call bis_fnc_selectRandom;
     	_missionText = _missionText	+"____________________<br/>"
-									+ "H.Q spotted downed aircraft nearby. Its most likely still hold some supplies.<br/>";
+									+ "HQ spotted downed aircraft nearby. Its most likely still hold some supplies.<br/>";
 	};
 };
 
@@ -76,12 +96,12 @@ _missionText = _missionText + format ["The area is %1 guarded so it might prove 
 _totalPlayers = {side _x == _side} count allplayers;
 
 //Start mission
-_startLocation = call compile format ["MCC_START_%1",_side];
+_startLocation = missionNamespace getVariable (format ["MCC_START_%1", _side]);
 
 _crates = MCC_logisticsCrates_TypesWest;
 _crates resize 3;
 _enemyFaction = missionNamespace getVariable ["MCC_campaignEnemyFaction","OPF_F"];
-_enemySide = [(getNumber (configfile >> "CfgFactionClasses" >> _enemyFaction >> "side"))] call BIS_fnc_sideType;
+_enemySide = [([_enemyFaction] call MCC_fnc_factionSide)] call BIS_fnc_sideType;
 
 _missionItems = [];
 
@@ -100,8 +120,7 @@ while {count _missionPos == 0} do {
 
 //if its a car then find road
 if (_scenario == "car") then {
-	private ["_road"];
-	_road = [_missionPos,300,[]] call bis_fnc_nearestRoad;
+	private _road = [_missionPos,300,[]] call bis_fnc_nearestRoad;
 	if (!isNull _road) then {_missionPos = getpos _road};
 };
 
@@ -134,24 +153,20 @@ for "_i" from 1 to _crateNumbers do {
 };
 
 //Lets spawn some infantry
-_unitsArray = [_enemyFaction ,"soldier"] call MCC_fnc_makeUnitsArray;
+_unitsArray = [[_enemyFaction ,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 
 if (count _unitsArray > 0) then {
 
 	if (count _unitsArray > 6) then {_unitsArray resize 6};
 
-	private ["_units"];
-	_units = [];
+	private _units = [];
 
 	_maxUnits = _totalPlayers * (_dif/4);
 	while {_maxUnits > 0} do {
 		_missionPos = [_missionPos,10,100,2,0,50,0] call BIS_fnc_findSafePos;
 
-	    _counter = floor random 5;
-		for "_i" from 1 to _counter do {
-			_units pushBack ((_unitsArray call bis_fnc_selectRandom) select 0);
-			_maxUnits = _maxUnits -2;
-		};
+		_units = [_enemyFaction, 2 + floor random 4] call MCCMK_fnc_buildSquad;
+		_maxUnits = _maxUnits - 2 * (count _units);
 
 		_group = [_missionPos, _units, 1, _enemySide, false, false] call MCC_fnc_groupSpawn;
 		{
@@ -176,7 +191,9 @@ if (count _unitsArray > 0) then {
 	while {_maxUnits > 0} do {
 		_missionPos = [_missionPos,10,100,2,0,50,0] call BIS_fnc_findSafePos;
 
-	    _units pushBack ((_unitsArray call bis_fnc_selectRandom) select 0);
+		private _vc = [_unitsArray, "patrol"] call MCCMK_fnc_pickVehicle;
+		if (_vc == "") then {_vc = (_unitsArray call bis_fnc_selectRandom) select 0};
+		_units = [_vc];
 		_maxUnits = _maxUnits -1;
 
 		_group = [_missionPos, _units, 1, _enemySide, false, false] call MCC_fnc_groupSpawn;
@@ -191,7 +208,7 @@ missionNamespace setVariable [format ['MCC_rtsMissionObjects_%1', _side],_missio
 publicVariable format ['MCC_rtsMissionOn_%1', _side];
 
 //Send hint
-[[_missionText,true],"MCC_fnc_globalHint",_side,false] spawn BIS_fnc_MP;
+[_missionText,true] remoteExec ["MCC_fnc_globalHint", _side, false];
 
 //Cleanup
 deleteVehicle _trg;

@@ -12,7 +12,9 @@ Example:
 
 */
 
-private ["_dist","_dir","_center"];
+private "_dist";
+private "_dir";
+private _center = [];
 params ["_start","_end","_lineMarkerName"];
 
 _dist = _start distance _end;

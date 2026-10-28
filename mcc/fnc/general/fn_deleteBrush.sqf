@@ -11,7 +11,13 @@ Delete objects/Markers in area radius.
 	 Return - nothing
 //================================================================================================================================================================*/
 
-private ["_pos","_radius","_type","_nearObjects","_crew","_markers","_ignorePlayers"];
+private _pos = [];
+private _radius = 0;
+private _type = 0;
+private _nearObjects = [];
+private _crew = [];
+private _markers = [];
+private _ignorePlayers = false;
 
 _pos = param [0,[0,0,0],[[]]];
 _radius = param [1,100,[0]];
@@ -118,7 +124,7 @@ switch _type do {
 	//"LightsOff"
 	case 8:
 		{
-			private "_lamps";
+			private _lamps = [];
 			//Lights
 			{
 				_lamps = [_pos select 0, _pos select 1, 0] nearObjects [_x, _radius];
@@ -129,7 +135,7 @@ switch _type do {
 	//"LightsOn"
 	case 9:
 		{
-			private "_lamps";
+			private _lamps = [];
 			//Lights
 			{
 				_lamps = [_pos select 0, _pos select 1, 0] nearObjects [_x, _radius];
@@ -140,7 +146,7 @@ switch _type do {
 	//"doorsAll"
 	case 10:
 		{
-			private "_buildings";
+			private _buildings = [];
 			//Buildings
 			_buildings = [_pos select 0, _pos select 1, 0] nearObjects ["house", _radius];
 
@@ -155,7 +161,7 @@ switch _type do {
 	//"doorsAllunlock"
 	case 11:
 		{
-			private "_buildings";
+			private _buildings = [];
 
 			//Buildings
 			_buildings = [_pos select 0, _pos select 1, 0] nearObjects ["house", _radius];
@@ -171,7 +177,7 @@ switch _type do {
 	//"doorsRandom"
 	case 12:
 		{
-			private "_buildings";
+			private _buildings = [];
 			//Buildings
 			_buildings = [_pos select 0, _pos select 1, 0] nearObjects ["house", _radius];
 			{
@@ -185,7 +191,7 @@ switch _type do {
 	//"Buildings"
 	case 13:
 		{
-			private "_buildings";
+			private _buildings = [];
 
 			//Buildings
 			_buildings = [_pos select 0, _pos select 1, 0] nearObjects ["house", _radius];
@@ -211,37 +217,37 @@ switch _type do {
 				};
 			};
 
-			[["bf",false],"MCC_fnc_ppEffects",true,false] call BIS_fnc_MP;
+			["bf",false] remoteExec ["MCC_fnc_ppEffects", 0, false];
 		};
 
 	//"sandstorm"
 	case 14:
 		{
-			[["sandstorm",false],"MCC_fnc_ppEffects",true,false] call BIS_fnc_MP;
+			["sandstorm",false] remoteExec ["MCC_fnc_ppEffects", 0, false];
 		};
 
 	//"storm"
 	case 15:
 		{
-			[["storm",false],"MCC_fnc_ppEffects",true,false] call BIS_fnc_MP;
+			["storm",false] remoteExec ["MCC_fnc_ppEffects", 0, false];
 		};
 
 	//"snow"
 	case 16:
 		{
-			[["snow",false],"MCC_fnc_ppEffects",true,false] call BIS_fnc_MP;
+			["snow",false] remoteExec ["MCC_fnc_ppEffects", 0, false];
 		};
 
 	//"heatwave"
 	case 17:
 		{
-			[["heatwave",false],"MCC_fnc_ppEffects",true,false] call BIS_fnc_MP;
+			["heatwave",false] remoteExec ["MCC_fnc_ppEffects", 0, false];
 		};
 
 	//"clear"
 	case 18:
 		{
-			[["clear",false],"MCC_fnc_ppEffects",true,false] call BIS_fnc_MP;
+			["clear",false] remoteExec ["MCC_fnc_ppEffects", 0, false];
 		};
 
 	//"N/V"

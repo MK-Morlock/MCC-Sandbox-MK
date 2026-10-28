@@ -7,13 +7,15 @@
 // _nshell = integer. Number of shells per burst
 // _sound = boolean, True - for impact wistle sound
 //===========================================================================================================================================================================			
-private ["_sound", "_pos", "_shelltype", "_shellspread", "_nshell", "_shell", "_i","_burst","_bombpos","_j","_disp","_hgt","_tr","_delay"];
-_pos					 = _this select 0; 
-_shelltype 			     = _this select 1; 
-_shellspread			 = _this select 2; 
-_nshell 				 = _this select 3; 
-_sound 					 = _this select 4; 
-_delay 					 = _this select 5; 
+private _shell = objNull;
+private _i = objNull;
+private _burst = "";
+private _bombpos = [];
+private _j = 0;
+private _disp = 0;
+private _hgt = 0;
+private _tr = "";
+params ["_pos", "_shelltype", "_shellspread", "_nshell", "_sound", "_delay"]; 
 _hgt = 200;
 
 if (isnil "_delay") then {_delay = 0};
@@ -21,7 +23,7 @@ for [{_i=0},{_i<_nshell},{_i=_i+1}] do
 	{
 		_shell = _shelltype createVehicle [(_pos select 0) + _shellspread - 2*(random _shellspread) ,(_pos select 1) + _shellspread - 2*(random _shellspread), _hgt];
 		sleep 2; 
-		if (_sound) then {[[[netid _shell,_shell],format["bon_Shell_In_v0%1",[1,2,3,4,5,6,7] select round random 6]], "MCC_fnc_globalSay3D", true, false] spawn BIS_fnc_MP}; 
+		if (_sound) then {[[netid _shell,_shell],format["bon_Shell_In_v0%1",[1,2,3,4,5,6,7] select round random 6]] remoteExec ["MCC_fnc_globalSay3D", 0, false];}; 
 		WaitUntil{(position _shell select 2)<100};
 		_bombpos = getpos _shell;
 		_burst = "HelicopterExploSmall" createVehicle _bombpos;

@@ -13,7 +13,12 @@
 #define	ID_APPLY 2401
 
 
-private ["_vehicle","_pylonsDialog","_pylonsAvailable","_zeus","_turrets","_config","_pylonComponent"];
+private _vehicle = objNull;
+private "_pylonsAvailable";
+private _zeus = false;
+private _turrets = configNull;
+private _config = configNull;
+private "_pylonComponent";
 _zeus = param [0,true,[true,objNull]];
 
 //If we initilize the loadouts are
@@ -65,7 +70,19 @@ MCC_fnc_pylonUpdate ={
 		["_selectedPrest",nil,[[],nil]]
 	];
 
-	private ["_vehicle","_ctrl","_display","_picPos","_uiPos","_index","_pylon","_currentMag","_config","_pylonComponent","_pylonsAvailable","_currentPylonMag","_mirror"];
+	private _vehicle = objNull;
+	private _ctrl = controlNull;
+	private _display = controlNull;
+	private _picPos = controlNull;
+	private _uiPos = [];
+	private "_index";
+	private "_pylon";
+	private "_currentMag";
+	private _config = configNull;
+	private "_pylonComponent";
+	private "_pylonsAvailable";
+	private "_currentPylonMag";
+	private _mirror = controlNull;
 
 	_vehicle = missionNamespace getVariable ["MCC_fnc_pylonsChangeVehicle",objNull];
 
@@ -94,9 +111,8 @@ MCC_fnc_pylonUpdate ={
 
 		    _uiPos apply {if (_x isEqualType 0) then {_x} else {call compile _x}};
 
-		    private ["_uiPosX","_uiPosY"];
-		    _uiPosX = if ((_uiPos select 0) isEqualType 0) then {(_uiPos select 0)} else {call compile (_uiPos select 0)};
-		    _uiPosY = if ((_uiPos select 1) isEqualType 0) then {(_uiPos select 1)} else {call compile (_uiPos select 1)};
+		    private _uiPosX = if ((_uiPos select 0) isEqualType 0) then {(_uiPos select 0)} else {call compile (_uiPos select 0)};
+		    private _uiPosY = if ((_uiPos select 1) isEqualType 0) then {(_uiPos select 1)} else {call compile (_uiPos select 1)};
 
 		    _ctrl ctrlSetPosition [
 		        (_picPos select 0) + _uiPosX,
@@ -137,7 +153,13 @@ MCC_fnc_pylonUpdate ={
 			#define	ID_MIROR 2800
 
 			params ["_ctrl","_selected"];
-			private ["_display","_mirror","_mirroredPylon","_vehicle","_config","_pylonComponent","_selectedPylon"];
+			private _display = controlNull;
+			private _mirror = controlNull;
+			private _mirroredPylon = 0;
+			private _vehicle = objNull;
+			private _config = configNull;
+			private "_pylonComponent";
+			private "_selectedPylon";
 
 			_vehicle = missionNamespace getVariable ["MCC_fnc_pylonsChangeVehicle",objNull];
 			_config = configFile >> "CfgVehicles" >> typeOf _vehicle;
@@ -163,7 +185,21 @@ MCC_fnc_pylonApply = {
 	#define	ID_REPAIR 2803
 
 
-	private ["_vehicle","_exit","_pylonsWeapons","_magType","_config","_pylonComponent","_pylonsAvailable","_ctrl","_success","_turrets","_display","_magData","_rearm","_refuel","_repair"];
+	private _vehicle = objNull;
+	private _exit = false;
+	private _pylonsWeapons = [];
+	private "_magType";
+	private _config = configNull;
+	private "_pylonComponent";
+	private "_pylonsAvailable";
+	private _ctrl = controlNull;
+	private _success = configNull;
+	private _turrets = configNull;
+	private _display = controlNull;
+	private _magData = [];
+	private _rearm = controlNull;
+	private _refuel = controlNull;
+	private _repair = controlNull;
 	_vehicle = missionNamespace getVariable ["MCC_fnc_pylonsChangeVehicle",objNull];
 	if (isNull _vehicle) exitWith {};
 
@@ -238,10 +274,13 @@ if (count _pylonsAvailable == 0) exitWith {[_vehicle,true,true,true] spawn MCC_f
 
 
 while {dialog} do {closeDialog 0};
-createDialog "MCC_displayPylonChange";
+createDialog ("MCC_displayPylonChange" call MCC_fnc_dialogName);
 waitUntil {dialog};
 
-private ["_ctrl","_display","_picPos","_index"];
+private _ctrl = controlNull;
+private _display = controlNull;
+private "_picPos";
+private "_index";
 
 _display = findDisplay IDD_DISPLAY_PYLONCHANGE;
 
@@ -281,7 +320,11 @@ _ctrl = _display displayCtrl ID_PRESETCOMBO;
 
 _ctrl ctrlAddEventHandler ["LBSelChanged", {
 	params ["_ctrl","_selected"];
-	private ["_preSets","_selectedPrest","_config","_pylonComponent","_vehicle"];
+	private _preSets = "";
+	private _selectedPrest = [];
+	private _config = configNull;
+	private "_pylonComponent";
+	private _vehicle = objNull;
 
 	_vehicle = missionNamespace getVariable ["MCC_fnc_pylonsChangeVehicle",objNull];
 	if (isNull _vehicle) exitWith {};

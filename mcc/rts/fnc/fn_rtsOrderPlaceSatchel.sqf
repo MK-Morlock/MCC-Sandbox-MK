@@ -3,7 +3,10 @@
 //  Parameter(s):
 //     _ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_group","_pos","_statment","_leader"];
+private "_group";
+private _pos = [];
+private _statment = {};
+private "_leader";
 _res = param [1, [], [[]]];
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
@@ -35,4 +38,4 @@ _statment = {
 	_mine spawn {sleep 30; _this setDamage 1};
 };
 
-[[[_pos, _leader], _statment], "BIS_fnc_spawn", _leader, false] call BIS_fnc_MP;
+[[_pos, _leader], _statment] remoteExec ["spawn", _leader, false];

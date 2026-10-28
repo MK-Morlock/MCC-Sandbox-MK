@@ -8,11 +8,17 @@
 //		[_door,_animation,_phase,_closed]
 //=======================================================================================================================================================================
 
-private ["_building","_cfg"];
 #define MCC_ARMA2MAPS ["takistan","zargabad","chernarus","utes","sara","saralite","sara_dbe1","chernarus_summer","lingor3","kunduz","panthera3","fallujah"]
 
-private ["_object","_doorTypes","_loadName","_optionalDoors","_door","_typeOfSelected","_str","_animation","_phase","_closed"];
-_object = _this select 0;
+private _doorTypes = [];
+private _loadName = "";
+private _optionalDoors = [];
+private _door = "";
+private "_typeOfSelected";
+private "_animation";
+private _phase = 0;
+private _closed = false;
+params ["_object"];
 
 //No house found - exit
 if !(_object isKindof "house" || _object isKindof "wall") exitWith {["","",0,false]};

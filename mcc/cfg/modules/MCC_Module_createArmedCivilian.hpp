@@ -12,7 +12,7 @@ class MCC_Module_createArmedCivilian : Module_F
 		{
 			displayName = "Attack Side";
 			typeName = "NUMBER";
-			property = "side";
+			property = "MCC_Module_createArmedCivilian_side";
 
 			class values
 			{
@@ -44,7 +44,7 @@ class MCC_Module_createArmedCivilian : Module_F
 		{
 			displayName = "Random Patrol";
 			typeName = "NUMBER";
-			property = "patrol";
+			property = "MCC_Module_createArmedCivilian_patrol";
 
 			class values
 			{
@@ -62,6 +62,14 @@ class MCC_Module_createArmedCivilian : Module_F
 			};
 		};
 
+		class weapon : Edit
+		{
+			displayName = "Weapon";
+			description = "Weapon class for the synced units (e.g. hgun_Pistol_heavy_01_F). Empty = random from the Armed Civilians Weapons pool (CBA setting or Mission Settings module).";
+			typeName = "STRING";
+			defaultValue = """""";
+			property = "MCC_Module_createArmedCivilian_weapon";
+		};
 		class ModuleDescription: ModuleDescription{};
 	};
 

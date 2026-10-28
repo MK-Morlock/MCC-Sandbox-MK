@@ -19,8 +19,7 @@ class EditorData
 	};
 };
 binarizationWanted=0;
-addons[]=
-{
+addons[]={
 	"A3_Ui_F",
 	"A3_Soft_F_Beta_Truck_01",
 	"A3_Soft_F_Exp_Truck_01",
@@ -145,8 +144,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"ARRAY"
 						};
 					};
@@ -159,8 +157,7 @@ class CustomAttributes
 							{
 								class type
 								{
-									type[]=
-									{
+									type[]={
 										"STRING"
 									};
 								};
@@ -173,8 +170,7 @@ class CustomAttributes
 							{
 								class type
 								{
-									type[]=
-									{
+									type[]={
 										"STRING"
 									};
 								};
@@ -195,8 +191,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -214,8 +209,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -233,8 +227,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -252,8 +245,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -271,8 +263,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -290,8 +281,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -309,8 +299,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -328,8 +317,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -347,8 +335,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -366,8 +353,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -390,8 +376,7 @@ class CustomAttributes
 				{
 					class type
 					{
-						type[]=
-						{
+						type[]={
 							"SCALAR"
 						};
 					};
@@ -1522,8 +1507,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"STRING"
 								};
 							};
@@ -1547,7 +1531,7 @@ class Mission
 			{
 				class Attribute0
 				{
-					property="code";
+					property="MCC_module_vehicleRespawn_code";
 					expression="_this setVariable ['code',_value,true];";
 					class Value
 					{
@@ -1555,8 +1539,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"STRING"
 								};
 							};
@@ -1566,7 +1549,7 @@ class Mission
 				};
 				class Attribute1
 				{
-					property="abondanDistance";
+					property="MCC_module_vehicleRespawn_abondanDistance";
 					expression="_this setVariable ['abondanDistance',_value,true];";
 					class Value
 					{
@@ -1574,8 +1557,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1585,7 +1567,7 @@ class Mission
 				};
 				class Attribute2
 				{
-					property="tickets";
+					property="MCC_module_vehicleRespawn_tickets";
 					expression="_this setVariable ['tickets',_value,true];";
 					class Value
 					{
@@ -1593,8 +1575,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1604,7 +1585,7 @@ class Mission
 				};
 				class Attribute3
 				{
-					property="respawnDisabled";
+					property="MCC_module_vehicleRespawn_respawnDisabled";
 					expression="_this setVariable ['respawnDisabled',_value,true];";
 					class Value
 					{
@@ -1612,8 +1593,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -1623,7 +1603,7 @@ class Mission
 				};
 				class Attribute4
 				{
-					property="destroyEffect";
+					property="MCC_module_vehicleRespawn_destroyEffect";
 					expression="_this setVariable ['destroyEffect',_value,true];";
 					class Value
 					{
@@ -1631,8 +1611,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -1642,7 +1621,7 @@ class Mission
 				};
 				class Attribute5
 				{
-					property="waitTime";
+					property="MCC_module_vehicleRespawn_waitTime";
 					expression="_this setVariable ['waitTime',_value,true];";
 					class Value
 					{
@@ -1650,8 +1629,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1683,8 +1661,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"STRING"
 								};
 							};
@@ -1702,8 +1679,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1721,8 +1697,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -1740,8 +1715,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1759,8 +1733,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1785,7 +1758,7 @@ class Mission
 			{
 				class Attribute0
 				{
-					property="code";
+					property="MCC_module_vehicleRespawn_code";
 					expression="_this setVariable ['code',_value,true];";
 					class Value
 					{
@@ -1793,8 +1766,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"STRING"
 								};
 							};
@@ -1804,7 +1776,7 @@ class Mission
 				};
 				class Attribute1
 				{
-					property="abondanDistance";
+					property="MCC_module_vehicleRespawn_abondanDistance";
 					expression="_this setVariable ['abondanDistance',_value,true];";
 					class Value
 					{
@@ -1812,8 +1784,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1823,7 +1794,7 @@ class Mission
 				};
 				class Attribute2
 				{
-					property="tickets";
+					property="MCC_module_vehicleRespawn_tickets";
 					expression="_this setVariable ['tickets',_value,true];";
 					class Value
 					{
@@ -1831,8 +1802,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1842,7 +1812,7 @@ class Mission
 				};
 				class Attribute3
 				{
-					property="respawnDisabled";
+					property="MCC_module_vehicleRespawn_respawnDisabled";
 					expression="_this setVariable ['respawnDisabled',_value,true];";
 					class Value
 					{
@@ -1850,8 +1820,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -1861,7 +1830,7 @@ class Mission
 				};
 				class Attribute4
 				{
-					property="destroyEffect";
+					property="MCC_module_vehicleRespawn_destroyEffect";
 					expression="_this setVariable ['destroyEffect',_value,true];";
 					class Value
 					{
@@ -1869,8 +1838,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -1880,7 +1848,7 @@ class Mission
 				};
 				class Attribute5
 				{
-					property="waitTime";
+					property="MCC_module_vehicleRespawn_waitTime";
 					expression="_this setVariable ['waitTime',_value,true];";
 					class Value
 					{
@@ -1888,8 +1856,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1922,8 +1889,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -1941,8 +1907,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"STRING"
 								};
 							};
@@ -1960,8 +1925,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -1979,8 +1943,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2465,7 +2428,7 @@ class Mission
 			{
 				class Attribute0
 				{
-					property="gunners";
+					property="MCC_Module_createEvac_gunners";
 					expression="_this setVariable ['gunners',_value,true];";
 					class Value
 					{
@@ -2473,8 +2436,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2484,7 +2446,7 @@ class Mission
 				};
 				class Attribute1
 				{
-					property="campaign";
+					property="MCC_Module_createEvac_campaign";
 					expression="_this setVariable ['campaign',_value,true];";
 					class Value
 					{
@@ -2492,8 +2454,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2503,7 +2464,7 @@ class Mission
 				};
 				class Attribute2
 				{
-					property="side";
+					property="MCC_Module_createEvac_side";
 					expression="_this setVariable ['side',_value,true];";
 					class Value
 					{
@@ -2511,8 +2472,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2537,7 +2497,7 @@ class Mission
 			{
 				class Attribute0
 				{
-					property="defaultCASEnabled";
+					property="MCC_Module_settings_defaultCASEnabled";
 					expression="_this setVariable ['defaultCASEnabled',_value,true];";
 					class Value
 					{
@@ -2545,8 +2505,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -2556,7 +2515,7 @@ class Mission
 				};
 				class Attribute1
 				{
-					property="timeAccel";
+					property="MCC_Module_settings_timeAccel";
 					expression="_this setVariable ['timeAccel',_value,true];";
 					class Value
 					{
@@ -2564,8 +2523,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2575,7 +2533,7 @@ class Mission
 				};
 				class Attribute2
 				{
-					property="defaultSupplyDropsEnabled";
+					property="MCC_Module_settings_defaultSupplyDropsEnabled";
 					expression="_this setVariable ['defaultSupplyDropsEnabled',_value,true];";
 					class Value
 					{
@@ -2583,8 +2541,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -2594,7 +2551,7 @@ class Mission
 				};
 				class Attribute3
 				{
-					property="commanderConsole";
+					property="MCC_Module_settings_commanderConsole";
 					expression="_this setVariable ['commanderConsole',_value,true];";
 					class Value
 					{
@@ -2602,8 +2559,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2613,7 +2569,7 @@ class Mission
 				};
 				class Attribute4
 				{
-					property="respawnOnGroupLeader";
+					property="MCC_Module_settings_respawnOnGroupLeader";
 					expression="_this setVariable ['respawnOnGroupLeader',_value,true];";
 					class Value
 					{
@@ -2621,8 +2577,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2632,7 +2587,7 @@ class Mission
 				};
 				class Attribute5
 				{
-					property="sync";
+					property="MCC_Module_settings_sync";
 					expression="_this setVariable ['sync',_value,true];";
 					class Value
 					{
@@ -2640,8 +2595,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2651,7 +2605,7 @@ class Mission
 				};
 				class Attribute6
 				{
-					property="allowRTS";
+					property="MCC_Module_settings_allowRTS";
 					expression="_this setVariable ['allowRTS',_value,true];";
 					class Value
 					{
@@ -2659,8 +2613,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2670,7 +2623,7 @@ class Mission
 				};
 				class Attribute7
 				{
-					property="armedCiviliansWeapons";
+					property="MCC_Module_settings_armedCiviliansWeapons";
 					expression="_this setVariable ['armedCiviliansWeapons',_value,true];";
 					class Value
 					{
@@ -2678,8 +2631,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"STRING"
 								};
 							};
@@ -2689,7 +2641,7 @@ class Mission
 				};
 				class Attribute8
 				{
-					property="logistics";
+					property="MCC_Module_settings_logistics";
 					expression="_this setVariable ['logistics',_value,true];";
 					class Value
 					{
@@ -2697,8 +2649,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2708,7 +2659,7 @@ class Mission
 				};
 				class Attribute9
 				{
-					property="commanderConsoleShowGPS";
+					property="MCC_Module_settings_commanderConsoleShowGPS";
 					expression="_this setVariable ['commanderConsoleShowGPS',_value,true];";
 					class Value
 					{
@@ -2716,8 +2667,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2727,7 +2677,7 @@ class Mission
 				};
 				class Attribute10
 				{
-					property="sqlPDA";
+					property="MCC_Module_settings_sqlPDA";
 					expression="_this setVariable ['sqlPDA',_value,true];";
 					class Value
 					{
@@ -2735,8 +2685,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2746,7 +2695,7 @@ class Mission
 				};
 				class Attribute11
 				{
-					property="CuratorEditDisabled";
+					property="MCC_Module_settings_CuratorEditDisabled";
 					expression="_this setVariable ['CuratorEditDisabled',_value,true];";
 					class Value
 					{
@@ -2754,8 +2703,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -2765,7 +2713,7 @@ class Mission
 				};
 				class Attribute12
 				{
-					property="respawnCinematic";
+					property="MCC_Module_settings_respawnCinematic";
 					expression="_this setVariable ['respawnCinematic',_value,true];";
 					class Value
 					{
@@ -2773,8 +2721,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2784,7 +2731,7 @@ class Mission
 				};
 				class Attribute13
 				{
-					property="deleteBody";
+					property="MCC_Module_settings_deleteBody";
 					expression="_this setVariable ['deleteBody',_value,true];";
 					class Value
 					{
@@ -2792,8 +2739,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2803,7 +2749,7 @@ class Mission
 				};
 				class Attribute14
 				{
-					property="t2t";
+					property="MCC_Module_settings_t2t";
 					expression="_this setVariable ['t2t',_value,true];";
 					class Value
 					{
@@ -2811,8 +2757,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2822,7 +2767,7 @@ class Mission
 				};
 				class Attribute15
 				{
-					property="squadDialog";
+					property="MCC_Module_settings_squadDialog";
 					expression="_this setVariable ['squadDialog',_value,true];";
 					class Value
 					{
@@ -2830,8 +2775,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2841,7 +2785,7 @@ class Mission
 				};
 				class Attribute16
 				{
-					property="messages";
+					property="MCC_Module_settings_messages";
 					expression="_this setVariable ['messages',_value,true];";
 					class Value
 					{
@@ -2849,8 +2793,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2860,7 +2803,7 @@ class Mission
 				};
 				class Attribute17
 				{
-					property="respawnMenu";
+					property="MCC_Module_settings_respawnMenu";
 					expression="_this setVariable ['respawnMenu',_value,true];";
 					class Value
 					{
@@ -2868,8 +2811,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2879,7 +2821,7 @@ class Mission
 				};
 				class Attribute18
 				{
-					property="artilleryComputer";
+					property="MCC_Module_settings_artilleryComputer";
 					expression="_this setVariable ['artilleryComputer',_value,true];";
 					class Value
 					{
@@ -2887,8 +2829,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2898,7 +2839,7 @@ class Mission
 				};
 				class Attribute19
 				{
-					property="commanderConsoleAI";
+					property="MCC_Module_settings_commanderConsoleAI";
 					expression="_this setVariable ['commanderConsoleAI',_value,true];";
 					class Value
 					{
@@ -2906,8 +2847,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2917,7 +2857,7 @@ class Mission
 				};
 				class Attribute20
 				{
-					property="commanderConsoleWP";
+					property="MCC_Module_settings_commanderConsoleWP";
 					expression="_this setVariable ['commanderConsoleWP',_value,true];";
 					class Value
 					{
@@ -2925,8 +2865,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2936,7 +2875,7 @@ class Mission
 				};
 				class Attribute21
 				{
-					property="saveGear";
+					property="MCC_Module_settings_saveGear";
 					expression="_this setVariable ['saveGear',_value,true];";
 					class Value
 					{
@@ -2944,8 +2883,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -2977,8 +2915,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -2996,8 +2933,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3015,8 +2951,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3034,8 +2969,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3053,8 +2987,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3072,8 +3005,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3091,8 +3023,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3110,8 +3041,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3129,8 +3059,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3148,8 +3077,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3181,8 +3109,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3200,8 +3127,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3219,8 +3145,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3238,8 +3163,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3257,8 +3181,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3276,8 +3199,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3295,8 +3217,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3314,8 +3235,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3333,8 +3253,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3352,8 +3271,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"STRING"
 								};
 							};
@@ -3371,8 +3289,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3390,8 +3307,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3409,8 +3325,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"STRING"
 								};
 							};
@@ -3428,8 +3343,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3447,8 +3361,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"BOOL"
 								};
 							};
@@ -3482,8 +3395,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3501,8 +3413,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3520,8 +3431,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3539,8 +3449,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3558,8 +3467,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3577,8 +3485,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3596,8 +3503,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3615,8 +3521,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3648,8 +3553,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3667,8 +3571,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3686,8 +3589,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3705,8 +3607,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3724,8 +3625,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3757,8 +3657,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3776,8 +3675,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3795,8 +3693,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3814,8 +3711,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3833,8 +3729,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3852,8 +3747,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3885,8 +3779,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3904,8 +3797,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3923,8 +3815,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3942,8 +3833,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3961,8 +3851,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -3980,8 +3869,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -4014,8 +3902,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -4033,8 +3920,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -4052,8 +3938,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -4071,8 +3956,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -4090,8 +3974,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -4109,8 +3992,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};
@@ -4134,7 +4016,7 @@ class Mission
 			{
 				class Attribute0
 				{
-					property="radius";
+					property="MCC_Module_ambientCiviliansCuratorDenied_radius";
 					expression="_this setVariable ['radius',_value,true];";
 					class Value
 					{
@@ -4142,8 +4024,7 @@ class Mission
 						{
 							class type
 							{
-								type[]=
-								{
+								type[]={
 									"SCALAR"
 								};
 							};

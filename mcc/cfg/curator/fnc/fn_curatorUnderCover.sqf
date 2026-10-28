@@ -1,8 +1,12 @@
 //============================================================MCC_fnc_curatorUnderCover========================================================================================
 // Sets units as undercover agents
 //===========================================================================================================================================================================
-private ["_object","_module","_resualt","_removeGear","_synced"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private _object = [];
+private _module = objNull;
+private _resualt = [];
+private _removeGear = false;
+private "_synced";
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 //did we get here from the 2d editor?
@@ -31,8 +35,8 @@ _object = _object select 1;
 if (!(local _module) || isnull curatorcamera) exitWith {};
 
 _resualt = ["Undercover Agents",[
- 						["Remove Weapons",true,"Automaticlly remove all weapons from the player"]
- 					  ],"<t align='center'>Turn players unit to undercover units. While undercover, AI units will not be hostile to the player unless he will get too close to AI units, hold a visible weapon or run or cruch inside AI line of sight. Players can conceal handguns and small weapons</t>"] call MCC_fnc_initDynamicDialog;
+ 						["Remove Weapons",true,"Automatically remove all weapons from the player"]
+ 					  ],"<t align='center'>Turn players unit to undercover units. While undercover, AI units will not be hostile to the player unless he will get too close to AI units, hold a visible weapon or run or crouch inside AI line of sight. Players can conceal handguns and small weapons</t>"] call MCC_fnc_initDynamicDialog;
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};
 _removeGear = _resualt select 0;

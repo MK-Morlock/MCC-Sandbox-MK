@@ -1,10 +1,39 @@
-private ["_targetPos","_unit","_veh","_zpos","_anchorPos","_muzzle","_mag","_initSpeed","_currentWeaponMode","_artilleryCharge","_ammo","_eta",
-         "_friction","_vec2Target","_altitude","_dir","_dist","_minElev","_maxElev","_turrets","_turret","_selectedMuzzl","_solution"];
+private "_veh";
+private _zpos = [];
+private "_anchorPos";
+private "_muzzle";
+private _mag = configNull;
+private "_initSpeed";
+private "_currentWeaponMode";
+private _artilleryCharge = 0;
+private _ammo = "";
+private "_eta";
+private _friction = 0;
+private _vec2Target = [];
+private "_altitude";
+private "_dir";
+private "_dist";
+private "_minElev";
+private "_maxElev";
+private _turrets = configNull;
+private "_turret";
+private "_selectedMuzzl";
+private "_solution";
 
 MCC_fnc_calcSolutionInside = 
 {
-	private ["_dist","_altitude","_initSpeed","_friction","_minElev","_maxElev",
-	"_gravity","_low_solution","_eta","_high_solution","_solution","_eta_low_solution"];
+	private "_dist";
+	private "_altitude";
+	private "_initSpeed";
+	private _friction = 0;
+	private "_minElev";
+	private "_maxElev";
+	private _gravity = 0;
+	private "_low_solution";
+	private "_eta";
+	private "_high_solution";
+	private "_solution";
+	private "_eta_low_solution";
 
 	_dist 				= _this select 0;
 	_altitude 			= _this select 1;
@@ -43,8 +72,7 @@ MCC_fnc_calcSolutionInside =
 	_solution;
 };
 
-_targetPos	= _this select 0;
-_unit		= _this select 1;
+params ["_targetPos", "_unit"];
 _veh 		= vehicle _unit;
 _anchorPos = positionCameraToWorld [0,0,0];
 _zpos = [(_anchorPos select 0),(_anchorPos select 1),((getPosASL _veh) select 2)-((getPosATL _veh) select 2)+(_anchorPos select 2)];

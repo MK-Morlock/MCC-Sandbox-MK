@@ -19,16 +19,16 @@ class MCC_module_survivalSpawnCratesCurator : MCC_Module_Base
 			description = "Radius in meters around the module";
 			typeName = "NUMBER";
 			defaultValue = 300;
-			property = "radius";
+			property = "MCC_module_survivalSpawnCratesCurator_radius";
 		};
 
 		class density : Edit
 		{
 			displayName = "Density";
-			description = "density in 1-10 where 10 is max";
+			description = "Density from 1 to 10, where 10 is the maximum";
 			typeName = "NUMBER";
 			defaultValue = 3;
-			property = "density";
+			property = "MCC_module_survivalSpawnCratesCurator_density";
 		};
 
 		class markers : Checkbox
@@ -36,7 +36,7 @@ class MCC_module_survivalSpawnCratesCurator : MCC_Module_Base
 			displayName = "Markers";
 			description = "Create markers";
 			typeName = "BOOL";
-			property = "markers";
+			property = "MCC_module_survivalSpawnCratesCurator_markers";
 		};
 
 		class ModuleDescription: ModuleDescription{};

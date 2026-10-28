@@ -6,9 +6,15 @@
 //===========================================================================================================================================================================
 #define MAX_WP 4
 
-private ["_group","_radius","_nearHouses","_building","_wp","_pos","_leader"];
-_group = [_this, 0, grpNull, [grpNull]] call BIS_fnc_param;
-_radius = [_this, 1, 100, [100]] call BIS_fnc_param;
+private _group = grpNull;
+private _radius = 0;
+private _nearHouses = nil;
+private _building = objNull;
+private _wp = [];
+private _pos = [];
+private _leader = objNull;
+_group = _this param [0, grpNull, [grpNull]];
+_radius = _this param [1, 100, [100]];
 
 if (isnull _group) exitWith {};
 

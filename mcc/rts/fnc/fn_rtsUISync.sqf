@@ -1,0 +1,26 @@
+disableSerialization;
+params [["_disp", uiNamespace getVariable ["MCC_LOGISTICS_BASE_BUILD", displayNull], [displayNull]]];
+if (isNull _disp) exitWith {};
+{
+	private _a = _disp displayCtrl _x;
+	(_disp displayCtrl (_x + 10000)) ctrlShow (ctrlShown _a && {ctrlText _a != ""});
+} forEach [9101, 9102, 9103, 9104, 9105, 9106, 9107, 9108, 9109, 9110, 9111, 9112, 9160, 9161, 9162, 9163];
+private _st = _disp displayCtrl 950;
+private _txt = ctrlText _st;
+private _on = _txt == "Online";
+private _off = _txt == "Offline";
+private _bar = _disp displayCtrl 955;
+private _bw = _bar getVariable ["MCC_baseW", -1];
+if (_bw < 0) then {_bw = (ctrlPosition _bar) select 2; _bar setVariable ["MCC_baseW", _bw]};
+private _bp = ctrlPosition _bar;
+_bp set [2, _bw];
+_bar ctrlSetPosition _bp;
+_bar ctrlCommit 0;
+_bar ctrlSetBackgroundColor ([[0.90, 0.40, 0.36, 1], [0.24, 0.83, 0.54, 1]] select _on);
+_bar ctrlShow (_on || _off);
+(_disp displayCtrl 956) ctrlShow (_on || _off);
+_st ctrlSetTextColor ([[1, 0.48, 0.41, 1], [0.50, 0.94, 0.71, 1]] select _on);
+private _cam = missionNamespace getVariable ["MCC_CONST_CAM", objNull];
+private _cp = if (!isNull _cam) then {getPos _cam} else {getPos player};
+private _locs = (nearestLocations [_cp, ["NameCityCapital", "NameCity", "NameVillage", "NameLocal", "Airport", "NameMarine"], 5000]) select {text _x != ""};
+(_disp displayCtrl 9136) ctrlSetText (if (count _locs > 0) then {text (_locs select 0)} else {""});

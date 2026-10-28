@@ -7,7 +7,11 @@
 //<OUT>
 //	Nothing
 //===========================================================================================================================================================================
-private ["_civArray", "_spawnCenters","_civ","_civSpawnDistance","_arrayName"];
+private "_civArray";
+private _spawnCenters = [];
+private "_civ";
+private _civSpawnDistance = 0;
+private _arrayName = "";
 _spawnCenters =  param [ 0, [], [[]]];
 _civSpawnDistance = param [ 1, 250, [250]];
 _arrayName = param [ 2, "", [""]];

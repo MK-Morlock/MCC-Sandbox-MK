@@ -1,5 +1,25 @@
 disableSerialization;
-private ["_vehicleArray","_vehicleClass","_pos1","_pos2","_escrot","_escrotDriver","_hvtCar","_vipclass","_vipcar","_x1","_y1","_x2","_y2","_group","_cargo","_unit","_cargoNum","_pos","_convoyArray","_vehicle","_x","_var"];
+private _vehicleArray = [];
+private _vehicleClass = nil;
+private _pos1 = [];
+private _pos2 = [];
+private _escrot = "";
+private _escrotDriver = "";
+private _hvtCar = objNull;
+private _vipclass = "";
+private _vipcar = "";
+private _x1 = 0;
+private _y1 = 0;
+private _x2 = 0;
+private _y2 = 0;
+private _group = grpNull;
+private _cargo = objNull;
+private _unit = objNull;
+private _cargoNum = 0;
+private _pos = [];
+private _convoyArray = [];
+private _vehicle = objNull;
+private _var = nil;
 
 _vehicleArray = [];
 for "_i" from 0 to 4 do {
@@ -58,7 +78,9 @@ if (_vipclass != "0") then {
 	//switch cars
 	if (_vipcar != "") then {
 
-		private ["_driver","_hvtCarNew","_index"];
+		private _driver = objNull;
+		private _hvtCarNew = objNull;
+		private _index = 0;
 		_index = _convoyArray find _hvtCar;
 		_pos = getpos _hvtCar;
 		_angle = getdir _hvtCar;

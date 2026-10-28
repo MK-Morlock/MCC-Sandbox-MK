@@ -252,7 +252,7 @@ class MCC_Module_settingsMechanics : Module_F
 		class survivePlayerPosition
 		{
 			displayName = "Survival - Load Player Position";
-			description = "Load Players last know position and teleport it there";
+			description = "Load players' last known positions and teleport them there";
 			typeName = "BOOL";
 			class values
 			{
@@ -296,7 +296,7 @@ class MCC_Module_settingsMechanics : Module_F
 		class survivePlayerStats
 		{
 			displayName = "Survival - Load Player Stats";
-			description = "Load Players last known stats such as health and food";
+			description = "Load players' last known stats such as health and food";
 			typeName = "BOOL";
 			class values
 			{

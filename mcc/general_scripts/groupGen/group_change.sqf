@@ -9,7 +9,7 @@
 #define MCC_GGUNIT_BEHAVIOR 3030
 #define MCC_GroupGenCurrentGroup_IDD 9003
 	
-#define MCC_GroupGenInfoText_IDC 9013
+#define MCC_GroupGenInfoText_IDC 9190
 #define MCC_GroupGenWPBckgr_IDC 9014
 #define MCC_GroupGenWPCombo_IDC 9015
 #define MCC_GroupGenWPformationCombo_IDC 9016
@@ -29,10 +29,16 @@
 #define MCC_GGSAVE_GROUPIDC 3020
 #define MCC_GGVREATE_IDC 3021
 
-private ["_action", "_type", "_comboBox", "_mccdialog", "_groupArray","_displayname","_index","_side","_group","_unit","_show"];
+private _type = 0;
+private _comboBox = controlNull;
+private _mccdialog = controlNull;
+private _groupArray = [];
+private _displayname = "";
+private _index = 0;
+private _show = false;
 disableSerialization;
 
-_action =_this select 0;	//What are we doing
+params ["_action"];	//What are we doing
 _mccdialog = findDisplay groupGen_IDD;	
 
 _show = if ((lbCurSel MCC_GGUNIT_TYPE)==0) then {true} else {false}; 
@@ -113,7 +119,7 @@ if (_action == 0) exitWIth
 			
 			_comboBox = _mccdialog displayCtrl UNIT_CLASS;
 			lbClear _comboBox;
-			private "_counter";
+			private _counter = 0;
 			_counter = 0;
 			{
 				if (MCC_faction == (_x select 0)) then
@@ -309,12 +315,18 @@ if ((_action ==3)&& (MCC_type_index != lbCurSel MCC_GGUNIT_TYPE)) exitWIth						
 		} foreach ["Infantry", "Vehicles", "Tracked/Static", "Motorcycle", "Helicopter", "Fixed-wing", "Ship", "Ammo"];
 		_comboBox lbSetCurSel 0; //MCC_class_index;	
 	};
+	//Refill the class list for the new type list now: selecting the first entry again is not seen as a change, so the
+	//class list kept the single units after switching to Groups until the type was chosen again
+	[0] call (missionNamespace getVariable ["MCC_groupChangeCode", {}]);
 };	
 
 //Save/Delete  custom 
 if (_action ==4) exitWIth
 {
-	private ["_groupArray","_groupToSave","_name","_nul"];
+	private _groupArray = [];
+	private _groupToSave = [];
+	private _name = "";
+	private _nul = [];
 	
 	//Delete
 	if (ctrlText MCC_GGSAVE_GROUPIDC == "Delete Group") then
@@ -328,7 +340,7 @@ if (_action ==4) exitWIth
 			saveProfileNamespace;
 		};
 		
-		_nul = [0] execVM format ["%1mcc\general_scripts\groupGen\group_change.sqf",MCC_path];
+		isNil {["branch"] call MCC_fnc_spawnLists};	//refill the Custom list (the old path here rebuilt it by row number)
 	}
 	else	//Save
 	{

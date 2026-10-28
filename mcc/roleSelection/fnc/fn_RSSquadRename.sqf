@@ -5,7 +5,14 @@
 
 	<OUT>
 ==============================================================================================================================================================================*/
-private ["_group","_groups","_idc","_ctrlGroupIdc","_ctrl","_disp","_hight","_groupsNamesArray","_groupsNames"];
+private "_group";
+private "_groups";
+private _idc = 0;
+private _ctrlGroupIdc = 0;
+private _ctrl = controlNull;
+private "_disp";
+private "_hight";
+private _groupsNames = [];
 disableSerialization;
 
 _idc = param [0,0,[0]];
@@ -17,6 +24,7 @@ if (isNull (_disp displayCtrl _ctrlGroupIdc+700)) then {
 	_ctrl = _disp ctrlCreate ["RscEdit",_ctrlGroupIdc+700,_disp displayCtrl _ctrlGroupIdc];
 	_ctrl ctrlSetPosition [0*safezoneW, 0.0* safezoneH, 0.04 * safezoneW, _hight];
 	_ctrl ctrlSetBackgroundColor [0.692,0.692,0.692,0.9];
+	_ctrl ctrlSetTextColor [0,0,0,1];	//dark text on the light box while editing (white could not be read)
 	(_disp displayCtrl _ctrlGroupIdc+700) ctrlShow false;
 	(_disp displayCtrl _ctrlGroupIdc+700) ctrlCommit 0;
 };
@@ -29,17 +37,17 @@ if !(ctrlShown (_disp displayCtrl _ctrlGroupIdc+700)) then {
 	_name = ctrlText (_disp displayCtrl _ctrlGroupIdc+700);
 
 	if (_name == "") exitWith {
-		[9999,"Squad name can't be empty",3,true] spawn MCC_fnc_setIDCText;
+		["Squad name can't be empty"] spawn MCC_fnc_rsMessage;
 		ctrlDelete (_disp displayCtrl _ctrlGroupIdc+700);
 	};
 
 	if (count (toArray _name) < 3) exitWith {
-		[9999,"Squad name is too short",3,true] spawn MCC_fnc_setIDCText;
+		["Squad name is too short"] spawn MCC_fnc_rsMessage;
 		ctrlDelete (_disp displayCtrl _ctrlGroupIdc+700);
 	};
 
 	if (count (toArray _name) > 12) exitWith {
-		[9999,"Squad name is too long",3,true] spawn MCC_fnc_setIDCText;
+		["Squad name is too long"] spawn MCC_fnc_rsMessage;
 		ctrlDelete (_disp displayCtrl _ctrlGroupIdc+700);
 	};
 
@@ -53,7 +61,7 @@ if !(ctrlShown (_disp displayCtrl _ctrlGroupIdc+700)) then {
 	{_groupsNames pushBack (toLower (_x select 1))} forEach _groups;
 
 	if (toLower _name in _groupsNames) exitWith {
-		[9999,"Squad name is already taken",3,true] spawn MCC_fnc_setIDCText;
+		["Squad name is already taken"] spawn MCC_fnc_rsMessage;
 		ctrlDelete (_disp displayCtrl _ctrlGroupIdc+700);
 	};
 
@@ -74,7 +82,7 @@ if !(ctrlShown (_disp displayCtrl _ctrlGroupIdc+700)) then {
 				publicvariable "CP_guerGroups";
 			};
 
-			case default {
+			default {
 				CP_westGroups set [_idc,[_group,_name]];
 				publicvariable "CP_westGroups";
 			};

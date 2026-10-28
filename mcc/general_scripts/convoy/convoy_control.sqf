@@ -14,10 +14,16 @@
 // to enable/disable debug change option 3 to true/false
 // =========================================================================================================
 
-private ["_units", "_convoy1", "_convoy2", "_debug", "_unit1", "_unit2", "_dist","_count","_c","_convoyArray"];
+private _units = [];
+private _convoy1 = objNull;
+private _convoy2 = objNull;
+private "_debug";
+private "_unit1";
+private "_unit2";
+private "_dist";
+private "_count";
 
-_convoyArray	= _this select 0;
-_c 				= _this select 1;
+params ["_convoyArray", "_c"];
 _count 			= count _convoyArray;
 _convoy1 			= objNull;
 _convoy2 			= objNull; 
@@ -34,7 +40,7 @@ _unit2 = _units select 1;
 while {alive _unit1 && alive _unit2} do {
 	_dist = (_unit1 distance _unit2);
 	if (_dist > 50) then {_unit2 forceSpeed 0; if (_debug) then {hintsilent format ["%1 waiting for %2",_unit2,_unit1]};};
-	if (_dist < 45) then {_unit2 forceSpeed 2; if (_debug) then {hintsilent format ["%1 front slowding down 2",_unit2]};};
+	if (_dist < 45) then {_unit2 forceSpeed 2; if (_debug) then {hintsilent format ["%1 front slowing down 2",_unit2]};};
 	if (_dist < 40) then {_unit2 forceSpeed 5; if (_debug) then {hintsilent format ["%1 front slowing down 4",_unit2]};};
 	// preffered distance
 	if (_dist < 35) then {_unit1 forceSpeed 8;_unit2 forceSpeed 8; if (_debug) then {hintsilent format ["%1 & %2 \nin formation",_unit1,_unit2]};};

@@ -1,6 +1,4 @@
-private ["_objs"];
-_objs =
-[
+private _objs = [
 	["CamoNet_INDP_big_F",[-1.91602,2.5625,0],201.001,1,0,{}],
 	["Land_LampHarbour_F",[-11.0488,-5.14453,0],8.4654,1,0,{}],
 	["Land_Portable_generator_F",[-11.6777,-4.82227,-0.000798464],189.486,1,0,{}],

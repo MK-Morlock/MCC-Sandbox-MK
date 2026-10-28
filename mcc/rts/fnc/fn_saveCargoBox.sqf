@@ -4,7 +4,9 @@
      0: OBJECT - cargoBox/vault item
      1: STRING - save file name
 =========================================================================================================================================================================*/
-private ["_object","_cargo","_saveName"];
+private _object = objNull;
+private _cargo = [];
+private _saveName = "";
 _object = param [0,objnull,[missionNamespace,objnull]];
 _saveName = param [1,"vaultObjects",[""]];
 

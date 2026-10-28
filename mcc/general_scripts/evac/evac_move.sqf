@@ -1,10 +1,20 @@
-private["_heli", "_route", "_endpos", "_height", "_landing ", "_pilot", "_i", "_j", "_pos", "_dist", "_distold", "_angh", "_dir","_startPos","_class",
-		"_accel", "_speed", "_steps", "_inipos", "_offset","_nearSmokes","_wp","_wp2","_distance","_relDirHor","_velocityX","_velocityY","_cargoUnits"];
+private _endpos = [];
+private "_landing";
+private "_pilot";
+private _j = configNull;
+private "_pos";
+private "_startPos";
+private _class = "";
+private _nearSmokes = [];
+private "_wp";
+private "_wp2";
+private _distance = [];
+private _relDirHor = [];
+private "_velocityX";
+private "_velocityY";
+private _cargoUnits = [];
 
-_route         = _this select 0;
-_height        = _this select 1;
-_landing       = _this select 2;
-_heli          = _this select 3;
+params ["_route", "_height", "_landing", "_heli"];
 
 
 _cargoUnits	   = [];
@@ -104,7 +114,7 @@ else
 
 						if (isMultiplayer) then
 						{
-							 [compile format ["unassignVehicle objectFromNetID '%1'; objectFromNetID '%1' action ['eject', vehicle objectFromNetID '%1']", netID _unit], "BIS_fnc_spawn", _unit, false] spawn BIS_fnc_MP;
+							 [[], compile format ["unassignVehicle objectFromNetID '%1'; objectFromNetID '%1' action ['eject', vehicle objectFromNetID '%1']", netID _unit]] remoteExec ["call", _unit, false];
 						}
 						else
 						{
@@ -149,7 +159,11 @@ else
 
 		case 5:			//Fast-rope
 		{
-			private ["_rope","_actualRopes","_ropes","_zc","_attachPoint"];
+			private "_rope";
+			private _actualRopes = [];
+			private _ropes = [];
+			private _zc = 0;
+			private "_attachPoint";
 			_actualRopes = [];
 
 			switch (typeOf _heli) do
@@ -242,7 +256,7 @@ else
 				sleep 0.5;
 			} forEach _ropes;
 
-			sleep 1+ random 2;
+			sleep (1+ random 2);
 
 
 			{
@@ -250,7 +264,12 @@ else
 
 				[_x, _rope] spawn
 					{
-						private ["_unit", "_zc", "_zdelta", "_rope","_timeOut","_time"];
+						private "_unit";
+						private _zc = 0;
+						private "_zdelta";
+						private "_rope";
+						private "_timeOut";
+						private "_time";
 						_unit = _this select 0;
 						_rope = _this select 1;
 						_zdelta = 7 / 10;
@@ -260,7 +279,7 @@ else
 						{
 							_unit action ["GETOUT", vehicle _unit];
 							unassignVehicle _unit;
-							[compile format ["objectFromNetID '%1' switchmove 'crew_tank01_out'", netID _unit], "BIS_fnc_spawn", true, false] call BIS_fnc_MP;
+							[[], compile format ["objectFromNetID '%1' switchmove 'crew_tank01_out'", netID _unit]] remoteExec ["call", 0, false];
 						}
 						else
 						{
@@ -285,11 +304,11 @@ else
 						detach _unit;
 						if (isMultiplayer) then
 						{
-							 [compile format ["objectFromNetID '%1' switchmove '';", netID _unit], "BIS_fnc_spawn", true, false] call BIS_fnc_MP;
+							 [[], compile format ["objectFromNetID '%1' switchmove '';", netID _unit]] remoteExec ["call", 0, false];
 						}
 						else
 						{
-							[compile format ["objectFromNetID '%1' switchmove ''", netID _unit], "BIS_fnc_spawn", true, false] call BIS_fnc_MP;
+							[[], compile format ["objectFromNetID '%1' switchmove ''", netID _unit]] remoteExec ["call", 0, false];
 						};
 					};
 
@@ -336,7 +355,8 @@ else
 	//Do we have a return trip
 	if (count _cargoUnits > 0) then
 	{
-		private ["_crew","_empty"];
+		private "_crew";
+		private _empty = false;
 		_timeOut = time + 30;
 		waitUntil
 		{
@@ -353,7 +373,7 @@ else
 
 		if (_empty && (!isnil "_startPos")) then
 		{
-			[[[_startPos], _height, 1, [netid _heli,_heli]],"MCC_fnc_evacMove",_heli,false] spawn BIS_fnc_MP;
+			[[_startPos], _height, 1, [netid _heli,_heli]] remoteExec ["MCC_fnc_evacMove", _heli, false];
 		};
 	};
 };

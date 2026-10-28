@@ -5,13 +5,28 @@
 #define MCC_UNIT_CLASS 8002
 #define MCC_PRESETS 8005
 
-private ["_type", "_comboBox", "_mccdialog", "_groupArray","_displayname","_index", "_spawn","_presets"];
+private "_type";
+private _comboBox = controlNull;
+private _mccdialog = controlNull;
+private "_groupArray";
+private "_displayname";
+private "_index";
+private _presets = [];
 disableSerialization;
 
 _mccdialog = findDisplay MCC3D_IDD;	
-_spawn = _this select 0; 
-_type = lbCurSel MCC_UNIT_TYPE;
+params ["_spawn"]; 
+_type = lbValue [MCC_UNIT_TYPE, lbCurSel MCC_UNIT_TYPE];
 MCC_class_index = lbCurSel MCC_UNIT_TYPE;
+if ((lbText [MCC_UNIT_TYPE, lbCurSel MCC_UNIT_TYPE]) == "Infantry Groups") exitWith {
+	lbClear (_mccdialog displayCtrl MCC_PRESETS);
+	MCC_3D_groupArray = [mcc_sidename, mcc_faction, "Infantry", "LAND"] call mcc_make_array_grps;
+	if (isNil "MCC_3D_groupArray") then {MCC_3D_groupArray = []};
+	_comboBox = _mccdialog displayCtrl MCC_UNIT_CLASS;
+	lbClear _comboBox;
+	{_comboBox lbAdd format ["%1 (%2 Units)", _x param [3, ""], _x param [4, ""]]} forEach MCC_3D_groupArray;
+	_comboBox lbSetCurSel 0;
+};
 
 //Which perset do we use?
 _presets = [];

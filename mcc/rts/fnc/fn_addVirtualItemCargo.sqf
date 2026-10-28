@@ -3,7 +3,11 @@
 //     0: OBJECT - objct to which items will be added
 //     1: STRING or ARRAY of STRINGs - item class(es) to be added
 //==============================================================================================================================================================================
-private ["_object","_classes","_type","_cargo","_cargoArray"];
+private "_object";
+private _classes = [];
+private _type = 0;
+private _cargo = [];
+private "_cargoArray";
 _object     = param [0,missionnamespace,[missionnamespace,objnull]];
 _classes    = param [1,[],["",true,[]]];
 _add        = param [2,1,[1]];

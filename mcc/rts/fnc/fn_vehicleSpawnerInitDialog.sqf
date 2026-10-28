@@ -1,7 +1,20 @@
 //=================================================================MCC_fnc_vehicleSpawnerInitDialog====================================================================
 //  Open vehicle spawner Dialog
 //=======================================================================================================================================================================
- private ["_side","_comboBox","_mccdialog","_displayname","_index","_array","_rtsAnchor","_caller","_vehicleType","_spawnPad","_arguments","_commadner","_faction","_cost","_sideBuy"];
+ private "_side";
+ private _comboBox = controlNull;
+ private "_mccdialog";
+ private "_displayname";
+ private "_index";
+ private "_array";
+ private _rtsAnchor = configNull;
+ private _caller = objNull;
+ private "_vehicleType";
+ private "_spawnPad";
+ private _arguments = [];
+ private _commadner = false;
+ private "_faction";
+ private _sideBuy = false;
 
 
 //We got here from the addaction
@@ -24,7 +37,7 @@ if ((attachedTo _spawnPad) isKindOf _rtsAnchor && !((missionNamespace getVariabl
    titleText ["Workshop Offline","PLAIN"];
 };
 
-createDialog "MCC_VEHICLESPAWNER";
+createDialog ("MCC_VEHICLESPAWNER" call MCC_fnc_dialogName);
 waitUntil {!isnull (uiNamespace getVariable ["MCC_VEHICLESPAWNER_IDD", displayNull])};
 
 //If it is from commander view use resources if it isn't use valor

@@ -1,6 +1,7 @@
 //=========================================================MCC_fnc_DoorMenuClicked==========================================================================================
 //==============================================================================================================================================================================
-private ["_ctrlData","_object"];
+private _ctrlData = "";
+private "_object";
 disableSerialization;
 #define MCC_CHARGE "ClaymoreDirectionalMine_Remote_Mag"
 #define MCC_MIROR ["MineDetector","MCC_videoProbe"]
@@ -11,7 +12,11 @@ if (_ctrlData == "") exitWith {};
 
 _object = (player getVariable ["interactWith",[]]) select 0;
 
-private ["_door","_animation","_phase","_closed","_tempArray"];
+private "_door";
+private "_animation";
+private "_phase";
+private "_closed";
+private _tempArray = [];
 _tempArray = [_object]  call MCC_fnc_isDoor;
 _door = _tempArray select 0;
 _animation = _tempArray select 1;
@@ -48,7 +53,11 @@ switch (true) do {
 	};
 
 	case (_ctrlData == "camera"): {
-		private ["_camera","_ppgrain","_ppblair","_keyDown","_tablet"];
+		private _camera = "";
+		private "_ppgrain";
+		private "_ppblair";
+		private _keyDown = controlNull;
+		private _tablet = "";
 		closedialog 0;
 		player setVariable ["MCC_mirrorCamOff",false];
 
@@ -143,7 +152,11 @@ switch (true) do {
 	case (_ctrlData == "breachandbang"):
 	{
 		//Breach & bang
-		private ["_grenadesType","_grenade","_grenadePic","_grenadeText","_array"];
+		private _grenadesType = [];
+		private "_grenade";
+		private _grenadePic = "";
+		private _grenadeText = "";
+		private _array = [];
 		_array = [["closeDialog 0","<t size='1' align='center' color='#ffffff'>Breach N Bang</t>",""]];
 
 		_grenadesType = [];

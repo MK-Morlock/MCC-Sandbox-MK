@@ -3,7 +3,15 @@
 
 ================================================================================================================================================*/
 
-private ["_vehicle","_pylonsDialog","_pylonsAvailable","_mag","_resualt","_magType","_zeus","_exit","_turrets"];
+private _vehicle = objNull;
+private _pylonsDialog = [];
+private _pylonsAvailable = configNull;
+private _mag = [];
+private _resualt = [];
+private "_magType";
+private _zeus = false;
+private _exit = false;
+private _turrets = configNull;
 _zeus = param [0,true,[true,objNull]];
 
 //If we initilize the loadouts are

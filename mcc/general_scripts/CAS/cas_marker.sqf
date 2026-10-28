@@ -1,12 +1,9 @@
-private ["_plane","_mkrType","_mkrText","_mkrColor","_ammount","_mkrName","_mkr","_grpName"];
+private _mkrName = "";
+private "_mkr";
 
 // ====================================================================================
 
-_plane = _this select 0;
-_mkrType = _this select 1;
-_mkrText = _this select 2;
-_mkrColor = _this select 3;
-_ammount = _this select 4;
+params ["_plane", "_mkrType", "_mkrText", "_mkrColor", "_ammount"];
 _mkrName = format ["mkr_%1",_plane];
 
 _mkr = createMarker [_mkrName,[(getPos _plane select 0),(getPos _plane select 1)]];

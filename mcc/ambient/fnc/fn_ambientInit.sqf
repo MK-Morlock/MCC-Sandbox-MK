@@ -9,7 +9,23 @@
 // _factionCiv			STRING - the units' faction
 // _factionCivCar		STRING - the units' cars faction
 //==================================================================================================================================================================
-private ["_spawnCenters","_isCiv","_player","_civArray","_civCount","_civSpawnDistance","_maxCivSpawn","_factionCiv","_unitsArray","_vehiclesArray","_isCar","_carCount","_carArray","_isParkedCar","_isLocked","_civRelations","_factionCivCar"];
+private _spawnCenters = [];
+private _isCiv = false;
+private "_player";
+private _civArray = [];
+private _civCount = 0;
+private _civSpawnDistance = 0;
+private _maxCivSpawn = 0;
+private _factionCiv = "";
+private _unitsArray = [];
+private _vehiclesArray = [];
+private _isCar = false;
+private _carCount = 0;
+private _carArray = [];
+private _isParkedCar = false;
+private _isLocked = false;
+private "_civRelations";
+private _factionCivCar = "";
 _isCiv =  param [0, true, [true]];
 _isCar = param [1, true, [true]];
 _isParkedCar = param [2, true, [true]];
@@ -18,6 +34,32 @@ _civSpawnDistance = param [4, 250, [250]];
 _maxCivSpawn = param [5, 4, [4]];
 _factionCiv	= param [6, "CIV_F", [""]];
 _factionCivCar = param [7, "CIV_F", [""]];
+
+// Only one ambient-civilians loop runs: starting it again (placing the module again) replaces the previous settings.
+// With civilians, driving cars and parked cars all unticked it stops and removes every ambient civilian and car.
+private _runId = (missionNamespace getVariable ["MCC_ambientRunId", 0]) + 1;
+missionNamespace setVariable ["MCC_ambientRunId", _runId];
+
+private _fnc_clear = {
+	params ["_var", "_isVehicle"];
+	{
+		if (!isNull _x) then {
+			if (_isVehicle) then {{deleteVehicle _x} forEach crew _x};
+			private _grp = group _x;
+			deleteVehicle _x;
+			if (!isNull _grp && {count units _grp == 0}) then {deleteGroup _grp};
+		};
+	} forEach (missionNamespace getVariable [_var, []]);
+	missionNamespace setVariable [_var, [], true];
+};
+if (!_isCiv) then {["MCC_ambientCivilians", false] call _fnc_clear};
+if (!_isCar) then {["MCC_ambientCars", true] call _fnc_clear};
+if (!_isParkedCar) then {["MCC_ambientParkedCars", true] call _fnc_clear};
+
+if (!_isCiv && !_isCar && !_isParkedCar) exitWith {
+	["INFO", "MCC_fnc_ambientInit", "ambient civilians stopped and removed", []] call MCC_fnc_log;
+};
+["INFO", "MCC_fnc_ambientInit", "ambient civilians started: civilians %1, driving cars %2, parked cars %3, distance %4, max %5, faction %6 / %7", [_isCiv, _isCar, _isParkedCar, _civSpawnDistance, _maxCivSpawn, _factionCiv, _factionCivCar]] call MCC_fnc_log;
 
 //Let's build the faction unit's array
 _unitsArray 	= [_factionCiv,"soldier","men"] call MCC_fnc_makeUnitsArray;
@@ -34,7 +76,7 @@ if(count _vehiclesArray < 4) then {
 //Scared civi AI beahvior
 MCC_fnc_ambientCivilianFiredNearEH = {
 	params ["_civ","_shooter"];
-	private ["_runAwayPos"];
+	private _runAwayPos = [];
 	if ((_civ getVariable ["MCC_ambientCiviliansIsScared",false]) || !(_civ == driver vehicle _civ)) exitWith {};
 
 	_civ setVariable ["MCC_ambientCiviliansIsScared",true];
@@ -58,7 +100,7 @@ MCC_fnc_ambientCivilianFiredNearEH = {
 	};
 };
 
-while {true} do {
+while {(missionNamespace getVariable ["MCC_ambientRunId", 0]) == _runId} do {
 	_spawnCenters = if (isMultiplayer) then {playableUnits} else {[player]};
 
 	//Do we have units going around?

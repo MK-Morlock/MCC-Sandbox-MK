@@ -13,12 +13,23 @@
 #define MCC_CONSOLEINFOLIVEFEED (uiNamespace getVariable "MCC_CONSOLEINFOLIVEFEED")
 #define MCC_CONSOLEINFOTEXT (uiNamespace getVariable "MCC_CONSOLEINFOTEXT")
 
-private ["_mccdialog","_group","_button","_posX","_posY","_shift","_ctrl","_alt","_html","_info","_rank","_icon","_groupControl","_groupSize","_properCfg","_lineCounter"];
+private _mccdialog = controlNull;
+private "_posX";
+private "_posY";
+private "_shift";
+private "_ctrl";
+private "_alt";
+private _html = "";
+private _info = [];
+private _rank = [];
+private _groupControl = false;
+private _groupSize = "";
+private _properCfg = 0;
+private _lineCounter = 0;
 disableSerialization;
 _mccdialog = findDisplay MCC_SQLPDA_IDD;
 
-_group = _this select 0;
-_button = _this select 1;
+params ["_group", "_button"];
 _posX = (_this select 2) select 0;
 _posY = (_this select 2) select 1;
 _shift = _this select 3;
@@ -132,7 +143,8 @@ if (_button == 1) then
 		};
 	};
 
-	private ["_UIFactor","_ctrl","_displayname"];
+	private "_UIFactor";
+	private "_ctrl";
 
 	_UIFactor = (0.02 * _lineCounter)* safezoneH;
 

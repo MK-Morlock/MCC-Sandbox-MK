@@ -7,7 +7,6 @@
 // <OUT>
 //      <Nothing>
 //===========================================================================================================================================================================
-private ["_target"];
 disableSerialization;
 
 _object = param [0,missionnamespace,[missionnamespace,objnull]];

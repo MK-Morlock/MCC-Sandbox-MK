@@ -1,5 +1,5 @@
 // script called by event handler in order to display server and Headless client FPS in MCC Gui
-private ["_i"];
+private _i = 0;
 
 //diag_log format ["FPS: this: [%1] - running [%2]", _this, mcc_fps_running];
 

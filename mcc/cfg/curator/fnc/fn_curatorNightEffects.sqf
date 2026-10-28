@@ -1,8 +1,10 @@
 //============================================================MCC_fnc_curatorNightEffects========================================================================================
 // Manage night effects
 //===========================================================================================================================================================================
-private ["_pos","_module","_resualt"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private "_pos";
+private _module = objNull;
+private _resualt = [];
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 //Not curator exit
@@ -20,9 +22,8 @@ _resualt = ["Set Night Effects",[
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};
 
-private ["_radius","_ignorePlayers"];
-_radius = _resualt select 0;
-_ignorePlayers = _resualt select 4;
+private _radius = _resualt select 0;
+private _ignorePlayers = _resualt select 4;
 
 //Lights
 if (_resualt select 1) then {

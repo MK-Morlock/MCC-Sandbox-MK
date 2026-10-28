@@ -4,7 +4,10 @@
 // _uav = OBJECT
 // _time = INTEGER - time until the uav got deleted
 //===========================================================================================================================================================================
-private ["_uav","_time","_markUnits","_varName"];
+private "_uav";
+private "_time";
+private _markUnits = [];
+private _varName = "";
 params ["_uav","_time"];
 
 _time = time + _time;

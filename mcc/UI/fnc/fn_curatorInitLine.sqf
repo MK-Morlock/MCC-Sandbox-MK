@@ -11,7 +11,46 @@
 =======================================================================================================================================================================*/
 #include "..\..\script_component.hpp"
 
-private ["_time","_target","_avtiveControls","_curator","_idc","_control","_display","_controlPos","_posY","_ctrlBackground","_ctrlTitle","_ctrlContent","_ctrlButtonOK","_ctrlButtonCancel","_ctrlBackgroundPos","_ctrlTitlePos","_ctrlContentPos","_ctrlButtonOKPos","_ctrlButtonCancelPos","_ctrlTitleOffsetY","_ctrlContentOffsetY","_name","_ctrlButtonCustom","_ctrlButtonCustomPos","_comboBox","_displayname","_ctrlButtonCustom2","_ctrlButtonCustom2Pos","_ctrlButtonCustom3","_ctrlButtonCustom3Pos","_cargoEnabled","_loadOutEnabled","_presetType","_preset","_targetData","_targetCategory","_targetType","_class","_cfgControl","_keyUp","_keyDown","_garageEnabled"];
+private "_time";
+private _avtiveControls = configNull;
+private _idc = 0;
+private _control = controlNull;
+private _display = controlNull;
+private "_controlPos";
+private "_posY";
+private _ctrlBackground = controlNull;
+private _ctrlTitle = controlNull;
+private _ctrlContent = controlNull;
+private _ctrlButtonOK = controlNull;
+private _ctrlButtonCancel = controlNull;
+private "_ctrlBackgroundPos";
+private "_ctrlTitlePos";
+private "_ctrlContentPos";
+private "_ctrlButtonOKPos";
+private "_ctrlButtonCancelPos";
+private "_ctrlTitleOffsetY";
+private "_ctrlContentOffsetY";
+private _name = configNull;
+private _ctrlButtonCustom = controlNull;
+private "_ctrlButtonCustomPos";
+private _comboBox = controlNull;
+private "_displayname";
+private _ctrlButtonCustom2 = controlNull;
+private "_ctrlButtonCustom2Pos";
+private _ctrlButtonCustom3 = controlNull;
+private "_ctrlButtonCustom3Pos";
+private _cargoEnabled = false;
+private _loadOutEnabled = configNull;
+private _presetType = "";
+private "_preset";
+private "_targetData";
+private "_targetCategory";
+private "_targetType";
+private _class = nil;
+private "_cfgControl";
+private _keyUp = controlNull;
+private _keyDown = controlNull;
+private _garageEnabled = false;
 disableSerialization;
 
 #define MCCCuratorInit_IDD 10000
@@ -24,8 +63,7 @@ disableSerialization;
 #define IDC_OK	1
 #define IDC_CANCEL 2
 
-_curator 		= _this select 0;
-_target 		= _this select 1;
+params ["_curator", "_target"];
 _time 			= time +0.1;
 MCC_unitInit 	= "";
 MCC_unitName 	= "";
@@ -39,7 +77,7 @@ if (!alive _target || isNull _target || (_target isKindof "Module_F") || (missio
 
 //_target call bis_fnc_showCuratorAttributes;
 
-_str = "<t size='0.8' t font = 'puristaLight' color='#FFFFFF'>" + "Hold Alt to disable MCC edit" + "</t>";
+_str = "<t size='0.8' font='PuristaLight' color='#FFFFFF'>" + "Hold Alt to disable MCC edit" + "</t>";
 _null = [_str,0,1.1,2,0.1,0.0] spawn bis_fnc_dynamictext;
 
 //What are we dealing here
@@ -227,7 +265,10 @@ _ctrlButtonOK ctrladdeventhandler [
 {_x ctrlShow false} forEach [_ctrlButtonCustom, _ctrlButtonCustom2,_ctrlButtonCustom3];
 
 //Build custom controls
-private ["_ctrlPos","_lastCtrl","_baseCtrlPos","_counter"];
+private "_ctrlPos";
+private "_lastCtrl";
+private "_baseCtrlPos";
+private _counter = 0;
 _lastCtrl = _ctrlButtonOK;
 _baseCtrlPos = ctrlPosition _ctrlButtonOK;
 _counter = 0;
@@ -246,7 +287,7 @@ _counter = 0;
 		};
 
 		_ctrlPos set [0, (_ctrlPos select 0) - ((_ctrlPos select 2)*1.1)];
-		_ctrl = (ctrlParent _lastCtrl) ctrlCreate ["RscButtonMenuOK", -1];
+		_ctrl = (ctrlParent _lastCtrl) ctrlCreate ["MCC_RscButtonMenuOK", -1];
 		_ctrl ctrlSetPosition _ctrlPos;
 		_ctrl ctrlsetText _text;
 		_ctrl ctrlSetBackgroundColor [(profilenamespace getvariable ['GUI_BCG_RGB_R',0.69]),(profilenamespace getvariable ['GUI_BCG_RGB_G',0.75]),(profilenamespace getvariable ['GUI_BCG_RGB_B',0.5]),(profilenamespace getvariable ['GUI_BCG_RGB_A',0.8])];
@@ -315,12 +356,12 @@ _counter = 0;
 waituntil {!dialog};
 if (MCC_unitName != "") then
 {
-	[[[netid _target,_target], MCC_unitName], "MCC_fnc_setVehicleName", true, true] spawn BIS_fnc_MP;
+	[[netid _target,_target], MCC_unitName] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 };
 
 if (MCC_unitInit != "" && (MCC_unitInit != (_target getVariable ["vehicleInit",""]))) then
 {
-	[[[netid _target,_target], MCC_unitInit], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
+	[[netid _target,_target], MCC_unitInit] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
 };
 
 /*

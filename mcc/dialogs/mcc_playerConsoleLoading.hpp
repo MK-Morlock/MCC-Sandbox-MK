@@ -32,7 +32,7 @@ class MCC_playerConsoleLoading {
   };
   
  //========================================= Background========================================
-	class mcc_ConsolePic: MCC_RscPicture	{idc = -1;text = __EVAL(MCCPATH +"data\console.paa");
+	class mcc_ConsolePic: MCC_RscPicture	{idc = -1;text = __EVAL(MCCPATH +"data\mk_cc_ca.paa");
 		x = -0.0446875 * safezoneW + safezoneX;
 		y = 0.0939094 * safezoneH + safezoneY;
 		w = 1.00406 * safezoneW;

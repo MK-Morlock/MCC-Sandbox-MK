@@ -24,10 +24,11 @@ params [["_object", objNull, [objNull]],
 		["_shellshockEffect", true, [true]]
 	   ];
 
-if (isNull _object) exitWith {diag_log "MCC Error: MCC_fnc_addVelocity - invalid object"};
-if (!local _object) exitWith  {diag_log "MCC Error: MCC_fnc_addVelocity - Object isn't local"};
+if (isNull _object) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC Error: MCC_fnc_addVelocity - invalid object"}};
+if (!local _object) exitWith  {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC Error: MCC_fnc_addVelocity - Object isn't local"}};
 
-private ["_vel","_dir"];
+private "_vel";
+private "_dir";
 _object = vehicle _object;
 _vel = velocity _object;
 
@@ -43,7 +44,7 @@ if (isplayer _object && ( vehicle _object == _object) ) then {
 	//Stop damage
 	if (_simDamage) then {_object allowDamage false};
 
-	private "_rag";
+	private _rag = "";
 	_rag = "Land_Can_V3_F" createVehicleLocal [0,0,0];
 	_rag setMass 1e10;
 	_rag attachTo [_object, [0,0,0], "Spine3"];
@@ -74,8 +75,7 @@ if (isplayer _object && ( vehicle _object == _object) ) then {
 		[] spawn {
 			addCamShake [2, 5, 20];
 
-			private ["_blur"];
-			_blur = ppEffectCreate ["DynamicBlur", 474];
+			private _blur = ppEffectCreate ["DynamicBlur", 474];
 			_blur ppEffectEnable true;
 			_blur ppEffectAdjust [0];
 			_blur ppEffectCommit 0;

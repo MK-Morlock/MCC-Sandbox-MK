@@ -7,11 +7,14 @@
 // <OUT>
 //		<nothing>
 //===========================================================================================================================================================================
-private ["_object","_str","_typeOfSelected","_return","_n","_position","_c4"];
 
-_object = _this select 0;
+params ["_object"];
 
-private ["_door","_animation","_phase","_closed","_tempArray"];
+private "_door";
+private "_animation";
+private "_phase";
+private "_closed";
+private _tempArray = [];
 _tempArray = [_object]  call MCC_fnc_isDoor;
 _door = _tempArray select 0;
 _animation = _tempArray select 1;

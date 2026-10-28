@@ -1,12 +1,12 @@
 //==================================================================MCC_fnc_setVariable======================================================================================
 // Global execute a command on server only  - SERVER ONLY
-// Example: [[varName,playerID,VarValue], "MCC_fnc_setVariable", false, false] spawn BIS_fnc_MP;
+// Example: [varName,playerID,VarValue] remoteExec ["MCC_fnc_setVariable", false, false];
 //==============================================================================================================================================================================
 
-private ["_varName","_id","_value","_player","_varType","_name"];
-_varName 	= _this select 0;
-_player 	= _this select 1;
-_value		= _this select 2;
+private "_id";
+private _varType = "";
+private "_name";
+params ["_varName", "_player", "_value"];
 _varType	= toUpper (_this select 3);
 
 if(!isServer) exitWith {};

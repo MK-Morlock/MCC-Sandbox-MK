@@ -4,9 +4,10 @@
 //		_ActionName - string
 // Out: keys names - string
 //==============================================================================================================================================================================
-private ["_modName","_ActionName","_keySetup","_specKeys","_name"];
-_modName = _this select 0;
-_ActionName = _this select 1;
+private "_keySetup";
+private "_specKeys";
+private _name = "";
+params ["_modName", "_ActionName"];
 
 _name = "";
 _keySetup = (([_modName,_ActionName] call CBA_fnc_getKeybind) select 5) ;

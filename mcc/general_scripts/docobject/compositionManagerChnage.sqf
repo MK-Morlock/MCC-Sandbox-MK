@@ -9,10 +9,15 @@
 #define MCC_3DComploadBcgIDC 8017
 #define MCC_INITBOX 8004 
 
-private ["_mccdialog","_pos","_comboBox","_index","_type","_saveIndex","_string","_tempText"];
+private _mccdialog = controlNull;
+private _comboBox = controlNull;
+private "_index";
+private "_saveIndex";
+private "_string";
+private "_tempText";
 disableSerialization;
 _mccdialog = findDisplay MCC3D_IDD;
-_type = _this select 0;
+params ["_type"];
 _saveIndex = (lbCurSel MCC_3DCompssaveListIDC);
 if (isnil "_saveIndex" || _saveIndex == -1) then {_saveIndex = 0}; 
 switch (_type) do
@@ -54,7 +59,7 @@ switch (_type) do
 	case 2: //Load MCC Composition from uinamespace
 		{
 			_string = (profileNamespace getVariable "MCC_3DCompSaveFiles") select _saveIndex;
-			if (_string == "" ) exitWith {hint "Composition load failed! : No MCC Composition pasted from namespace"};
+			if (_string == "" ) exitWith {hint "Composition load failed: no MCC composition pasted from the namespace"};
 			_tempText = ctrlText MCC_INITBOX;
 			_string = "[position _this, getdir _this," + _string +"] call MCC_fnc_objectMapper; deleteVehicle _this;" + _tempText; 			
 			ctrlSetText [MCC_INITBOX,_string];

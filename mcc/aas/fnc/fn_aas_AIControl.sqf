@@ -4,7 +4,15 @@
 			IN
 				_this select 0 -  _side 			- SIDE - side to handle
 		*/
-private ["_side","_sectors","_attackZonesPos","_group","_leader","_closestZonePos","_defendRatio","_allPos","_wpPos"];
+private "_side";
+private _sectors = [];
+private _attackZonesPos = [];
+private "_group";
+private "_leader";
+private "_closestZonePos";
+private _defendRatio = 0;
+private "_allPos";
+private "_wpPos";
 _side = param [0, west];
 _defendRatio = 0.2;
 

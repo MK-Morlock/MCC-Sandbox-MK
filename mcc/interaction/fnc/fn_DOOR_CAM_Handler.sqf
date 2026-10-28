@@ -1,14 +1,22 @@
 //=========================================================MCC_fnc_DOOR_CAM_Handler==========================================================================================
 //==============================================================================================================================================================================
-private ["_keyNightVision","_keysBanned","_keyForward","_keyBack","_keyLeft","_keyRight","_mode","_input","_NVGstate","_camTarget","_pos","_relDir"];
+private "_keyNightVision";
+private _keysBanned = [];
+private "_keyForward";
+private "_keyBack";
+private "_keyLeft";
+private "_keyRight";
+private "_NVGstate";
+private _camTarget = [];
+private "_pos";
+private _relDir = [];
 _keyNightVision	= actionKeys "NightVision";
 _keysBanned		= [1,15];
 _keyForward		= actionKeys "carForward";
 _keyBack		= actionKeys "carBack";
 _keyLeft		= actionKeys "carLeft";
 _keyRight		= actionKeys "carRight";
-_mode 	= _this select 0;
-_input 	= _this select 1;
+params ["_mode", "_input"];
 _cam 	= player getVariable ["MCC_doorCam",objNull];
 _camTarget = _cam getVariable ["MCC_DOORCAM_TARGET",[0,2,0]];
 

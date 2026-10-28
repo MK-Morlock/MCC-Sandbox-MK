@@ -7,12 +7,20 @@
 // <OUT>
 //		<nothing>
 //===========================================================================================================================================================================
-private ["_object","_addIndex","_eh","_camera","_keyDown","_tablet"];
+private "_addIndex";
+private "_eh";
+private _camera = "";
+private _keyDown = controlNull;
+private _tablet = "";
 #define MCC_MIROR ["MineDetector","MCC_videoProbe"]
 
-_object = _this select 0;
+params ["_object"];
 
-private ["_door","_animation","_phase","_closed","_tempArray"];
+private "_door";
+private "_animation";
+private "_phase";
+private "_closed";
+private _tempArray = [];
 _tempArray = [_object]  call MCC_fnc_isDoor;
 _door = _tempArray select 0;
 _animation = _tempArray select 1;

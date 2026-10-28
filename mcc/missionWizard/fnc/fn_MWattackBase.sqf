@@ -6,15 +6,28 @@
 /
 /	OUT <NOTHING>
 /=========================================================================================================*/
-private ["_side","_factionEnemy","_enemySide","_startLocation","_strength","_fronts","_d","_spawnPos","_simu","_roads","_unitsArray","_grp","_vehicle","_pos"];
+private "_side";
+private _factionEnemy = "";
+private _enemySide = configNull;
+private "_startLocation";
+private "_strength";
+private _fronts = [];
+private _d = 0;
+private "_spawnPos";
+private _simu = [];
+private "_roads";
+private "_unitsArray";
+private _grp = [];
+private "_vehicle";
+private _pos = [];
 _side = param [0, sideLogic, [sideLogic]];
 _factionEnemy = param [1,"OPF_F",[""]];
-_enemySide = (getNumber (configfile >> "CfgFactionClasses" >> _factionEnemy >> "side")) call BIS_fnc_sideType;
+_enemySide = ([_factionEnemy] call MCC_fnc_factionSide) call BIS_fnc_sideType;
 
 _startLocation = missionNamespace getVariable [format ["MCC_START_%1",_side],[0,0,0]];
 
-if (str _startLocation == "[0,0,0]") exitWith {diag_log "MCC: MCC_fnc_attackBase error - base not found"};
-if (_factionEnemy isEqualTo "") exitWith {diag_log "MCC: MCC_fnc_MWattackBase - error No enemy faction found "};
+if (str _startLocation == "[0,0,0]") exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: MCC_fnc_attackBase error - base not found"}};
+if (_factionEnemy isEqualTo "") exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: MCC_fnc_MWattackBase - error No enemy faction found "}};
 
 //Lets calculate strength
 _strength = (_side countSide allUnits) max 10;
@@ -32,7 +45,7 @@ for "_i" from 0 to 360 step 30 do {
 	_fronts pushBack ([_startLocation, _d,_i] call BIS_fnc_relPos);
 };
 
-if (count _fronts <=0) exitWith {diag_log "MCC: MCC_fnc_attackBase error - no fronts found"};
+if (count _fronts <=0) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: MCC_fnc_attackBase error - no fronts found"}};
 
 //spawn units acoording to the strength of the base
 for "_i" from 0 to _strength step 5 do {
@@ -67,13 +80,10 @@ for "_i" from 0 to _strength step 5 do {
 
 		//Spawn units
 		if (_simu == "soldier") then {
-			_units = [];
-			for "_i" from 0 to ((floor random 10) max 3) step 1 do {
-				_units pushBack ((_unitsArray call BIS_fnc_selectRandom) select 0);
-			};
+			_units = [_unitsArray, 4 + floor random 7] call MCCMK_fnc_buildSquad;
 			_grp = [_spawnPos, _enemySide, _units] call BIS_fnc_spawnGroup;
 		} else {
-			([_spawnPos, 200, ((_unitsArray call BIS_fnc_selectRandom) select 0), _enemySide] call MCC_fnc_spawnVehicle) params [
+			([_spawnPos, 200, ([[_unitsArray, "patrol"] call MCCMK_fnc_pickVehicle] apply {if (_x == "") then {(_unitsArray call BIS_fnc_selectRandom) select 0} else {_x}}) select 0, _enemySide] call MCC_fnc_spawnVehicle) params [
 					["_vehicle",objNull,[objNull]],
 					["_units",[],[[]]],
 					["_grp",grpNull,[grpNull]]

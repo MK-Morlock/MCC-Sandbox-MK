@@ -1,7 +1,33 @@
 //======================================================MCC_fnc_dayCycle=================================================================================================
 //Control day and night cycle gain tickets and change weather every day
 //=======================================================================================================================================================================
-private ["_dayCounter","_hourCounter","_goingUp","_overcast","_WindForce","_Waves","_Rain","_Lightnings","_fog","_time","_evac","_sideRep","_sidePlayer2","_CompleteText","_ticketsGain","_side","_resVar","_resArray","_resourceDecreasing","_units","_tickets","_elecUnits","_isElecOn","_buildingLevel","_sides","_value","_showText","_factionEnemy","_elecVar","_enemySides"];
+private "_dayCounter";
+private "_hourCounter";
+private "_goingUp";
+private "_overcast";
+private "_WindForce";
+private "_Waves";
+private "_Rain";
+private "_Lightnings";
+private "_fog";
+private _time = 0;
+private _sideRep = 0;
+private "_sidePlayer2";
+private _CompleteText = "";
+private "_side";
+private _resVar = "";
+private "_resArray";
+private _resourceDecreasing = false;
+private _units = {};
+private _tickets = [];
+private "_isElecOn";
+private _buildingLevel = 0;
+private _sides = [];
+private "_value";
+private _showText = false;
+private _factionEnemy = "";
+private _elecVar = "";
+private "_enemySides";
 waitUntil {time >0};
 
 _sidePlayer = param [0, west, [sideLogic]];
@@ -47,7 +73,8 @@ while {true} do {
 			_showText = false;
 
 			//get number of storage
-			([["resources","units","electricity"],playerSide] call MCC_fnc_rtsCalculateResourceTreshold) params [
+			// _side, not playerSide: this runs on the server, where playerSide is not the side being checked
+			([["resources","units","electricity"],_side] call MCC_fnc_rtsCalculateResourceTreshold) params [
 									["_cargoSpace",0,[0]],
 									["_unitsSpace",0,[0]],
 									["_fuelForElectricity",0,[0]]
@@ -83,7 +110,7 @@ while {true} do {
 			} foreach _resArray;
 
 			if (_resourceDecreasing) then {
-				_CompleteText = _CompleteText + format ["<img image='%1data\IconRepair.paa'/> We are loosing resources. Build more Storage Areas<br/><br/>", MCC_path];
+				_CompleteText = _CompleteText + format ["<img image='%1data\IconRepair.paa'/> We are losing resources. Build more Storage Areas<br/><br/>", MCC_path];
 				_showText = true;
 			} else {
 				_CompleteText = _CompleteText + format ["<img image='%1data\IconRepair.paa'/> We have enough Storage Areas<br/><br/>", MCC_path];
@@ -95,7 +122,7 @@ while {true} do {
 
 			//Send hint
 			if (_showText) then {
-				[[_CompleteText,true],"MCC_fnc_globalHint",_side,false] spawn BIS_fnc_MP;
+				[_CompleteText,true] remoteExec ["MCC_fnc_globalHint",_side,false];
 			};
 
 		} forEach _sides;
@@ -112,7 +139,7 @@ while {true} do {
 		{
 			_side = _x;
 
-			([["units"],playerSide,true] call MCC_fnc_rtsCalculateResourceTreshold) params [
+			([["units"],_side,true] call MCC_fnc_rtsCalculateResourceTreshold) params [
 									["_unitsSpace",0,[0]],
 									["_buildings",[],[[]]]
 								   ];
@@ -124,13 +151,13 @@ while {true} do {
 			//units
 			_CompleteText = _CompleteText + format ["<t align='center' size='1.2' color='#FFCF11'><img image='%1data\IconMen.paa'/> Morale <br/></t>", MCC_path];
 
-			_units = {side _x == _side && (isPlayer _x || group _x getVariable ["MCC_canbecontrolled",false])} count allUnits;
+			_units = [_side] call MCC_fnc_rtsCountPersonnel;
 
 			if (_units > _unitsSpace) then {
 				_tickets = [_side, (_units - _unitsSpace)*-1] call BIS_fnc_respawnTickets;
-				_CompleteText = _CompleteText + format ["<t color='#FF0000'>Missing %1 Sleeping Bunks - %1 tickets decreased<br/></t>",(_units - _unitsSpace)];
+				_CompleteText = _CompleteText + format ["<t color='#FF0000'>Missing %1 sleeping bunks - tickets reduced by %1<br/></t>",(_units - _unitsSpace)];
 			} else {
-				_CompleteText = _CompleteText + "We Have Enough sleeping bunks<br/>";
+				_CompleteText = _CompleteText + "We have enough sleeping bunks<br/>";
 			};
 
 			_CompleteText = _CompleteText + "<br/>";
@@ -181,7 +208,7 @@ while {true} do {
 					[_x,_factionEnemy] spawn MCC_fnc_MWattackBase
 				} else {
 					if (random 100 < _sideRep) then {
-						_CompleteText = _CompleteText 	+ "<t color='#FF0000'>Your actions did not go unnoticed, enemy forces are more likely to attck. <br/></t>";
+						_CompleteText = _CompleteText 	+ "<t color='#FF0000'>Your actions did not go unnoticed, enemy forces are more likely to attack. <br/></t>";
 						_sideRep = _sideRep *2;
 					} else {
 						_CompleteText = _CompleteText 	+ "Enemy forces are not searching for your forces<br/>";
@@ -210,11 +237,11 @@ while {true} do {
 					_Lightnings = (Lightnings -0.2) max 0;
 					_fog = (fog -0.2) max 0;
 				};
-				[[[_overcast, _WindForce, _Waves, _Rain, _Lightnings,_fog,_time]],"MCC_fnc_setWeather",true,false] spawn BIS_fnc_MP;
+				[[_overcast, _WindForce, _Waves, _Rain, _Lightnings,_fog,_time]] remoteExec ["MCC_fnc_setWeather", 0,false];
 
 
 				_CompleteText = _CompleteText 	+  "<t align='center' size='1.2' color='#FFCF11'> Weather</t><br/>"
-													+ format ["It seems like today weather is goint to get %1<br/>", if (_goingUp) then {"worse"} else {"better"}];
+													+ format ["It seems today's weather is going to get %1<br/>", if (_goingUp) then {"worse"} else {"better"}];
 			};
 
 

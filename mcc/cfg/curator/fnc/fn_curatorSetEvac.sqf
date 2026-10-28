@@ -1,8 +1,14 @@
 //============================================================MCC_fnc_curatorSetEvac======================================================================================
 //Mark Vehicle as Evac Vehicle
 //=======================================================================================================================================================================
-private ["_pos","_module","_object","_resualt","_side","_gunners","_campaign"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private "_pos";
+private _module = objNull;
+private _object = [];
+private _resualt = [];
+private _side = [];
+private _gunners = false;
+private _campaign = false;
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 _pos = getpos _module;
@@ -12,7 +18,9 @@ if (typeName (_module getVariable ["side",true]) == typeName 0) exitWith {
 
 	_side =  [(_module getVariable ["side",1])] call BIS_fnc_sideType;
 	_gunners = (_module getVariable ["gunners",0]) == 1;
-	_campaign = (_module getVariable ["campaign",0]) == 1;
+	_campaign = _module getVariable ["campaign",1];
+	if (_campaign isEqualType "") then {_campaign = parseNumber _campaign};
+	_campaign = _campaign isEqualTo 1 || {_campaign isEqualTo true};	//default Yes
 
 	{
 		[_x, _side, _gunners, _campaign] remoteExec ["MCC_fnc_setEvac",2];
@@ -39,9 +47,9 @@ if (_object emptyPositions "cargo" <=0 || isplayer driver _object) exitWith {del
 if (count (_object getVariable ["MCC_evacStartPos", []]) > 0) exitWith {deleteVehicle _module};
 
 _resualt = ["Add the vehicle as MCC evac vehicle",[
- 						["Side",["East","West","Resistance"]],
+ 						["Side",["East","West","Resistance"],"",1],
  						["Add gunners",true],
- 						["Campaign Evac",false]
+ 						["Campaign Evac",true]
  					  ]] call MCC_fnc_initDynamicDialog;
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};

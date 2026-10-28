@@ -1,7 +1,6 @@
 disableSerialization;
-private ["_type","_string"];
-_string = _this select 0;
-_type = _this select 1;
+
+params ["_string", "_type"];
 
 switch (_type) do
 {

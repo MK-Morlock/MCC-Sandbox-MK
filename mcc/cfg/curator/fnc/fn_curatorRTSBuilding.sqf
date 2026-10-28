@@ -1,22 +1,31 @@
 /*==========================================================MCC_fnc_curatorRTSBuilding====================================================================================
 // Instantly construct RTS Building
 ========================================================================================================================================================================*/
-private ["_module","_resualt"];
+private _module = objNull;
+private _resualt = [];
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {deleteVehicle _module};
 
 //did we get here from the 2d editor?
-if (typeName (_module getVariable ["building",true]) == typeName "") exitWith {
+if ((_module getVariable ["building", _module getVariable ["MCC_Module_RTSBuildingsCurator_building", true]]) isEqualType "") exitWith {
 
 	if (isServer) then {
-		[getpos _module, getDir _module, (_module getVariable ["building","MCC_rts_storage1"]),0,((_module getVariable ["side",0]) call BIS_fnc_sideType)] spawn MCC_fnc_construct_base;
+		private _bld = _module getVariable ["building", _module getVariable ["MCC_Module_RTSBuildingsCurator_building", "MCC_rts_storage1"]];
+		if (_bld == "") then {_bld = "MCC_rts_storage1"};
+		private _sid = _module getVariable ["side", _module getVariable ["MCC_Module_RTSBuildingsCurator_side", 1]];
+		if (_sid isEqualType "") then {_sid = if (_sid == "") then {1} else {parseNumber _sid}};
+		[getpos _module, getDir _module, _bld, 0, [_sid] call BIS_fnc_sideType] spawn MCC_fnc_construct_base;
 	};
 };
 
 //Not curator exit
 if (!(local _module) || isnull curatorcamera) exitWith {};
 
-private ["_path","_buildingsCfg","_buildingsDisplay","_class","_index"];
+private _path = configNull;
+private _buildingsCfg = [];
+private _buildingsDisplay = [];
+private "_class";
+private "_index";
 
 _path = if (isClass(missionConfigFile >> "cfgRTSBuildings")) then {
 		(missionConfigFile >> "cfgRTSBuildings")
@@ -42,7 +51,7 @@ for "_i" from 0 to (count _path - 1) do	{
 
 _resualt = ["(RTS)Buildings",[
 						["Building",_buildingsDisplay],
-						["Side", ["East","West","Eesistance"]]
+						["Side", ["East","West","Resistance"],"",1]
 					  ]] call MCC_fnc_initDynamicDialog;
 
 if (count _resualt == 0) exitWith {};

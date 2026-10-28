@@ -1,6 +1,21 @@
-private 
-["_CfgWeapons",  "_Acetype", "_type",  "_i",  "_CfgWeapon", "_weaponDisplayName","_cfgclass","_picture", "_ar_index", "_bino_index", "_item_index",
-	"_launchers_index","_mg_index","_pistol_index", "_rifle_index", "_sniper_index", "_ruck_index", "_ammo_index"];
+private _CfgWeapons = configNull;
+private _Acetype = 0;
+private _type = 0;
+private "_i";
+private "_CfgWeapon";
+private _weaponDisplayName = "";
+private _cfgclass = configNull;
+private _picture = "";
+private _ar_index = 0;
+private _bino_index = 0;
+private _item_index = 0;
+private _launchers_index = 0;
+private _mg_index = 0;
+private _pistol_index = 0;
+private _rifle_index = 0;
+private _sniper_index = 0;
+private _ruck_index = 0;
+private _ammo_index = 0;
 
 _ar_index = 0;
 _launchers_index = 0;
@@ -94,13 +109,13 @@ for "_i" from 0 to (count _CfgWeapons - 1) do
 			} else {
 			switch (getNumber(_CfgWeapon>>"Type")) do { 
 					case 16: {
-						U_UNDERBARREL set [count U_UNDERBARREL, _weaponDisplayName,_picture]];
+						U_UNDERBARREL set [count U_UNDERBARREL, [_cfgclass,_weaponDisplayName,_picture]];
 					};
 					case 256: {
-						U_GRENADE set [count U_GRENADE, _weaponDisplayName,_picture]];
+						U_GRENADE set [count U_GRENADE, [_cfgclass,_weaponDisplayName,_picture]];
 					};
 					default {
-						U_EXPLOSIVE set [count U_EPLOSIVE, _weaponDisplayName,_picture]];
+						U_EXPLOSIVE set [count U_EXPLOSIVE, [_cfgclass,_weaponDisplayName,_picture]];
 					};
 				};
 			};

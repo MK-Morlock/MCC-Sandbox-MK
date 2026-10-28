@@ -18,7 +18,11 @@
 //if no server get out
 if ((missionNamespace getVariable ["MCC_isLocalHC",false]) || !hasInterface || !(local player)) exitWith {};
 
-private ["_varName","_var","_position","_gear","_stats"];
+private _varName = "";
+private "_var";
+private _position = false;
+private _gear = false;
+private _stats = false;
 
 _position = param [0, false, [false]];
 _gear = param [1, false, [false]];

@@ -4,7 +4,22 @@
 #define HCAM_CTRL_BACK (uiNamespace getVariable "hcam_ctrl_back")
 #define HCAM_CTRL_FRONT (uiNamespace getVariable "hcam_ctrl_front")
 
-private ["_old","_neck","_pilot","_target","_camOn","_units","_pos1","_pos2","_vx1","_vy1","_vz1","_dir","_tilt","_dive","_tz","_veh"];
+private _old = "";
+private _neck = nil;
+private _pilot = nil;
+private _target = nil;
+private _camOn = false;
+private "_units";
+private "_pos1";
+private "_pos2";
+private "_vx1";
+private "_vy1";
+private "_vz1";
+private "_dir";
+private "_tilt";
+private "_dive";
+private "_tz";
+private "_veh";
 
 
 if (hcam_active || isDedicated) exitWith {};

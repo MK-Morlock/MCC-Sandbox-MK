@@ -14,7 +14,41 @@ params [
 	["_unit", objNull, [objNull]]
 ];
 
-private ["_cablesPosASL","_cablelenght","_activationdist","_cablewidth","_brakeforce","_elasticity","_glidepathxdev","_glidepathydev","_cablepos1","_angle1","_plane","_planeposx","_planeposy","_glidepath1y","_landing","_planepos","_planepostempxA","_planepostempyA","_planepostempxB","_planepostempyB","_hooked","_planeposdiffx","_planeposdiffy","_planeposdifftot","_vel","_velx","_vely","_velz","_nrofbrakes","_brakeingdist","_backspeed","_velxfinal","_velyfinal","_stopping","_veltotal"];
+private "_cablesPosASL";
+private _cablelenght = 0;
+private _activationdist = 0;
+private _cablewidth = 0;
+private _brakeforce = 0;
+private _elasticity = 0;
+private "_glidepathxdev";
+private "_glidepathydev";
+private "_cablepos1";
+private "_angle1";
+private "_plane";
+private "_planeposx";
+private "_planeposy";
+private "_glidepath1y";
+private _landing = false;
+private "_planepos";
+private _planepostempxA = 0;
+private _planepostempyA = 0;
+private "_planepostempxB";
+private "_planepostempyB";
+private _hooked = false;
+private "_planeposdiffx";
+private "_planeposdiffy";
+private "_planeposdifftot";
+private "_vel";
+private "_velx";
+private "_vely";
+private "_velz";
+private "_nrofbrakes";
+private "_brakeingdist";
+private "_backspeed";
+private "_velxfinal";
+private "_velyfinal";
+private _stopping = false;
+private "_veltotal";
 
 //Params
 _cablelenght=122;
@@ -95,7 +129,7 @@ if (((abs (_glidepath1x-_planeposx)<=30) && (abs (_glidepath1y-_planeposy)<=30))
 	sleep 0.01;
 	_velx=(_vel select 0);
 	_vely=(_vel select 1);
-	2_velz=(_vel select 2);
+	_velz=(_vel select 2);
 	if (((abs _velx)<0.3) && ((abs _vely)<0.3)) then {
 		_plane setVelocity [0,0,0];
 		sleep 0.01;

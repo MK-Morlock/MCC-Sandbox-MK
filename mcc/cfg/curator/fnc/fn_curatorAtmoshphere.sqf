@@ -1,8 +1,11 @@
 //============================================================MCC_fnc_curatorAtmoshphere========================================================================================
 // Manage atmosphere
 //===========================================================================================================================================================================
-private ["_pos","_module","_resualt","_atmosphere","_weather"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private "_pos";
+private _module = objNull;
+private _resualt = [];
+private _weather = [];
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 _pos = getpos _module;
@@ -89,7 +92,17 @@ _resualt = ["Add Atmosphere",[
  					  ],format ["<t align='center'> %1</t>",localize "STR_Module__atmosphere_description"]] call MCC_fnc_initDynamicDialog;
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};
-private ["_effect","_dust","_snow","_papers","_mist","_fog","_leaves","_wind","_color","_grain","_weather","_preDefinedWeather"];
+private "_effect";
+private "_dust";
+private "_snow";
+private "_papers";
+private "_mist";
+private "_fog";
+private "_leaves";
+private "_wind";
+private "_color";
+private "_grain";
+private _weather = [];
 _effect = (["custom","random","clearWeather","cloudy","rain","stormy","sandstorm","storm","snow","heatwave","clear"]) select (_resualt select 0);
 _changeTime = _resualt select 1;
 _dust = _resualt select 2;

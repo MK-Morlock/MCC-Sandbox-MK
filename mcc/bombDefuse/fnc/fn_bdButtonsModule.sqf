@@ -6,11 +6,19 @@
     _serialNumber - INTEGER
 */
 
-private ["_difficulty","_ctrlGroup","_display","_idc","_buttons","_buttonsCombinations","_ratio","_ctrl","_xPos","_ctrls","_serialNumber","_answers","_symbol","_index"];
+private "_display";
+private "_idc";
+private "_buttons";
+private _buttonsCombinations = [];
+private "_ratio";
+private _ctrl = controlNull;
+private _xPos = 0;
+private _ctrls = [];
+private _answers = [];
+private "_symbol";
+private "_index";
 disableSerialization;
-_difficulty = _this select 0;
-_ctrlGroup = _this select 1;
-_serialNumber = _this select 2;
+params ["_difficulty", "_ctrlGroup", "_serialNumber"];
 
 _display = ctrlParent _ctrlGroup;
 _idc = ctrlIDC _ctrlGroup *1000;
@@ -61,7 +69,7 @@ for "_i" from 1 to _buttons do {
 };
 
 //Add submit button
-_ctrl = _display ctrlCreate ["RscButtonMenu", _idc+10,_ctrlGroup];
+_ctrl = _display ctrlCreate ["MCC_RscButtonMenuStd", _idc+10,_ctrlGroup];
 _ctrl ctrlSetPosition [0.08*_ratio, 0.16*_ratio, 0.08*_ratio, 0.05*_ratio];
 _ctrl ctrlSetTextColor [0,0.8,0,0.8];
 _ctrl ctrlsetText "Submit";

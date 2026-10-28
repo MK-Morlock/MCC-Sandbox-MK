@@ -1,119 +1,109 @@
 // By: Shay_gman
-// Version: 1.1 (September 2011)
+// Version: 1.1 (September 2011). Restyled to match the MCC console: rounded panel, orange title, rounded buttons;
+// it opens over the console and its pages return to the console (mission_settings_change.sqf).
 #define missionSettings_IDD 2997
 
-//-----------------------------------------------------------------------------
-// Main dialog
-//-----------------------------------------------------------------------------
-class missionSettings
+class MCCDLG_NAME
 {
 	idd = missionSettings_IDD;
 	movingEnable = true;
-
-	controlsBackground[] =
-	{
-	};
-
-	objects[] =
-	{
-	};
-
+	controlsBackground[] = {};
+	objects[] = {};
 	class controls
 	{
-		class RscPicture_1200: MCC_RscText
+		class MCC_settingsPanel: MCC_RscText
 		{
 			idc = -1;
-			moving = true;
-			x = 0.12875 * safezoneW + safezoneX;
-			y = 0.17 * safezoneH + safezoneY;
-			w = 0.670312 * safezoneW;
-			h = 0.583 * safezoneH;
-			text = "";
-			colorBackground[] = { 0, 0, 0, 0.8 };
+			style = 48;
+			moving = 1;
+			text = "\mcc_sandbox_mod\data\panel_round_ca.paa";
+			colorText[] = {0.11,0.12,0.13,0.96};
+			colorBackground[] = {0,0,0,0};
+			x = 0.3800 * safezoneW + safezoneX;
+			y = 0.2500 * safezoneH + safezoneY;
+			w = 0.2400 * safezoneW;
+			h = 0.4 * safezoneH;
 		};
-
-		class CancelButton: MCC_RscButton
+		class MCC_settingsTitle: MCC_RscText
 		{
 			idc = -1;
-			action = "closeDialog 0";
-
-			text = "Cancel"; //--- ToDo: Localize;
-			x = 0.133906 * safezoneW + safezoneX;
-			y = 0.698 * safezoneH + safezoneY;
-			w = 0.120313 * safezoneW;
-			h = 0.0439828 * safezoneH;
-		};
-
-		class MissionSettingsButton: MCC_RscButton
-		{
-			idc = -1;
-			action = __EVAL("[0] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
-
 			text = "Mission Settings";
-			x = 0.3 * safezoneW + safezoneX;
-			y = 0.2 * safezoneH + safezoneY;
-			w = 0.25 * safezoneW;
-			h = 0.05 * safezoneH;
+			colorText[] = {0.89,0.90,0.91,1};
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
+			x = 0.3900 * safezoneW + safezoneX;
+			y = 0.2600 * safezoneH + safezoneY;
+			w = 0.2200 * safezoneW;
+			h = 0.035 * safezoneH;
 		};
-
-		class UISettingsButton: MCC_RscButton
+		class MissionSettingsButton: MCCBTN_R
 		{
 			idc = -1;
-			action = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
-
+			text = "Mission Settings";
+			action = __EVAL("[0] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
+			x = 0.3900 * safezoneW + safezoneX;
+			y = 0.3050 * safezoneH + safezoneY;
+			w = 0.2200 * safezoneW;
+			h = 0.0329871 * safezoneH;
+		};
+		class UISettingsButton: MCCBTN_R
+		{
+			idc = -1;
 			text = "UI Settings";
-			x = 0.3 * safezoneW + safezoneX;
-			y = 0.26 * safezoneH + safezoneY;
-			w = 0.25 * safezoneW;
-			h = 0.05 * safezoneH;
+			action = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
+			x = 0.3900 * safezoneW + safezoneX;
+			y = 0.3500 * safezoneH + safezoneY;
+			w = 0.2200 * safezoneW;
+			h = 0.0329871 * safezoneH;
 		};
-
-		class classMechanicsSettingsButton: MCC_RscButton
+		class classMechanicsSettingsButton: MCCBTN_R
 		{
 			idc = -1;
-			action = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
-
 			text = "Mechanics Settings";
-			x = 0.3 * safezoneW + safezoneX;
-			y = 0.32 * safezoneH + safezoneY;
-			w = 0.25 * safezoneW;
-			h = 0.05 * safezoneH;
+			action = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
+			x = 0.3900 * safezoneW + safezoneX;
+			y = 0.3950 * safezoneH + safezoneY;
+			w = 0.2200 * safezoneW;
+			h = 0.0329871 * safezoneH;
 		};
-
-		class classMedicalSettingsButton: MCC_RscButton
+		class classMedicalSettingsButton: MCCBTN_R
 		{
 			idc = -1;
-			action = __EVAL("[3] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
-
 			text = "Medical System Settings";
-			x = 0.3 * safezoneW + safezoneX;
-			y = 0.38 * safezoneH + safezoneY;
-			w = 0.25 * safezoneW;
-			h = 0.05 * safezoneH;
+			action = __EVAL("[3] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
+			x = 0.3900 * safezoneW + safezoneX;
+			y = 0.4400 * safezoneH + safezoneY;
+			w = 0.2200 * safezoneW;
+			h = 0.0329871 * safezoneH;
 		};
-
-		class classRSSettingsButton: MCC_RscButton
+		class classRSSettingsButton: MCCBTN_R
 		{
 			idc = -1;
-			action = __EVAL("[4] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
-
 			text = "Role Selection Settings";
-			x = 0.3 * safezoneW + safezoneX;
-			y = 0.44 * safezoneH + safezoneY;
-			w = 0.25 * safezoneW;
-			h = 0.05 * safezoneH;
+			action = __EVAL("[4] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
+			x = 0.3900 * safezoneW + safezoneX;
+			y = 0.4850 * safezoneH + safezoneY;
+			w = 0.2200 * safezoneW;
+			h = 0.0329871 * safezoneH;
 		};
-
-		class classGAIASettingsButton: MCC_RscButton
+		class classGAIASettingsButton: MCCBTN_R
 		{
 			idc = -1;
-			action = __EVAL("[5] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
-
 			text = "GAIA Settings";
-			x = 0.3 * safezoneW + safezoneX;
-			y = 0.5 * safezoneH + safezoneY;
-			w = 0.25 * safezoneW;
-			h = 0.05 * safezoneH;
+			action = __EVAL("[5] execVM '"+MCCPATH+"mcc\general_scripts\mission_settings\mission_settings_change.sqf'");
+			x = 0.3900 * safezoneW + safezoneX;
+			y = 0.5300 * safezoneH + safezoneY;
+			w = 0.2200 * safezoneW;
+			h = 0.0329871 * safezoneH;
+		};
+		class CancelButton: MCCBTN_S
+		{
+			idc = -1;
+			text = "Close";
+			action = "closeDialog 0";
+			x = 0.3900 * safezoneW + safezoneX;
+			y = 0.6150 * safezoneH + safezoneY;
+			w = 0.0573 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 	};
 };

@@ -2,17 +2,22 @@
 // Interaction with Door type
 // Example: [_object] spawn MCC_fnc_interactMan;
 //===============================================================================================================================================================
-private ["_object","_doorTypes","_waitTime","_array"];
+private _waitTime = 0;
+private _array = [];
 #define MCC_CHARGE "ClaymoreDirectionalMine_Remote_Mag"
 #define MCC_MIROR ["MineDetector","MCC_videoProbe"]
 #define MCC_LOCKPICK ["ToolKit","AGM_DefusalKit","MCC_multiTool","ACE_DefusalKit","ACE_key_lockpick"]
 
 disableSerialization;
-_object 	= _this select 0;
+params ["_object"];
 
 _waitTime = 1;
 
-private ["_door","_animation","_phase","_closed","_tempArray"];
+private "_door";
+private "_animation";
+private "_phase";
+private "_closed";
+private _tempArray = [];
 _tempArray = [_object]  call MCC_fnc_isDoor;
 _door = _tempArray select 0;
 _animation = _tempArray select 1;
@@ -87,7 +92,10 @@ switch (true) do {
 	{
 		MCC_fnc_vehicleMenuClicked =
 		{
-			private ["_ctrlData","_object","_phase","_door"];
+			private "_ctrlData";
+			private _object = objNull;
+			private "_phase";
+			private "_door";
 			disableSerialization;
 
 			_ctrlData	= _this select 0;
@@ -146,12 +154,16 @@ switch (true) do {
 
 				case (_ctrlData == "kitSelect"): {
 					player setVariable ["MCC_kitSelect",(_object getVariable ["MCC_kitSelect",["all"]])];
-					createDialog "CP_GEARPANEL";
+					createDialog ("CP_GEARPANEL" call MCC_fnc_dialogName);
 				};
 
 				//Load object to vehicle
 				case (_ctrlData == "logisticsLoad"): {
-					private ["_objectMass","_availableVehicles","_array","_vehicleName","_vehiclePic"];
+					private "_objectMass";
+					private "_availableVehicles";
+					private _array = [];
+					private _vehicleName = configNull;
+					private _vehiclePic = configNull;
 
 					_objectMass = (getMass _object) max 5;
 					_availableVehicles = (player nearObjects ["AllVehicles",10]) select {_x getVariable ["MCC_logisticsObjectMass",_x call MCC_fnc_logisticsCargoGetMass] >= _objectMass};
@@ -174,9 +186,9 @@ switch (true) do {
 				{
 					private _array = [["[(missionNamespace getVariable ['MCC_interactionLayer_0',[]]),1] spawn MCC_fnc_interactionsBuildInteractionUI","Back",format ["%1mcc\interaction\data\iconBack.paa",MCC_path]]];
 
-					_array pushBack [format ["[%1, 'ammo'] spawn MCC_fnc_logisticsWithdrawBox",_object getVariable ['mcc_mainBoxSide',sidelogic]],"Ammo","\mcc_sandbox_mod\data\IconAmmo.paa"];
-					_array pushBack [format ["[%1, 'Materials'] spawn MCC_fnc_logisticsWithdrawBox",_object getVariable ['mcc_mainBoxSide',sidelogic]],"Ammo","\mcc_sandbox_mod\data\IconRepair.paa"];
-					_array pushBack [format ["[%1, 'Fuel'] spawn MCC_fnc_logisticsWithdrawBox",_object getVariable ['mcc_mainBoxSide',sidelogic]],"Ammo","\mcc_sandbox_mod\data\IconFuel.paa"];
+					_array pushBack [format ["[%1, 'ammo'] spawn MCC_fnc_logisticsWithdrawBox",str str (_object getVariable ['mcc_mainBoxSide',sidelogic])],"Withdraw Ammo crate","\mcc_sandbox_mod\data\IconAmmo.paa"];
+					_array pushBack [format ["[%1, 'Materials'] spawn MCC_fnc_logisticsWithdrawBox",str str (_object getVariable ['mcc_mainBoxSide',sidelogic])],"Withdraw Supplies crate","\mcc_sandbox_mod\data\IconRepair.paa"];
+					_array pushBack [format ["[%1, 'Fuel'] spawn MCC_fnc_logisticsWithdrawBox",str str (_object getVariable ['mcc_mainBoxSide',sidelogic])],"Withdraw Fuel crate","\mcc_sandbox_mod\data\IconFuel.paa"];
 
 					[_array,1] call MCC_fnc_interactionsBuildInteractionUI;
 				};
@@ -260,7 +272,16 @@ switch (true) do {
 			if (_object isKindOf "Car") then {
 
 				//Are we looking at a wheel?
-				private ["_geomTypes","_door","_typeOfSelected","_wheel","_wheelPos","_selectionPos","_hitpoint","_closeDist","_hpIndex","_hpDamage"];
+				private _geomTypes = [];
+				private "_door";
+				private "_typeOfSelected";
+				private _wheel = "";
+				private "_wheelPos";
+				private "_selectionPos";
+				private _hitpoint = "";
+				private _closeDist = 0;
+				private _hpIndex = 0;
+				private "_hpDamage";
 				_wheel = "";
 				_geomTypes = [_object, "GEOM"] intersect [asltoatl (eyepos player),(player modelToworld [0, 3, 0])];
 
@@ -303,7 +324,11 @@ switch (true) do {
 			if ((_object isKindOf "tank") ) then {
 
 				//find the closest hitpoint - don't u just love BI bruth force since getHit doesn't work?!
-				private ["_selectionPos","_hitpoint","_closeDist","_hpIndex","_hpDamage"];
+				private "_selectionPos";
+				private _hitpoint = "";
+				private _closeDist = 0;
+				private _hpIndex = 0;
+				private "_hpDamage";
 
 				(getAllHitPointsDamage _object) params ["_hitPoints", "_selections","_hpDamages"];
 

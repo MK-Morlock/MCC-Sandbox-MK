@@ -14,10 +14,24 @@
 #define MCC_loadTruckOutpot2 (uiNamespace getVariable "MCC_loadTruckOutpot2")
 #define MCC_loadTruckOutpot3 (uiNamespace getVariable "MCC_loadTruckOutpot3")
 
-private ["_add","_loadedCrates","_truck","_crateType","_index","_array","_resLevel","_crate","_attachPoint","_attachedObjects","_startLoad","_nearByCrates",
-	         "_position","_factor","_unload","_isHeli","_maxLoad","_pos","_costFactor"];
-_add 		= _this select 0;
-_startLoad	= _this select 1;
+private "_loadedCrates";
+private "_truck";
+private "_crateType";
+private "_index";
+private "_array";
+private "_resLevel";
+private _crate = objNull;
+private _attachPoint = configNull;
+private "_attachedObjects";
+private _nearByCrates = [];
+private "_position";
+private "_factor";
+private _unload = false;
+private "_isHeli";
+private _maxLoad = 0;
+private "_pos";
+private _costFactor = 0;
+params ["_add", "_startLoad"];
 _ctrl		= (_this select 2) select 0;
 _isHeli		= _this select 3;
 _unload		= false;
@@ -75,7 +89,7 @@ if (_add) then {
 
 					//Set ammo count and helper
 					_crate setVariable ["ammoLeft",200*_costFactor,true];
-					[[_crate, "Hold %1 to resupply"], "MCC_fnc_createHelper", false] call BIS_fnc_MP;
+					[_crate, "Hold %1 to resupply"] remoteExec ["MCC_fnc_createHelper", 2, false];
 
 					_crate setVariable ["MCC_loadedBy", getplayeruid player, true];
 					//Change mass
@@ -119,7 +133,7 @@ if (_add) then {
 
 					//Set ammo count and helper
 					_crate setVariable ["ammoLeft",100,true];
-					[[_crate, "Hold %1 to resupply"], "MCC_fnc_createHelper", false] call BIS_fnc_MP;
+					[_crate, "Hold %1 to resupply"] remoteExec ["MCC_fnc_createHelper", 2, false];
 
 					_crate setVariable ["MCC_loadedBy", getplayeruid player, true];
 

@@ -9,7 +9,15 @@
 //================================================================================================================================================================
 #define    MCC_ANCHOROBJECT    "UserTexture10m_F"
 
-private ["_req","_center","_radius","_available","_facility","_var","_level","_buildings","_pos"];
+private "_req";
+private _center = objNull;
+private _radius = 0;
+private _available = false;
+private _facility = [];
+private _var = "";
+private _level = 0;
+private "_buildings";
+private _pos = [];
 //Let see what we already built
 _req =  param [0,missionnamespace,[missionnamespace,"",[]]];
 _center = param [1,objNull,[missionnamespace,objNull,[],grpNull,sideLogic]];

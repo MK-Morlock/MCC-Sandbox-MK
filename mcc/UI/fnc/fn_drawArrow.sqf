@@ -10,14 +10,11 @@
 //maxDist = Integer, maximum marker distance. 
 //Returns : marker name
 //==================================================================================================================================================================================
-private ["_start", "_end", "_marker","_dist","_dir","_center","_arrowType","_arrowWidth","_arrowColor","_arrowMarkerName","_maxDist"];
-_start 		= _this select 0;
-_end 		= _this select 1;
-_marker 	= _this select 2;
-_arrowType 	= _this select 3;
-_arrowWidth = _this select 4;
-_arrowColor = _this select 5;
-_maxDist	= _this select 6;
+private _dist = 0;
+private _dir = 0;
+private _center = [];
+private _arrowMarkerName = "";
+params ["_start", "_end", "_marker", "_arrowType", "_arrowWidth", "_arrowColor", "_maxDist"];
 
 _arrowMarkerName = format ["mccarrow_%1", _marker];
 

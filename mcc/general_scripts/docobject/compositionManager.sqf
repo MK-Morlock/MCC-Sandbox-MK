@@ -6,7 +6,9 @@
 #define MCC_3DCargoGen 8018
 #define MCC_3dTasksControlsIDC 8020
 
-private ["_mccdialog","_pos","_comboBox","_index"];
+private "_mccdialog";
+private _comboBox = controlNull;
+private "_index";
 disableSerialization;
 _mccdialog = uiNamespace getVariable "MCC3D_Dialog";
 
@@ -28,6 +30,7 @@ else
 		_index = _comboBox lbAdd _x;
 	} foreach (profileNamespace getVariable "MCC_3DCompSaveNames");
 	_comboBox lbSetCurSel 0;
+	ctrlSetFocus _comboBox;
 	
 	ctrlSetText [MCC_3DCompssaveDescriptionIDC,(profileNamespace getVariable "MCC_3DCompSaveFiles") select 0];
 }; 

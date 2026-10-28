@@ -11,10 +11,21 @@
 //	_faction					String, Faction name.
 //	_startPosDir				Array, spawn and de-spawn location for the reinforcement.
 //===========================================================================================================================================================================
-private ["_unitsArray","_endPos","_side","_size","_zoneMarker","_faction","_startPosDir","_vehiclesArray","_groupVehicles","_limit",
-         "_counter","_vehicleClass","_nearRoads","_vehicle","_vehiclesTypesArray","_cargoyGroupArray"];
-_endPos 				= _this select 0;
-_side					= _this select 1;
+private _unitsArray = [];
+private "_size";
+private "_zoneMarker";
+private "_faction";
+private "_startPosDir";
+private _vehiclesArray = [];
+private _groupVehicles = grpNull;
+private _limit = [];
+private _counter = 0;
+private "_vehicleClass";
+private "_nearRoads";
+private _vehicle = [];
+private _vehiclesTypesArray = [];
+private _cargoyGroupArray = [];
+params ["_endPos", "_side"];
 _size 					=  if (TypeName  (_this select 2) == "STRING") then {call compile (_this select 2)} else {(_this select 2)};
 _zoneMarker 			=  if (TypeName  (_this select 3) == "STRING") then {(_this select 3)} else {str (_this select 3)};
 _faction				= _this select 4;
@@ -31,12 +42,12 @@ if (TypeName _side == "STRING") then
 	};
 };
 
-_unitsArray 	= [_faction,"soldier","men",false] call MCC_fnc_makeUnitsArray;
+_unitsArray 	= [[_faction,"soldier","men",false] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 if (count _unitsArray < 4) then {
-	_unitsArray = [_faction,"soldier","",false] call MCC_fnc_makeUnitsArray;
+	_unitsArray = [[_faction,"soldier","",false] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 };
 
-if ( (count _unitsArray) == 0 ) exitWith { diag_log format ["MCC Warning: no suitable reinforcement group found for %1", _this]; systemchat format ["Error: no suitable reinforcement group for this Faction"]; };
+if ( (count _unitsArray) == 0 ) exitWith { if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC Warning: no suitable reinforcement group found for %1", _this]}; systemchat format ["Error: no suitable reinforcement group for this Faction"]; };
 
 _vehiclesTypesArray 	= [_faction,"carx","car"] call MCC_fnc_makeUnitsArray;
 
@@ -44,12 +55,12 @@ if(count _vehiclesTypesArray < 2) then {
 	_vehiclesTypesArray = [_faction,"carx"] call MCC_fnc_makeUnitsArray;
 };
 
-if ( (count _vehiclesTypesArray) == 0 ) exitWith { diag_log format ["MCC Warning: no suitable reinforcement group found for %1", _this]; systemchat format ["Error: no suitable reinforcement group for this Faction"]; };
+if ( (count _vehiclesTypesArray) == 0 ) exitWith { if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC Warning: no suitable reinforcement group found for %1", _this]}; systemchat format ["Error: no suitable reinforcement group for this Faction"]; };
 
 //Find a road
 _nearRoads = ([_startPosDir,500] call MCC_fnc_nearestRoad) select 0;
 
-if ( isnull _nearRoads) exitWith { diag_log format ["MCC Warning: no suitable reinforcement place found for %1", _this]; systemchat format ["Error: no suitable reinforcement place found"]; };
+if ( isnull _nearRoads) exitWith { if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC Warning: no suitable reinforcement place found for %1", _this]}; systemchat format ["Error: no suitable reinforcement place found"]; };
 _startPosDir = getposAtl _nearRoads;
 
 //Let's build the group and vehicles
@@ -62,9 +73,11 @@ _vehiclesArray = [];
 
 while {_counter <=_limit} do
 {
-	_vehicleClass = (_vehiclesTypesArray call BIS_fnc_selectRandom) select 0;
+	_vehicleClass = [_vehiclesTypesArray, "transport", 4] call MCCMK_fnc_pickVehicle;
+	private _fitTransport = _vehicleClass != "";
+	if (!_fitTransport) then {_vehicleClass = (_vehiclesTypesArray call BIS_fnc_selectRandom) select 0};
 
-	if ((getNumber (configfile >> "CfgVehicles" >> _vehicleClass >> "transportSoldier") > 2) || (count (configfile >> "CfgVehicles" >> _vehicleClass >> "Turrets") >0)) then
+	if (_fitTransport || {(getNumber (configfile >> "CfgVehicles" >> _vehicleClass >> "transportSoldier") > 2) || (count (configfile >> "CfgVehicles" >> _vehicleClass >> "Turrets") >0)}) then
 	{
 		_isFlat = _startPosDir findEmptyPosition [10, 100];
 		if (count _isFlat == 0) then {_isFlat = _startPosDir};
@@ -90,7 +103,11 @@ sleep 1;
 _nearRoads = ([_endPos,500] call MCC_fnc_nearestRoad) call BIS_fnc_selectRandom;
 
 //Add WP
-private ["_wpPos","_car1","_car","_transportCars","_transportCarsGroup"];
+private "_wpPos";
+private "_car1";
+private "_car";
+private _transportCars = [];
+private _transportCarsGroup = grpNull;
 if (isnull  _nearRoads) then
 {
 	_wpPos = _endPos;
@@ -115,9 +132,8 @@ waitUntil {sleep 5; (!(canMove _car1) || (currentCommand _car1 == "") || (_car1 
 [2,_wpPos,[0,"NO CHANGE","NO CHANGE","UNCHANGED","UNCHANGED","", {},0],[_groupVehicles]] call MCC_fnc_manageWp;
 sleep 3;
 
-private ["_transportCars","_transportCarsGroup"];
-_transportCars = [];
-_transportCarsGroup = createGroup _side;
+private _transportCars = [];
+private _transportCarsGroup = createGroup _side;
 
 {
 	if !( isNil "_x" ) then

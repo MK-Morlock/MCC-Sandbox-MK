@@ -24,7 +24,17 @@ if (typeName _deck == typeName objNull) exitWith {
 	};
 };
 
-private ["_ship","_camera","_display","_spawnPos","_pos","_dummy","_objects","_displayname","_index","_decks","_shipClass","_availableLHD","_vehicleType","_side"];
+private "_ship";
+private _camera = "";
+private "_display";
+private _spawnPos = [];
+private "_pos";
+private _dummy = "";
+private _objects = [];
+private "_decks";
+private _shipClass = 0;
+private _availableLHD = [];
+private "_side";
 
 _availableLHD = [];
 {
@@ -37,9 +47,8 @@ _availableLHD = [];
 } forEach (missionNamespace getVariable ["MCC_staticShips",[]]);
 
 if (count _availableLHD == 0) exitWith {
-	private ["_str","_null"];
-	_str = "<t size='0.8' t font = 'puristaLight' color='#FFFFFF'>" + "Spawn Static Ship First" + "</t>";
-	_null = [_str,0,1.1,2,0.1,0.0] spawn bis_fnc_dynamictext;
+	private _str = "<t size='0.8' font='PuristaLight' color='#FFFFFF'>" + "Spawn Static Ship First" + "</t>";
+	private _null = [_str,0,1.1,2,0.1,0.0] spawn bis_fnc_dynamictext;
 };
 
 if !(_lhdIndex isEqualType 0) then {_lhdIndex = 0};
@@ -84,7 +93,7 @@ if ( !isNull(findDisplay 312) ) then {
 };
 
 if (isnil "MCC_LHD_CAM") then {
-	private ["_ppgrain"];
+	private "_ppgrain";
 
 	_pos = getposasl _ship;
 	_camera = "camera" camcreate _pos;
@@ -125,7 +134,7 @@ if (isnil "MCC_LHD_CAM") then {
 
 
 
-createDialog "MCC_LHDSpawn";
+createDialog ("MCC_LHDSpawn" call MCC_fnc_dialogName);
 _camera = missionNamespace getVariable ["MCC_LHD_CAM",objNull];
 
 switch (_deck) do
@@ -243,7 +252,7 @@ _decks = switch (_shipClass) do
 
 //Add decks control
 {
-	_ctrl = _display ctrlCreate ["RscButtonMenu", -1];
+	_ctrl = _display ctrlCreate ["MCC_RscButtonMenuStd", -1];
 	_ctrl ctrlSetPosition [0.05*safezoneW+safezoneX, 0.05*safezoneH+safezoneY + (_foreachindex*0.06*safezoneH),0.1*safezoneW,0.05*safezoneH];
 	_ctrl ctrlsetText _x;
 
@@ -260,7 +269,7 @@ _decks = switch (_shipClass) do
 //If more then one carrier and a commander or a mission maker
 if (_operator <=1) then {
 	{
-		_ctrl = _display ctrlCreate ["RscButtonMenu", -1];
+		_ctrl = _display ctrlCreate ["MCC_RscButtonMenuStd", -1];
 		_ctrl ctrlSetPosition [0.21*safezoneW+safezoneX + (_foreachindex*0.11*safezoneW), 0.05*safezoneH+safezoneY ,0.1*safezoneW,0.05*safezoneH];
 		_ctrl ctrlsetText (_x getVariable ["MCC_LHDDisplayName","Ship"]);
 
@@ -276,7 +285,7 @@ if (_operator <=1) then {
 };
 
 //Add exit ctrl
-_ctrl = _display ctrlCreate ["RscButtonMenu", -1];
+_ctrl = _display ctrlCreate ["MCC_RscButtonMenuStd", -1];
 _ctrl ctrlSetPosition [0.85*safezoneW+safezoneX, 0.85*safezoneH+safezoneY,0.1*safezoneW,0.05*safezoneH];
 _ctrl ctrlsetText "Exit";
 _ctrl ctrlAddEventHandler ["MouseButtonUp","closeDialog 0"];
@@ -301,7 +310,7 @@ _objects = [];
 	_pos set [3,0.03*safezoneH];
 
 	if ((typeName (_pos select 0) isEqualTo typeName 0)) then {
-		_ctrl = _display ctrlCreate ["RscButtonMenu", -1];
+		_ctrl = _display ctrlCreate ["MCC_RscButtonMenuStd", -1];
 		_ctrl ctrlSetPosition _pos;
 		_ctrl ctrlsetText (str _foreachindex);
 		_ctrl ctrlSetBackgroundColor [0, 0, 0, 0.5];

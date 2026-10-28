@@ -1,8 +1,11 @@
 //============================================================MCC_fnc_curatorVehicleSpawner======================================================================================
 // Create a vhicles kiosk
 //===========================================================================================================================================================================
-private ["_pos","_module","_resualt","_array"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private "_pos";
+private _module = objNull;
+private _resualt = [];
+private _array = [];
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 _pos = getpos _module;
@@ -20,4 +23,5 @@ if (count _resualt == 0) exitWith {};
 
 _module setVariable ["type", (_array select (_resualt select 0)) ,true];
 _module setVariable ["spawnFrom", if (_resualt select 1) then {1} else {0} ,true];
-[_module,[]] call MCC_fnc_vehicleSpawnerInit;
+//The kiosk is set up on the server (see MCC_fnc_vehicleSpawnerInit)
+if (isServer) then {[_module,[]] spawn MCC_fnc_vehicleSpawnerInit} else {[_module,[]] remoteExec ["MCC_fnc_vehicleSpawnerInit",2]};

@@ -6,7 +6,11 @@
 //==================================================================================================================================================================================			
 	MCC_CBU_EXPLOSION =
 		{
-			private ["_skeet","_para", "_split","_pos","_x"];
+			private "_skeet";
+			private "_para";
+			private _split = "";
+			private "_pos";
+			private "_x";
 			_skeet = _this select 0;
 			_para = _this select 1;
 			WaitUntil{(getpos _skeet select 2) < 100};
@@ -24,7 +28,12 @@
 	
 	MCC_CBU_MINES =
 		{
-			private ["_skeet","_para", "_split","_pos","_x","_mine"];
+			private "_skeet";
+			private "_para";
+			private _split = "";
+			private "_pos";
+			private "_x";
+			private _mine = "";
 			_skeet = _this select 0;
 			_para = _this select 1;
 			WaitUntil{(getpos _skeet select 2) < 100};
@@ -41,7 +50,12 @@
 	
 	MCC_CBU_WP =
 		{
-			private ["_skeet","_para", "_split","_pos","_x","_mine"];
+			private "_skeet";
+			private "_para";
+			private _split = "";
+			private "_pos";
+			private "_x";
+			private "_mine";
 			_skeet = _this select 0;
 			_para = _this select 1;
 			WaitUntil{(getpos _skeet select 2) < 100};
@@ -59,7 +73,12 @@
 	
 	MCC_CBU_CS =
 		{
-			private ["_skeet","_para", "_split","_pos","_x","_mine"];
+			private "_skeet";
+			private "_para";
+			private _split = "";
+			private "_pos";
+			private "_x";
+			private "_mine";
 			_skeet = _this select 0;
 			_para = _this select 1;
 			WaitUntil{(getpos _skeet select 2) < 100};
@@ -75,9 +94,11 @@
 				};
 		};
 
-private ["_bomb","_split", "_vel", "_x","_y","_type"];
-_bomb = _this select 0;
-_type = _this select 1;
+private _split = "";
+private "_vel";
+private "_x";
+private "_y";
+params ["_bomb", "_type"];
 _vel = velocity _bomb;
 for [{_x = 1},{_x <= 4},{_x = _x+1}] do 
 	{

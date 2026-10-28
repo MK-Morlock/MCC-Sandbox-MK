@@ -1,11 +1,11 @@
 //==================================================================MCC_fnc_getGroupID======================================================================================
 //get group ID 
-// Example: [[group], "MCC_fnc_getGroupID", false, false] spawn BIS_fnc_MP;
+// Example: [group] remoteExec ["MCC_fnc_getGroupID", false, false];
 // Params: 
 //==============================================================================================================================================================================	
-private ["_group","_groupID"];
+private "_groupID";
 
-_group 		= _this select 0;
+params ["_group"];
 	
 _groupID 	= groupID _group;
 

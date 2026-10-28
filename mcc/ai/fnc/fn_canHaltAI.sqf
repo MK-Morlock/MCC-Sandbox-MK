@@ -7,8 +7,8 @@
 // <OUT>
 //		Boolean
 //===========================================================================================================================================================================
-private["_target"];
-_target		= _this select 0;
+
+params ["_target"];
 
 if (MCC_isACE) then {
 	if (((side _target != civilian && (side _target getFriend  side player)>0.6)) || isPlayer _target || (_target getVariable ["ACE_captives_isSurrendering",false]) || (_target getVariable ["ACE_captives_isHandcuffed",false]) || !(alive _target) || (captive _target)) then {false} else {true};

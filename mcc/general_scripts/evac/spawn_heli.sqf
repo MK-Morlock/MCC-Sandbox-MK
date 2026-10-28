@@ -1,7 +1,14 @@
-private ["_heliType","_pos", "_dummy", "_dir","_gunNum","_type","_entry","_side","_gunnersGroup","_evac","_evac_p","_turretPath","_isCargo","_index"];
+private _type = "";
+private _entry = configNull;
+private _side = 0;
+private _gunnersGroup = grpNull;
+private _evac = objNull;
+private _evac_p = objNull;
+private _turretPath = "";
+private _isCargo = [];
+private _index = 0;
 
-_heliType 	= _this select 0; 	//Type of heli
-_pos 		= _this select 1;
+params ["_heliType", "_pos"];
 
 evac_p_type = getText (configFile >> "CfgVehicles" >> _heliType >> "crew");
 _side =  getNumber (configFile >> "CfgVehicles" >> _heliType >> "side");
@@ -52,15 +59,13 @@ _type = typeOf _evac;														//Find turrets
 _entry = configFile >> "CfgVehicles" >> _type;
 _turrets = [_entry >> "turrets"] call BIS_fnc_returnVehicleTurrets;			//All turrets were found, now spawn crew for them
 _path = [];
-private ["_i"];
-_i = 0;
+private _i = 0;
 _index = 0;
 
 while {_i < (count _turrets)} do
 {
-	private ["_turretIndex", "_thisTurret"];
-	_turretIndex = _turrets select _i;
-	_thisTurret = _path + [_turretIndex];
+	private _turretIndex = _turrets select _i;
+	private _thisTurret = _path + [_turretIndex];
 	_turretPath = configName ((configFile >> "CfgVehicles" >> _type >> "turrets") Select _index);
 
 	_isCargo = ["cargo",tolower _turretPath] call BIS_fnc_inString;

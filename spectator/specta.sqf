@@ -1,8 +1,40 @@
-private ["_target", "_killer", "_seagull", "_markers", "_KEGsNextRun", "_name", "_setOriginalSide", "_OriginalSide", "_RatingDelta",
-		"_ehVehicles", "_t", "_disp", "_cCamera", "_cTarget", "_cName", "_cCamerasBG", "_cTargetsBG", "_cMap", "_cMapFull", "_cDebug",
-		"_pos", "_foo", "_nNoDialog", "_lastUpdateMarkers", "_lastUpdateMarkerTypes", "_lastUpdateTags", "_allUnits", "_allVehicles",
-		"_newUnits", "_newVehicles", "_fh", "_kh", "_waitUnits", "_m", "_s", "_rate", "_doMarkerTypes", "_mapFull", "_mappos",
-		"_markedVehicles", "_i", "_u", "_type", "_icon", "_map", "_tt", "_bpos", "_bird", "_KEGs_EH_Indx", "_KEGs_EHF_Indx","_nextTarget"];
+private _target = nil;
+private _markers = nil;
+private _name = "";
+private _OriginalSide = sideUnknown;
+private _RatingDelta = 0;
+private _ehVehicles = [];
+private _disp = controlNull;
+private _cCamera = 0;
+private _cTarget = 0;
+private _cName = 0;
+private _cCamerasBG = 0;
+private _cTargetsBG = 0;
+private _cMap = 0;
+private _cMapFull = 0;
+private _cDebug = 0;
+private _pos = [];
+private _foo = 0;
+private _nNoDialog = 0;
+private _lastUpdateMarkers = 0;
+private _lastUpdateMarkerTypes = 0;
+private _lastUpdateTags = 0;
+private _allUnits = [];
+private _allVehicles = [];
+private _newUnits = [];
+private _fh = 0;
+private _waitUnits = [];
+private _m = "";
+private _rate = 0;
+private _doMarkerTypes = false;
+private _mapFull = controlNull;
+private _mappos = [];
+private _markedVehicles = [];
+private _i = 0;
+private _u = objNull;
+private _map = controlNull;
+private _KEGs_EHF_Indx = 0;
+private _nextTarget = 0;
 
 //
 // Spectating Script for ArmA 3
@@ -87,6 +119,7 @@ fangleY = 15;
 //KEGs_flybydst = 35; // Distance of flyby camera (adjusted based on target speed)
 szoom = 0.976;
 _markers = []; // Map markers showing positions of all units
+KEGs_markers = _markers;
 KEGsTagSources = []; // Particle sources for tags
 KEGsTagStatSources = []; // Particle sources for status tags
 KEGs_lastTgt = 0;
@@ -128,7 +161,9 @@ if(isNil "KEGsShownSides") then {
 //Renegade Fix add function _setOriginalSide - ViperMaul
 VM_CheckOriginalSide =
 {
-	private ["_unit", "_OriginalSide", "_RatingDelta"];
+	private _unit = objNull;
+	private _OriginalSide = sideUnknown;
+	private _RatingDelta = 0;
 
 	_unit = _this;
 
@@ -254,7 +289,8 @@ KEGs_tbase = 0.1;
 // Initialize the arrays and the listboxes.
 	CheckNewUnits =
 		{
-			private["_vm_CheckNewUnitsNumber"];
+			private _vm_CheckNewUnitsNumber = 0;
+			private _markers = missionNamespace getVariable ["KEGs_markers", []];
 			CheckNewUnitsReady = false;
 			RefreshListReady = false;
 			_vm_CheckNewUnitsNumber = vm_count;
@@ -311,7 +347,7 @@ KEGs_tbase = 0.1;
 
 				// Create markers
 				{
-					if ( isNil "_markers" ) then { diag_log format ["spectator script: '_markers' error for unit [%1]", _x]; };
+					if ( isNil "_markers" ) then { if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["spectator script: '_markers' error for unit [%1]", _x]}; };
 
 					// Create marker
 					_m = createMarkerLocal[format["KEGsMarker%1", count _markers], (player modelToWorld [0,0,0]) ];
@@ -341,7 +377,15 @@ KEGs_tbase = 0.1;
 
 KEGs_fnc_MovementCameraLoop =
 	{
-		private ["_bb", "_nextTarget", "_foo", "_name", "_targetSpeed", "_KEGs_targetPos", "_actionCam", "_checkTarget", "_hstr", "_d", "_z", "_cMapFull", "_camMove", "_comSpeed", "_coef", "_zCoef", "_camPos", "_dX", "_dY", "_dZ", "_dir", "_pos"  ];
+		private _nextTarget = 0;
+		private _foo = 0;
+		private _targetSpeed = 0;
+		private _KEGs_targetPos = [];
+		private _actionCam = false;
+		private _d = 0;
+		private _z = 0;
+		private _cMapFull = 0;
+		private _comSpeed = 0;
 		_cMapFull = 55014;
 		_CameraLoop_count = 0;
 		CameraLoop_count = 0;
@@ -465,19 +509,18 @@ KEGs_fnc_MovementCameraLoop =
 			//if ( (isNull KEGs_target) || { !(alive KEGs_target) } ) then
 			if ( (isNull KEGs_target) ) then
 			{
-				private ["_newCheckUnits", "_foundUnit", "_s1", "_s2"];
 
-				diag_log format ["WARNING - KEGs_target no longer found - waiting for new target"];
+				if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["WARNING - KEGs_target no longer found - waiting for new target"]};
 
 				waitUntil { sleep 0.5; if ( (isNull KEGs_target) && ( alive player ) ) then { KEGs_target = player}; ( !(isNull KEGs_target) ); };
 
-				diag_log format ["KEGs_target found - switching to new target: %1 (%2) (%3 - %4)", KEGs_target, KEGs_targetName, _CameraLoop_count, CameraLoop_count];
+				if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["KEGs_target found - switching to new target: %1 (%2) (%3 - %4)", KEGs_target, KEGs_targetName, _CameraLoop_count, CameraLoop_count]};
 
 				[] call KEGs_fnc_refreshPlayerList;
 			};
 		};
 
-		diag_log "Exiting Spectator mode";
+		if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "Exiting Spectator mode"};
 	};
 // end MovementCameraLoop
 

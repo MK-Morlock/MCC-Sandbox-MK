@@ -1,6 +1,7 @@
-private ["_unit","_Cargocount","_sucess"];
+private "_Cargocount";
+private _sucess = false;
 if (count _this == 0) exitWith {};
-_unit 	=  _this select 0;
+params ["_unit"];
 
 _sucess = false;
 
@@ -38,4 +39,4 @@ if (missionNamespace getVariable ["MCC_teleportToTeam",false]) then {
 		};
 	};
 
-} else {hint "Telpeport is N/A"};
+} else {hint "Teleport is N/A"};

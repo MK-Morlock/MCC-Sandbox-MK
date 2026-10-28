@@ -4,11 +4,18 @@
 // "keyUp" 		string: "keyUp" or "KeyDown"
 // _this 			ctrl varable
 //==============================================================================================================================================================================
-private ["_keyVarable","_ehType","_ctrl","_dikCode","_shift","_ctrlKey","_alt","_arrayToCheck","_action","_null","_lastKeyStroke"];
+private "_ctrl";
+private "_dikCode";
+private "_shift";
+private "_ctrlKey";
+private "_alt";
+private _arrayToCheck = "";
+private _action = 0;
+private _null = [];
+private _lastKeyStroke = [];
 disableSerialization;
 
-_ehType	 	= _this select 0;
-_keyVarable = _this select 1;
+params ["_ehType", "_keyVarable"];
 
 _ctrl 		= _keyVarable select 0;
 _dikCode 	= _keyVarable select 1;
@@ -19,7 +26,7 @@ _alt 		= _keyVarable select 4;
 //Disable keybinds id uncconcious or role selection or in Zeus
 if (!(player getVariable ["cpReady",true]) ||
     (player getvariable ["MCC_medicUnconscious",false]) ||
-    !(isnull curatorcamera)
+    !(isNull (findDisplay 312))	// Zeus open (curatorCamera can stay non-null after a Zeus remote control in SP)
    ) exitWith {};
 
 //IF CBA do not use the keybinds

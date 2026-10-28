@@ -6,11 +6,18 @@
 // <OUT>
 //		<Nothing>
 //===========================================================================================================================================================================
-private ["_type","_markerName","_path","_pos","_markerClass","_text"];
-_type = [_this, 0, "", [""]] call BIS_fnc_param;
+private _type = "";
+private "_markerName";
+private _path = "";
+private "_pos";
+private _markerClass = "";
+private _text = "";
+_type = _this param [0, "", [""]];
 
 if (_type == "") exitWith {};
-private ["_radioSelf","_radioGlobal","_type"];
+private _radioSelf = "";
+private _radioGlobal = "";
+private "_type";
 
 _markerName = (getplayerUID player) + str floor time;
 _path = "";
@@ -90,7 +97,7 @@ switch (_type) do {
 };
 
 player globalRadio "CuratorWaypointPlacedAttack";
-[[_markerName, _path, _pos, _markerClass, _text, time, "default"] ,"MCC_fnc_PDAcreatemarker", playerside,false] call BIS_fnc_MP;
+[_markerName, _path, _pos, _markerClass, _text, time, "default"] remoteExec ["MCC_fnc_PDAcreatemarker", playerside, false];
 
 titleText ["Marker Added","PLAIN DOWN"];
 titleFadeOut 10;

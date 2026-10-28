@@ -1,7 +1,17 @@
 /*============================================================MCC_fnc_curatorLHDSpawn==================================================================================
 // Spawn LHD Curator Menu
 //================================================================================================================================================================*/
-private ["_pos","_module","_resualt","_dir","_side","_hq","_lhdType","_displayName","_shipsTypes","_store","_rearm"];
+private "_pos";
+private _module = objNull;
+private _resualt = [];
+private "_dir";
+private _side = [];
+private _hq = false;
+private _lhdType = 0;
+private _displayName = "";
+private _shipsTypes = [];
+private _store = false;
+private _rearm = false;
 _module = param [0,objNull,[objNull]];
 if (isNull _module) exitWith {};
 
@@ -35,7 +45,7 @@ _shipsTypes = ["Destroyer","Aircraft Carrier","Submarine"];
 if (isClass (configFile >> "CfgVehicles" >> "CUP_LHD_BASE")) then {_shipsTypes pushBack "LHD"};
 
 _resualt = ["Spawn Static Ship",[
-				["Ship Side",["East","West","Resistance"]],
+				["Ship Side",["East","West","Resistance"],"",1],
 				["Respawn Position",false],
 				["Ship Type",_shipsTypes],
 				["Ship Name",""],

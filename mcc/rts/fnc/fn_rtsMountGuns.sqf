@@ -3,9 +3,14 @@
 //  Parameter(s):
 //     _ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_ctrl","_cfgName","_obj","_pos","_dir","_damage","_res","_BuildTime"];
+private "_obj";
+private "_pos";
+private "_dir";
+private "_damage";
+private _res = [];
+private _BuildTime = 0;
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _res = param [1, [], [[]]];
 
 

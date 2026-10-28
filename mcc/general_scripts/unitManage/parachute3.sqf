@@ -1,6 +1,16 @@
-private ["_pos", "_unit", "_halo","_height", "_gwh", "_gwhpos", "_headgear", "_uniform", "_backpack", "_backPackItems",
-	"_uniformItems", "_parachute", "_jumperNumber", "_chute", "_packHolder"];
-_pos 			= _this select 0;
+private "_unit";
+private "_halo";
+private "_height";
+private "_headgear";
+private "_uniform";
+private "_backpack";
+private "_backPackItems";
+private "_uniformItems";
+private _parachute = objNull;
+private "_jumperNumber";
+private _chute = "";
+private _packHolder = nil;
+params ["_pos"];
 _unit			= if (((_this select 1) select 0) == "") then {(_this select 1) select 1} else {objectFromNetId ((_this select 1) select 0)};
 if (isNil "_unit") exitWIth {};
 _halo			= _this select 2;
@@ -153,7 +163,7 @@ if (_halo) then
 				}; 
 			} foreach _uniformItems;
 		
-			_unit setCombatMode "AWARE";
+			_unit setBehaviour "AWARE";
 		};		
 }; 
 	
@@ -222,7 +232,7 @@ if (!_halo) then
 	}
 	else
 	{
-		_unit setCombatMode "AWARE";
+		_unit setBehaviour "AWARE";
 	};	
 };
 	

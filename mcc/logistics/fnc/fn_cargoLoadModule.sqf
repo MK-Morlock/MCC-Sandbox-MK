@@ -3,7 +3,8 @@
 Load object from 3den or curator to MCC/ACE logistic system
 */
 
-private ["_module","_object"];
+private _module = objNull;
+private "_object";
 
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
@@ -27,7 +28,7 @@ if (isNull curatorCamera) exitWith {
         };
 	} forEach (synchronizedObjects _module);
 
-    if (isNil "_object") exitWith {diag_log "Error MCC_fnc_cargoLoadModule: can't find cargo vehicle"};
+    if (isNil "_object") exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "Error MCC_fnc_cargoLoadModule: can't find cargo vehicle"}};
 
     [_synced,_object] spawn {
         params ["_synced","_object"];
@@ -44,7 +45,7 @@ if (isNull curatorCamera) exitWith {
         } forEach _synced;
     };
 
-    diag_log format ["MCC_fnc_cargoLoadModule: %1 %2", _object , _synced];
+    if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC_fnc_cargoLoadModule: %1 %2", _object , _synced]};
 };
 
 //Not curator exit
@@ -60,7 +61,8 @@ _object = _object select 1;
     _object,
     {
     	params ["_success", "_object", "_mousePosASL", "_shift", "_ctrl", "_alt"];
-    	private ["_availableVehicle","_objectMass"];
+    	private _availableVehicle = objNull;
+    	private "_objectMass";
 
     	if (!_success || !alive _object) exitWith {};
 

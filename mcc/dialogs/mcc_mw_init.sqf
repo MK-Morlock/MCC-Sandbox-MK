@@ -26,11 +26,13 @@
 #define MCC_MWBattleGroundIDC 6024
 #define MCC_MCC_MWMusicIDC 6024
 
-private ["_mccdialog","_comboBox","_displayname","_missionTypeIcons"];
+private _comboBox = controlNull;
+private _displayname = "";
+private _missionTypeIcons = [];
 disableSerialization;
 
 uiNamespace setVariable ["MCC_MWDialog", _this select 0];
-_mccdialog = _this select 0;
+params ["_mccdialog"];
 
 MCC_mcc_screen = 3;
 
@@ -43,7 +45,7 @@ _comboBox = _mccdialog displayCtrl FACTIONCOMBO;		//fill combobox CFG factions
 		_displayname = format ["%1(%2)",_x select 0,_x select 1];
 		_comboBox lbAdd _displayname;
 	} foreach U_FACTIONS;
-	_comboBox lbSetCurSel MCC_faction_index;
+	_comboBox lbSetCurSel ((U_FACTIONS findIf {toLower (_x select 2) == toLower (call MCC_fnc_MWEnemyFaction)}) max 0);	//the Mission Generator enemy faction
 
 //------------------------------------------- Civilians -------------------------------------------------------------------------------------------------
 _comboBox = _mccdialog displayCtrl CIVILIANFACTIONCOMBO;		//fill combobox CFG factions
@@ -52,7 +54,7 @@ _comboBox = _mccdialog displayCtrl CIVILIANFACTIONCOMBO;		//fill combobox CFG fa
 		_displayname = format ["%1(%2)",_x select 0,_x select 1];
 		_comboBox lbAdd _displayname;
 	} foreach U_FACTIONSCIV;
-_comboBox lbSetCurSel 0;
+_comboBox lbSetCurSel ((U_FACTIONSCIV findIf {toLower (_x select 2) == toLower (missionNamespace getVariable ["MCC_MWStartCivFaction", ""])}) max 0);
 
 //------------------------------------------- ZONES --------------------------------------------------------------------------------------------------
 _comboBox = _mccdialog displayCtrl 1023; //fill combobox zone's numbers
@@ -68,7 +70,8 @@ _comboBox lbSetCurSel MCC_zone_index;
 //Number of players
 _comboBox = _mccdialog displayCtrl MCC_MWPlayersIDC;
 _comboBox sliderSetRange [1, MCC_MWmaxPlayers];
-_comboBox sliderSetPosition (profileNamespace getVariable ["MCC_MWPlayersIndex",(floor MCC_MWmaxPlayers/2)]);
+//A value from the (Settings) Mission Generator module, or one changed in this session, wins over the saved profile value
+_comboBox sliderSetPosition (missionNamespace getVariable ["MCC_MWPlayersSession", profileNamespace getVariable ["MCC_MWPlayersIndex",(floor MCC_MWmaxPlayers/2)]]);
 _comboBox sliderSetSpeed [1, 1];
 
 //Stealth
@@ -186,3 +189,5 @@ _comboBox lbSetCurSel (profileNamespace getVariable ["MCC_MWWeatherIndex",1]);
 //Mission Area
 _comboBox = _mccdialog displayCtrl MCC_MCC_MWAreaComboIDC;
 _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWAreaIndex",0]),true];
+
+

@@ -1,7 +1,8 @@
-private ["_option", "_clase", "_lastpos", "_lastdir","_evac","_evac_p","_evac_p_type","_heliType"];
+private "_evac_p";
+private _evac_p_type = "";
+private "_heliType";
 
-_option			= _this select 0; 
-_evac			= _this select 1; 
+params ["_option", "_evac"]; 
 if (isnil "_evac") exitWith {}; 
 _heliType		= typeof _evac;
 _evac_p 		= driver _evac;

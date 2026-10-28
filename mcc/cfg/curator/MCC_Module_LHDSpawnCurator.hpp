@@ -16,9 +16,9 @@ class MCC_Module_LHDSpawnCurator : MCC_Module_Base
 		class side : Combo
 		{
 			displayName = "Side";
-			description = "Which side the carrier belong to";
+			description = "Which side the carrier belongs to";
 			typeName = "NUMBER";
-			property = "side";
+			property = "MCC_Module_LHDSpawnCurator_side";
 
 			class values
 			{
@@ -46,23 +46,23 @@ class MCC_Module_LHDSpawnCurator : MCC_Module_Base
 			displayName = "Respawn Position";
 			description = "The carrier will act as a respawn position";
 			typeName = "BOOL";
-			property = "hq";
+			property = "MCC_Module_LHDSpawnCurator_hq";
 		};
 
 		class store : Checkbox
 		{
 			displayName = "Vehicles Purchasing";
-			description = "Enable player's purchasing vehicles from main deck";
+			description = "Enable players to purchase vehicles from the main deck";
 			typeName = "BOOL";
-			property = "store";
+			property = "MCC_Module_LHDSpawnCurator_store";
 		};
 
 		class rearm : Checkbox
 		{
 			displayName = "Rearm and Refuel";
-			description = "Enable rearming, refueling and reparing vehicles from main deck";
+			description = "Enable rearming, refueling and repairing vehicles on the main deck";
 			typeName = "BOOL";
-			property = "rearm";
+			property = "MCC_Module_LHDSpawnCurator_rearm";
 		};
 
 		class lhdType : Combo
@@ -70,7 +70,7 @@ class MCC_Module_LHDSpawnCurator : MCC_Module_Base
 			displayName = "Ship type";
 			description = "LHD Requires CUP addon";
 			typeName = "NUMBER";
-			property = "lhdType";
+			property = "MCC_Module_LHDSpawnCurator_lhdType";
 
 			class values
 			{
@@ -106,7 +106,7 @@ class MCC_Module_LHDSpawnCurator : MCC_Module_Base
 			displayName = "Ship Name";
 			description = "Display Name";
 			typeName = "STRING";
-			property = "displayName";
+			property = "MCC_Module_LHDSpawnCurator_displayName";
 		};
 
 		class ModuleDescription: ModuleDescription{};

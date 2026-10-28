@@ -1,6 +1,6 @@
-private ["_ok"];
+private _ok = false;
 disableSerialization;
-MCC_mcc_screen= _this select 0;
+MCC_mcc_screen = _this select 0;
 
 
 closeDialog 0;
@@ -22,10 +22,10 @@ switch (MCC_mcc_screen) do
    { _ok = createDialog "MCC_Sandbox4";
 	 if !(_ok) exitWith { hint "createDialog failed" };};
    case 4:
-   { _ok = createDialog "MCC3D_Dialog";
+   { _ok = createDialog ("MCC3D_Dialog" call MCC_fnc_dialogName);
 	 if !(_ok) exitWith { hint "createDialog failed" };};
    case 5:
-   { _ok = createDialog "mcc_groupGen";
+   { _ok = createDialog (['mcc_groupGen', 'mcc_groupGenButtons'] select (profileNamespace getVariable ['MCC_consoleButtons', false]));
 	 if !(_ok) exitWith { hint "createDialog failed" };};
    case 6:
    { _ok = createDialog "MCC_Sandbox5";

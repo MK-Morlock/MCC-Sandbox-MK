@@ -4,9 +4,9 @@
 //     	_ctrl: CONTROL
 //		_res: resources Needed
 //==============================================================================================================================================================================
-private ["_ctrl","_answer","_obj"];
+private "_obj";
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 _obj = MCC_ConsoleGroupSelected select 0;

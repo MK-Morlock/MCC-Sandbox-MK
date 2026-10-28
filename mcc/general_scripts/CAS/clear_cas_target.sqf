@@ -1,8 +1,6 @@
-private ["_targeth", "_cas_name", "_spawnkind"];
 
-_cas_name = _this select 0;
-_targeth =  _this select 1;
-_spawnkind = _this select 2;
+
+params ["_cas_name", "_targeth", "_spawnkind"];
 
 //hint format ["Target damage check A: %1", (damage _targeteh)];
 //sleep 0.1;

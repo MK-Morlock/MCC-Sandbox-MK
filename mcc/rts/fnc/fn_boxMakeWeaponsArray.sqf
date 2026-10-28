@@ -7,7 +7,15 @@
 ======================================================================================================================================================================*/
 
 disableSerialization;
-private ["_weaponType","_type","_object","_returnArray","_Cfg","_isPlayer","_class","_itemsBox","_fnc_checkACCComp","_fnc_getItems"];
+private _weaponType = 0;
+private _type = 0;
+private _object = objNull;
+private _returnArray = [];
+private _Cfg = configNull;
+private _class = "";
+private "_itemsBox";
+private _fnc_checkACCComp = {};
+private _fnc_getItems = {};
 _weaponType = param [0,0,[0]];
 _object = param [1,objNull,[objNull]];
 _class = param [2,"",[""]];
@@ -27,10 +35,8 @@ _fnc_checkACCComp = {
 _fnc_getItems = {
     //Get items by filter from an object
     params ["_object","_CfgClass","_filter","_itemsBox"];
-    private ["_returnArray","_Cfg"];
-    _returnArray = [];
-
-    _Cfg = configFile >> _CfgClass;
+    private _returnArray = [];
+    private _Cfg = configFile >> _CfgClass;
 
     {
         if (isClass(_Cfg >> _x)) then {

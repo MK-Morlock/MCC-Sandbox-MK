@@ -13,7 +13,8 @@
 		Nothing
 
 //==============================================================================================================================================*/
-private ["_side","_fileName"];
+private "_side";
+private _fileName = "";
 _fileName = "MCC_campaign";
 
 //Clear Save stuff for each side

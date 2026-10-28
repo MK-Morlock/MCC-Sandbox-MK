@@ -4,7 +4,14 @@
 ========================================================================================================================================================================*/
 
 disableSerialization;
-private ["_actionID","_string","_taskID","_markerstr","_text","_stringName","_counter","_side","_taskType","_priority","_mccTasks"];
+private _actionID = 0;
+private _taskID = [];
+private _stringName = "";
+private "_counter";
+private _side = 0;
+private _taskType = "";
+private _priority = [];
+private _mccTasks = [];
 _actionID 			= param [0,0,[-1]];
 _stringName 		= param [1,"",[""]];
 _stringDescription 	= param [2,"",[""]];
@@ -27,8 +34,10 @@ switch (true) do
 {
 	case (_actionID == 0):		//create task
 	{
-		_priority = ["MCC_tasksCounter"] call BIS_fnc_counter;
-		_taskID = [true,_stringName,[_stringDescription, _stringName, _stringName],objNull,"CREATED",_priority,true,_taskType] call bis_fnc_taskCreate;
+		_priority = ["MCC_tasksCounter",1] call BIS_fnc_counter;
+		// BIS_fnc_taskCreate returns success, not the ID - the ID is the name passed in (used by the delete/update cases below)
+		[true,_stringName,[_stringDescription, _stringName, _stringName],objNull,"CREATED",_priority,true,_taskType] call bis_fnc_taskCreate;
+		_taskID = _stringName;
 
 		_mccTasks pushBack [_stringName,_taskID,_stringDescription];
 	};

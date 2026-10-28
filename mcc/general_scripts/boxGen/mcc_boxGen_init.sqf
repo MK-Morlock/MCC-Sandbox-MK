@@ -1,4 +1,14 @@
-private ["_display","_comboBox","_displayname","_pic", "_index", "_array", "_class","_null","_ctrl","_target","_isMCC3D","_ctrlButtton"];
+private "_display";
+private _comboBox = controlNull;
+private "_displayname";
+private "_pic";
+private "_index";
+private "_array";
+private "_class";
+private _null = [];
+private _ctrl = controlNull;
+private _target = nil;
+private _isMCC3D = false;
 #define MCC3D_IDD 8000
 #define ALLGEAR_IDD 8500
 #define BOXGEAR_IDD 8501
@@ -9,7 +19,7 @@ private ["_display","_comboBox","_displayname","_pic", "_index", "_array", "_cla
 
 disableSerialization;
 
-_ctrlButtton 	= _this select 0;
+params ["_ctrlButtton"];
 _display 		= ctrlParent _ctrlButtton;
 _ctrl			= _display displayCtrl MCC_3DCargoGen;
 
@@ -25,15 +35,15 @@ else
 	_isMCC3D = true;
 };
 
-if (isnil "_target") exitWith {}; 
-if !(_target isKindof "CAR" || _target isKindof "TANK" || _target isKindof "Air" || _target isKindof "ReammoBox_F") exitWith {};
+if (isnil "_target" || {!(_target isKindof "CAR" || _target isKindof "TANK" || _target isKindof "Air" || _target isKindof "ReammoBox_F")}) exitWith {
+	if (_isMCC3D && {!isNil "MCC_3D_panel"}) then {MCC_3D_msg = "Choose a vehicle, aircraft or crate first to set its cargo"; [] call MCC_3D_panel};
+};
 _ctrl ctrlShow !(ctrlShown _ctrl);
 
 //Align it for the Curator interface
 if !(_isMCC3D) then
 {
-	private ["_ctrlPos"];
-	_ctrlPos = ctrlposition _ctrl;
+	private _ctrlPos = ctrlposition _ctrl;
 	_ctrlPos set [0,safezoneW - ((safezoneW)+(safezoneW/5))];
 	_ctrl ctrlsetposition _ctrlPos;
 	_ctrl ctrlcommit 0; 
@@ -120,6 +130,15 @@ _comboBox = _display displayCtrl ALLGEAR_IDD;
 		_comboBox lbSetData [_index, _class];
 	} foreach _array;
 _comboBox lbSetCurSel 0;
+
+//Saved cargo presets (GitHub #11)
+private _presetCombo = _display displayCtrl 8503;
+lbClear _presetCombo;
+{
+	private _idx = _presetCombo lbAdd (_x select 0);
+	_presetCombo lbSetData [_idx, _x select 0];
+} forEach (profileNamespace getVariable ["MCC_boxPresets", []]);
+if (lbSize _presetCombo > 0) then {_presetCombo lbSetCurSel 0};
 
 tempBox = _target;
 tempBoxWeapons 	= getWeaponCargo tempBox;	//Update box

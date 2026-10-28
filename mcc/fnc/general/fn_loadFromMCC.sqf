@@ -6,8 +6,19 @@
 // Returns:
 //     <Nothing>
 //==============================================================================================================================================================================
- private ["_arrayGroups","_arrayVehicles","_objectData","_side","_array","_pos","_newString","_finalString","_isKindofUnit","_vehicle","_unitData",
-          "_allCuratorObjectives","_class","_group","_indecator","_tempArray","_arrayWeather","_arrayTime","_savedMissionSettings"];
+ private "_arrayGroups";
+ private "_arrayVehicles";
+ private "_objectData";
+ private "_side";
+ private "_pos";
+ private _vehicle = objNull;
+ private "_allCuratorObjectives";
+ private "_class";
+ private _group = grpNull;
+ private "_indecator";
+ private "_arrayWeather";
+ private "_arrayTime";
+ private "_savedMissionSettings";
 
  _input 				= _this;
 _allCuratorObjectives 	= _input select 0;
@@ -96,7 +107,10 @@ if (count _arrayGroups > 0) then
 		} foreach (_indecator select 2);
 
 
-		private ["_wp","_newWP","_wayPoints","_variables"];
+		private "_wp";
+		private "_newWP";
+		private "_wayPoints";
+		private "_variables";
 
 		if (count _indecator > 3) then
 		{
@@ -157,7 +171,7 @@ if ((count _arrayVehicles) > 0) then
 		if (_objectData select 4 != "") then
 		{
 			_vehicle setVariable ["vehicleinit",(_objectData select 4),true];
-			[[[netID _vehicle,_vehicle], (_objectData select 4)], "MCC_fnc_setVehicleInit", true, false] spawn BIS_fnc_MP;
+			[[netID _vehicle,_vehicle], (_objectData select 4)] remoteExec ["MCC_fnc_setVehicleInit", 0, false];
 		};
 
 		clearWeaponCargoGlobal _vehicle;
@@ -174,7 +188,11 @@ if ((count _arrayVehicles) > 0) then
 if ((count _allCuratorObjectives) > 0) then
 {
 	{
-		private ["_sector","_areas","_size","_trigger","_attachedUnit"];
+		private _sector = objNull;
+		private _areas = [];
+		private "_size";
+		private "_trigger";
+		private "_attachedUnit";
 		_objectData = _x;
 		_pos = _objectData select 1;
 		_class = _objectData select 0;
@@ -313,12 +331,12 @@ publicVariable "MCC_Rain";
 publicVariable "MCC_Lightnings";
 publicVariable "MCC_Fog";
 
-[[[MCC_Overcast,MCC_WindForce,MCC_Waves,MCC_Rain,MCC_Lightnings,MCC_Fog]],"MCC_fnc_setWeather",true,false] spawn BIS_fnc_MP;
+[[MCC_Overcast,MCC_WindForce,MCC_Waves,MCC_Rain,MCC_Lightnings,MCC_Fog]] remoteExec ["MCC_fnc_setWeather", 0, false];
 
 //Time
 MCC_date = [_arrayTime select 0, _arrayTime select 1, _arrayTime select 2, _arrayTime select 3, _arrayTime select 4];
 publicVariable "MCC_date";
-[[MCC_date],"MCC_fnc_setTime",true,false] spawn BIS_fnc_MP;
+[MCC_date] remoteExec ["MCC_fnc_setTime", 0, false];
 
 //Mission settings
 {
@@ -332,4 +350,4 @@ private "_name";
 _name = _arrayTime select 5;
 missionnamespace setvariable ["bis_fnc_moduleMissionName_name",_name];
 publicvariable "bis_fnc_moduleMissionName_name";
-[true,"bis_fnc_moduleMissionName"] call bis_fnc_mp;
+true remoteExec ["bis_fnc_moduleMissionName", 0, false];

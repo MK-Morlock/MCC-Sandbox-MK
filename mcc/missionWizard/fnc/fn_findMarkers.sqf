@@ -7,11 +7,10 @@
 //	<RETURM>
 //		MARKERS ARRAY
 //========================================================================================================================================================================================
-private ["_pos","_radius","_filter","_return"];
-_pos = param [0, [0,0,0], [[]]];
-_radius = param [1, 200, [0]];
-_filter = param [2, "", [""]];
-_return = [];
+private _pos = param [0, [0,0,0], [[]]];
+private _radius = param [1, 200, [0]];
+private _filter = param [2, "", [""]];
+private _return = [];
 if (count _pos > 0) then {
 	{
 		if (markerPos _x distance2D _pos <= _radius) then {

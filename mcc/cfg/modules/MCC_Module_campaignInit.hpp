@@ -10,19 +10,20 @@ class MCC_Module_campaignInit : Module_F
 	{
 		class factionPlayer : Edit
 		{
+			control = "MCC_AttributeFaction";	//drop-down of all loaded factions (mod factions included)
 			displayName = "Players Faction";
 			description = "Config name";
 			typeName = "STRING";
 			defaultValue = """BLU_F""";
-			property = "factionPlayer";
+			property = "MCC_Module_campaignInit_factionPlayer";
 		};
 
 		class factionRivalPlayer : Combo
 		{
 			displayName = "Rival Players Side";
-			description = "Players on rival side will gain resources from killing main faction's players";
+			description = "Players on the rival side gain resources by killing the main faction's players";
 			typeName = "NUMBER";
-			property = "factionRivalPlayer";
+			property = "MCC_Module_campaignInit_factionRivalPlayer";
 
 			class values
 			{
@@ -57,20 +58,22 @@ class MCC_Module_campaignInit : Module_F
 
 		class factionEnemy : Edit
 		{
+			control = "MCC_AttributeFaction";	//drop-down of all loaded factions (mod factions included)
 			displayName = "Enemy Faction";
 			typeName = "STRING";
 			description = "Config name";
 			defaultValue = """OPF_F""";
-			property = "factionEnemy";
+			property = "MCC_Module_campaignInit_factionEnemy";
 		};
 
 		class factionCiv : Edit
 		{
+			control = "MCC_AttributeFaction";	//drop-down of all loaded factions (mod factions included)
 			displayName = "Civilian Faction";
 			typeName = "STRING";
 			description = "Config name";
 			defaultValue = """CIV_F""";
-			property = "factionCiv";
+			property = "MCC_Module_campaignInit_factionCiv";
 		};
 
 		class missionMax : Combo
@@ -78,7 +81,7 @@ class MCC_Module_campaignInit : Module_F
 			displayName = "Number of Missions";
 			description = "Until Campaign Ends - 0 means no mission will be generated";
 			typeName = "NUMBER";
-			property = "missionMax";
+			property = "MCC_Module_campaignInit_missionMax";
 			class values
 			{
 				class five
@@ -109,7 +112,7 @@ class MCC_Module_campaignInit : Module_F
 		{
 			displayName = "Difficulty";
 			typeName = "NUMBER";
-			property = "difficulty";
+			property = "MCC_Module_campaignInit_difficulty";
 
 			class values
 			{
@@ -136,7 +139,7 @@ class MCC_Module_campaignInit : Module_F
 		{
 			displayName = "Intro";
 			typeName = "NUMBER";
-			property = "playMusic";
+			property = "MCC_Module_campaignInit_playMusic";
 
 			class values
 			{
@@ -164,32 +167,101 @@ class MCC_Module_campaignInit : Module_F
 			displayName = "Starting Tickets";
 			typeName = "NUMBER";
 			defaultValue = 100;
-			property = "tickets";
+			property = "MCC_Module_campaignInit_tickets";
+		};
+
+		class playersCount : Edit
+		{
+			displayName = "Players (enemy scaling)";
+			description = "Enemy numbers are sized for at least this many players. 0 = count the real players (with few players a mission still has at least 20 enemies).";
+			typeName = "NUMBER";
+			defaultValue = 0;
+			property = "MCC_Module_campaignInit_playersCount";
 		};
 
 		class missionRotation : Edit
 		{
 			displayName = "Missions Rotation";
-			description = "After each set of mission passed MCC will pick a new location for the next mission";
+			description = "How many missions are played in the same area before the campaign moves to a new area (1 = a new area for every mission)";
 			typeName = "NUMBER";
-			defaultValue = 3;
-			property = "missionRotation";
+			defaultValue = 1;
+			property = "MCC_Module_campaignInit_missionRotation";
 		};
 
 		class tileSize : Edit
 		{
 			displayName = "Tile Size";
-			description = "MCC will categorize the map to tiles - the default size of a tile";
+			description = "MCC divides the map into tiles - the default size of a tile";
 			typeName = "NUMBER";
 			defaultValue = 400;
-			property = "tileSize";
+			property = "MCC_Module_campaignInit_tileSize";
+		};
+
+		class tileTransparency : Default
+		{
+			displayName = "Map Overlay Transparency";
+			description = "Makes the red/blue territory squares on the map more see-through. Shading differences between squares are kept; 100% hides them completely. Territory, enemy spawns and saving are not affected.";
+			tooltip = "Makes the red/blue territory squares on the map more see-through. Shading differences between squares are kept; 100% hides them completely. Territory, enemy spawns and saving are not affected.";
+			control = "Slider";
+			typeName = "NUMBER";
+			defaultValue = "0";
+			property = "MCC_Module_campaignInit_tileTransparency";
+		};
+
+		class objectiveMarkers : Combo
+		{
+			displayName = "Objective Markers";
+			tooltip = "Area: task markers are placed up to ~400 m from the objective and must be searched for (classic MCC campaign). Precise: markers sit on the objective with a 3D icon.";
+			typeName = "NUMBER";
+			property = "MCC_Module_campaignInit_objectiveMarkers";
+			defaultValue = "0";
+
+			class values
+			{
+				class area
+				{
+					name = "Area (search)";
+					value = 0;
+					default = 1;
+				};
+				class precise
+				{
+					name = "Precise";
+					value = 1;
+				};
+			};
+		};
+
+		class overStorage : Combo
+		{
+			displayName = "Resources Over Storage Limit";
+			description = "What happens to resources above your storage limit (HQ + Storage Areas) when a campaign mission ends. Cut: anything over the limit is lost at once (original MCC). Keep: only the new reward is capped; stock already over the limit stays and is lost at 10% per in-game hour instead.";
+			tooltip = "What happens to resources above your storage limit (HQ + Storage Areas) when a campaign mission ends. Cut: anything over the limit is lost at once (original MCC). Keep: only the new reward is capped; stock already over the limit stays and is lost at 10% per in-game hour instead.";
+			typeName = "NUMBER";
+			property = "MCC_Module_campaignInit_overStorage";
+			defaultValue = "0";
+
+			class values
+			{
+				class cut
+				{
+					name = "Cut at mission end (original)";
+					value = 0;
+					default = 1;
+				};
+				class keep
+				{
+					name = "Keep (lose 10% per hour)";
+					value = 1;
+				};
+			};
 		};
 
 		class loadDB : Checkbox
 		{
 			displayName = "Load from DB";
-			description = "Load saved camapign data from Data Base";
-			property = "loadDB";
+			description = "Load saved campaign data from the database";
+			property = "MCC_Module_campaignInit_loadDB";
 		};
 
 		class ModuleDescription: ModuleDescription{};
@@ -197,13 +269,13 @@ class MCC_Module_campaignInit : Module_F
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Creates a Campaign. MCC will generate missions and the players will gain resources to expend their base. Every in game day the enemy faction behavior will change according to the players advance";
+		description = "Creates a Campaign. MCC will generate missions and the players will gain resources to expand their base. Every in-game day the enemy faction behavior will change according to the players advance";
 		sync[] = {"mcc_sandbox_moduleStartLocations","mcc_sandbox_moduleMissionSettings"};
 
 		class mcc_sandbox_moduleStartLocations
 		{
 			description[] = {
-				"Set at least one H.Q start location"
+				"Set at least one HQ start location"
 			};
 			position = 0;
 			direction = 0;

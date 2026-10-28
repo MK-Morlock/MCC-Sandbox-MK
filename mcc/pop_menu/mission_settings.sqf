@@ -1,7 +1,23 @@
 #define MCCVIEWDISTANCE 1006
 #define MCCGRASSDENSITY 1007
 
-private ["_weather","_type", "_grass","_fogLevel","_d","_nul","_rain","_overcast","_month","_day","_year","_hour","_minute","_wind","_Waves","_time","_initDone","_html"];
+private _weather = [];
+private _type = 0;
+private _grass = controlNull;
+private _fogLevel = controlNull;
+private _nul = [];
+private _rain = controlNull;
+private _overcast = controlNull;
+private _month = controlNull;
+private _day = controlNull;
+private _year = controlNull;
+private _hour = controlNull;
+private _minute = controlNull;
+private _wind = controlNull;
+private _Waves = controlNull;
+private _time = controlNull;
+private _initDone = false;
+private _html = "";
 _type = param [0,-1,[0]];
 _initDone = missionNamespace getVariable ["MCC_GUI1initDone",false];
 
@@ -64,7 +80,9 @@ switch (_type) do
 	//Sunset Sunrise times
 	case 5:
 	{
-		private ["_suriseTime","_sunsetTime","_date"];
+		private _suriseTime = 0;
+		private _sunsetTime = 0;
+		private _date = [];
 		_month 	= (MCC_months_array select (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 15))) select 1;
 		_day 	= (MCC_days_array select (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 16)));
 		_year	= (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 17)) + 1990;
@@ -76,11 +94,11 @@ switch (_type) do
 		_suriseTime = (_date call BIS_fnc_sunriseSunsetTime) select 0;
 		_sunsetTime = (_date call BIS_fnc_sunriseSunsetTime) select 1;
 
-		_html = "<t color='#b0e0e6' size='1' shadow='1' align='left' underline='true'> Sunrise: </t>" +
-				"<t color='#ffffff' size='0.9' shadow='1' align='left' underline='false'> " +
+		_html = "<t color='#C48214' size='0.8' shadow='0' align='left' underline='false'> Sunrise: </t>" +
+				"<t color='#E1E3E5' size='0.8' shadow='0' align='left' underline='false'> " +
 		        ([_suriseTime,"HH:MM"]  call BIS_fnc_timeToString) +
-		        "<t color='#b0e0e6' size='1' shadow='1' align='right' underline='true'>  Sunset: </t>" +
-		        "<t color='#ffffff' size='0.9' shadow='1' align='right' underline='false'> " +
+		        "<t color='#C48214' size='0.8' shadow='0' align='right' underline='false'>  Sunset: </t>" +
+		        "<t color='#E1E3E5' size='0.8' shadow='0' align='right' underline='false'> " +
 		        ([_sunsetTime,"HH:MM"]  call BIS_fnc_timeToString) +
 		        "</t>";
 

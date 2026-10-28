@@ -4,9 +4,11 @@
 //     	_ctrl: CONTROL
 //		_res: resources Needed
 //==============================================================================================================================================================================
-private ["_ctrl","_res","_side","_varName"];
+private _res = [];
+private "_side";
+private _varName = "";
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _res = param [1, [], [[]]];
 _side = playerSide;
 _varName = format ['MCC_rtsMissionOn_%1', _side];
@@ -14,7 +16,7 @@ _varName = format ['MCC_rtsMissionOn_%1', _side];
 if (missionNamespace getVariable [_varName ,false]) exitWith {};
 
 //Start building time
-private ["_obj","_BuildTime"];
+private "_obj";
 playsound "click";
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 _obj = MCC_ConsoleGroupSelected select 0;
@@ -38,4 +40,4 @@ publicVariable _varName;
 
 [MCC_ConsoleGroupSelected] spawn MCC_fnc_baseSelected;
 
-[[_side,20,false],"MCC_fnc_rtsScanResources",false,false] spawn BIS_fnc_MP;
+[_side,20,false] remoteExec ["MCC_fnc_rtsScanResources", 2, false];

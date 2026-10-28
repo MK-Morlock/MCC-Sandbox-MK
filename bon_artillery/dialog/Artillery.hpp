@@ -27,7 +27,7 @@
 #define MCC_ConsoleMapRulerDir 9164
 #define MCC_ConsoleMapRulerDis 9165
 
-class ArtilleryDialog
+class MCCDLG_NAME
 {
 	idd = BON_ARTY_DIALOG;
 	movingEnable = true;
@@ -37,7 +37,7 @@ class ArtilleryDialog
 	{
 		class mcc_ConsolePic: MCC_RscPicture {
 			idc = -1;
-			text =  __EVAL(MCCPATH +"data\console.paa");
+			text =  __EVAL(MCCPATH +"data\mk_cc_ca.paa");
 			x = -0.0446875 * safezoneW + safezoneX;
 			y = 0.0939094 * safezoneH + safezoneY;
 			w = 1.00406 * safezoneW;
@@ -150,7 +150,7 @@ class ArtilleryDialog
 		colorBackgroundActive[] = {0,0,0,0};
 		colorDisabled[] = {0,0,0,0};
 		colorBackgroundDisabled[] = {0,0,0,0};
-		tooltip = "Close the conosle";
+		tooltip = "Close the console";
 		onButtonClick = "closedialog 0;";
 		};
 		class HW_ArtiTextField : MCC_RscText {
@@ -440,16 +440,13 @@ class ArtilleryDialog
 			w = 0.0515625 * safezoneW;
 			h = 0.022 * safezoneH;
 		};
-		class HW_ArtiConfirmButton : MCC_RscButton
+		class HW_ArtiConfirmButton: MCCBTN_S
 		{
 			idc = -1;
-			colorDisabled[] = {1, 0.4, 0.3, 0.8};
 			x = 0.442708 * safezoneW + safezoneX;
 			y = 0.555 * safezoneH + safezoneY;
 			w = 0.0630208 * safezoneW;
 			h = 0.022 * safezoneH;
-			size = 0.02821;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 			text = "Confirm";
 			onButtonClick = __EVAL("[] execVM '"+MCCPATH+"bon_artillery\bon_arti_setup.sqf'");
 		};
@@ -462,7 +459,7 @@ class ArtilleryDialog
 			text = "Reset";
 			onButtonClick = __EVAL("[] execVM '"+MCCPATH+"bon_artillery\bon_arti_clearcannons.sqf'");
 		};
-		class HW_artiCoordApplyButton : MCC_RscButton
+		class HW_artiCoordApplyButton: MCCBTN_R
 		{
 			idc = -1;
 			x = 0.436979 * safezoneW + safezoneX;
@@ -470,20 +467,20 @@ class ArtilleryDialog
 			w = 0.0515625 * safezoneW;
 			h = 0.066 * safezoneH;
 			text = "Copy Position";
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			onButtonClick = __EVAL("[] execVM '"+MCCPATH+"bon_artillery\dialog\apply_pos.sqf'");
+			class TextPos {left = 0; top = "((0.066 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};
 
-		class HW_RequestButton : MCC_RscButton
+		class HW_RequestButton: MCCBTN_R
 		{
 			idc = BON_ARTY_REQUESTBUTTON;
-			colorDisabled[] = {1, 0.4, 0.3, 0.8};
 			x = 0.442708 * safezoneW + safezoneX;
 			y = 0.742 * safezoneH + safezoneY;
 			w = 0.0572917 * safezoneW;
 			h = 0.055 * safezoneH;
 			text = "Execute";
 			onButtonClick = __EVAL("player execVM '"+MCCPATH+"bon_artillery\bon_arti_request.sqf'");
+			class TextPos {left = 0; top = "((0.055 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};
 		class HW_CancelButton : HW_RequestButton
 		{
@@ -506,7 +503,7 @@ class ArtilleryDialog
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 			text = "Corr. left-right";
 		};
-		class HW_ArtiRightCorrection : MCC_RscButton
+		class HW_ArtiRightCorrection: MCCBTN_T
 		{
 			idc = -1;
 			x = 0.494271 * safezoneW + safezoneX;
@@ -598,7 +595,7 @@ class ArtilleryDialog
 			onMouseMoving = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\console\mouseMoving.sqf'");
 		};
 
-		class MCC_ConsoleMapRulerButton: MCC_RscButton
+		class MCC_ConsoleMapRulerButton: MCCBTN_R
 		{
 			idc = MCC_ConsoleMapRulerButton;
 			text = "Ruler";

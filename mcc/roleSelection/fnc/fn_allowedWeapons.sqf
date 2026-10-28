@@ -1,7 +1,15 @@
 //==================================================================MCC_fnc_allowedWeapons======================================================================================
 // Check if the player is in vehicle while he is not a pilot or a crewman
 //==============================================================================================================================================================================
-private ["_curWeapon","_role","_playerVehicle","_type","_cursor","_drop","_neededRole","_camShake","_cfg"];
+private "_curWeapon";
+private _role = "";
+private "_playerVehicle";
+private _type = 0;
+private _cursor = "";
+private _drop = false;
+private _neededRole = "";
+private _camShake = false;
+private _cfg = configNull;
 _drop			= false;
 _neededRole		= "";
 _role 			= tolower (player getvariable ["CP_role","n/a"]);
@@ -37,7 +45,7 @@ if (_playerVehicle == player) then {
 	//Not allowed
 	if (_drop) then {
 		if (!_camShake) then {
-			cutText [format ["You need to be %1 inorder to use this weapon, you'll suffer from increased weapon sway",_neededRole],"Plain Down",0.5];
+			cutText [format ["You need to be %1 to use this weapon. You'll suffer from increased weapon sway.",_neededRole],"Plain Down",0.5];
 			addCamShake [2, 999, 0.7];
 			player setVariable ["MCC_camShake",true];
 		};

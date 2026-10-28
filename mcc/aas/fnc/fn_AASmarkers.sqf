@@ -13,7 +13,9 @@ Example:
 
 */
 
-private ["_logic","_triggers","_attack","_marker","_attackText"];
+private _attack = false;
+private "_marker";
+private _attackText = "";
 params ["_owner","_pos","_markerName"];
 
 _pos =  [_pos, 20, 0] call BIS_fnc_relPos;

@@ -3,11 +3,16 @@
 // Example:[_totalEnemyUnits,_zoneNumber] call MCC_fnc_MWSpawnInfantry;
 // Return - handler
 //===============================================================================================================================================================================
-private ["_menArraySpecial","_unitPlaced","_totalEnemyUnits","_script_handler","_spawnbehavior","_group","_unitsArray","_side"];
-_totalEnemyUnits	= _this select 0;
-_zoneNumber			= _this select 1;
-_spawnbehavior		= _this select 2;
-_side				= _this select 3;
+private _menArraySpecial = [];
+private _unitPlaced = 0;
+private _group = grpNull;
+private _unitsArray = [];
+params [
+	["_totalEnemyUnits", 0, [0]],
+	["_zoneNumber", 0, [0, ""]],
+	["_spawnbehavior", "", ["", []]],
+	["_side", sideUnknown, [sideUnknown]]
+];
 
 _menArraySpecial = [];
 if ((count MCC_MWGroupArrayMenRecon)>0) then {_menArraySpecial = _menArraySpecial + MCC_MWGroupArrayMenRecon};
@@ -43,7 +48,7 @@ if (count _unitsArray > 0) then
 }
 else
 {
-	diag_log "MCC: Mission Wizard Error: No group available in the selected enemy faction";
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: Mission Wizard Error: No group available in the selected enemy faction"};
 };
 
 _unitPlaced;

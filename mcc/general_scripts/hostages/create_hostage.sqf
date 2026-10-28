@@ -1,4 +1,5 @@
-private ["_hostage","_init"];
+private _hostage = objNull;
+private _init = "";
 #define	MCC_UNTIE_ICON "\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_unbind_ca.paa"
 
 _hostage = _this;
@@ -14,8 +15,8 @@ if (MCC_isACE) then {
 	removeallweapons _hostage;
 	_hostage setcaptive true;
 	_init = "_this switchmove 'Acts_ExecutionVictim_Loop';";
-	[[[netID _hostage,_hostage], _init, false], "MCC_fnc_setVehicleInit", true, true] spawn BIS_fnc_MP;
-	/*[[_hostage, "Hold %1 to interact"], "MCC_fnc_createHelper", false] call BIS_fnc_MP;*/
+	[[netID _hostage,_hostage], _init, false] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+	/*[_hostage, "Hold %1 to interact"] remoteExec ["MCC_fnc_createHelper", 2, false];*/
 };
 
 [
@@ -23,7 +24,7 @@ if (MCC_isACE) then {
 	format ["Untie %1",name _hostage],
 	MCC_UNTIE_ICON,
 	MCC_UNTIE_ICON,
-	"(alive _target) && (_target distance _this < 5)",
+	"(alive _target) && (_target distance _this < 5) && !(_target getVariable ['MCC_hostageFreed',false])",
 	"(alive _target) && (_target distance _this < 5)",
 	{
 		//Start action
@@ -32,6 +33,9 @@ if (MCC_isACE) then {
 	{},
 	{
 		//Success
+		if (MCC_isACE && {_target getVariable ["ace_captives_isHandcuffed", false]}) then {
+			[_target, false] remoteExecCall ["ACE_captives_fnc_setHandcuffed", _target];
+		};
 		_null = [_target, player, 0,[0]] execVM format ["%1mcc\general_scripts\hostages\hostage.sqf",MCC_path];
 		[name _target,"Thank you!"] remoteExec ["BIS_fnc_showSubtitle", _caller];
 	},
@@ -44,7 +48,7 @@ if (MCC_isACE) then {
 	0,
 	true,
 	false
-] remoteExec ["bis_fnc_holdActionAdd", 0];
+] remoteExec ["bis_fnc_holdActionAdd", 0, _hostage];
 
 
 

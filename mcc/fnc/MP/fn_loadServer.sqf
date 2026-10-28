@@ -24,7 +24,17 @@
 
 #define BASE_ANCHOR "UserTexture10m_F"
 
-private ["_tempVar","_fileName","_loadTickets","_loadResources","_loadCivRelation","_loadCAS","_loadAirDrop","_loadArtillery","_loadStartLoc","_loadRTSBuildngs","_loadArtilleryTypes"];
+private _tempVar = [];
+private _fileName = "";
+private _loadTickets = false;
+private _loadResources = false;
+private _loadCivRelation = false;
+private _loadCAS = false;
+private _loadAirDrop = false;
+private _loadArtillery = false;
+private _loadStartLoc = false;
+private _loadRTSBuildngs = false;
+private _loadArtilleryTypes = false;
 
 _fileName = param [0, "mission", [""]];
 _loadTickets = param [1, true, [false]];

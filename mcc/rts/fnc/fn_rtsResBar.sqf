@@ -1,0 +1,24 @@
+disableSerialization;
+params ["_disp", "_fillIdc", "_tagIdc", "_value", "_cap", ["_allowLow", false, [false]]];
+private _fill = _disp displayCtrl _fillIdc;
+if (isNull _fill) exitWith {};
+private _base = _fill getVariable ["MCC_baseW", -1];
+if (_base < 0) then {_base = (ctrlPosition _fill) select 2; _fill setVariable ["MCC_baseW", _base]};
+private _pct = if (_cap > 0) then {((_value / _cap) max 0) min 1} else {0};
+private _p = ctrlPosition _fill;
+_p set [2, _base * _pct];
+_fill ctrlSetPosition _p;
+_fill ctrlCommit 0;
+private _tag = _disp displayCtrl _tagIdc;
+private _empty = _allowLow && {_value <= 0};
+private _full = !_empty && {_cap > 0} && {_value >= _cap};
+private _low = !_empty && {_allowLow} && {_cap > 0} && {_value < 0.2 * _cap};
+_tag ctrlShow (_empty || _full || _low);
+if (_empty || _full || _low) then {
+	_tag ctrlSetText (["LOW", "FULL", "EMPTY"] select ([_low, _full, _empty] find true));
+	_tag ctrlSetBackgroundColor ([[0.95, 0.70, 0.50, 0.25], [0.93, 0.83, 0.55, 0.25], [0.90, 0.56, 0.53, 0.25]] select ([_low, _full, _empty] find true));
+	_tag ctrlSetTooltip (["", "Build a Workshop and upgrade its\nStorage Area to increase capacity"] select _full);
+	private _tp = ctrlPosition _tag;
+	_tag ctrlSetPosition [_tp select 0, _tp select 1, (ctrlTextWidth _tag) + 0.006, _tp select 3];
+	_tag ctrlCommit 0;
+};

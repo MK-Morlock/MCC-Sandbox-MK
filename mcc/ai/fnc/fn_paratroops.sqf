@@ -19,9 +19,35 @@
 //	_p_mcc_spawnfaction			String, Faction name.
 //	_startPosDir				Array, spawn and de-spawn location for the helicopter.
 //==============================================================================================================================================================*/
-private ["_away","_p_mcc_zone_markername","_heli","_heliCrew","_pos","_paraSide", "_paraType", "_helitype","_heli_pilot","_spawn","_heliPilot","_gunnersGroup","_type","_entry","_turrets","_path", "_timeOut","_unit", "_side", "_spawnParaGroup", "_paraGroupArray", "_paraGroup", "_paraMode", "_heliCrewCount","_p_mcc_spawnfaction", "_p_mcc_zone_behavior", "_mcc_awareness", "_newParaGroup", "_rampOutPos", "_flyHeight","_dropPos", "_rope", "_ropes","_vehicleClass"];
+private _away = [];
+private "_p_mcc_zone_markername";
+private _heli = [];
+private "_heliCrew";
+private _paraSide = "";
+private "_paraType";
+private _helitype = "";
+private _spawn = [];
+private "_heliPilot";
+private "_type";
+private "_timeOut";
+private _unit = objNull;
+private "_side";
+private "_spawnParaGroup";
+private _paraGroupArray = [];
+private "_paraGroup";
+private _paraMode = 0;
+private _heliCrewCount = 0;
+private "_p_mcc_spawnfaction";
+private "_p_mcc_zone_behavior";
+private "_mcc_awareness";
+private _rampOutPos = [];
+private _flyHeight = 0;
+private _dropPos = [];
+private "_rope";
+private _ropes = [];
+private "_vehicleClass";
 
-_pos 					= _this select 0;
+params ["_pos"];
 _paraSide				= param [1,"",["",east]];
 _paraType 				=  if (TypeName  (_this select 2) == "STRING") then {call compile (_this select 2)} else {(_this select 2)};
 _p_mcc_zone_markername  = _this select 3;
@@ -66,7 +92,7 @@ if ( (count _paraGroupArray) == 0 ) then {
 	//Let's build the faction unit's array
 	{
 		_unitsArray	pushBack (_x select 0);
-	} foreach ([_p_mcc_spawnfaction,"soldier","",false] call MCC_fnc_makeUnitsArray);
+	} foreach ([[_p_mcc_spawnfaction,"soldier","",false] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry);
 
 	//diag_log format ["MCC paradrop custom array: %1", _unitsArray];
 
@@ -77,7 +103,7 @@ if ( (count _paraGroupArray) == 0 ) then {
 	//diag_log format ["MCC paradrop custom array: %1", count _paraGroupArray];
 };
 
-if ( (count _paraGroupArray) == 0 ) exitWith { diag_log format ["MCC Warning: no suitable paratrooper group found for %1", _this]; player groupChat format ["Error: no suitable paratrooper group for this Faction"]; };
+if ( (count _paraGroupArray) == 0 ) exitWith { if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC Warning: no suitable paratrooper group found for %1", _this]}; player groupChat format ["Error: no suitable paratrooper group for this Faction"]; };
 
 //Set default helicopter and crew
 switch (_paraSide) do {
@@ -162,10 +188,13 @@ switch (_paraSide) do {
 };
 
 
-if ( isNil "_spawnParaGroup" ) exitWith { diag_log format ["MCC ERROR: no group found for %1", _this]; };
+if ( isNil "_spawnParaGroup" ) exitWith { if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC ERROR: no group found for %1", _this]}; };
 
 //Try to find an helicopter from the faction
-private ["_minSpaces","_vehiclesTypesArray","_availableSpaces","_newHeliClassesArray","_totalSeats","_crewSeats"];
+private "_minSpaces";
+private _vehiclesTypesArray = [];
+private _availableSpaces = [];
+private _newHeliClassesArray = [];
 _minSpaces = switch (_paraType % 3) do {
 				case 0: {6};
 				case 1: {12};
@@ -179,6 +208,7 @@ if (count _vehiclesTypesArray < 2) then {
 
 _vehiclesTypesArray = _vehiclesTypesArray + ([_p_mcc_spawnfaction,"helicopterX"] call MCC_fnc_makeUnitsArray);
 
+private _defHeli = _helitype;
 _newHeliClassesArray = [];
 
 for "_i" from 0 to (count _vehiclesTypesArray)-1 step 1 do {
@@ -194,6 +224,15 @@ for "_i" from 0 to (count _vehiclesTypesArray)-1 step 1 do {
 if (count _newHeliClassesArray > 0) then {
 	_newHeliClassesArray sort true;
 	_helitype = (_newHeliClassesArray select 0) select 1;
+};
+if (_helitype != _defHeli) then {
+	private _ro = getArray (configFile >> "CfgVehicles" >> _helitype >> "ace_fastroping_ropeOrigins");
+	_ro = _ro select {_x isEqualType [] && {count _x == 3}};
+	if (count _ro >= 2) then {_ropes = [_ro select 0, _ro select 1]} else {
+		private _w = (getNumber (configFile >> "CfgVehicles" >> _helitype >> "mapSize")) * 0.12;
+		_w = (_w max 0.9) min 1.6;
+		_ropes = [[_w, 0.5, 0], [-_w, 0.5, 0]];
+	};
 };
 
 if ( _paraType < 3 ) then {
@@ -243,7 +282,12 @@ if ( _paraMode > 0 ) then {
 	_heliPilot flyInHeight _flyHeight;
 };
 
-private ["_cargoNum","_unitsArray","_i","_type","_z","_cargoGroups"];
+private _cargoNum = [];
+private "_unitsArray";
+private "_i";
+private "_type";
+private "_z";
+private _cargoGroups = [];
 //--------spawn the jumping group----------------------
 _cargoNum = [_helitype, "allCargo"] call MCC_fnc_crewCount; //populate heli before kick off
 _cargoGroups = [];
@@ -278,13 +322,13 @@ if (_cargoNum > 0) then {
 
 			_unitspawned = createGroup _side;
 
-			for "_z" from 1 to (6 min _cargoNum) step 1 do	{
-				_type = _spawnParaGroup select round (random 4);
+			{
+				private _type = _x;
 				_unit = _unitspawned createUnit [_type, _spawn, [], 0.5, "NONE"];
 
 				//Curator
 				{_x addCuratorEditableObjects [[_unit],false]} forEach allCurators;
-			};
+			} forEach ([_spawnParaGroup, 6 min _cargoNum] call MCCMK_fnc_buildSquad);
 		};
 
 		_cargoGroups pushBack _unitspawned;
@@ -352,8 +396,17 @@ if ( _paraMode == 2 ) then {
 	[units _x] allowGetIn false;
 	[_x, _heli, _p_mcc_zone_markername, _p_mcc_zone_behavior, _p_mcc_awareness, _paraMode, _paraType, _actualRopes, (_forEachIndex % 2), count _cargoGroups] spawn
 	{
-		private ["_paraGroup", "_dir", "_p_mcc_zone_markername", "_p_mcc_zone_behavior", "_p_mcc_awareness", "_paraMode", "_paraType",
-					"_actualRopes", "_rope", "_index", "_number"];
+		private "_paraGroup";
+		private "_dir";
+		private "_p_mcc_zone_markername";
+		private "_p_mcc_zone_behavior";
+		private "_p_mcc_awareness";
+		private "_paraMode";
+		private "_paraType";
+		private "_actualRopes";
+		private "_rope";
+		private "_index";
+		private "_number";
 
 		_paraGroup 	= _this select 0;
 		_heli = (_this select 1);
@@ -438,7 +491,10 @@ if ( _paraMode == 2 ) then {
 
 					[_x, _rope] spawn
 						{
-							private ["_unit", "_zc", "_zdelta", "_rope"];
+							private "_unit";
+							private _zc = 0;
+							private "_zdelta";
+							private "_rope";
 							_unit = _this select 0;
 							_rope = _this select 1;
 							_zdelta = 7 / 10;
@@ -448,7 +504,7 @@ if ( _paraMode == 2 ) then {
 
 							_unit action ["GETOUT", vehicle _unit];
 							unassignVehicle _unit;
-							[compile format ["objectFromNetID '%1' switchmove 'crew_tank01_out'", netID _unit], "BIS_fnc_spawn", true, false] call BIS_fnc_MP;
+							[[], compile format ["objectFromNetID '%1' switchmove 'crew_tank01_out'", netID _unit]] remoteExec ["call", 0, false];
 							//_unit switchmove "crew_tank01_out";
 
 							_unit setpos [(getpos _unit select 0), (getpos _unit select 1), 0 max ((getpos _unit select 2) - 3)];
@@ -460,7 +516,7 @@ if ( _paraMode == 2 ) then {
 								sleep 0.1;
 							};
 
-							[compile format ["objectFromNetID '%1' switchmove ''", netID _unit], "BIS_fnc_spawn", true, false] call BIS_fnc_MP;
+							[[], compile format ["objectFromNetID '%1' switchmove ''", netID _unit]] remoteExec ["call", 0, false];
 							//_unit switchmove "";
 							detach _unit;
 						};
@@ -550,9 +606,7 @@ if (_p_mcc_zone_behavior in ["bis", "bisd","bisp"]) then {
 } else {
 
 	{
-		private ["_paraGroup"];
-
-		_paraGroup = _x;
+		private _paraGroup = _x;
 
 		if ( _p_mcc_awareness == "Default" ) then // MM most likely forgot to set awareness - paratroopers are not default :-)
 		{

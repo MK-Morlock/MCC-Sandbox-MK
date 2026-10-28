@@ -1,6 +1,19 @@
-private 
-["_CfgWeapons", "_type",  "_i",  "_CfgWeapon", "_weaponDisplayName","_cfgclass","_picture", "_bino_index", "_item_index","_displayArray",
-	"_launchers_index","_mg_index","_pistol_index", "_rifle_index", "_ammo_index","_glasses_index"];
+private _CfgWeapons = configNull;
+private _type = 0;
+private _i = 0;
+private _CfgWeapon = configNull;
+private _weaponDisplayName = "";
+private _cfgclass = configNull;
+private _picture = "";
+private _bino_index = 0;
+private _item_index = 0;
+private _displayArray = [];
+private _launchers_index = 0;
+private _mg_index = 0;
+private _pistol_index = 0;
+private _rifle_index = 0;
+private _ammo_index = 0;
+private _glasses_index = 0;
 
 _launchers_index = 0;
 _mg_index 		= 0;

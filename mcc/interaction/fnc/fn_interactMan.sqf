@@ -2,10 +2,9 @@
 // Interaction with man type
 // Example: [_suspect,_men] spawn MCC_fnc_interactMan;
 //=================================================================================================================================================================================
-private ["_suspect","_men","_rand","_factor","_null","_suspectCorage","_keyName","_pos","_suspectName"];
-_suspect 	= _this select 0;
-_men 		= _this select 1;
-_keyName	= _this select 2;
+private "_pos";
+private "_suspectName";
+params ["_suspect", "_men", "_keyName"];
 
 disableSerialization;
 player setVariable ["MCC_interactionActive",true];
@@ -100,3 +99,4 @@ _id = addMissionEventHandler ["EntityKilled",{ if (missionNamespace getVariable 
 									};
 								} forEach units _killed;
 							}}];
+*/

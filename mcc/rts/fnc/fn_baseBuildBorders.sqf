@@ -6,11 +6,22 @@
 //======================================================================================================================================================================
 #define	MCC_RTS_BORDER_MARKERS_ITEM "Sign_Sphere200cm_F"
 
-private ["_center","_oldBorder","_border","_width","_pi","_perimeter","_size","_wallcount","_total","_centerObj","_dir","_xpos","_ypos","_zpos","_a"];
+private "_oldBorder";
+private _border = [];
+private _width = 0;
+private _pi = 0;
+private "_perimeter";
+private "_wallcount";
+private "_total";
+private _centerObj = objNull;
+private "_dir";
+private "_xpos";
+private "_ypos";
+private "_zpos";
+private _a = objNull;
 disableSerialization;
 
-_center = _this select 0;
-_size 	= _this select 1;
+params ["_center", "_size"];
 
 if (typeName _center != typeName []) then {getpos _center};
 

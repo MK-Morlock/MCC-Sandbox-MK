@@ -13,7 +13,21 @@
 		<OUT>
 		Name of the LHD
 ==================================================================================================================================================================*/
-private ["_shipParts","_dir","_shipPos","_objects","_parts","_heliPads","_cargoPos","_ship","_pos","_markers","_typeName","_LHDType","_ships","_defualtName","_storePos","_fnc_spawnWeapons"];
+private _shipParts = configNull;
+private "_dir";
+private "_shipPos";
+private _objects = objNull;
+private _parts = [];
+private _heliPads = [];
+private "_cargoPos";
+private _ship = "";
+private "_pos";
+private _markers = [];
+private "_LHDType";
+private _ships = [];
+private _defualtName = "";
+private _storePos = [];
+private _fnc_spawnWeapons = {};
 
 #define MCC_billboard   "Land_Noticeboard_F"
 #define	MCC_AA_SAM	 	"B_SAM_System_02_F"
@@ -54,9 +68,8 @@ if (typeName _pos isEqualTo typeName objNull) then {
 
 
 if (!(isClass (configFile >> "CfgVehicles" >> "CUP_LHD_BASE")) && (_LHDType == 3)) exitWith {
-	private ["_str","_null"];
-	_str = "<t size='0.8' t font = 'puristaLight' color='#FFFFFF'>" + "CUP Addon is required" + "</t>";
-	_null = [_str,0,1.1,2,0.1,0.0] spawn bis_fnc_dynamictext;
+	private _str = "<t size='0.8' font='PuristaLight' color='#FFFFFF'>" + "CUP Addon is required" + "</t>";
+	private _null = [_str,0,1.1,2,0.1,0.0] spawn bis_fnc_dynamictext;
 };
 
 
@@ -129,7 +142,7 @@ _fnc_spawnWeapons = {
 		["_weapons",[],[[]]]
 	];
 
-	private ["_dummy"];
+	private "_dummy";
 
 	{
 		_dummy =([[0,0,0], 0, (_x select 0), _side] call bis_fnc_spawnvehicle) select 0;
@@ -217,8 +230,7 @@ switch (_LHDType) do
 		//spawn the ship
 		_parts = [];
 		{
-			private ["_section"];
-			_section = _x createVehicle _shipPos;
+			private _section = _x createVehicle _shipPos;
 			_section setDir _dir;
 			_section setPos _shipPos;
 
@@ -247,8 +259,7 @@ switch (_LHDType) do
 			// Create heli pads
 			_heliPads = [];
 			{
-				private ["_pad"];
-				_pad = "HeliH" createVehicle [0,0,0];
+				private _pad = "HeliH" createVehicle [0,0,0];
 				_pad attachTo [_ship,[0,0,0],_x];
 
 				_heliPads pushBack _pad;
@@ -265,7 +276,9 @@ switch (_LHDType) do
 
 
 		//Aresting gear
-		private ["_temp_pos","_dummy","_logcClass"];
+		private "_temp_pos";
+		private _dummy = "";
+		private _logcClass = "";
 
 		//H (Invisable) Startfly
 		_temp_pos = _ship modeltoworld [10,100,-4.5];
@@ -284,8 +297,7 @@ switch (_LHDType) do
 		publicVariable "MCC_cables";
 
 		//Arresting Gear trigger
-		private ["_trg"];
-		_trg = createTrigger ["EmptyDetector", _temp_pos];
+		private _trg = createTrigger ["EmptyDetector", _temp_pos];
 		_trg setDir ((getDir _ship));
 		_trg setPos _temp_pos;
 		_trg setTriggerArea [15, 10, 0, false];
@@ -301,7 +313,7 @@ switch (_LHDType) do
 
 		_markers pushBack _dummy;
 
-		private ["_vehicle"];
+		private _vehicle = objNull;
 
 		//Spawn two tractors
 		{
@@ -317,10 +329,7 @@ switch (_LHDType) do
 
 			/*
 			// For each vehicle add an action to detach from the ship - MP compliant
-			[
-				[_vehicle,[format ["%1 %2",localize "STR_CUP_CFG_RELEASEVEHICLE", (getText (configFile >> "CfgVehicles" >> "CUP_B_TowingTractor_USMC" >> "displayName"))], {[_this, "CUP_fnc_detachFromShip", _this select 0, false, true] call BIS_fnc_MP},nil, 1.5, false, true]],
-				"addAction", true, true
-			] call BIS_fnc_MP;
+			[_vehicle,[format ["%1 %2",localize "STR_CUP_CFG_RELEASEVEHICLE", (getText (configFile >> "CfgVehicles" >> "CUP_B_TowingTractor_USMC" >> "displayName"))], {_this remoteExec ["CUP_fnc_detachFromShip", _this select 0, false];},nil, 1.5, false, true]] remoteExec ["addAction", 0, true];
 			*/
 
 			{_x addCuratorEditableObjects [[_vehicle],false]} forEach allCurators;

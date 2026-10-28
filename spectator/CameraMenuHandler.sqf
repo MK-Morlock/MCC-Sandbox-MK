@@ -1,4 +1,7 @@
-private ["_Source", "_debugPlayer", "_cName", "_cCamera", "_KEGs_cs"];
+private _debugPlayer = objNull;
+private _cName = 0;
+private _cCamera = 0;
+private _KEGs_cs = 0;
 
 //diag_log format ["camera menu start: %1", KEGs_target];
 
@@ -91,19 +94,19 @@ _cCamera = 55002;
 // ----------------------------------------------------------------------------------------------------------------------------------------------------
 	// Set toggle text color for camera menu		
 		
-	if(KEGsTags) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTags, [1, 0.5, 0, 1]]} 
+	if(KEGsTags) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTags, [0.77, 0.51, 0.08, 1]]} 
 	else {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTags, [1,1,1,0.33]]};			
 
-	if(KEGsTagsStat) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTagsStat, [1, 0.5, 0, 1]]} 
+	if(KEGsTagsStat) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTagsStat, [0.77, 0.51, 0.08, 1]]} 
 	else {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleTagsStat, [1,1,1,0.33]]};			
 	
-	if(KEGsAIfilter) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleAiFilter, [1, 0.5, 0, 1]]} 
+	if(KEGsAIfilter) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleAiFilter, [0.77, 0.51, 0.08, 1]]} 
 	else {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleAiFilter, [1,1,1,0.33]]};			
 
-	if(KEGsDeadFilter) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleDeadFilter, [1, 0.5, 0, 1]]} 
+	if(KEGsDeadFilter) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleDeadFilter, [0.77, 0.51, 0.08, 1]]} 
 	else {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleDeadFilter, [1,1,1,0.33]]};	
 	
-	if(KEGsCombatActionFilter) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleCombatActionFilter, [1, 0.5, 0, 1]]} 
+	if(KEGsCombatActionFilter) then {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleCombatActionFilter, [0.77, 0.51, 0.08, 1]]} 
 	else {lbSetColor[KEGs_cLBCameras, KEGs_cLbToggleCombatActionFilter, [1,1,1,0.33]]};
 	
 // ----------------------------------------------------------------------------------------------------------------------------------------------------

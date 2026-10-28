@@ -1,7 +1,16 @@
 //==================================================================MCC_fnc_weaponShopInit============================================================================
 // Sync with triggers to create MCC zones
 //==============================================================================================================================================================
-private ["_module","_text","_objects","_object","_box","_prices","_persistent","_persistentName","_pos","_resualt"];
+private _module = objNull;
+private _text = "";
+private _objects = [];
+private "_object";
+private "_box";
+private _prices = 0;
+private _persistent = false;
+private _persistentName = "";
+private "_pos";
+private _resualt = [];
 #define MCC_SHOP_ICON	"\a3\ui_f\data\IGUI\Cfg\Actions\reammo_ca.paa"
 
 _module = param [0, objNull, [objNull]];
@@ -10,12 +19,16 @@ if (isNull _module) exitWith {};
 _pos = getpos _module;
 
 //did we get here from the 2d editor?
-if (_module isKindOf "MCC_Module_createShop") then {
+// (it used to test for a class "MCC_Module_createShop" that does not exist, so a shop placed in Eden never did anything;
+//  an Eden-placed module carries its attribute values, a Zeus-placed one does not)
+if (!isNil {_module getVariable "tittle"} || {count (synchronizedObjects _module) > 0 && {isNull curatorcamera}}) then {
 
 	if (isServer) then {
 
 		_text = _module getVariable ["tittle","Open Shop"];
 		_prices = _module getVariable ["prices",0.5];
+		if (_prices > 1) then {_prices = _prices / 100};
+		if (_prices <= 0) then {_prices = 0.5};
 		_persistent = _module getVariable ["persistent",false];
 		_persistentName =  _module getVariable ["persistentName","testShop"];
 
@@ -29,11 +42,21 @@ if (_module isKindOf "MCC_Module_createShop") then {
 			};
 		} forEach (synchronizedObjects _module);
 
-		if (isNil "_box") exitWith {};
+		if (isNil "_box") exitWith {
+			["WARN", "fn_weaponShopInit", "Weapon shop module at %1 is not synced to an ammo box - shop not created", [_pos]] call MCC_fnc_log;
+		};
 
 		_box enableSimulation false;
 		_box allowDamage false;
-		_box hideObjectGlobal true;
+		_box setVariable ["MCC_vaultNoInventory",true,true];	//stock is bought/sold through the shop dialog only
+
+		// Synced only to the ammo box: the box itself is the shop (it used to be hidden with nothing to open it).
+		// Synced to other objects too (a table, a unit...): those open the shop and the box stays hidden as its stock.
+		if (count _objects == 0) then {
+			_objects = [_box];
+		} else {
+			_box hideObjectGlobal true;
+		};
 
 		//If persistent DB
 		if (_persistent) then {
@@ -101,6 +124,8 @@ if (_module isKindOf "MCC_Module_createShop") then {
 	clearBackpackCargoGlobal _box;
 	_box enableSimulation false;
 	_box allowDamage false;
+	_box setVariable ["MCC_vaultNoInventory",true,true];	//stock is bought/sold through the shop dialog only
+	_object setVariable ["MCC_vaultNoInventory",true,true];
 
 
 	//get prices

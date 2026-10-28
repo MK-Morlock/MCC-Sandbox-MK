@@ -2,7 +2,16 @@
 
 	Throw a grenade into a house
 */
-private ["_door","_animation","_phase","_closed","_magazine","_params","_object","_doorStatus","_eh","_magMuzzle"];
+private "_door";
+private "_animation";
+private "_phase";
+private "_closed";
+private _magazine = "";
+private _params = [];
+private _object = objNull;
+private _doorStatus = [];
+private "_eh";
+private _magMuzzle = "";
 _unit = param [0, objNull, [objNull]];
 _params = param [2, [], [[]]];
 _magazine = _params param [0, "", [""]];

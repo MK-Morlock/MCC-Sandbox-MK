@@ -1,6 +1,29 @@
-private ["_mccdialog","_comboBox","_displayname","_pic", "_index","_planeName","_counter","_type","_group","_groupControl","_cost",
-		 "_insetionArray","_control","_unitsCount","_markerType","_markerColor","_leader","_markerInf","_markerMech","_markerArmor","_markerAir",
-		"_markerName","_icon","_wpArray","_haveGPS","_behaviour","_unitsSize","_unitsSizeMarker","_arrayName","_evacVehicles"];
+[findDisplay 2993] call MCC_fnc_consoleApply3D;
+["start"] spawn {sleep 0.1; ["start"] call MCC_fnc_consoleCampaignTiles};	//no campaign territory overlay on the Commander Console map (once its display exists)
+[] spawn {sleep 0.15; ["init", "cc"] call MCC_fnc_consoleMapLayers};
+private _mccdialog = controlNull;
+private _comboBox = controlNull;
+private _displayname = "";
+private _pic = "";
+private "_index";
+private _planeName = "";
+private _counter = 0;
+private "_type";
+private "_group";
+private _groupControl = configNull;
+private "_cost";
+private _insetionArray = [];
+private "_control";
+private "_markerType";
+private "_markerColor";
+private "_leader";
+private "_icon";
+private _wpArray = [];
+private _haveGPS = nil;
+private "_behaviour";
+private "_unitsSizeMarker";
+private _arrayName = "";
+private "_evacVehicles";
 // By: Shay_gman
 // Version: 1.1 (May 2012)
 #define mcc_playerConsole_IDD 2993
@@ -28,6 +51,7 @@ private ["_mccdialog","_comboBox","_displayname","_pic", "_index","_planeName","
 #define MCC_CONSOLEWPADD 	9159
 #define MCC_CONSOLEWPREPLACE 9160
 #define MCC_CONSOLEWPCLEAR 9161
+#define MCC_CONSOLEWPCANCEL 9169
 #define MCC_ConsoleMapRulerButton 9163
 #define MCC_ConsoleMapRulerDir 9164
 #define MCC_ConsoleMapRulerDis 9165
@@ -57,6 +81,7 @@ ctrlShow [MCC_CONSOLEWPBEHAVIORCOMBO,false];
 ctrlShow [MCC_CONSOLEWPADD,false];
 ctrlShow [MCC_CONSOLEWPREPLACE,false];
 ctrlShow [MCC_CONSOLEWPCLEAR,false];
+ctrlShow [MCC_CONSOLEWPCANCEL,false];
 ctrlShow [MCC_CONSOLEINFOUAVCONTROL,false];
 ctrlShow [MCC_ResourcesControlsGroup,false];
 
@@ -105,7 +130,10 @@ _evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1",play
 } forEach [1011,1021,1031];
 
 //Add default drops & CAS
-private ["_cfg","_varName","_airDrops","_cratesTypes","_costsTable","_airDropsAvaliable"];
+private _cfg = configNull;
+private _varName = "";
+private _airDrops = [];
+private "_airDropsAvaliable";
 if (([["hq",2], playerSide] call MCC_fnc_CheckBuildings || (missionNamespace getVariable ["MCC_defaultSupplyDropsEnabled",false])) &&
     !(missionNamespace getVariable ["MCC_RTSAddDefaultSupplyDrops",false])) then {
 
@@ -175,6 +203,14 @@ if (([["hq",3], playerSide] call MCC_fnc_CheckBuildings || (missionNamespace get
 	publicVariable "MCC_RTSAddDefaultCAS";
 };
 
+[] spawn {
+	disableSerialization;
+	while {!isNull (findDisplay 2993)} do {
+		private _d = findDisplay 2993;
+		{(_d displayCtrl (_x select 1)) ctrlSetTooltip (([_x select 0] call MCC_fnc_consoleFKeyState) select 2)} forEach [[2, 9196], [3, 9197]];
+		sleep 1;
+	};
+};
 //--------------------------------------------------Evac-------------------------------------------------------------------------------
 if (count _evacVehicles > 0) then {
 	_comboBox = _mccdialog displayCtrl MCC_ConsoleEvacTypeText_IDD;		//fill combobox type
@@ -215,6 +251,16 @@ if (count _evacVehicles > 0) then {
 	} foreach _insetionArray;
 	_comboBox lbSetCurSel 0;
 };
+if (count _evacVehicles > 0 && {(lbCurSel MCC_ConsoleEvacTypeText_IDD) >= 0}) then {missionNamespace setVariable ["MCC_evacConsoleObj", _evacVehicles select (lbCurSel MCC_ConsoleEvacTypeText_IDD)]};
+[] spawn {
+	disableSerialization;
+	private _last = (missionNamespace getVariable [format ["MCC_evacVehicles_%1", playerSide], []]) apply {[_x, alive _x, alive (driver _x)]};
+	while {!isNull (findDisplay 2993)} do {
+		sleep 1;
+		private _sig = (missionNamespace getVariable [format ["MCC_evacVehicles_%1", playerSide], []]) apply {[_x, alive _x, alive (driver _x)]};
+		if !(_sig isEqualTo _last) then {_last = _sig; call MCC_fnc_evacConsoleRefresh};
+	};
+};
 
 //----------------------------------------------CAS--------------------------------------------------------------------------------------
 _arrayName	= format ["MCC_CASConsoleArray%1",(player getVariable ["CP_side",  playerside])];
@@ -238,7 +284,7 @@ lbClear _comboBox;
 		private _str = "";
 
 		{
-			_str = _str + (_x select 0) + " x " + str (_x select 1) + " ";
+			_str = _str + (toUpper ((_x select 0) select [0, 1])) + ((_x select 0) select [1]) + " x " + str (_x select 1) + " ";
 		} forEach _cost;
 
 		_comboBox lbSetTooltip [_index, _str];
@@ -263,10 +309,7 @@ lbClear _comboBox;
 _counter = 0;
 {
 	_counter = _counter + 1;
-	_displayname = format ["%1: ",_counter];
-	{
-		_displayname = format ["%1 %2, ",_displayname, getText(configFile >> "CfgVehicles" >> _x >> "displayname")];
-	} foreach ((_x select 0) select 0);
+	_displayname = format ["%1: %2", _counter, ((((_x select 0) select 0) apply {getText (configFile >> "CfgVehicles" >> _x >> "displayname")}) joinString ", ")];
 	_displayname = _displayname;
 	_pic = if (!(_x select 2 isEqualTo 1) || (_x isEqualTo true)) then {"\a3\ui_f\data\gui\cfg\CommunicationMenu\supplydrop_ca.paa"} else {"\A3\ui_f\data\map\markers\handdrawn\pickup_CA.paa"};
 	_index = _comboBox lbAdd _displayname;
@@ -281,7 +324,7 @@ _counter = 0;
 		ctrlShow [MCC_ResourcesControlsGroup,true];
 
 		{
-			_str = _str + (_x select 0) + " x " + str (_x select 1) + " ";
+			_str = _str + (toUpper ((_x select 0) select [0, 1])) + ((_x select 0) select [1]) + " x " + str (_x select 1) + " ";
 		} forEach _cost;
 
 		_comboBox lbSetTooltip [_index, _str];
@@ -332,8 +375,10 @@ MCC_fnc_mapDrawWPConsole =
 			_wpArray = waypoints (group _leader);
 			if (count _wpArray > 0)then
 			{
-				private ["_wp","_wPos","_wType"];
-				MCC_lastPos = nil;
+				private "_wp";
+				private "_wPos";
+				private "_wType";
+				private _lastPos = nil;
 				_texture = gettext (configfile >> "CfgMarkers" >> "waypoint" >> "icon");
 				for [{_i= currentWaypoint (group _leader)},{_i < count _wpArray},{_i=_i+1}] do 	//Draw the current WP
 				{
@@ -358,15 +403,15 @@ MCC_fnc_mapDrawWPConsole =
 							"center"
 						];
 
-						if (isnil "MCC_lastPos") then {MCC_lastPos = [(getpos _leader) select 0,(getpos _leader) select 1]};
+						if (isNil "_lastPos") then {_lastPos = [(getpos _leader) select 0,(getpos _leader) select 1]};
 
 						_map drawLine [
-							MCC_lastPos,
+							_lastPos,
 							_wPos,
 							[0,0,1,1]
 						];
 
-						MCC_lastPos = _wPos;
+						_lastPos = _wPos;
 					};
 				};
 			};
@@ -396,7 +441,16 @@ MCC_fnc_mapDrawWPConsole =
 };
 
 [] call {
-	private ["_handler","_markerSupport","_markerAutonomous","_markerNaval","_markerRecon","_haveGPS","_leader","_groupStatus","_wpArray","_behaviour","_groupControl","_haveGPS","_groupName","_groupIconData"];
+	private _handler = controlNull;
+	private _haveGPS = nil;
+	private "_leader";
+	private "_groupStatus";
+	private _wpArray = [];
+	private "_behaviour";
+	private _groupControl = configNull;
+	private _haveGPS = nil;
+	private "_groupName";
+	private _groupIconData = [];
 
 	setGroupIconsVisible [true,false];
 	setGroupIconsSelectable true;
@@ -428,7 +482,12 @@ MCC_fnc_mapDrawWPConsole =
 
 				_icon = (_x getvariable "MCCgroupIconData");
 				if (!isnil "_icon") then {_x removeGroupIcon _icon};
-				_icon = _x addGroupIcon [_markerType,[0,0]];
+				private _iconType = _markerType;
+				if (_behaviour == "COMBAT" && {_side != civilian}) then {
+					private _c = format [["MCC_%1_combat", "MCC_%1_combatP"] select (isPlayer _leader), _markerType];
+					if (isClass (configFile >> "CfgGroupIcons" >> _c)) then {_iconType = _c};
+				};
+				_icon = _x addGroupIcon [_iconType,[0,0]];
 				_x setGroupIconParams [_markerColor,format ["%1",_groupName],1,true];
 				_x setvariable ["MCCgroupIconData",_icon,false];
 
@@ -439,9 +498,8 @@ MCC_fnc_mapDrawWPConsole =
 
 				if (! isnil "_groupStatus") then 					//Draw group status
 					{
-						private ["_time","_status"];
-						_time 		= _groupStatus select 1;
-						_status 	= _groupStatus select 0;
+						private _time = _groupStatus select 1;
+						private _status = _groupStatus select 0;
 
 						if (abs (time - _time) < 180) then
 							{

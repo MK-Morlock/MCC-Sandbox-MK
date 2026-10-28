@@ -1,7 +1,9 @@
-private ["_disp","_comboBox","_scale","_array"];
+private "_scale";
 disableSerialization;
 
-_disp = _this select 0;
+params ["_disp"];
+uiNamespace setVariable ["MCC_SQLPDA_rscDisp", _disp];
+["start"] call MCC_fnc_consoleCampaignTiles;	//no campaign territory overlay on the PDA map
 
 _scale = switch (player getvariable ["MCC_sqlPDAScale",0]) do {
     case 0: {
@@ -33,16 +35,16 @@ _scale = switch (player getvariable ["MCC_sqlPDAScale",0]) do {
 	_ctrl ctrlCommit 0;
 } forEach [22,9120];
 
-private ["_rscMap","_dialogMap","_dialogMapPos"];
-_rscMap 	= _disp displayCtrl 9120;
-_dialogMap 	= (uiNamespace getVariable "MCC_SQLPDA") displayCtrl 9120;
-_dialogMapPos = ctrlPosition _dialogMap;
+private _rscMap = _disp displayCtrl 9120;
+private _dialogMap = (uiNamespace getVariable "MCC_SQLPDA") displayCtrl 9120;
+private _dialogMapPos = ctrlPosition _dialogMap;
 
 _rscMap ctrlMapAnimAdd [0.5, ctrlMapScale _dialogMap, _dialogMap ctrlMapScreenToWorld [(_dialogMapPos select 0) + ((_dialogMapPos select 3)/2), (_dialogMapPos select 1) + ((_dialogMapPos select 2)/2)]];
 
 while {dialog} do {closeDialog 0; sleep 0.1};
 [_rscMap] call MCC_fnc_pipOpen;
 ctrlMapAnimCommit (_disp displayCtrl 9120);
+["init", "pdaRsc"] call MCC_fnc_consoleMapLayers;
 //------------------------------------------Group Control-------------------------------------------------------------------------------------
 //---------------------Console Groups management
 
@@ -59,8 +61,10 @@ MCC_fnc_mapDrawWPPDA =
 			_wpArray = waypoints (group _leader);
 			if (count _wpArray > 0)then
 			{
-				private ["_wp","_wPos","_wType"];
-				MCC_lastPos = nil;
+				private "_wp";
+				private "_wPos";
+				private "_wType";
+				private _lastPos = nil;
 				_texture = gettext (configfile >> "CfgMarkers" >> "waypoint" >> "icon");
 				for [{_i= currentWaypoint (group _leader)},{_i < count _wpArray},{_i=_i+1}] do 	//Draw the current WP
 				{
@@ -85,15 +89,15 @@ MCC_fnc_mapDrawWPPDA =
 							"center"
 						];
 
-						if (isnil "MCC_lastPos") then {MCC_lastPos = [(getpos _leader) select 0,(getpos _leader) select 1]};
+						if (isNil "_lastPos") then {_lastPos = [(getpos _leader) select 0,(getpos _leader) select 1]};
 
 						_map drawLine [
-							MCC_lastPos,
+							_lastPos,
 							_wPos,
 							[0,0,1,1]
 						];
 
-						MCC_lastPos = _wPos;
+						_lastPos = _wPos;
 					};
 				};
 			};
@@ -103,7 +107,26 @@ MCC_fnc_mapDrawWPPDA =
 
 _disp call
 {
-	private ["_handler","_markerSupport","_markerAutonomous","_markerColor","_markerNaval","_markerRecon","_haveGPS","_leader","_groupStatus","_wpArray","_behaviour","_groupControl","_haveGPS","_groupName","_markerType","_markerInf","_markerMech","_markerArmor","_markerAir","_disp"];
+	private _handler = controlNull;
+	private _markerSupport = "";
+	private _markerAutonomous = "";
+	private _markerColor = [];
+	private _markerNaval = "";
+	private _markerRecon = "";
+	private _haveGPS = nil;
+	private "_leader";
+	private "_groupStatus";
+	private _wpArray = [];
+	private "_behaviour";
+	private _groupControl = configNull;
+	private _haveGPS = nil;
+	private _groupName = "";
+	private "_markerType";
+	private _markerInf = "";
+	private _markerMech = "";
+	private _markerArmor = "";
+	private _markerAir = "";
+	private "_disp";
 
 	_disp = _this;
 	_handler = (_disp displayCtrl 9120) ctrladdeventhandler ["draw","_this call MCC_fnc_mapDrawWPPDA;"];
@@ -187,7 +210,7 @@ _disp call
 
 					_x setGroupIconParams [_markerColor,_groupName ,1,true];
 
-					_unitsCount = [group _leader] call MCC_fnc_countGroupHC;
+					_unitsCount = [group _leader] call MCC_fnc_countGroupHC; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 					_unitsSize = 0;
 					_markerType = nil;
 					if (_unitsCount select 0 > 0) then {_markerType = _markerInf; _unitsSize = _unitsSize + (1*(_unitsCount select 0))};
@@ -201,7 +224,7 @@ _disp call
 
 					if (isnil "_markerType") then
 					{
-						_unitsCount = [group _leader] call MCC_fnc_countGroup;
+						_unitsCount = [group _leader] call MCC_fnc_countGroup; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 						if (_unitsCount select 0 > 0) then {_markerType = _markerInf; _unitsSize = _unitsSize + (1*(_unitsCount select 0))};
 						if (_unitsCount select 1 > 0) then {_markerType = _markerMech; _unitsSize = _unitsSize + (3*(_unitsCount select 1))};
 						if (_unitsCount select 2 > 0) then {_markerType = _markerArmor; _unitsSize = _unitsSize + (3*(_unitsCount select 2))};
@@ -228,9 +251,8 @@ _disp call
 
 					if (! isnil "_groupStatus") then 					//Draw group status
 						{
-							private ["_time","_status"];
-							_time 		= _groupStatus select 1;
-							_status 	= _groupStatus select 0;
+							private _time = _groupStatus select 1;
+							private _status = _groupStatus select 0;
 
 							if (abs (time - _time) < 180) then
 								{

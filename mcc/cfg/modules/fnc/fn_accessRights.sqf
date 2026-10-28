@@ -5,13 +5,14 @@
 //=					                             24.12.2011
 //==========================================================================================
 //******************************************************************************************
-private ["_logic","_namesList","_synced"];
+private "_namesList";
+private "_synced";
 
 
 // Exit if player or HC
 if !(hasInterface || isServer) exitWith {};
 
-_logic 		= _this select 0;
+params ["_logic"];
 _namesList 	= call compile (_logic getvariable ["names","[]"]);
 _namesList = _namesList + (missionNameSpace getVariable ["MCC_allowedPlayers",[]]);
 missionNamespace setVariable ["MCC_allowAdmin",_logic getvariable ["allowAdmin",true]];
@@ -36,3 +37,4 @@ else
 {
 	player setvariable ["MCC_allowed",false,true];
 };
+*/

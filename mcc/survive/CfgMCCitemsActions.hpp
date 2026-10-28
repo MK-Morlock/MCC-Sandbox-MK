@@ -313,7 +313,7 @@ class CfgMCCitemsActions
 
 			condition = "'MCC_waterpure' in (items player)";
 			function = "[_itemClass,'MCC_bottle_water','MCC_waterpure','Purificatting Water'] spawn MCC_fnc_surviveWaterTreatment;";
-			displayName = "Purificat Water";
+			displayName = "Purify Water";
 		};
 
 		class Eat
@@ -422,7 +422,7 @@ class CfgMCCitemsActions
 
 			condition = "'MCC_waterpure' in (items player)";
 			function = "[_itemClass,'MCC_canteenWater','MCC_waterpure','Purificatting Water'] spawn MCC_fnc_surviveWaterTreatment;";
-			displayName = "Purificat Water";
+			displayName = "Purify Water";
 		};
 
 		class Eat

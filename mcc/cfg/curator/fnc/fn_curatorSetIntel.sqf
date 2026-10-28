@@ -1,7 +1,15 @@
 //============================================================MCC_fnc_curatorSetIntel======================================================================================
 // Make item/object/unit a pickable intel
 //===========================================================================================================================================================================
-private ["_pos","_module","_objects","_text","_shared","_delete","_markers","_tittle","_marker"];
+private "_pos";
+private _module = objNull;
+private "_objects";
+private _text = "";
+private _shared = 0;
+private _delete = false;
+private _markers = [];
+private _tittle = "";
+private _marker = [];
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 

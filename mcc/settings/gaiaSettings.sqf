@@ -92,7 +92,7 @@
 [
     "GAIA_CACHE_STAGE_1",
     "SLIDER",
-   	["Cache Distance","How far any player should be from a unit before it cached"],
+   	["Cache Distance","How far any player should be from a unit before it is cached"],
   	"MCC GAIA",
     [1000, 10000, 3000, 0],
     true
@@ -102,7 +102,7 @@
 [
     "MCC_GAIA_ATTACKS_FOR_NONGAIA",
     "CHECKBOX",
-   	["GAIA Controlls All","If set to everyone GAIA will give order to all units availables even players"],
+   	["GAIA Controls All","If set to everyone, GAIA will give orders to all available units, even players"],
    	"MCC GAIA",
     false,
     true

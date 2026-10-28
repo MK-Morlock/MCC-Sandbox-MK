@@ -8,11 +8,9 @@
 	<OUT>
 		NOTHING
 ==============================================================================================================================================================================*/
-private ["_heli","_open","_animPhase"];
-
-_heli= param [0,objNull,[objNull]];
-_open = param [1,true,[true]];
-_animPhase = if (_open) then {1} else {0};
+private _heli = param [0,objNull,[objNull]];
+private _open = param [1,true,[true]];
+private _animPhase = if (_open) then {1} else {0};
 
 if (isNull _heli) exitWith {};
 

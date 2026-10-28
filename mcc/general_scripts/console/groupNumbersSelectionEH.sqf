@@ -1,4 +1,4 @@
-private ["_disp","_pressed","_shift","_ctrlKey","_alt","_selectedGroup"];
+private "_selectedGroup";
 #define MCC_CONSOLEINFOTEXT 9150
 #define MCC_CONSOLEINFOLIVEFEED 9151
 #define MCC_CONSOLEINFOUAVCONTROL 9162
@@ -8,16 +8,13 @@ private ["_disp","_pressed","_shift","_ctrlKey","_alt","_selectedGroup"];
 #define MCC_CONSOLEWPADD 	9159
 #define MCC_CONSOLEWPREPLACE 9160
 #define MCC_CONSOLEWPCLEAR 9161
+#define MCC_CONSOLEWPCANCEL 9169
 #define MCC_ConsoleMapRulerDir 9164
 #define MCC_ConsoleMapRulerDis 9165
 
 disableSerialization;
  
-_disp = _this select 0;
-_pressed = _this select 1;
-_shift = _this select 2;
-_ctrlKey = _this select 3;
-_alt = _this select 4;
+params ["_disp", "_pressed", "_shift", "_ctrlKey", "_alt"];
 
 if !(_pressed in [2,3,4,5,6,7,8,9,10,11]) exitWith {};
 //hint str _this; 

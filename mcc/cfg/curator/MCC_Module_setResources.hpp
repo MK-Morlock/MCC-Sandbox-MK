@@ -39,7 +39,7 @@ class MCC_Module_setResourcesCurator : MCC_Module_Base
 
 		class repair
 		{
-			displayName = "Materials";
+			displayName = "Supplies";
 			typeName = "NUMBER";
 			defaultValue = 500;
 		};

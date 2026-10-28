@@ -2,13 +2,15 @@
 // Create a fire solution hint
 // Example:[_cannon, _splashpos,_firedelay,_artitype,_nrshells,_spread] spawn MCC_fnc_artyGetSolution;
 //===========================================================================================================================================================================	
-private ["_unit","_cannon","_splashpos","_firedelay","_artitype","_nrshells","_spread","_counter","_messege","_solution","_solLow","_solLowETA","_solHigh","_solHighETA"];
-_unit	 	= _this select 0;
-_splashpos 	= _this select 1;
-_firedelay 	= _this select 2;
-_artitype 	= _this select 3;
-_nrshells 	= _this select 4;
-_spread 	= _this select 5;
+private "_cannon";
+private _counter = [];
+private _messege = configNull;
+private _solution = nil;
+private "_solLow";
+private "_solLowETA";
+private "_solHigh";
+private "_solHighETA";
+params ["_unit", "_splashpos", "_firedelay", "_artitype", "_nrshells", "_spread"];
 
 _cannon = vehicle _unit;
 if (_cannon != vehicle player) exitWith {};

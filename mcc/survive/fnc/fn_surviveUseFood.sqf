@@ -43,7 +43,7 @@ if (_returnItem != "") then {
 //Sick chance
 if (random 100 < _foodPoisionChance) then {
 	0 spawn {
-		sleep 10 + random 600;
+		sleep (10 + random 600);
 		player setVariable ["MCC_surviveIsSick",true];
 		TitleText ["You feel sick...", "PLAIN DOWN",0.5];
 	};

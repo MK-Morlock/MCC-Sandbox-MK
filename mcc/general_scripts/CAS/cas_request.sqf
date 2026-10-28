@@ -3,8 +3,14 @@
 #define MCC_AIRDROPARRAYCONTROL 1033
 
 disableSerialization;
-private ["_type","_indecator","_array","_arrayName","_side","_index","_groupArray","_dummy","_isParachute"];
-_type = _this select 0;
+private _indecator = controlNull;
+private _array = [];
+private _arrayName = "";
+private _side = sideUnknown;
+private _index = 0;
+private _dummy = "";
+private _isParachute = false;
+params ["_type"];
 
 _side = switch (toLower mcc_sidename) do
 		{
@@ -16,12 +22,21 @@ _side = switch (toLower mcc_sidename) do
 
 //If slingload ignore array and call what we have or we didn't fill the array
 _isParachute = (missionNamespace getVariable ["MCC_airdropIsParachute",0])==0;
+if (_isParachute && {_type in [0,3]} && {count MCC_airDropArray == 0}) exitWith {
+	hint "Current Airdrop is empty: pick something to drop.";
+};
 if ((_type in [0,1] && !_isParachute) || (count MCC_airDropArray == 0)) then {
-	_index = lbCurSel MCC_AIRDROPCLASSCONTROL;
+	_index = lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl MCC_AIRDROPCLASSCONTROL);
 	if (_index == -1) exitWith {};
 
-	_dummy = lbData [MCC_AIRDROPCLASSCONTROL,_index];
+	_dummy = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl MCC_AIRDROPCLASSCONTROL) lbData _index;
 	MCC_airDropArray = [_dummy];
+	MCCMK_adLive = true;
+};
+
+//CAS with an aircraft that has no suitable attack (empty Type list)
+if (_type in [1,2] && {(lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 26)) < 0}) exitWith {
+	hint "This aircraft cannot fly any of the CAS attacks. Pick another aircraft.";
 };
 
 switch (_type) do
@@ -34,40 +49,24 @@ switch (_type) do
 
 	    case 1:		//CAS
 		{
-			MCC_spawnkind	= [MCC_CASBombs select (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 26))];
+			MCC_spawnkind	= [((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 26) lbData (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 26))];
 			_indecator 		= (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 25));
-			MCC_planeType 	= if (_indecator <= (count (U_GEN_AIRPLANE)-1)) then
-								{
-									[(U_GEN_AIRPLANE select _indecator) select 1];
-								}
-								else
-								{
-									_indecator = _indecator - (count U_GEN_AIRPLANE);
-									[(U_GEN_HELICOPTER select _indecator) select 1];
-								};
+			MCC_planeType 	= [((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 25) lbData _indecator];
 		};
 
 		 case 2:	//CAS Add
 		{
-			MCC_spawnkind	= [MCC_CASBombs select (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 26))];
+			MCC_spawnkind	= [((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 26) lbData (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 26))];
 
 			_indecator 		= (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 25));
-			MCC_planeType 	= if (_indecator <= (count (U_GEN_AIRPLANE)-1)) then
-								{
-									[(U_GEN_AIRPLANE select _indecator) select 1];
-								}
-								else
-								{
-									_indecator = _indecator - (count U_GEN_AIRPLANE);
-									[(U_GEN_HELICOPTER select _indecator) select 1];
-								};
+			MCC_planeType 	= [((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 25) lbData _indecator];
 			_arrayName		= format ["MCC_CASConsoleArray%1",mcc_sidename];
 
 			if (MCC_capture_state) then
 			{
 				MCC_capture_var = MCC_capture_var + FORMAT ['%5 set [count %5,[%1, %2]];
 					publicVariable "%5";
-					[[2,{["MCCNotifications",["%4 CAS available","%3data\ammo_icon.paa",""]] call bis_fnc_showNotification;}], "MCC_fnc_globalExecute", true, false] spawn BIS_fnc_MP;
+					[2,{["MCCNotifications",["%4 CAS available","%3data\ammo_icon.paa",""]] call bis_fnc_showNotification;}] remoteExec ["MCC_fnc_globalExecute", 0, false];
 					'
 					,MCC_spawnkind
 					,MCC_planeType
@@ -90,7 +89,7 @@ switch (_type) do
 					missionNameSpace setVariable [_arrayName,_array];
 					publicvariable _arrayName;
 
-					[[2,compile format ['["MCCNotifications",["%1 CAS available","%2data\ammo_icon.paa",""]] call bis_fnc_showNotification;',MCC_spawnkind select 0,MCC_path]], "MCC_fnc_globalExecute", _side, false] spawn BIS_fnc_MP;
+					[2,compile format ['["MCCNotifications",["%1 CAS available","%2data\ammo_icon.paa",""]] call bis_fnc_showNotification;',MCC_spawnkind select 0,MCC_path]] remoteExec ["MCC_fnc_globalExecute", _side, false];
 			};
 		};
 
@@ -130,7 +129,14 @@ switch (_type) do
 	};
 
 if (_type == 0 || _type == 1) then {
-	hint "Left click on the map,hold and drag the cursor to mark the area and direction of the Air Support";
+	private _skind = missionNamespace getVariable ["MCC_spawnkind", [""]];
+	while {_skind isEqualType []} do {_skind = _skind param [0, ""]};
+	if (!(_skind isEqualType "")) then {_skind = ""};
+	if (toLower _skind == "cruise missile") then {
+		["Left click on the map, hold and drag: the line shows the direction the cruise missile comes from"] call MCC_fnc_hintBrief;
+	} else {
+		["Left click on the map, hold and drag the cursor to mark the area and direction of the Air Support"] call MCC_fnc_hintBrief;
+	};
 	MCC_CASrequestMarker = true;
 	};
 

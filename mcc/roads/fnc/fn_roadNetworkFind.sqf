@@ -48,12 +48,12 @@ params [
 	["_debug",false,[false]]
 ];
 
-if (_startPos isEqualTo []) exitWith {diag_log "MCC_fnc_roadNetworkFind: Start pos is empty"};
+if (_startPos isEqualTo []) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC_fnc_roadNetworkFind: Start pos is empty"}};
 
 _startTime = time;
 _results = [] call {
 	_fnc_sortRoads = {
-		private ["_branches"];
+		private "_branches";
 		params ["_road"];
 
 		_branches = roadsConnectedTo _road;
@@ -177,7 +177,8 @@ _routesPaths = [];
 //If we have an end pos then find the route
 if !(_endPos isEqualTo []) then {
 
-	private ["_destinationsRoads","_index"];
+	private _destinationsRoads = [];
+	private "_index";
 
 	_destinationsRoads = [];
 
@@ -208,7 +209,7 @@ if !(_endPos isEqualTo []) then {
 	_visitedPaths = [];
 
 	_findRoute = {
-		private ["_previousPath"];
+		private "_previousPath";
 		params ["_startRoad","_endRoad","_previousPath"];
 
 

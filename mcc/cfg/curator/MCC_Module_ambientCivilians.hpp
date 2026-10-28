@@ -17,7 +17,7 @@ class MCC_Module_ambientCiviliansCurator : MCC_Module_Base
 			displayName = "$STR_CURATOR_Module_ambientCiviliansCurator_isCiv_displayName";
 			description = "$STR_CURATOR_Module_ambientCiviliansCurator_isCiv_description";
 			typeName = "NUMBER";
-			property = "isCiv";
+			property = "MCC_Module_ambientCiviliansCurator_isCiv";
 
 			class values
 			{
@@ -40,7 +40,7 @@ class MCC_Module_ambientCiviliansCurator : MCC_Module_Base
 			displayName = "$STR_CURATOR_Module_ambientCiviliansCurator_isCar_displayName";
 			description = "$STR_CURATOR_Module_ambientCiviliansCurator_isCar_description";
 			typeName = "NUMBER";
-			property = "isCar";
+			property = "MCC_Module_ambientCiviliansCurator_isCar";
 
 			class values
 			{
@@ -63,7 +63,7 @@ class MCC_Module_ambientCiviliansCurator : MCC_Module_Base
 			displayName = "$STR_CURATOR_Module_ambientCiviliansCurator_isParkedCar_displayName";
 			description = "$STR_CURATOR_Module_ambientCiviliansCurator_isParkedCar_description";
 			typeName = "NUMBER";
-			property = "isParkedCar";
+			property = "MCC_Module_ambientCiviliansCurator_isParkedCar";
 
 			class values
 			{
@@ -86,7 +86,7 @@ class MCC_Module_ambientCiviliansCurator : MCC_Module_Base
 			displayName = "$STR_CURATOR_Module_ambientCiviliansCurator_isLocked_displayName";
 			description = "$STR_CURATOR_Module_ambientCiviliansCurator_isLocked_description";
 			typeName = "NUMBER";
-			property = "isLocked";
+			property = "MCC_Module_ambientCiviliansCurator_isLocked";
 
 			class values
 			{
@@ -106,20 +106,22 @@ class MCC_Module_ambientCiviliansCurator : MCC_Module_Base
 
 		class factionCiv : Edit
 		{
+			control = "MCC_AttributeFaction";	//drop-down of all loaded factions (mod factions included)
 			displayName = "$STR_CURATOR_Module_ambientCiviliansCurator_factionCiv_displayName";
 			typeName = "STRING";
 			description = "$STR_CURATOR_Module_ambientCiviliansCurator_factionCiv_description";
 			defaultValue = """CIV_F""";
-			property = "factionCiv";
+			property = "MCC_Module_ambientCiviliansCurator_factionCiv";
 		};
 
 		class factionCivCar : Edit
 		{
+			control = "MCC_AttributeFaction";	//drop-down of all loaded factions (mod factions included)
 			displayName = "$STR_CURATOR_Module_ambientCiviliansCurator_factionCivCar_displayName";
 			typeName = "STRING";
 			description = "$STR_CURATOR_Module_ambientCiviliansCurator_factionCiv_description";
 			defaultValue = """CIV_F""";
-			property = "factionCivCar";
+			property = "MCC_Module_ambientCiviliansCurator_factionCivCar";
 		};
 
 		class civRelations : Combo
@@ -127,35 +129,35 @@ class MCC_Module_ambientCiviliansCurator : MCC_Module_Base
 			displayName = "$STR_CURATOR_Module_ambientCiviliansCurator_civRelations_displayName";
 			description = "$STR_CURATOR_Module_ambientCiviliansCurator_civRelations_displayName";
 			typeName = "NUMBER";
-			property = "civRelations";
+			property = "MCC_Module_ambientCiviliansCurator_civRelations";
 
 			class values
 			{
 				class bad
 				{
 					name = "$STR_CURATOR_Module_ambientCiviliansCurator_civRelations_bad";
-					value = 0.2;
+					value = 2;
 					default = 1;
 				};
 				class average
 				{
 					name = "$STR_CURATOR_Module_ambientCiviliansCurator_civRelations_average";
-					value = 0.5;
+					value = 5;
 				};
 				class aboveAverage
 				{
 					name = "$STR_CURATOR_Module_ambientCiviliansCurator_civRelations_aboveAverage";
-					value = 0.6;
+					value = 6;
 				};
 				class good
 				{
 					name = "$STR_CURATOR_Module_ambientCiviliansCurator_civRelations_good";
-					value = 0.8;
+					value = 8;
 				};
 				class verygood
 				{
-					name = "$STR_CURATOR_Module_ambientCiviliansCurator_civRelations_Very Good";
-					value = 0.9;
+					name = "$STR_CURATOR_Module_ambientCiviliansCurator_civRelations_veryGood";
+					value = 9;
 				};
 			};
 		};
@@ -165,7 +167,7 @@ class MCC_Module_ambientCiviliansCurator : MCC_Module_Base
 			displayName = "Civs Always Friendly";
 			description = "Civilians will always be friendly to players";
 			typeName = "NUMBER";
-			property = "isParkedCar";
+			property = "MCC_Module_ambientCiviliansCurator_civRelationsIgnore";
 
 			class values
 			{
@@ -188,7 +190,7 @@ class MCC_Module_ambientCiviliansCurator : MCC_Module_Base
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Server side: spawn AI around players when next to towns and despawn them when no player around";
+		description = "Server side: spawn AI around players when next to towns and despawn them when no player is around";
 		position = 0;
 		direction = 0;
 	};

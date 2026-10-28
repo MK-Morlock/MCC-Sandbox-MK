@@ -1,10 +1,8 @@
-private ["_sound", "_pos", "_shelltype", "_shellspread", "_nshell","_lasertargets","_nul","_x","_simulate","_delay"];
-_pos					 = _this select 0; 
-_shelltype 			     = _this select 1; 
-_shellspread			 = _this select 2; 
-_nshell 				 = _this select 3; 
-_simulate				 = _this select 4; 
-_delay					 = _this select 5; 
+private _sound = false;
+private _lasertargets = [];
+private _nul = [];
+private _x = objNull;
+params ["_pos", "_shelltype", "_shellspread", "_nshell", "_simulate", "_delay"]; 
 
 _sound = true;
 

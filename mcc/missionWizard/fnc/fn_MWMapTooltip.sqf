@@ -16,10 +16,17 @@
 */
 disableserialization;
 
-private ["_classParams","_display","_tooltip","_mousepos","_infoPosX","_infoPosY","_infoPosW","_infoPosH"];
-_classParams 	= [_this,0,[],[configfile,[]]] call bis_fnc_param;
-_display 		= [_this,1,displaynull,[displaynull]] call bis_fnc_param;
-_mousepos 		= [_this,2,[0.5,0.5],[[]]] call bis_fnc_param;
+private _classParams = configNull;
+private "_display";
+private _tooltip = controlNull;
+private _mousepos = [];
+private "_infoPosX";
+private "_infoPosY";
+private _infoPosW = 0;
+private "_infoPosH";
+_classParams 	= _this param [0, [], [configfile,[]]];
+_display 		= _this param [1, displaynull, [displaynull]];
+_mousepos 		= _this param [2, [0.5,0.5], [[]]];
 _tooltip 		= _display displayctrl 9511;
 
 if (count _classParams == 0) exitwith {

@@ -19,15 +19,35 @@ _isFlat = (position _preview) isflatempty [
 */
 
 //Initialize
-private ["_away","_p_mcc_zone_markername","_heli","_heliCrew""_helocargo","_pos","_paraSide", "_paraType", "_helitype",
-         "_heli_pilot","_spawn","_heliPilot","_gunnersGroup","_type","_entry","_turrets","_path", "_timeOut",
-		 "_unit", "_side", "_spawnParaGroup", "_paraGroupArray", "_paraGroup", "_paraMode", "_heliCrewCount",
-		 "_p_mcc_spawnfaction", "_p_mcc_zone_behavior", "_p_mcc_awareness", "_newParaGroup", "_rampOutPos", "_flyHeight",
-		 "_dropPos", "_rope", "_ropes"
-		 ];
+private _away = [];
+private "_p_mcc_zone_markername";
+private _heli = [];
+private "_heliCrew";
+private "_helocargo";
+private "_paraType";
+private _helitype = "";
+private _spawn = [];
+private "_heliPilot";
+private "_type";
+private "_timeOut";
+private _unit = objNull;
+private "_side";
+private "_spawnParaGroup";
+private _paraGroupArray = [];
+private "_paraGroup";
+private _paraMode = 0;
+private _heliCrewCount = 0;
+private "_p_mcc_spawnfaction";
+private "_p_mcc_zone_behavior";
+private "_p_mcc_awareness";
+private _newParaGroup = grpNull;
+private _rampOutPos = [];
+private _flyHeight = 0;
+private _dropPos = [];
+private _rope = objNull;
+private _ropes = [];
 
-_pos 					= _this select 0;
-_paraSide				= _this select 1;
+params ["_pos", "_paraSide"];
 _paraType 				=  if (TypeName  (_this select 2) == "STRING") then {call compile (_this select 2)} else {(_this select 2)};
 _p_mcc_zone_markername  = _this select 3;
 _p_mcc_zone_behavior	= _this select 4;
@@ -71,7 +91,7 @@ if ( (count _paraGroupArray) == 0 ) then
 	//Let's build the faction unit's array
 	{
 		_unitsArray	set [ count _unitsArray, _x select 0];
-	} foreach ( [_p_mcc_spawnfaction,"soldier"] call MCC_fnc_makeUnitsArray );
+	} foreach ( [[_p_mcc_spawnfaction,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry );
 
 	//diag_log format ["MCC paradrop custom array: %1", _unitsArray];
 
@@ -82,7 +102,7 @@ if ( (count _paraGroupArray) == 0 ) then
 	//diag_log format ["MCC paradrop custom array: %1", count _paraGroupArray];
 };
 
-if ( (count _paraGroupArray) == 0 ) exitWith { diag_log format ["MCC Warning: no suitable paratrooper group found for %1", _this]; player groupChat format ["Error: no suitable paratrooper group for this Faction"]; };
+if ( (count _paraGroupArray) == 0 ) exitWith { if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC Warning: no suitable paratrooper group found for %1", _this]}; player groupChat format ["Error: no suitable paratrooper group for this Faction"]; };
 
 switch (_paraSide) do
 	{
@@ -170,7 +190,7 @@ switch (_paraSide) do
 	};
 
 
-if ( isNil "_spawnParaGroup" ) exitWith { diag_log format ["MCC ERROR: no group found for %1", _this]; };
+if ( isNil "_spawnParaGroup" ) exitWith { if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC ERROR: no group found for %1", _this]}; };
 
 
 if ( _paraType < 3 ) then
@@ -224,7 +244,10 @@ if ( _paraMode > 0 ) then
 	_heliPilot flyInHeight _flyHeight;
 };
 
-private ["_cargoNum","_unitsArray","_i","_type"];
+private "_cargoNum";
+private _unitsArray = [];
+private "_i";
+private "_type";
 //--------spawn the jumping group----------------------
 _cargoNum = _heli emptyPositions "cargo"; //populate heli before kick off
 _cargoUnits = [];
@@ -349,8 +372,17 @@ if ( _paraMode == 2 ) then  // toss ropes for fast-rope
 
 	[_x, _heli, _p_mcc_zone_markername, _p_mcc_zone_behavior, _p_mcc_awareness, _paraMode, _paraType, _actualRopes, _forEachIndex, count _cargoGroups] spawn
 	{
-		private ["_paraGroup", "_dir", "_p_mcc_zone_markername", "_p_mcc_zone_behavior", "_p_mcc_awareness", "_paraMode", "_paraType",
-					"_actualRopes", "_rope", "_index", "_number"];
+		private "_paraGroup";
+		private "_dir";
+		private "_p_mcc_zone_markername";
+		private "_p_mcc_zone_behavior";
+		private "_p_mcc_awareness";
+		private "_paraMode";
+		private "_paraType";
+		private "_actualRopes";
+		private "_rope";
+		private "_index";
+		private "_number";
 
 		_paraGroup 	= _this select 0;
 		_heli = (_this select 1);
@@ -433,7 +465,10 @@ if ( _paraMode == 2 ) then  // toss ropes for fast-rope
 
 					[_x, _rope] spawn
 						{
-							private ["_unit", "_zc", "_zdelta", "_rope"];
+							private "_unit";
+							private _zc = 0;
+							private "_zdelta";
+							private "_rope";
 							_unit = _this select 0;
 							_rope = _this select 1;
 							_zdelta = 7 / 10;
@@ -541,9 +576,7 @@ sleep 5;
 if (_p_mcc_zone_behavior != "bis" && _p_mcc_zone_behavior != "bisd" && _p_mcc_zone_behavior != "bisp") then
 {
 	{
-		private ["_paraGroup"];
-
-		_paraGroup = _x;
+		private _paraGroup = _x;
 
 		if ( _p_mcc_awareness == "Default" ) then // MM most likely forgot to set awareness - paratroopers are not default :-)
 		{

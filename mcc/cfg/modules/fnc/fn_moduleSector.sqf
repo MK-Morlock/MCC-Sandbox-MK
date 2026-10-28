@@ -36,10 +36,9 @@
 	NOTHING
 */
 
-private ["_logic","_units","_activated"];
-_logic = [_this,0,objnull] call bis_fnc_param;
-_units = [_this,1,[]] call bis_fnc_param;
-_activated = [_this,2,true,[true]] call bis_fnc_param;
+private _logic = _this param [0, objnull];
+private _units = _this param [1, []];
+private _activated = _this param [2, true, [true]];
 
 //--- Return all sectors
 if (typename _logic == typename true) exitwith {
@@ -48,9 +47,8 @@ if (typename _logic == typename true) exitwith {
 
 //--- Return sectors belonging to a side
 if (typename _logic == typename sideunknown) exitwith {
-	private ["_side","_sideID"];
-	_side = _logic;
-	_sideID = _side call bis_fnc_sideID;
+	private _side = _logic;
+	private _sideID = _side call bis_fnc_sideID;
 	if (_sideID in [0,1,2,3,4]) then {MCC_fnc_moduleSector_sideSectors select _sideID} else {-1}
 };
 
@@ -62,7 +60,7 @@ if (typename _units == typename sideunknown) exitwith {
 
 //--- Initialize the sector
 if !(_activated) exitwith {};
-_mode = [_this,3,"init",[""]] call bis_fnc_param;
+_mode = _this param [3, "init", [""]];
 
 switch _mode do {
 
@@ -144,7 +142,7 @@ switch _mode do {
 		};
 		_taskTitle = "";
 		for "_i" from 0 to 5 do {
-			_taskTitle = [_taskTitles,_i,_taskTitle,[""]] call bis_fnc_paramin;
+			_taskTitle = _taskTitles param [_i, _taskTitle, [""]];
 			_taskTitles set [_i,_taskTitle];
 		};
 		_taskDescriptions = _taskDescription;
@@ -153,7 +151,7 @@ switch _mode do {
 		};
 		_taskDescription = "";
 		for "_i" from 0 to 5 do {
-			_taskDescription = [_taskDescriptions,_i,_taskDescription,[""]] call bis_fnc_paramin;
+			_taskDescription = _taskDescriptions param [_i, _taskDescription, [""]];
 			_taskDescriptions set [_i,_taskDescription];
 		};
 
@@ -356,7 +354,7 @@ switch _mode do {
 		if (isnil {MCC_fnc_moduleSector_sideSectors}) then {MCC_fnc_moduleSector_sideSectors = [0,0,0,0,0];};
 
 		//--- Execute local function
-		//[[_logic,[],true,"player"],"MCC_fnc_moduleSector",_sides - [sideunknown],true] call bis_fnc_mp;
+		//[_logic,[],true,"player"] remoteExec ["MCC_fnc_moduleSector", _sides - [sideunknown], true];
 
 		_fnc_conversion = {
 			_total = 0;
@@ -371,13 +369,11 @@ switch _mode do {
 			_result
 		};
 		_fnc_threat = {
-			private ["_veh","_coef","_scanCrew","_threat","_score"];
-			_veh = _this select 0;
-			_coef = _this select 1;
-			_scanCrew = _this select 2;
-			_threat = getarray (configfile >> "cfgvehicles" >> typeof _veh >> "threat");
-
-			_score = 0;
+			private _veh = _this select 0;
+			private _coef = _this select 1;
+			private _scanCrew = _this select 2;
+			private _threat = getarray (configfile >> "cfgvehicles" >> typeof _veh >> "threat");
+			private _score = 0;
 			{_score = _score + _x} foreach _threat;
 			_score = _score * _coef;
 			if (isplayer _veh) then {_score = _score * _costPlayersLocal;};
@@ -441,7 +437,7 @@ switch _mode do {
 			if (str _sides != _sidesOldStr) then {
 
 				//--- Show MP progress HUD - disable HUD
-				//[[_logic,[],true,"player"],"MCC_fnc_moduleSector",_sides - _sidesOld,true] call bis_fnc_mp;
+				//[_logic,[],true,"player"] remoteExec ["MCC_fnc_moduleSector", _sides - _sidesOld, true];
 
 				//--- Add sides
 				{
@@ -609,8 +605,8 @@ switch _mode do {
 				//--- Show notification
 				_ownerName = _owner call bis_fnc_sidename;
 				if (_owner != sideunknown) then {
-					[[format ["sectorCaptured%1",_owner],[_name,_ownerName,_iconTexture,_designation]],"BIS_fnc_showNotification",_sides - [_ownerOld]] call bis_fnc_mp;
-					[[format ["sectorLost%1",_owner],[_name,_ownerName,_iconTexture,_designation]],"BIS_fnc_showNotification",_ownerOld] call bis_fnc_mp;
+					[format ["sectorCaptured%1",_owner],[_name,_ownerName,_iconTexture,_designation]] remoteExec ["BIS_fnc_showNotification", _sides - [_ownerOld], false];
+					[format ["sectorLost%1",_owner],[_name,_ownerName,_iconTexture,_designation]] remoteExec ["BIS_fnc_showNotification", _ownerOld, false];
 				};
 
 				//--- Update flag (not for default owner)

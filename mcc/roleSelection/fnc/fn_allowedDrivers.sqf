@@ -1,7 +1,11 @@
 //==================================================================MCC_fnc_allowedDrivers===============================================================================
 // Check if the player is in vehicle while he is not a pilot or a crewman
 //====================================================================================================================================================================
-private ["_getout","_role","_roleName","_playerVehicle","_string","_counter","_cfg"];
+private _getout = false;
+private _role = "";
+private _roleName = "";
+private _playerVehicle = objNull;
+private _cfg = configNull;
 _vehiclePosition = tolower (_this select 1);
 _playerVehicle = _this select 2;
 
@@ -33,7 +37,7 @@ if (missionNamespace getVariable ["MCC_rsEnableDriversPilots",false]) then {
 	//Not allowed kick him out
 	if (_getout) then {
 		player action ["getOut", _playerVehicle];
-		cutText [format ["You need to be a %1 inorder to use this vehicle",_roleName],"BLACK OUT",0.1];
+		cutText [format ["You need to be a %1 to use this vehicle",_roleName],"BLACK OUT",0.1];
 		sleep 3;
 		cutText ["","BLACK IN",0.1];
 	};

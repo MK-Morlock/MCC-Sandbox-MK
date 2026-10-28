@@ -13,14 +13,27 @@
 #define MAX_TRESHOLD_PER_AREA 1
 #define MAX_WP 2
 
-private ["_pos","_counter","_carSpawnDistance","_nearRoads","_carArray","_road","_carClass","_carGroup","_unit","_wp","_vehiclesArray","_side","_nearRoads","_farRoads","_car"];
-_pos = [_this, 0, [], [[]]] call BIS_fnc_param;
-_counter =[_this, 1, 1,[1]] call BIS_fnc_param;
-_factionCiv	= [_this, 2, "CIV_F", [""]] call BIS_fnc_param;
-_carSpawnDistance = [_this, 3, 250, [250]] call BIS_fnc_param;
-_vehiclesArray = [_this, 4, [], [[]]] call BIS_fnc_param;
+private _pos = [];
+private _counter = 0;
+private _carSpawnDistance = 0;
+private "_nearRoads";
+private _carArray = [];
+private "_road";
+private "_carClass";
+private _carGroup = grpNull;
+private "_unit";
+private "_wp";
+private _vehiclesArray = [];
+private _side = [];
+private "_nearRoads";
+private "_car";
+_pos = _this param [0, [], [[]]];
+_counter =_this param [1, 1, [1]];
+_factionCiv	= _this param [2, "CIV_F", [""]];
+_carSpawnDistance = _this param [3, 250, [250]];
+_vehiclesArray = _this param [4, [], [[]]];
 
-_side = [(getNumber (configfile >> "CfgFactionClasses" >> _factionCiv >> "side"))] call BIS_fnc_sideType;
+_side = [([_factionCiv] call MCC_fnc_factionSide)] call BIS_fnc_sideType;
 _carArray = missionNamespace getVariable ["MCC_ambientCars",[]];
 
 //Find nearest houses
@@ -54,11 +67,11 @@ for "_i" from 1 to _counter do {
 	_carClass = (_vehiclesArray call bis_fnc_selectRandom) select 0;
 
 	//Are we inside denied zone
-	private ["_spawn"];
-	_spawn = true;
+	private _spawn = true;
 	{
 		if (_x distance _road < (_x getVariable ["radius",100])) exitWith {_spawn = false};
 	} forEach _deniedZones;
+	if (_spawn && {[getPosATL _road, _side] call MCCMK_fnc_inKeepOutZone}) then {_spawn = false};
 
 	if (_spawn) then {_spawn = !([getpos _road, 200] call MCC_fnc_isVisableToPlayers)};
 
@@ -88,7 +101,9 @@ for "_i" from 1 to _counter do {
 		_carGroup setBehaviour "SAFE";
 
 		_nearRoads = _pos nearRoads _carSpawnDistance;
+		_nearRoads = _nearRoads select {private _r = _x; !([getPosATL _r, side _carGroup] call MCCMK_fnc_inKeepOutZone) && {(_deniedZones findIf {_r distance _x < (_x getVariable ["radius", 100])}) < 0}};
 
+		if (count _nearRoads > 0) then {
 		for "_i" from 0 to MAX_WP do {
 			_road = _nearRoads call bis_fnc_selectRandom;
 			_pos = getPosASL _road;
@@ -100,6 +115,7 @@ for "_i" from 1 to _counter do {
 
 		_wp = _carGroup addWaypoint [_pos,(count waypoints _carGroup)];
 		_wp setWaypointType "Cycle";
+		};
 
 		{_x addCuratorEditableObjects [[_car],true]} forEach allCurators;
 	};

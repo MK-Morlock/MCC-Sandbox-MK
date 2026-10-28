@@ -1,5 +1,9 @@
-private ["_caller","_groupSide", "_group","_hijackedSide","_delete","_preUnit"];
-_caller = _this select 0;	//Who activate the script
+private "_groupSide";
+private _group = grpNull;
+private "_hijackedSide";
+private _delete = false;
+private "_preUnit";
+params ["_caller"];	//Who activate the script
 If (!(isPlayer _caller) || !(local player)) exitWith{};
 if (!alive MCC_Prev_Player) exitWith {systemchat "Previous player is no longer alive"; player removeaction MCC_backToplayerIndex};
 _delete = false; 
@@ -26,10 +30,13 @@ _group = creategroup _groupSide;
 [MCC_Prev_Player] joinSilent _group;
 [_caller] joinSilent _group;
 _caller removeaction MCC_backToplayerIndex; 
+if ((_caller getVariable ["MCC_actionBackToPlayer", -1]) != -1) then {_caller removeAction (_caller getVariable ["MCC_actionBackToPlayer", -1]); _caller setVariable ["MCC_actionBackToPlayer", -1]};
+if ((_caller getVariable ["MCC_actionMCCMain", -1]) != -1) then {_caller removeAction (_caller getVariable ["MCC_actionMCCMain", -1]); _caller setVariable ["MCC_actionMCCMain", -1]};
 player setVariable ["MCC_allowed",true,true];
 //_caller removeaction mcc_actionInedx; 
 
-private ["_camera","_ppgrain"];
+private _camera = "";
+private "_ppgrain";
 _camera = "Camera" camcreate [(getpos MCC_Prev_Player) select 0, (getpos MCC_Prev_Player) select 1,((getpos MCC_Prev_Player) select 2) + 100];
 _camera cameraeffect ["internal","back"];
 _camera camPrepareFOV 0.900;
@@ -59,6 +66,7 @@ _camera = nil;
 				
 _group selectLeader player;
 selectPlayer MCC_Prev_Player;
+MCC_Prev_Player = objNull;
 player setcaptive false; 
 
 if (!isnull MCC_Prev_Group) then
@@ -67,13 +75,15 @@ if (!isnull MCC_Prev_Group) then
 	waituntil {group player == MCC_Prev_Group};
 	if (MCC_Prev_GroupIsLeader) then 
 	{
+		// Give the player back the lead of his own squad. In singleplayer this used to re-select the *hijacked*
+		// unit as leader of its group instead, so an AI squad mate kept the lead after "Back To Player".
 		if (isMultiplayer) then
 		{
-			[[2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group player), netID player]], "MCC_fnc_globalExecute", true, false] spawn BIS_fnc_MP;
+			[group player, player] remoteExec ["selectLeader", 0, false];	// runs where the group is local
 		}
 		else
 		{
-			(group _preUnit) selectLeader _preUnit;
+			(group player) selectLeader player;
 		};
 	};
 };
@@ -99,7 +109,7 @@ if (MCC_Prev_HijackedGroupIsLeader) then
 {
 	if (isMultiplayer) then
 	{
-		[[2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group _preUnit), netID _preUnit]], "MCC_fnc_globalExecute", _preUnit, false] spawn BIS_fnc_MP;
+		[2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group _preUnit), netID _preUnit]] remoteExec ["MCC_fnc_globalExecute", _preUnit, false];
 	}
 	else
 	{

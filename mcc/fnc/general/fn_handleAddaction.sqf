@@ -6,7 +6,14 @@
 //==============================================================================================================================================================================
 #define MCC_HELPER "UserTexture1m_F"
 
-private ["_string","_respawnItems","_airports","_counter","_searchArray","_key","_text","_nul"];
+private _string = "";
+private _respawnItems = [];
+private _airports = [];
+private _counter = 0;
+private _searchArray = [];
+private _key = [];
+private _text = "";
+private _nul = 0;
 
 //Interactive objects EH
 uiNameSpace setVariable ["MCC_interactionActive",false];
@@ -69,7 +76,14 @@ if ((MCC_isACE) && MCC_isMode) then {
 
 _text spawn
 {
-	private ["_keyName","_interactiveObjects","_objects","_selected","_dir","_text","_tested","_ingameText"];
+	private _keyName = "";
+	private _interactiveObjects = [];
+	private _objects = [];
+	private _selected = objNull;
+	private _dir = 0;
+	private _text = "";
+	private _tested = objNull;
+	private _ingameText = "";
 	_keyName = _this;
 
 	while {alive player} do
@@ -145,6 +159,6 @@ if (missionNamespace getvariable ["MCC_showActionKey",true]) then {
 	if (!MCC_isMode && !MCC_isCBA) then {
 		_string = "(vehicle _target == vehicle _this) && !(getplayerUID player in (missionNamespace getvariable ['MCC_allowedPlayers',[]]) || 'all' in  (missionNamespace getvariable ['MCC_allowedPlayers',['all']]) || (serverCommandAvailable '#kick' && missionNamespace getvariable ['MCC_allowAdmin',true]) || (isServer && missionNamespace getvariable ['MCC_allowAdmin',true]) || (player getvariable ['MCC_allowed',false])) || !(missionNamespace getvariable ['MCC_showActionKey',true])";
 
-		_null =  player addaction ["<t color=""#FF0000"">Set Keys</t>",{createDialog "mcc_rscKeyBinds"},[nil,nil,nil,nil,0], 0,false, false, "",_string];
+		_null =  player addaction ["<t color=""#FF0000"">Set Keys</t>",{createDialog ("mcc_rscKeyBinds" call MCC_fnc_dialogName)},[nil,nil,nil,nil,0], 0,false, false, "",_string];
 	};
 };

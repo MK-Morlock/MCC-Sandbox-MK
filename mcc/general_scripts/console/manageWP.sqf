@@ -7,9 +7,14 @@
 #define MCC_CONSOLEWPADD 	9159
 #define MCC_CONSOLEWPREPLACE 9160
 #define MCC_CONSOLEWPCLEAR 9161
-private ["_wp","_wpType","_groups","_wpFormation","_wpSpeed","_wpBehavior"];
+#define MCC_CONSOLEWPCANCEL 9169
+private "_wpType";
+private _groups = [];
+private _wpFormation = [];
+private _wpSpeed = [];
+private _wpBehavior = [];
 
-_action 	= _this select 0;
+params ["_action"];
 _wpType 	= lbCurSel MCC_CONSOLEWPCOMBO;
 _groups		= [];
 _wpFormation = ["NO CHANGE", "COLUMN", "STAG COLUMN", "WEDGE", "ECH LEFT", "ECH RIGHT", "VEE", "LINE", "FILE", "DIAMOND"] select (lbCurSel MCC_CONSOLEWPFORMATIONCOMBO);
@@ -23,8 +28,10 @@ _wpBehavior = ["UNCHANGED", "CARELESS", "SAFE", "AWARE", "COMBAT", "STEALTH"] se
 		};
 } foreach MCC_ConsoleGroupSelected;
 
+if (_action != 3) then {
 //Call the server to handle WP
-[[_action,MCC_ConsoleWPpos,[_wpType,"NO CHANGE",_wpFormation,_wpSpeed,_wpBehavior,"true","",0],_groups,true],"MCC_fnc_manageWp", false, false] spawn BIS_fnc_MP;
+[_action,MCC_ConsoleWPpos,[_wpType,"NO CHANGE",_wpFormation,_wpSpeed,_wpBehavior,"true","",0],_groups,true] remoteExec ["MCC_fnc_manageWp", 2, false];
+};
 
 ctrlShow [MCC_CONSOLEWPBCKGR,false];
 ctrlShow [MCC_CONSOLEWPCOMBO,false];
@@ -34,3 +41,10 @@ ctrlShow [MCC_CONSOLEWPBEHAVIORCOMBO,false];
 ctrlShow [MCC_CONSOLEWPADD,false];
 ctrlShow [MCC_CONSOLEWPREPLACE,false];
 ctrlShow [MCC_CONSOLEWPCLEAR,false];
+ctrlShow [MCC_CONSOLEWPCANCEL,false];
+if (_action == 3) then {
+	(missionNamespace getVariable ["MCC_consoleWPHidden", []]) params [["_i", false], ["_f", false], ["_u", false]];
+	ctrlShow [9150, _i];
+	ctrlShow [9151, _f];
+	ctrlShow [9162, _u];
+};

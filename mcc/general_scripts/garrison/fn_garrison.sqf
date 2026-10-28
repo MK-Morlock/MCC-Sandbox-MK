@@ -1,18 +1,25 @@
-private ["_center","_radius","_action","_intanse","_faction","_unitsArray","_vehiclesArray","_SpawnUnit","_SpawnVehicle","_group",
-		"_unitsCount","_vehiclesCount","_buildingsArray","_buildingscount","_side","_spawnBuilding","_spawnPos","_unit","_type",
-		"_vehiclesNumber","_roads","_road","_vehicle","_vehicleClass","_groupUnits"];
+private _unitsArray = [];
+private _vehiclesArray = [];
+private _group = grpNull;
+private "_unitsCount";
+private "_vehiclesCount";
+private _buildingsArray = objNull;
+private "_buildingscount";
+private "_spawnPos";
+private _unit = objNull;
+private "_type";
+private _vehiclesNumber = 0;
+private "_roads";
+private "_road";
+private _vehicle = objNull;
+private _groupUnits = false;
 
 disableSerialization;
 
-_center			= _this select 0;
-_radius			= _this select 1;
-_action 		= _this select 2;
-_intanse		= _this select 3;
-_faction		= _this select 4;
-_side			= _this select 5;
+params ["_center", "_radius", "_action", "_intanse", "_faction", "_side"];
 _groupUnits 	= if (count _this >6) then {true} else {false};
 
-_unitsArray 	= [_faction,"soldier"] call MCC_fnc_makeUnitsArray;		//Let's build the faction unit's array
+_unitsArray 	= [[_faction,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;		//Let's build the faction unit's array
 _vehiclesArray	= [_faction,"carx"] call MCC_fnc_makeUnitsArray;		//Let's build the faction vehicles's array
 _buildingsArray	= nearestObjects  [_center,["House","Ruins","Church","FuelStation","Strategic"],_radius];	//Let's find the buildings in the area
 

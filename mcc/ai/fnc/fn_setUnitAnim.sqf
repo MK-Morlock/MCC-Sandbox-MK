@@ -10,7 +10,14 @@
 // <OUT>
 //		nothing
 //===========================================================================================================================================================================
-private["_anim","_npc","_switch","_time","_prevAnim","_t","_eh","_breakAnim"];
+private _anim = "";
+private _npc = objNull;
+private _switch = false;
+private _time = 0;
+private "_prevAnim";
+private "_t";
+private _eh = objNull;
+private _breakAnim = false;
 _npc 	= param [0,objNull,[objNull]];
 _anim 	= param [1,"",[""]];
 _switch = param [2,false,[false]];
@@ -52,10 +59,8 @@ switch (true) do
 		_eh = _npc addEventHandler	[
 			"AnimDone",
 			{
-				private["_npc","_anim"];
-
-				_npc = param [0,objNull,[objNull]];
-				_anim = param [1,"",[""]];
+				private _npc = param [0,objNull,[objNull]];
+				private _anim = param [1,"",[""]];
 
 				if ((!alive _npc) ||
 				    ((_npc getVariable ["MCC_animRunningBreakAnim",false]) && ((behaviour _npc == "COMBAT") || (_npc call BIS_fnc_enemyDetected)))

@@ -1,7 +1,9 @@
 /*================================================================MCC_fnc_handleKilled============================================================================
 // Kill messeges
 ==============================================================================================================================================================*/
-private ["_distance","_string","_xpFactor","_source"];
+private _distance = 0;
+private _string = "";
+private _xpFactor = 0;
 
 params ["_unit", ["_killer", objNull]];
 if ((missionNamespace getVariable ["CP_activated",true]) && (typeOf _unit isKindOf "Man" ))then {

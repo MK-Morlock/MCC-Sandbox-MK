@@ -5,7 +5,9 @@
 #define MCC_UM_LIST 3069
 disableSerialization;
 
-private ["_mccdialog", "_name", "_worldPos","_group","_index"];
+private _mccdialog = displayNull;
+private _group = grpNull;
+private _index = 0;
 
 //If we are messing with the list do not refresh
 if (isnil "MCC_UMFocus") then {MCC_UMFocus = false};
@@ -18,7 +20,7 @@ _mccdialog =  (uiNamespace getVariable "MCC_groupGen_Dialog");
 _comboBox = _mccdialog displayCtrl MCC_UM_LIST;
 lbClear _comboBox;
 
-if (("players" in MCC_groupGenGroupStatus) && (count MCC_groupGenGroupStatus == 1)) exitWith //player
+if (false) exitWith
 {
 	if (MCC_UMUnit==0) then
 	{
@@ -51,7 +53,7 @@ if (MCC_UMUnit==0) then
 	{
 		_group = _x;
 		{
-			if (alive _x && side _x in MCC_groupGenGroupStatus) then	//Unit
+			if (alive _x && {["shows", _x] call MCC_fnc_consoleFilter}) then
 			{
 				_displayname = if (isPlayer _x) then
 								{
@@ -74,7 +76,7 @@ if (MCC_UMUnit==0) then
 else
 {
 	{
-		if (side (leader _x) in MCC_groupGenGroupStatus) then	//group
+		if (["shows", leader _x] call MCC_fnc_consoleFilter) then
 		{
 			_displayname =  format ["%1", _x];
 			if (isPlayer leader _x) then {_displayname = format ["(Players) - %1",_displayname]};
@@ -84,3 +86,10 @@ else
 	} forEach  MCC_GroupGenGroupSelected;
 };
 
+//Keep the selection: the list is rebuilt every few seconds, which used to drop the highlight while the selection
+//stayed in MCC_selectedUnits (or the other way round) - HALO then said "no group selected". The rows of what is
+//selected are highlighted again; whatever is no longer in the list is dropped from the selection.
+private _rowsOf = [MCC_UMunitsNames, UMgroupNames] select (MCC_UMUnit != 0);
+private _keep = (missionNamespace getVariable ["MCC_selectedUnits", []]) select {(_rowsOf find _x) >= 0};
+MCC_selectedUnits = _keep;
+{_comboBox lbSetSelected [_rowsOf find _x, true]} forEach _keep;

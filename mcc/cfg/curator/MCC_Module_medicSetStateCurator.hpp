@@ -17,7 +17,7 @@ class MCC_Module_medicSetStateCurator : MCC_Module_Base
 			displayName = "Disable Bleeding";
 			description = "Unit will not die from bleeding over time ";
 			typeName = "BOOL";
-			property = "enableBleeding";
+			property = "MCC_Module_medicSetStateCurator_enableBleeding";
 		};
 
 		class forceUnconscious : Checkbox
@@ -25,7 +25,7 @@ class MCC_Module_medicSetStateCurator : MCC_Module_Base
 			displayName = "Force Unconscious";
 			description = "Unit will not wake up even after a medical treatment";
 			typeName = "BOOL";
-			property = "forceUnconscious";
+			property = "MCC_Module_medicSetStateCurator_forceUnconscious";
 		};
 
 		class ModuleDescription: ModuleDescription{};
@@ -33,7 +33,7 @@ class MCC_Module_medicSetStateCurator : MCC_Module_Base
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Sync to any AI man unit to force unconscious state, need MCC medics system on";
+		description = "Sync to any AI unit to force an unconscious state (requires the MCC medic system)";
 		sync[] = {"BLUFORunit"};
 
 		class BLUFORunit

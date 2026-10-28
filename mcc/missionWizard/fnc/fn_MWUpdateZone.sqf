@@ -3,10 +3,12 @@
 // Example:[_zoneNumber,_pos,_radius] call MCC_fnc_MWUpdateZone;
 // Return - handler
 //======================================================================================================================================================================
-private ["_zoneNumber","_script_handler","_pos","_radius","_zone_marker_X","_zone_marker_Y","_ar","_zones","_dir"];
-_zoneNumber = _this select 0;
-_pos		= _this select 1;
-_radius		= _this select 2;
+private _zone_marker_X = 0;
+private _zone_marker_Y = 0;
+private _ar = [];
+private _zones = [];
+private _dir = 0;
+params [["_zoneNumber", 0, [0, ""]], ["_pos", [0,0,0], [[]]], ["_radius", 0, [0, []]]];
 
 _zone_marker_X		= if (typeName _radius == typeName []) then {_radius select 0} else {_radius};
 _zone_marker_Y		= if (typeName _radius == typeName []) then {_radius select 1} else {_radius};
@@ -23,7 +25,7 @@ missionNamespace setVariable ["MCC_zones_numbers",_zones];
 
 mcc_zone_pos  set [_zoneNumber, _pos];
 mcc_zone_size set [_zoneNumber,[_zone_marker_X,_zone_marker_Y]];
-mcc_zone_dir set [_zoneNumber,0];
+mcc_zone_dir set [_zoneNumber,_dir];	//was always 0, so rotated zones (e.g. Front Lines) were drawn unrotated
 mcc_zone_locations set [_zoneNumber,0];
 
 publicVariable "mcc_zone_pos";
@@ -68,17 +70,17 @@ _ar =	[ 		  ''
 
 // Send data over the network, or when on server, execute directly
 if ( (isServer) && ( (mcc_hc == 0) || !(MCC_isHC) ) ) then {
-	[_ar, "mcc_setup", false, false] spawn BIS_fnc_MP;
-	diag_log "MCC: attemping to spawn";
+	_ar remoteExec ["mcc_setup", 2, false];
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: attempting to spawn"};
 
 } else {
 	if ( ( mcc_hc == 0 ) || !(MCC_isHC) ) then	{
-		[_ar, "mcc_setup", false, false] spawn BIS_fnc_MP;
+		_ar remoteExec ["mcc_setup", 2, false];
 	};
 
 	if (( mcc_hc == 1 ) && (MCC_isHC)) then	{
 
-		[_ar, "mcc_setup_hc", MCC_ownerHC, false] spawn BIS_fnc_MP;
+		_ar remoteExec ["mcc_setup_hc", MCC_ownerHC, false];
 	};
 };
 

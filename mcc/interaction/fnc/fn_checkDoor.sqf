@@ -7,14 +7,16 @@
 // <OUT>
 //		<Nothing>
 //===========================================================================================================================================================================
-private ["_object","_str","_typeOfSelected","_return"];
 #define MCC_CHARGE "ClaymoreDirectionalMine_Remote_Mag"
 #define MCC_MIROR ["MineDetector","MCC_videoProbe"]
 #define MCC_LOCKPICK ["ToolKit","AGM_DefusalKit","MCC_multiTool","ACE_DefusalKit","ACE_key_lockpick"]
 
-_object = _this select 0;
+params ["_object"];
 
-private ["_door","_animation","_phase","_closed"];
+private "_door";
+private "_animation";
+private "_phase";
+private "_closed";
 _tempArray = [_object]  call MCC_fnc_isDoor;
 _door = _tempArray select 0;
 _animation = _tempArray select 1;

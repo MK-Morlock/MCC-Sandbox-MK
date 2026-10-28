@@ -7,6 +7,8 @@
 		Nothing
 ==============================================================================================================================================================*/
 if (!hasInterface) exitWith {};
+if (!isNil "MCC_ambientFireFiredEHAdded") exitWith {};	//added once; player EHs carry over on respawn
+MCC_ambientFireFiredEHAdded = true;
 
 player addEventHandler ["firedMan", {
 							if ((missionNamespace getVariable ["MCC_ambientFire",false]) && (missionNamespace getVariable ["MCC_ambientFireSettingIndex",true])) then {

@@ -1,6 +1,6 @@
 //===================================================================MCC_fnc_groupSpawn=========================================================================================
 // Create a group on the server
-//[[_pos,_unitsArray,_loc, _side, _isEmpty, _cache],"MCC_fnc_groupSpawn",false,false] spawn BIS_fnc_MP;
+//[_pos,_unitsArray,_loc, _side, _isEmpty, _cache] remoteExec ["MCC_fnc_groupSpawn", false, false];
 //	<in>
 //		_pos: Array		Position to spawn
 //		_unitsArray		Array of units or Cfg path
@@ -12,11 +12,17 @@
 //==============================================================================================================================================================================
 //Made by Shay_Gman (c) 09.10
 
-private ["_pos","_unitsArray","_side","_group","_loc","_isEmpty","_unitClass","_unitSim","_unit","_safePos","_waterSpawn","_cache"];
+private _side = sideUnknown;
+private _group = objNull;
+private _isEmpty = false;
+private _unitClass = "";
+private _unitSim = "";
+private _unit = objNull;
+private _safePos = [];
+private _waterSpawn = 0;
+private _cache = nil;
 
-_pos 		= _this select 0;
-_unitsArray = _this select 1;
-_loc 		= _this select 2;
+params ["_pos", "_unitsArray", "_loc"];
 _side		= if (typeName (_this select 3) == "STRING") then
 				{
 					switch (tolower (_this select 3)) do
@@ -104,5 +110,12 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 
 		_group setVariable ["mcc_gaia_cache",_cache, true];
 	};
+};
+private _beh = toLower (_this param [6, "-", [""]]);
+if (!_isEmpty && {_beh != "-"} && {_group isEqualType grpNull} && {!isNull _group}) then {
+	if (_this param [7, false, [false]]) then {_group setVariable ["MCC_canbecontrolled", true, true]};
+	if (_beh == "bisd") then {[_group, getPos (leader _group)] call BIS_fnc_taskDefend};
+	if (_beh == "bisp") then {[_group, getPos (leader _group), 100] call BIS_fnc_taskPatrol};
+	["DEBUG", "spawn", "%1 placed with behaviour %2, commandable: %3", [_group, _beh, _this param [7, false, [false]]]] call MCC_fnc_log;
 };
 _group

@@ -14,7 +14,7 @@ _fail = false;
 _medicAnims = ["ainvpknlmstpsnonwrfldnon_medic0s","ainvpknlmstpsnonwrfldnon_medic","ainvpknlmstpsnonwrfldnon_medicend","ainvpknlmstpsnonwrfldnon_ainvpknlmstpsnonwrfldnon_medic"];
 
 //If self then no need for wounded anim
-if (!_self && !_unitUnconcious) then {[[[_unit],{(_this select 0) playactionNow "agonyStart"}], "BIS_fnc_spawn", _unit, false] spawn BIS_fnc_MP};
+if (!_self && !_unitUnconcious) then {[_unit, "agonyStart"] remoteExec ["playActionNow", _unit]};
 
 player playactionNow "medicStart";
 
@@ -24,10 +24,13 @@ _ctrl = ((uiNamespace getVariable "MCC_interactionPB") displayCtrl 2);
 _ctrl ctrlSetText _text;
 _ctrl = ((uiNamespace getVariable "MCC_interactionPB") displayCtrl 1);
 sleep 2;
+// The bandage stopped part-way: the check above only accepted 4 exact animation names, but the medic animation
+// cycles through others (medic1..medic5, medicOther, pistol/no-weapon/prone variants), so it "failed" as soon as one
+// of those played. Any medic animation now counts; moving away, dying or other actions still cancel.
 for [{_x=1},{_x<_time},{_x=_x+0.1}]  do
 {
 	_ctrl progressSetPosition (_x/_time);
-	if (player distance _unit > 2 || !(animationState player in _medicAnims) || !alive player || !alive _unit || (player getvariable ["MCC_medicUnconscious",false]) || isNull ((uiNamespace getVariable "MCC_interactionPB"))) then {_fail = true; _x = _time};
+	if (player distance _unit > 2 || ((toLower animationState player) find "medic" < 0) || !alive player || !alive _unit || (player getvariable ["MCC_medicUnconscious",false]) || isNull ((uiNamespace getVariable "MCC_interactionPB"))) then {_fail = true; _x = _time};
 	sleep 0.1;
 };
 
@@ -36,6 +39,6 @@ for [{_x=1},{_x<_time},{_x=_x+0.1}]  do
 player playactionNow "medicStop";
 
 //If self then no need for wounded anim
-if (!_self && !_unitUnconcious) then {[[[_unit],{(_this select 0) playactionNow "agonyStop"}], "BIS_fnc_spawn", _unit, false] spawn BIS_fnc_MP};
+if (!_self && !_unitUnconcious) then {[_unit, "agonyStop"] remoteExec ["playActionNow", _unit]};
 
 _fail

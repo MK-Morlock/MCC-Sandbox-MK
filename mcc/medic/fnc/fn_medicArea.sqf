@@ -30,5 +30,5 @@ while {alive _building} do
 		};
 	} foreach (_building nearEntities ["CAManBase",50]);
 
-	sleep 60 + random 60;
+	sleep (60 + random 60);
 }

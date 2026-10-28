@@ -18,7 +18,7 @@ class MCC_Module_underCoverCurator : MCC_Module_Base
 			displayName = "Remove Weapons:";
 			description = "Remove all weapons on game start";
 			typeName = "NUMBER";
-			property = "removeGear";
+			property = "MCC_Module_underCoverCurator_removeGear";
 
 			class values
 			{
@@ -41,7 +41,7 @@ class MCC_Module_underCoverCurator : MCC_Module_Base
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Sync to any player role to play as an Undercover agent. Undercover agents can move freely in near enemy units as long as they keep their gun concealed and are not acting suspicious";
+		description = "Sync to any player role to play as an Undercover agent. Undercover agents can move freely near enemy units as long as they keep their gun concealed and are not acting suspicious";
 		sync[] = {"BLUFORunit"};
 
 		class BLUFORunit

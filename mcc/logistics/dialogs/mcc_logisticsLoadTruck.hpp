@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // Main dialog
 //-----------------------------------------------------------------------------
-class MCC_LOGISTICS_LOAD_TRUCK
+class MCCDLG_NAME
 {
 	idd = -1;
 	movingEnable = 1;
@@ -25,7 +25,7 @@ class MCC_LOGISTICS_LOAD_TRUCK
 		class MCC_loadTruckbckgs: MCC_RscText
 		{
 			idc = -1;
-			colorBackground[] = { 0.051, 0.051, 0.051,0.9};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 			x = 0.276562 * safezoneW + safezoneX;
 			y = 0.225 * safezoneH + safezoneY;
 			w = 0.4125 * safezoneW;
@@ -43,7 +43,7 @@ class MCC_LOGISTICS_LOAD_TRUCK
 			colorBackground[] = {0.31,0.31,0.31,0.9};
 		};
 
-		class MCC_loadTruckC1Minus: MCC_RscButton
+		class MCC_loadTruckC1Minus: MCCBTN_R
 		{
 			idc = 1000;
 			text = "-";
@@ -74,7 +74,7 @@ class MCC_LOGISTICS_LOAD_TRUCK
 		{
 			idc = -1;
 			text = "Logistics"; //--- ToDo: Localize;
-			colorText[] = {0,1,1,1};
+			colorText[] = {0.89,0.90,0.91,1};
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 2)";
 
 			x = 0.425 * safezoneW + safezoneX;
@@ -113,6 +113,8 @@ class MCC_LOGISTICS_LOAD_TRUCK
 		class MCC_loadTruckSupplies: MCC_RscPicture
 		{
 			idc = -1;
+
+			style = 2096;
 			text =  __EVAL(MCCPATH +"data\IconAmmo.paa");
 			tooltip = "Ammo";
 			colorText[] = { 0.9, 0, 0, 1 };
@@ -125,8 +127,10 @@ class MCC_LOGISTICS_LOAD_TRUCK
 		class MCC_loadTruckRepair: MCC_RscPicture
 		{
 			idc = -1;
+
+			style = 2096;
 			text =  __EVAL(MCCPATH +"data\IconRepair.paa");
-			tooltip = "Materials";
+			tooltip = "Supplies";
 			colorText[] = { 0, 0.5, 0.9, 1 };
 
 			x = 0.454167 * safezoneW + safezoneX;
@@ -137,6 +141,8 @@ class MCC_LOGISTICS_LOAD_TRUCK
 		class MCC_loadTruckFuel: MCC_RscPicture
 		{
 			idc = -1;
+
+			style = 2096;
 			text =  __EVAL(MCCPATH +"data\IconFuel.paa");
 			tooltip = "Fuel";
 			colorText[] = { 0, 0.9, 0.5, 1 };
@@ -147,7 +153,7 @@ class MCC_LOGISTICS_LOAD_TRUCK
 			h = 0.033 * safezoneH;
 		};
 
-		class MCC_loadTruckCancelButton: MCC_RscButton
+		class MCC_loadTruckCancelButton: MCCBTN_R
 		{
 			idc = -1;
 			action = "closeDialog 0;";
@@ -158,7 +164,7 @@ class MCC_LOGISTICS_LOAD_TRUCK
 			w = 0.0802083 * safezoneW;
 			h = 0.033 * safezoneH;
 		};
-		class MCC_loadTruckOutpot: MCC_RscButton
+		class MCC_loadTruckOutpot: MCCBTN_R
 		{
 			idc = 4;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
@@ -169,7 +175,7 @@ class MCC_LOGISTICS_LOAD_TRUCK
 			w = 0.1 * safezoneW;
 			h = 0.077 * safezoneH;
 		};
-		class MCC_loadTruckOutpot2: MCC_RscButton
+		class MCC_loadTruckOutpot2: MCCBTN_R
 		{
 			idc = 5;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
@@ -179,7 +185,7 @@ class MCC_LOGISTICS_LOAD_TRUCK
 			w = 0.1 * safezoneW;
 			h = 0.077 * safezoneH;
 		};
-		class MCC_loadTruckOutpot3: MCC_RscButton
+		class MCC_loadTruckOutpot3: MCCBTN_R
 		{
 			idc = 6;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";

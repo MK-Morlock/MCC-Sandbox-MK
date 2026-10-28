@@ -5,7 +5,7 @@
 */
 
 //Not a client
-private ["_compassTeamMates"];
+private _compassTeamMates = false;
 if (!hasInterface || isDedicated) exitWith {};
 
 waituntil {!(IsNull (findDisplay 46))};
@@ -31,7 +31,18 @@ uiNamespace setVariable ["MCC_HuD_units",[]];
 
 
 MCC_fnc_compHudEVH = {
-    private ["_click","_dir","_pos","_wpPos","_index","_orgDir","_iconPic","_iconColor","_iconSize","_ctrls","_offset","_dialog"];
+    private "_click";
+    private "_dir";
+    private "_pos";
+    private "_wpPos";
+    private "_index";
+    private "_orgDir";
+    private _iconPic = "";
+    private "_iconColor";
+    private "_iconSize";
+    private _ctrls = [];
+    private _offset = 0;
+    private "_dialog";
     _click = 0.816 / 180;
 
     _orgDir = ([player, positionCameraToWorld [0,0,100]] call BIS_fnc_dirTo);

@@ -8,7 +8,12 @@
 	<OUT>
 		Nothing
 ===========================================================================================*/
-private ["_ammo","_itemClass","_attach","_type","_index","_gesture","_sleep"];
+private _itemClass = "";
+private _attach = false;
+private _type = "";
+private _index = [];
+private _gesture = "";
+private _sleep = 0;
 _itemClass = param [0,"",[""]];
 _attach = param [1,true,[true]];
 _type = toLower (param [2,"",[""]]);

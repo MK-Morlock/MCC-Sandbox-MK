@@ -1,4 +1,15 @@
-private ["_mccdialog","_comboBox","_tempBox","_array","_displayArray","_displayname","_class","_pic","_resIndex","_valor","_index","_isVirtual"];
+private "_mccdialog";
+private _comboBox = controlNull;
+private _tempBox = objNull;
+private _array = [];
+private _displayArray = [];
+private "_displayname";
+private "_class";
+private "_pic";
+private _resIndex = configNull;
+private _valor = [];
+private _index = 0;
+private "_isVirtual";
 #define	TRADERCUT	1.15
 
 disableSerialization;
@@ -12,7 +23,9 @@ _playerValor = player getVariable ["MCC_valorPoints",50];
 
 _fnc_addItem = {
 	params ["_itemClass","_add"];
-	private ["_return","_countStart","_countFinish"];
+	private _return = false;
+	private _countStart = {};
+	private _countFinish = {};
 
 	([_itemClass] call BIS_fnc_itemType) params ["_category","_type"];
 
@@ -82,7 +95,7 @@ _fnc_addItem = {
 
 _fnc_addRemoveItemFromBox = {
 	params ["_tempBox", "_class","_add","_item","_isVirtual"];
-	private ["_tempArray"];
+	private "_tempArray";
 
 	if (_isVirtual) then {
 		switch (_item) do
@@ -167,7 +180,7 @@ _fnc_addRemoveItemFromBox = {
 
 _fnc_errorMessage = {
 	params ["_text"];
-	private _str = "<t size='1' t font = 'puristaLight' color='#FFFFFF'>" + _text + "</t>";
+	private _str = "<t size='1' font='PuristaLight' color='#FFFFFF'>" + _text + "</t>";
 	[_str,0,1,1,0.1,0.1] spawn bis_fnc_dynamictext;
 	player globalRadio "SentCommandFailed";
 };
@@ -283,7 +296,7 @@ if (_index <20) then {
 	_index = missionNamespace getVariable ["MCC_rtsMainBoxIndex",0];
 };
 
-private ["_isShop"];
+private "_isShop";
 {
 	_displayArray = [];
 

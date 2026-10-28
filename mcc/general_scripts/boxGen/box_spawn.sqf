@@ -1,9 +1,5 @@
-private ["_object", "_weapons", "_magazines", "_box", "_count","_items","_rucks"];
-_object		= _this select 0;
-_weapons 	= _this select 1;
-_magazines 	= _this select 2;
-_items		= _this select 3;
-_rucks		= _this select 4;
+private _count = 0;
+params ["_object", "_weapons", "_magazines", "_items", "_rucks"];
 
 if !(_object iskindof "Tank" || _object iskindof "Air" ||  _object iskindof "car" || _object iskindof "ReammoBox" || _object iskindof "ReammoBox_F" || _object iskindof "ship") exitWith {};
 

@@ -2,13 +2,24 @@
 // Gear AI with gear acording to its role
 // Example: [_currentWeapon], "MCC_fnc_addItem", true, false] spawn BIS_fnc_MP;
 //===================================================================================================================================================================
-private ["_role","_muzzles","_wepItems","_currentWeapon","_unit","_cfg","_items","_selectedItem","_sideUnit","_index","_currentMagazines","_currentWeaponName","_image","_weaponType"];
+private _role = "";
+private _currentWeapon = nil;
+private _unit = objNull;
+private _cfg = configNull;
+private _items = [];
+private "_selectedItem";
+private "_sideUnit";
+private "_index";
+private _currentMagazines = [];
+private _currentWeaponName = "";
+private _image = "";
+private "_weaponType";
 
 _role = param [0,"rifleman",[""]];
 _unit = param [1,objNull,[objNull]];
 waitUntil {alive _unit};
 
-if (isNull _unit || _role == "" || !local _unit) exitWith {diag_log "MCC: MCC_fnc_gearAI not local or null unit "};
+if (isNull _unit || _role == "" || !local _unit) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: MCC_fnc_gearAI not local or null unit "}};
 
 _sideUnit = str side _unit;
 _cfg = if (isClass (missionconfigFile >> "MCC_loadouts" )) then {(missionconfigFile >> "MCC_loadouts")} else {(configFile >> "MCC_loadouts")};

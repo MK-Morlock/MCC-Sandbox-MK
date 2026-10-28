@@ -3,7 +3,9 @@
 //  Parameter(s):
 //     	_ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_target","_unitsArray","_groupCfg"];
+private _target = grpNull;
+private _unitsArray = [];
+private _groupCfg = "";
 _target = param [0,grpNull,[missionNamespace,grpNull]];
 
 _groupCfg = _target getVariable ["MCC_rtsGroupCfg",""];

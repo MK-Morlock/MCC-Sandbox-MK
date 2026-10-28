@@ -1,13 +1,12 @@
 //==================================================================MCC_fnc_moveToPos======================================================================================
 // move an object to a new location
-// Example: [[[netid _unit,_unit],_pos], "MCC_fnc_moveToPos", true, false] spawn BIS_fnc_MP;
+// Example: [[netid _unit,_unit],_pos] remoteExec ["MCC_fnc_moveToPos", true, false];
 // Params:
 //	_unit: object, brocadcasting unit
 //	_pos: array, position
 //==============================================================================================================================================================================
-private ["_unit","_pos"];
-_unit = if (((_this select 0) select 0) == "") then {(_this select 0) select 1} else {objectFromNetID ((_this select 0) select 0)};
-_pos = _this select 1;
+private _unit = if (((_this select 0) select 0) == "") then {(_this select 0) select 1} else {objectFromNetID ((_this select 0) select 0)};
+private _pos = _this select 1;
 if (vehicle _unit == _unit) then {
 	_unit setpos _pos;
 } else {

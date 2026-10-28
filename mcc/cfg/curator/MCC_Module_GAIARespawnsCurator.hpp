@@ -15,7 +15,7 @@ class MCC_Module_GAIARespawnsCurator : MCC_Module_Base
 			description = "$STR_Module__groupRespawns_Respawns_description";
 			typeName = "NUMBER";
 			defaultValue = 5;
-			property = "Respawns";
+			property = "MCC_Module_GAIARespawnsCurator_Respawns";
 		};
 
 		class ModuleDescription: ModuleDescription{};

@@ -1,21 +1,3 @@
-private ["_effectParams"];
+//MCC console unit feed: Regular / Night Vision / Thermal (MCC_fnc_feedVision; the choice is kept for next time)
 MCC_UMPIPView = _this select 1;
-_effectParams = switch (MCC_UMPIPView) do {
-	// Normal
-	case 0: {
-		[3, 1, 1, 1, 0.1, [0, 0.4, 1, 0.1], [0, 0.2, 1, 1], [0, 0, 0, 0]]
-	};
-	
-	// Night vision
-	case 1: {
-		[1]
-	};
-	
-	// Thermal imaging
-	case 2: {
-		[2]
-	};
-};
-
-// Set effect
-"rendertarget10" setPiPEffect _effectParams;
+["rendertarget10", MCC_UMPIPView, "unit"] call MCC_fnc_feedVision;

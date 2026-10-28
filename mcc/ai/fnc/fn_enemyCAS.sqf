@@ -4,11 +4,27 @@
 // _tower 	OBJECT  while object alive
 // Return - nothing
 //=======================================================================================================================================================================
-private ["_tower","_sideEnemy","_factionEnemy","_sidePlayer","_casArray","_heliArray","_spawnPos","_casGroup","_IsCAS","_vehicleClass","_casType","_cas","_casVehicle","_casPilot","_ClosestZone","_totalCASActive","_tempArray"];
-_tower = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
-_sideEnemy = [_this, 1, east] call BIS_fnc_param;
-_factionEnemy = [_this, 2, "OPF_F", [""]] call BIS_fnc_param;
-_sidePlayer = [_this, 3, west] call BIS_fnc_param;
+private _tower = objNull;
+private "_sideEnemy";
+private _factionEnemy = "";
+private "_sidePlayer";
+private _casArray = [];
+private _heliArray = [];
+private _spawnPos = [];
+private "_casGroup";
+private _IsCAS = false;
+private "_vehicleClass";
+private "_casType";
+private _cas = [];
+private "_casVehicle";
+private "_casPilot";
+private "_ClosestZone";
+private _totalCASActive = 0;
+private _tempArray = [];
+_tower = _this param [0, objNull, [objNull]];
+_sideEnemy = _this param [1, east];
+_factionEnemy = _this param [2, "OPF_F", [""]];
+_sidePlayer = _this param [3, west];
 
 _totalCASActive = missionNamespace getVariable ["MCC_totalCASActive",0];
 if (_totalCASActive > 0) exitWith {};
@@ -77,13 +93,18 @@ if (_IsCAS) then {
 };
 
 [_casVehicle,_casPilot,_IsCAS,_sidePlayer] spawn {
-		private ["_casVehicle","_targetList","_casPilot","_IsCAS","_totalCASActive","_sidePlayer"];
+		private "_casVehicle";
+		private "_targetList";
+		private "_casPilot";
+		private "_IsCAS";
+		private _totalCASActive = 0;
+		private "_sidePlayer";
 		_casVehicle = _this select 0;
 		_casPilot = _this select 1;
 		_IsCAS = _this select 2;
 		_sidePlayer = _this select 3;
 
-		[["MCCNotificationBad",["CAS","Enemy CAS approaching",""]], "bis_fnc_showNotification", _sidePlayer, false] spawn BIS_fnc_MP;
+		["MCCNotificationBad",["CAS","Enemy CAS approaching",""]] remoteExec ["bis_fnc_showNotification", _sidePlayer, false];
 
 		while {(alive _casVehicle)} do {
 			_casVehicle setVehicleAmmo 1;
@@ -95,7 +116,7 @@ if (_IsCAS) then {
 			sleep 60;
 		};
 
-		[["MCCNotificationGood",["CAS","Enemy CAS down",""]], "bis_fnc_showNotification", _sidePlayer, false] spawn BIS_fnc_MP;
+		["MCCNotificationGood",["CAS","Enemy CAS down",""]] remoteExec ["bis_fnc_showNotification", _sidePlayer, false];
 
 		sleep 30;
 		if (!isNull _casVehicle) then {deleteVehicle _casVehicle;};

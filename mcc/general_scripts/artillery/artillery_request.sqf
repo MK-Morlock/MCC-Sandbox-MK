@@ -1,7 +1,7 @@
-private ["_type"];
+
 disableSerialization;
 
-_type = _this select 0;
+params ["_type"];
 if !mcc_isloading then 
 	{
 	if (mcc_missionmaker == (name player)) then
@@ -20,7 +20,7 @@ if !mcc_isloading then
 			{
 				shellspread = (MCC_artillerySpreadArray select (lbCurSel ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 31))) select 1;
 				missionNameSpace setVariable ["MCC_artilleryEnabled",true];
-				hint "click on map where you want to send artillery -Hold Ctrl for multiple clicks"; 
+				["Click on the map where you want to send artillery - hold Ctrl for multiple clicks"] call MCC_fnc_hintBrief; 
 				
 			};
 			case 1:	//Add		
@@ -32,7 +32,7 @@ if !mcc_isloading then
 						+ 		  "publicVariable ""HW_arti_types"";"
 						+ FORMAT ["HW_arti_number_shells_per_hour = HW_arti_number_shells_per_hour + %1;",nshell]
 						+ 		  "publicVariable ""HW_arti_number_shells_per_hour"";"
-						+ FORMAT ["[[2,{[""MCCNotifications"",[""%1 %2 shells added"",""%3data\ammo_icon.paa"",""""]] call bis_fnc_showNotification;}], ""MCC_fnc_globalExecute"", true, false] spawn BIS_fnc_MP;",_shellName,nshell,MCC_path];
+						+ FORMAT ["[2,{[""MCCNotifications"",[""%1 %2 shells added"",""%3data\ammo_icon.paa"",""""]] call bis_fnc_showNotification;}] remoteExec [""MCC_fnc_globalExecute"", 0, false];",_shellName,nshell,MCC_path];
 				} 
 				else 
 				{
@@ -63,7 +63,7 @@ if !mcc_isloading then
 							case "civ" : {MCC_server setVariable ["Arti_CIV_shellsleft",HW_arti_number_shells_per_hour,true]};
 						};	
 							
-						[[2,compile format ['["MCCNotifications",["%2 %1 shells added","%3data\ammo_icon.paa",""]] call bis_fnc_showNotification;',nshell,_shellName,MCC_path]], "MCC_fnc_globalExecute", true, false] spawn BIS_fnc_MP;
+						[2,compile format ['["MCCNotifications",["%2 %1 shells added","%3data\ammo_icon.paa",""]] call bis_fnc_showNotification;',nshell,_shellName,MCC_path]] remoteExec ["MCC_fnc_globalExecute", 0, false];
 						//["MCCNotifications",[format ["%2 %1 shells added",nshell,_shellName],format ["%1data\ammo_icon.paa",MCC_path],""]] call bis_fnc_showNotification;
 				};
 				hint format ["%1 Artillery enabled. \nAdded %2 artillery rounds",_shellName,nshell];

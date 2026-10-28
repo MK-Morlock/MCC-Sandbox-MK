@@ -1,6 +1,9 @@
 //===============================================================MCC_fnc_VONRadioBroadcast========================================================================================
 //==============================================================================================================================================================================
-private ["_speaker","_channel","_channelIndex","_radioRange","_beep"];
+private "_speaker";
+private "_channelIndex";
+private _radioRange = 0;
+private _beep = "";
 
 _speaker 		= objectFromNetID (_this select 0);
 _channelName 	= _this select 1;
@@ -44,7 +47,14 @@ if (_channelIndex >= 0) then {
 	sleep 0.2;
 
 	[_speaker,_radioRange] spawn {
-		private ["_speaker","_radioRange","_helper","_t","_c","_static","_distance","_rangeFactor"];
+		private "_speaker";
+		private "_radioRange";
+		private _helper = "";
+		private "_t";
+		private "_c";
+		private _static = "";
+		private "_distance";
+		private "_rangeFactor";
 		_speaker 	= _this select 0;
 		_radioRange = _this select 1;
 		_distance = _speaker distance player;

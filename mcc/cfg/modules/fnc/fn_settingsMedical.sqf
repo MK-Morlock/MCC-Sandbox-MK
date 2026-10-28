@@ -35,10 +35,13 @@ if (typeName (_module getVariable ["medicComplex",true]) == typeName 0) exitWith
 	MCC_medicPunishTK = ((_module getvariable ["medicPunishTK",1])==1);
 
 	//Medic HuD
-	MCC_medicShowWounded = ((_module getvariable ["MCC_medicShowWounded",1])==1);
+	MCC_medicShowWounded = ((_module getvariable ["medicShowUI",1])==1);	// module attribute is "medicShowUI" (the old name never matched, so the setting was ignored)
 
 	//Only Medic Heals
 	MCC_medicOnlyMedicHeals = ((_module getvariable ["onlyMedicsCanHeal",1])==1);
+
+	//Hook the system onto the soldiers (module runs on every machine: isGlobal = 1)
+	[] call MCC_fnc_medicEnableXEH;
 };
 
 //Not curator exit
@@ -60,6 +63,7 @@ if (count _resualt == 0) exitWith {deleteVehicle _module};
 
 missionNamespace setVariable ["MCC_medicSystemEnabled",true];
 publicvariable "MCC_medicSystemEnabled";
+[] remoteExec ["MCC_fnc_medicEnableXEH", 0, true];
 
 {
 	missionNamespace setVariable [_x,_resualt select _foreachindex];

@@ -6,7 +6,12 @@
 //
 //	OUT <BOOLEAN>
 //==============================================================================================================================================================================
-private ["_side","_res","_resToCheck","_var","_level","_available"];
+private "_side";
+private "_res";
+private "_resToCheck";
+private "_var";
+private "_level";
+private _available = false;
 
 _side = param [0,missionnamespace,[missionnamespace,sideLogic]];
 _res = param [1,missionnamespace,[[]]];

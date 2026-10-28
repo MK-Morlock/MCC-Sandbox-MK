@@ -2,7 +2,14 @@
  Create a progress bar and anim for the player
  Example: [_text,_time] call MCC_fnc_interactProgress;
 ====================================================================================================================================================================*/
-private ["_text","_time","_ctrl","_object","_success","_endActionEH","_anim","_defaultAnim"];
+private _text = "";
+private _time = 0;
+private _ctrl = controlNull;
+private _object = objNull;
+private _success = false;
+private _endActionEH = controlNull;
+private _anim = false;
+private _defaultAnim = "";
 _text = param [0,"",[""]];
 _time = param [1,10,[0]];
 _object = param [2,objNull,[objNull]];

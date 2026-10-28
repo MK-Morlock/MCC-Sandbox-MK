@@ -34,7 +34,7 @@ class MCC_Module_atmosphereCurator : MCC_Module_Base
 				{
 					name = "Clear";
 					value = 2;
-				}
+				};
 				class Cloudy
 				{
 					name = "Cloudy";
@@ -263,7 +263,7 @@ class MCC_Module_atmosphereCurator : MCC_Module_Base
 				{
 					name = "Murky";
 					value = 2;
-				}
+				};
 				class green
 				{
 					name = "Green";
@@ -314,7 +314,7 @@ class MCC_Module_atmosphereCurator : MCC_Module_Base
 				{
 					name = "Medium";
 					value = 2;
-				}
+				};
 				class heavy
 				{
 					name = "Heavy";

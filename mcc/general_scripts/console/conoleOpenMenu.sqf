@@ -1,4 +1,10 @@
-private ["_message","_messageFinal","_time","_ok","_type","_nul","_stance"];
+private _message = "";
+private _messageFinal = [];
+private "_time";
+private _ok = false;
+private "_type";
+private _nul = [];
+private _stance = "";
 // By: Shay_gman
 // Version: 1.1 (May 2012)
 #define MCC_playerConsoleLoading_IDD 2991
@@ -77,7 +83,7 @@ if (_type == 0) then {											//Opening the conole
 	if (dialog && _commander) then
 	{
 		closedialog 0;
-		_ok = createDialog "MCC_playerConsole";
+		_ok = createDialog ("MCC_playerConsole" call MCC_fnc_dialogName);
 	};
 
 	//access denied

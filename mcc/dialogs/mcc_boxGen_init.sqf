@@ -1,4 +1,10 @@
-private ["_mccdialog","_comboBox","_displayname","_pic", "_index", "_array", "_class"];
+private _mccdialog = controlNull;
+private _comboBox = controlNull;
+private "_displayname";
+private "_pic";
+private "_index";
+private "_array";
+private "_class";
 #define boxGen_IDD 2995
 
 #define ALLGEAR_IDD 8500

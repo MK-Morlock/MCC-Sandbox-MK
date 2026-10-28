@@ -3,7 +3,10 @@
 
 #define MCC_MINIMAP 9120
 #define MCC_CONSOLE_AC_MAP 5022
-private ["_mccdialog","_control","_string","_uav"];
+private _mccdialog = controlNull;
+private _control = controlNull;
+private "_string";
+private "_uav";
 disableSerialization;
 
 if (MCC_Console2Open) then {_mccdialog = findDisplay mcc_playerConsole2_IDD; _uav = MCC_ConolseUAV};
@@ -18,7 +21,8 @@ if (_string == "Open Map") then {
 	waitUntil {ctrlCommitted (_mccdialog displayctrl MCC_MINIMAP)};
 	
 	[_uav,_mccdialog] spawn {
-			private ["_control","_uav"];
+			private _control = controlNull;
+			private "_uav";
 			disableSerialization;
 			_uav = _this select 0;
 			_mccdialog = _this select 1;
@@ -30,6 +34,8 @@ if (_string == "Open Map") then {
 			_control = _mccdialog displayCtrl MCC_MINIMAP;
 			_control ctrlMapAnimAdd [0.5, 0.1, getmarkerpos "mccUAVMarker"];
 			ctrlMapAnimCommit _control;
+			//Keep following it (it used to centre only once) until right-click on the map
+			[_control, _uav] spawn MCC_fnc_consoleMapFollow;
 			while {ctrlShown (_mccdialog displayctrl MCC_MINIMAP)} do	{
 				"mccUAVMarker" setMarkerposLocal getpos _uav;
 				sleep 0.05;

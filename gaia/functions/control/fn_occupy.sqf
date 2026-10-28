@@ -5,6 +5,18 @@ _mcc_gaia_density = 0.4;
 
 //Buildup the unit arrays
 [mcc_faction,mcc_sidename] call MCC_fnc_MWCreateUnitsArray;
+private _occSide = if (mcc_sidename isEqualType west) then {mcc_sidename} else {
+	switch (toUpper mcc_sidename) do {
+		case "WEST": {west};
+		case "EAST": {east};
+		case "GUER";
+		case "RESISTANCE";
+		case "INDEPENDENT": {resistance};
+		case "CIV";
+		case "CIVILIAN": {civilian};
+		default {sideUnknown};
+	}
+};
 
 //Init the MW groups configs
 [mcc_faction] call MCC_fnc_createConfigs;
@@ -18,7 +30,7 @@ _all = ["Airport","CityCenter","FlatAreaCity","FlatAreaCitySmall","NameCity","Na
 
 //Make vehicles move around the big area
 _points = (round ((getmarkersize _mcc_zone select 0) max (getmarkersize _mcc_zone select 1))/50)*_mcc_gaia_density;
-_unitPlaced = [(_points*2),parsenumber _mcc_zone,MCC_MWGroupArrayCar,MCC_MWunitsArrayCar,5,15,"LAND",mcc_sidename] call MCC_fnc_MWSpawnVehicles;
+_unitPlaced = [(_points*2),parsenumber _mcc_zone,MCC_MWGroupArrayCar,MCC_MWunitsArrayCar,5,15,"LAND",_occSide] call MCC_fnc_MWSpawnVehicles;
 
 //Ship
 _missionCenter = getmarkerpos _mcc_zone;
@@ -26,7 +38,7 @@ _safepos =[_missionCenter ,1,(((getmarkersize _mcc_zone select 0) max (getmarker
 
 if (str _safepos != "[-500,-500,0]") then
 {
-	_unitPlaced = [(_points*0.6),parsenumber _mcc_zone,MCC_MWGroupArrayShip,MCC_MWunitsArrayShip,5,15,"WATER",mcc_sidename] call MCC_fnc_MWSpawnVehicles;
+	_unitPlaced = [(_points*0.6),parsenumber _mcc_zone,MCC_MWGroupArrayShip,MCC_MWunitsArrayShip,5,15,"WATER",_occSide] call MCC_fnc_MWSpawnVehicles;
 };
 
 
@@ -49,22 +61,22 @@ if (str _safepos != "[-500,-500,0]") then
 
 		_missionCenter = getmarkerpos (str _zoneNumber);
 
-		_unitPlaced = [_points, _zoneNumber, _spawnbehavior,mcc_sidename] call MCC_fnc_MWSpawnInfantry;
+		_unitPlaced = [_points, _zoneNumber, _spawnbehavior,_occSide] call MCC_fnc_MWSpawnInfantry;
 
-		[[_zoneNumber],"MCC_fnc_MWspawnAnimals",false,false] spawn BIS_fnc_MP;
+		[_zoneNumber] remoteExec ["MCC_fnc_MWspawnAnimals", 2, false];
 
 		if (random(1) >0.5) then
-		{_unitPlaced = [(_points*.6),_zoneNumber,MCC_MWGroupArrayCar,MCC_MWunitsArrayCar,5,15,"LAND",mcc_sidename] call MCC_fnc_MWSpawnVehicles;};
+		{_unitPlaced = [(_points*.6),_zoneNumber,MCC_MWGroupArrayCar,MCC_MWunitsArrayCar,5,15,"LAND",_occSide] call MCC_fnc_MWSpawnVehicles;};
 
 
 	//Armor
 		if (random(1) >0.5) then
-		{_unitPlaced = [(_points*0.2),_zoneNumber,MCC_MWGroupArrayArmored,MCC_MWunitsArrayArmored,10,30,"LAND",mcc_sidename] call MCC_fnc_MWSpawnVehicles;};
+		{_unitPlaced = [(_points*0.2),_zoneNumber,MCC_MWGroupArrayArmored,MCC_MWunitsArrayArmored,10,30,"LAND",_occSide] call MCC_fnc_MWSpawnVehicles;};
 
 
 	//Support
 		if (random(1) >0.5) then
-		{_unitPlaced = [(_points*0.2),_zoneNumber,MCC_MWGroupArraySupport,MCC_MWunitsArraySupport,10,30,"LAND",mcc_sidename] call MCC_fnc_MWSpawnVehicles;};
+		{_unitPlaced = [(_points*0.2),_zoneNumber,MCC_MWGroupArraySupport,MCC_MWunitsArraySupport,10,30,"LAND",_occSide] call MCC_fnc_MWSpawnVehicles;};
 
 		//Ship
 		if (random(1) >0.5) then
@@ -72,7 +84,7 @@ if (str _safepos != "[-500,-500,0]") then
 			_safepos =[_missionCenter ,1,(_oc_size*3.5),2,2,10,0,[],[[-500,-500,0],[-500,-500,0]]] call BIS_fnc_findSafePos; //Check if they are water
 			if (str _safepos != "[-500,-500,0]") then
 			{
-				_unitPlaced = [(_points*0.6),_zoneNumber,MCC_MWGroupArrayShip,MCC_MWunitsArrayShip,5,15,"WATER",mcc_sidename] call MCC_fnc_MWSpawnVehicles;
+				_unitPlaced = [(_points*0.6),_zoneNumber,MCC_MWGroupArrayShip,MCC_MWunitsArrayShip,5,15,"WATER",_occSide] call MCC_fnc_MWSpawnVehicles;
 
 			};
 		};

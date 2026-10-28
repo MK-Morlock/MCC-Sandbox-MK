@@ -4,7 +4,12 @@
 		_this select 0 - unit
 		_this select 1 - rope
 */
-private ["_unit","_rope","_vehicle","_time","_zdelta","_zc"];
+private _unit = objNull;
+private _rope = objNull;
+private "_vehicle";
+private "_time";
+private "_zdelta";
+private _zc = 0;
 _unit = param [0,objNull,[objNull,missionNamespace]];
 _rope = param [1,objNull,[objNull,missionNamespace]];
 _zdelta = 7 / 10;

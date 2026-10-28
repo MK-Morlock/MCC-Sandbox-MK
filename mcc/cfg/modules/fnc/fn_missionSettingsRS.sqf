@@ -2,9 +2,7 @@
 // module
 // Example: [] call MCC_fnc_missionSettingsRS;
 //================================================================================================================================================================
-private ["_module"];
-
-_module = param [0, objNull, [objNull]];
+private _module = param [0, objNull, [objNull]];
 
 
 if (typeName (_module getVariable ["rsAllWeapons",true]) == typeName 0) exitWith {

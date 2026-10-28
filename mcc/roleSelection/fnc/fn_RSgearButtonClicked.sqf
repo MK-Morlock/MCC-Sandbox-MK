@@ -5,7 +5,18 @@
 
 	<OUT>
 ==============================================================================================================================================================================*/
-private ["_type","_groups","_availableObjects","_alloweObjects","_playerLevel","_hight","_selectedWeapon","_role","_cfg","_levelFactor","_idc","_side","_xPos"];
+private _type = "";
+private _availableObjects = [];
+private _alloweObjects = [];
+private _playerLevel = 0;
+private "_hight";
+private _selectedWeapon = "";
+private _role = "";
+private _cfg = configNull;
+private _levelFactor = 0;
+private _idc = 0;
+private _side = "";
+private "_xPos";
 disableSerialization;
 playSound "click";
 
@@ -216,7 +227,7 @@ lbClear _ctrl;
 
 
 MCC_fnc_RSWeaponAttachmentSelected = {
-	private ["_array"];
+	private _array = [];
 	disableSerialization;
 
 	params ["_type","_ctrl"];
@@ -234,7 +245,8 @@ MCC_fnc_RSWeaponAttachmentSelected = {
 };
 
 MCC_fnc_RSItemSelected = {
-	private ["_array","_outfits"];
+	private "_array";
+	private _outfits = [];
 	disableSerialization;
 	params ["_type","_ctrl","_index"];
 	_outfits = ["nightVision","headgear","googles","vests","backpacks","uniforms","_data","_attachments","_role"];

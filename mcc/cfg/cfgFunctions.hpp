@@ -12,13 +12,53 @@ class general
 	#endif
 
 	class login {};
+	class unitCategory {description = "MCC unit category of a class, also for mod vehicleClass names";};
+	class combatInfantry {description = "Ground infantry only from a faction soldier list (no pilots, crews, divers, unarmed)";};
+	class factionSide {description = "Side number of a faction, also when CfgFactionClasses has no side";};
 	class activateAddons {preInit = 1; description = "Pre init addon";};
 	class gear	{preInit = 1; description = "Assign gear by roles";};
 
 	class mobileRespawn	{description = "will move the respawn marker to the current position of the unit while the unit is alive, if the unit dead will move the marker to the prvious location.";};
 	class buildingPosCount	{description = "return the ammount of indexed positions in a building.";};
+	class posOnBuilding	{description = "(MK) is a spawn spot on, in or under a building";};
+	class openSpotNear	{description = "(MK) Nearest open ground around a spawn spot that was on a building";};
+	class paraOffRoof	{description = "(MK) AI parachutist landed: chute removed, off a roof when nobody is near or watching";};
 	class makeUnitsArray	{description = "returns a unit array consist of all the units from the given function and simulation in format [_cfgclass,_vehicleDisplayName].";};
 	class countGroup	{description = "Count the number of infantry, vehicles, tank, air, ships in a group.";};
+	class edenFactionCombo	{description = "Eden faction drop-down for MCC module attributes";};
+	class assetRoleMatch	{description = "Does a class fit an asset role";};
+	class factionVehicles	{description = "A faction own vehicles for a role (tank, aa, artillery, air, podCarrier, gunship)";};
+	class factionSiblings	{description = "Other factions of the same mod and side";};
+	class toggleRespawn	{description = "Console respawn button: switch player respawn off or on";};
+	class respawnButton	{description = "Console respawn button text";};
+	class respawnRestore	{description = "Bring a spectating player back when respawn is on again";};
+	class supportFactionOK	{description = "No support menus for civilian factions";};
+	class edenStartLocPreview	{description = "Eden: preview of Start Location modules";};
+	class uavCanAim {description = "(MK) Commander console UAV view: can the drone's weapon reach the aim point, by the turret's own traverse / elevation limits (or a fixed weapon's missile lock cone): [ok, details]";};
+	class uavPickWeapon {description = "(MK) Commander console UAV view: the drone's first loaded missile or bomb (pilot or gunner, pylons included) as [label, rounds, weapon, ammo, firing unit]";};
+	class uavSetHeight {description = "(MK) Commander console UAV view: set a drone's flight height and have it hold its position there, so it climbs or descends";};
+	class formationMove {description = "(MK) Player-led squad given a move order: each AI goes to his formation slot around the destination (leader's spot left empty) and falls back in when the leader arrives";};
+	class acReticle {description = "(MK) AC-130 console view: draw the gunship sight reticle (cross with ticks and corner brackets) over the video";};
+	class consoleApply3D {description = "(MK) Buttons console: swap the static flat button pictures of a window for their 3D versions";};
+	class openDebug {description = "(MK) Open Arma's debug console from the MCC Debug panel and say so when the game refuses it";};
+	class dialogName {description = "(MK) Name of an MCC window for the chosen console look (Flat or Buttons)";};
+	class supportHint {description = "(MK) The 'Air support incoming' hint, with a control reminder for the AC-130 (gun control) and the UAVs (camera control)";};
+	class acAmmoType {description = "(MK) AC-130 console view: the selected 40mm ammunition type (HE or AP) as [muzzle, label, rounds left]";};
+	class acAmmoRefresh {description = "(MK) AC-130 console view: refresh the 40mm counter and the ammunition button";};
+	class acAmmoToggle {description = "(MK) AC-130 console view: switch the 40mm between HE and AP ammunition";};
+	class acAmmo {description = "(MK) AC-130 console view: rounds left for a weapon, summed from the gunship's magazines in every turret";};
+	class acFire {description = "(MK) AC-130 console view: fire a gun, finding and remembering the fire mode that actually produces a round";};
+	class acGun {description = "(MK) AC-130 console view: the crew member and muzzle that fire a given weapon";};
+	class acAim {description = "(MK) AC-130 console view aim: gun turret limits, centre, clamp, or world direction from traverse / elevation";};
+	class supportNotice {description = "(MK) Support aircraft message (leaving, left, arrived) on the console banner, shown once per aircraft and kind";};
+	class consoleBanner {description = "(MK) Message drawn on top of the commander console screen for a few seconds (falls back to a notification when no console is open)";};
+	class consoleFKey {description = "(MK) Commander console F2 (UAV) / F3 (AC-130): connect, ask to select on the map, or deploy through the normal CAS call";};
+	class consoleFKeyState {description = "(MK) What F2 / F3 will do: [action, target or CAS list index, tooltip]";};
+	class consoleFolderClose	{description = "Commander console: slide a side folder back in";};
+	class factionClasses	{description = "Public CfgVehicles classes of a faction (engine filter, cached for the session)";};
+	class pipFollow	{description = "Smooth follow camera for small video feeds";};
+	class perfLog	{description = "Performance diagnostics: mission generation and approaching objectives";};
+	class pipCycleView	{description = "Right-click the video feed: next camera view";};
 	class PiPOpen	{description = "Do the transmitting feed animation.";};
 	class time2String	{description = "convert time to string.";};
 	class time	{description = "convert time to hh:mm:ss.";};
@@ -34,7 +74,9 @@ class general
 	class pickItem	{description = "Make a vehicle class item pickable and add variable to it.";};
 	class broadcast	{description = "Create a virtual camera and broadcast a short PiP video to all clients for 15 seconds.";};
 	class paradrop	{description = "Create a HALO or regular parachute jump for the given unit.";};
-	class realParadrop	{description = "Create a HALO or regular parachute jump for the given units with simulation of runing out of an airplane.";};
+	class pipOrbit	{description = "Mouse orbit / zoom of the MCC console unit video feed";};
+	class paraGuide	{description = "Steer an AI paratrooper to his landing spot";};
+	class realParadrop	{description = "Create a HALO or regular parachute jump for the given units with simulation of running out of an airplane.";};
 	class realParadropPlayer	{description = "Handle the paradrop from the unit side.";};
 	class countGroupHC	{description = "Count the number of infantry, vehicles, tank, air, ships in a group expand.";};
 	class manageWp	{description = "Create and control AI WP on map.";};
@@ -54,6 +96,10 @@ class general
 	class keyToName		{description = "get idkKey and return string with his name";};
 	class makeBriefing	{description = "Server Only - create a Logic based briefing";};
 	class handleAddaction	{description = "Handle addactions after respawn - init";};
+	class loadGear	{description = "Equip player from a saved gear array (goggles/headgear/uniform/vest/backpack/weapons/items) - used by the DB persistence restore and the respawn-carries-your-gear feature";};
+	class log		{description = "Write a tagged MCC line to the RPT (MCC [LEVEL] source | message | t= machine player)";};
+	class logSummary	{description = "Dump MCC log counters to the RPT (runs on mission end)";};
+	class parseSetting	{description = "Safely compile an MCC CBA EDITBOX setting; falls back to the default and logs the setting name if malformed";};
 	class ppEffects	{description = "Create effects to all players";};
 	class SetPitchBankYaw	{};
 	class openArtillery {};
@@ -99,6 +145,15 @@ class cas
 	class CreateAmmoDrop	{description = "drop an object from a plane and attach paracute to it, thanks to BIS.";};
 	class createPlane		{description = "create a flying plane from the given type and return the plane , pilot and group.";};
 	class deletePlane		{description = "set a plane to move to a location and delete it once it come closer then 800 meters.";};
+	class gunshipClass	{description = "Gunship class for the Gunship button (faction first)";};
+	class casAllowedTypes	{description = "CAS attack types an aircraft can fly";};
+	class casCanRun {description = "(MK) Can this aircraft's pilot fly this Direct CAS run (0 gun, 1 rockets, 2 gun + rockets, 3 bombs) with his own weapons and pylons";};
+	class casGuide {description = "(MK) Steer one real projectile onto a point (ASL) or a target object";};
+	class casGuideArm {description = "(MK) Guide every projectile a vehicle fires in the next few seconds onto a target (point with spread, or object); run where the vehicle is local";};
+	class casReleaseWait {description = "(MK) Wait until a bomb released now would fall onto the target (ballistic release point)";};
+	class casRealFire {description = "(MK) An aircraft fires its own loaded weapon of a kind (bomb, rocket, agm, aam) at targets, each real projectile guided on";};
+	class supportTimer {description = "(MK) On-station time limit for a support aircraft: 60 s warning, optional leave when out of ammunition, releases a controlling player, flies it away";};
+	class casFillTypes	{description = "Fill the CAS type list for the chosen aircraft";};
 	class airDrop		{description = "Handles CAS and airdrop requests on the server";};
 	class uavDetect {};
 	class cas {description = "Simulate Zeus CAS with moded vehicles";};
@@ -133,7 +188,11 @@ class groupGen
 	#endif
 
 	class groupGenRefresh	{description = "Refresh the group gen markers";};
+		class spawnLists	{description = "Spawn panel: Branch and Class lists matching Type and Branch";};
 	class groupSpawn		{description = "Create a group on the server";};
+	class applyPlaceBehaviour	{description = "(MK) 3D editor: Behaviour and Commandable for a placed group";};
+	class restore3D		{description = "(MK) 3D editor: rebuild deleted objects for Ctrl+Z";};
+	class groupPlace3D		{description = "(MK) 3D editor: spawn a group facing and at the height it was placed, and add it to undo";};
 	class groupGenUMRefresh	{description = "Refresh the group gen units lists";};
 };
 
@@ -146,6 +205,7 @@ class console
 	#endif
 
 	class consoleClickGroupIcon	{description = "Define icon behaviot when clicked on the MCC Console";};
+	class consoleMapFollow	{description = "Commander console map: follow a moving object until right-click";};
 };
 
 class mp
@@ -166,6 +226,7 @@ class mp
 	class inidbGet	{};
 	class inidbSet 	{};
 	class handleDB {};
+	class initExtDB3 {description = "Detect and connect to extDB3 for persistent campaign storage; falls back to profileNamespace";};
 	class saveServer {description = "Save persistent data about the server to the server";};
 	class loadServer {description = "Load persistent data about the server from the server";};
 	class savePlayer {description = "Save persistent data about the player to the server";};
@@ -185,6 +246,11 @@ class actions
 	class dragObject	{description = "Start a dragging animation must be run local on the dragging unit";};
 	class releaseObject	{description = "stop a dragging animation must be run local on the dragging unit";};
 	class releasePod	{description = "Release a pod from Taru helicopter";};
+	class podTaruReturn	{description = "(MK) Pod drop Taru: waits away 5 minutes, comes back, hooks, winches and docks the pod, then leaves";};
+	class taruAI	{description = "(MK) AI Taru pod job: pick up / winch drop / parachute / release a pod at a place";};
+	class taruWaypoint	{description = "(MK) A Taru pod job as a waypoint (the console's Taru - ... types)";};
+	class podDock	{description = "(MK) Dock a Taru pod from the sling (XENO - Taru Pod Mod)";};
+	class podAssault	{description = "(MK) Assault undock: lower the pod on the ropes, unload, dock again (XENO - Taru Pod Mod)";};
 	class attachPod		{description = "Attach a pod to Taru helicopter";};
 	class vault			{description = "Vault over an obstacle";};
 	class cover			{description = "Manage cover mechanics";};
@@ -212,11 +278,49 @@ class evac
 	#endif
 
 	class evacDelete {description = "Delete the given vehicle or it's driver";};
+	class evacFillFactions {description = "(MK) Evac panel: fill the Faction list (factions that have evac vehicles), defaulting to the player's faction";};
+	class evacFillClass {description = "(MK) Evac panel: fill the Class list straight from the chosen faction and type";};
+	class evacConsoleRefresh {description = "(MK) Commander Console: rebuild the evac list from the side's live evac list, keeping the selection on the same vehicle";};
+	class evacSide {description = "(MK) Side an evac made in the MCC console belongs to: the console's side if a player is on it, otherwise the mission maker's own side";};
+	class evacPanelRefresh {description = "(MK) Rebuild the Evac panel's evac list from the side's live evac list, keeping the selection on the same vehicle";};
 	class evacMove {description = "Move a vehicle to selected WP";};
 	class evacSpawn {description = "Spawn a vehicle with crew and gunners, mark it as an evac vehicle";};
 	class repairEvac {description = "Repair evac helicopter";};
 	class setEvac {description = "Sets an empty ot AI vehicle into an ecav for a specific side";};
 	class fastRopeLocal {description = "handles fast rope on clients";};
+};
+
+class uiTheme
+{
+	#ifdef MCCMODE
+	file = "\mcc_sandbox_mod\mcc\fnc\ui";
+	#else
+	file = "mcc\fnc\ui";
+	#endif
+
+	class hintBrief	{description = "Hint that clears itself after a few seconds";};
+	class consoleCampaignTiles	{description = "Hide the campaign tiles on the console map while it is open";};
+	class comboRemember	{description = "Console panels: drop-down lists open on the last choice";};
+	class consoleTheme	{description = "Console colour (squares under the transparency sliders)";};
+	class feedVision	{description = "View mode of every MCC video feed (saved per feed)";};
+	class umFeedToggle	{description = "MCC console unit video feed On / Off button";};
+	class umToolboxHighlight	{description = "Rounded box under the chosen Units / Groups and video view entries";};
+	class choiceBar	{description = "Small one-line three-button choice window";};
+	class umAutoSelect	{description = "Select a group / units just spawned in the MCC console unit list";};
+	class haloFormation	{description = "HALO formation free fall (after ROS_HaloFormation)"; file = "\mcc_sandbox_mod\mcc\fnc\general\fn_haloFormation.sqf";};
+	class haloFormationPlayer	{description = "(MK) HALO formation round a player and his AI (ROS_HaloFormation)"; file = "\mcc_sandbox_mod\mcc\fnc\general\fn_haloFormationPlayer.sqf";};
+	class haloPlaneExit	{description = "HALO aircraft flies off the nearest map edge at its drop height and is deleted"; file = "\mcc_sandbox_mod\mcc\fnc\general\fn_haloPlaneExit.sqf";};
+	class dropLight	{description = "(MK) Jump light in a drop aircraft: red / green (ROS Group HALO)"; file = "\mcc_sandbox_mod\mcc\fnc\general\fn_dropLight.sqf";};
+	class umModeSwitch	{description = "Units / Groups switch: the selection follows";};
+	class umSelectionFromList	{description = "MCC_selectedUnits from what is highlighted in the unit list";};
+	class consoleModeButtons	{description = "Commander console mode buttons: show the one in use";};
+	class consoleAlpha	{description = "Transparency slider of the MCC console";};
+	class consoleMapLayers	{description = "MK: map layers button of the MCC console (terrain / contours only)";};
+	class consoleFilter	{description = "MK: MCC console filter toggles (All, Players, West, East, Ind, Civ)";};
+	class consoleAmbientLook	{description = "MK: MCC console Ambient Warzone toggle look";};
+	class zoneList	{description = "MK: MCC console Zone drop-down - zones on the map, rows carry the zone number";};
+	class deleteZone	{description = "MK: MCC console Delete Zone button";};
+	class applyTheme	{description = "MCC look (VBS4 style) for an MCC window";};
 };
 
 class dynamicDialog
@@ -228,4 +332,5 @@ class dynamicDialog
 	#endif
 
 	class initDynamicDialog {description = "init the dynamic dialog";};
+	class messageBox	{description = "MCC-styled question box (replaces BIS_fnc_guiMessage)";};
 };

@@ -5,10 +5,11 @@
 // rating  	Integer
 // messege	String
 //===============================================================================================================================================================================
-private ["_uid","_rating","_mesg","_string","_ctrlGroup","_ctrl","_ratingPrev"];
-_uid 		=_this select 0;
-_rating 	=_this select 1;
-_mesg 		=_this select 2;
+private _string = "";
+private _ctrlGroup = controlNull;
+private _ctrl = controlNull;
+private "_ratingPrev";
+params ["_uid", "_rating", "_mesg"];
 
 if (isDedicated) exitWith {};
 if (!isDedicated && !hasInterface) exitWith {};
@@ -24,7 +25,7 @@ player addrating _rating;
 if (_mesg != "") then {
 	disableSerialization;
 
-	_string = format ["<t font='TahomaB' size='0.8' color='#FFFFFF' align ='center' >+%1 Exp %2</t>",_rating,_mesg];
+	_string = format ["<t font='RobotoCondensedBold' size='0.8' color='#FFFFFF' align ='center' >+%1 Exp %2</t>",_rating,_mesg];
 
 	waitUntil {isnull ((findDisplay 46) displayCtrl 854579)};
 	_ctrlGroup = (findDisplay 46) ctrlCreate ["RscControlsGroupNoScrollbars", 854579];

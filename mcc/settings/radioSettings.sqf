@@ -56,7 +56,7 @@
 [
     "MCC_vonRadioKickIdle",
     "CHECKBOX",
-   	["Kick Hot Mic","Will kick player with hot mic after some time"],
+   	["Kick Hot Mic","Kicks a player with a hot mic after some time"],
     ["MCC Radio","Anti-Abuse"],
     false,
     true

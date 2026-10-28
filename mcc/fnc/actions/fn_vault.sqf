@@ -3,7 +3,10 @@
 // Example: [] call MCC_fnc_vault;
 //======================================================================================================================================================================*/
 
-private ["_endPos","_hight","_startAnim","_endAnim"];
+private "_endPos";
+private _hight = "";
+private _startAnim = "";
+private _endAnim = "";
 _hight = player getVariable ["MCC_wallAhead",""];
 
 player SetVariable ["MCC_vaultOver",true];
@@ -34,7 +37,7 @@ switch (_hight) do
 
 player setpos (player modelToworld [0,-0.2,0]);
 //player switchmove _startAnim;
-[[player, _startAnim, true, 0], "MCC_fnc_setUnitAnim", true, false] call BIS_fnc_MP;
+[player, _startAnim, true, 0] remoteExec ["MCC_fnc_setUnitAnim", 0, false];
 
 waituntil {(animationState player) != _startAnim};
 
@@ -55,7 +58,7 @@ switch (_hight) do
 player setpos _endPos;
 
 if (_endAnim != "") then {
-	[[player, _endAnim, true, 0], "MCC_fnc_setUnitAnim", true, false] call BIS_fnc_MP;
+	[player, _endAnim, true, 0] remoteExec ["MCC_fnc_setUnitAnim", 0, false];
 };
 
 sleep 1;

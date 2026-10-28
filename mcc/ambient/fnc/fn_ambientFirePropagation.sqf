@@ -24,6 +24,10 @@ params [
 
 if (_fireDistance <=0) exitWith {};
 
+// Stop if ambient fire is switched off, or fires were extinguished after this spread step was scheduled
+if !(missionNamespace getVariable ["MCC_ambientFireSettingIndex", true]) exitWith {};
+private _fireEpoch = missionNamespace getVariable ["MCC_ambientFireEpoch", 0];
+
 private ["_pos","_fire","_fireSpread","_posTree","_dummy","_effect","_object"];
 _fireSpread = 7;
 
@@ -41,7 +45,8 @@ if (random 1 < rain) exitWith {};
 {
 	_object = _x;
 	_posTree = getPosATL _object;
-	if (damage _object < 0.5 &&
+	if (_fireEpoch == (missionNamespace getVariable ["MCC_ambientFireEpoch", 0]) &&
+	    damage _object < 0.5 &&
 	    ({typeOf _x in [PLACE_HOLDER,FIRE_OBJECTBIG]} count (_posTree nearObjects 5) <= 0) &&
 	     ({typeOf _x in [PLACE_HOLDER,FIRE_OBJECTBIG]} count (_posTree nearObjects 50) < MAX_FIRES)
 	   ) then {
@@ -54,16 +59,16 @@ if (random 1 < rain) exitWith {};
 		[_effect,10] remoteExec ["MCC_fnc_ambientFireClientSide",0];
 
 		//Each tree have a chance create new fire source
-		if (random 10 > 6) then {
+		if (random 100 < (missionNamespace getVariable ["MCC_ambientFireSpreadChance",40])) then {
 			[_posTree] spawn MCC_fnc_ambientFireStart;
 		};
 
 		//Put fire out after sometime
 		[_effect, _dummy, _object] spawn {
 			params ["_effect","_dummy","_object"];
-			sleep 180 + random 120;
+			sleep (180 + random 120);
 			_object setdamage 1;
-			sleep 60 + random 60;
+			sleep (60 + random 60);
 			while {!isnull (attachedTo _effect)} do {detach _effect};
 			_nearObjects =  (getpos _effect) nearObjects 5;
 			{
@@ -80,6 +85,7 @@ if (["grass", tolower (surfaceType _pos)] call BIS_fnc_inString ||
     ["forest", tolower (surfaceType _pos)] call BIS_fnc_inString ||
     ["dirt", tolower (surfaceType _pos)] call BIS_fnc_inString
     ) then {
+	if (_fireEpoch != (missionNamespace getVariable ["MCC_ambientFireEpoch", 0])) exitWith {};
 
 	_fire  = FIRE_OBJECTSMALL createVehicle _pos;
 	_fire setPosATL _pos;
@@ -90,7 +96,8 @@ if (["grass", tolower (surfaceType _pos)] call BIS_fnc_inString ||
 	//Next step
 	_fireDistance = _fireDistance - _fireSpread;
 
-	sleep 10 + (random 30);
+	sleep (10 + (random 30));
+	if (_fireEpoch != (missionNamespace getVariable ["MCC_ambientFireEpoch", 0])) exitWith {};
 	[_pos,_fireDistance,_dir] spawn MCC_fnc_ambientFirePropagation;
 };
 

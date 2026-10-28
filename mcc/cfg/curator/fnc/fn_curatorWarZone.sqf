@@ -1,7 +1,9 @@
 //============================================================MCC_fnc_curatorWarZone========================================================================================
 // Create war zone effect"
 //===========================================================================================================================================================================
-private ["_pos","_module","_resualt"];
+private "_pos";
+private _module = objNull;
+private _resualt = [];
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
@@ -16,8 +18,7 @@ _resualt = ["Add Atmosphere",[
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};
 
-private ["_radius"];
-_radius = _resualt select 0;
+private _radius = _resualt select 0;
 
 [_pos, _radius, 13,true] remoteExec ["MCC_fnc_deleteBrush",2];
 

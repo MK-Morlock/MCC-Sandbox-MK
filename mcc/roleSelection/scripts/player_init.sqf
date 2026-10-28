@@ -6,7 +6,13 @@
 //******************************************************************************************************************************
 
 0 spawn {
-	private ["_string","_logicPos","_logicEmpty","_nearObjects","_target","_nvgstate","_camLogic","_camBuildings","_camLight","_role","_exp","_level","_teleportAtStart","_starLoc","_defaultLevel"];
+	private _logicPos = [];
+	private _logicEmpty = false;
+	private "_nearObjects";
+	private _camLogic = objNull;
+	private "_role";
+	private "_level";
+	private _defaultLevel = [];
 
 	waituntil {time > 0 && alive player && isPlayer player && count ([player] call BIS_fnc_getRespawnPositions) > 0};
 	if !(player getVariable ["cpReady",true]) exitWith {};
@@ -20,7 +26,7 @@
 	//Get rank from the server
 	["MCCplayerRank", player, "N/A", "STRING"] remoteExec ["MCC_fnc_getVariable",2];
 	waituntil {! isnil "MCCplayerRank"};
-	if (MCC_debug) then {systemchat format ["player Rank : %1",MCCplayerRank]};
+	if (MCC_debug) then {systemchat format ["Player rank: %1",MCCplayerRank]};
 
 	_cfg = if (isClass (missionconfigFile >> "MCC_loadouts" )) then {(missionconfigFile >> "MCC_loadouts")} else {(configFile >> "MCC_loadouts")};
 
@@ -88,8 +94,8 @@
 	closeDialog 0;
 	waituntil {!dialog};
 	sleep 0.1;
-	_ok = createDialog "CP_RESPAWNPANEL";
-	if !(_ok) exitWith { hint "createDialog failed"; diag_log  "CP: create respawn Dialog failed";};
+	_ok = createDialog ("CP_RESPAWNPANEL" call MCC_fnc_dialogName);
+	if !(_ok) exitWith { hint "createDialog failed"; if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log  "CP: create respawn Dialog failed"};};
 
 	waituntil {missionNameSpace getvariable ["playerDeploy",false]};
 

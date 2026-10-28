@@ -117,6 +117,25 @@ class MCC_crateSupplyBigEast : Land_Pod_Heli_Transport_04_repair_F
 	author = "MCC-Team";
 };
 
+class Land_Pod_Heli_Transport_04_bench_F;
+class MCC_podBench : Land_Pod_Heli_Transport_04_bench_F
+{
+	scope = 1;
+	scopeCurator = 0;
+	displayName = "(MCC) Drop Pod";
+	extCameraPosition[] = {0, 3.2, -20};
+	author = "MCC-Team";
+};
+class Land_Pod_Heli_Transport_04_bench_black_F;
+class MCC_podBench_black : Land_Pod_Heli_Transport_04_bench_black_F
+{
+	scope = 1;
+	scopeCurator = 0;
+	displayName = "(MCC) Drop Pod (Black)";
+	extCameraPosition[] = {0, 3.2, -20};
+	author = "MCC Sandbox MK";
+};
+
 class Land_Pod_Heli_Transport_04_fuel_F;
 class MCC_crateFuelBigEast : Land_Pod_Heli_Transport_04_fuel_F
 {

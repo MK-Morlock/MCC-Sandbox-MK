@@ -14,10 +14,15 @@
 #define MCC_ConsoleMapRulerDis 9165
 
 
-private ["_mccdialog","_control","_target","_mempoints","_veh","_option","_effectParams","_leader"];
+private _mccdialog = controlNull;
+private _control = controlNull;
+private _mempoints = [];
+private "_veh";
+private _effectParams = [];
+private "_leader";
 disableSerialization;
 
-_option = _this select 0;
+params ["_option"];
 //Cleanup previos camera
 if (!isnil "MCC_consoleLiveFeedCam")  then
 {
@@ -63,7 +68,7 @@ switch (_option) do
 {
 	// Normal
 	case 0: {
-		_effectParams = [3, 0.1,1, 1, 0, [0,0,0,0], [1.1,0.7,1.1,1.1], [1.0,0.7,1.0,1.1]];
+		_effectParams = [0];	//vanilla camera picture (as Arma UAV feeds)
 	};
 
 	// Night vision
@@ -73,7 +78,7 @@ switch (_option) do
 
 	// Thermal imaging
 	case 2: {
-		_effectParams = [2, 1,1, 1, 0, [0,0,0,0], [1.1,0.7,1.1,1.1], [1.0,0.7,1.0,1.1]];
+		_effectParams = [2];	//vanilla thermal (as Arma UAV feeds)
 	};
 };
 _mccdialog = findDisplay mcc_playerConsole_IDD;
@@ -129,7 +134,7 @@ MCC_consoleLiveFeedCam camCommit 0;
 ctrlSetText [MCC_MAPBACKGROUND, ""];
 _control = _mccdialog displayCtrl MCC_MAPBACKGROUND;
 [_control] call MCC_fnc_pipOpen;
-ctrlSetText [MCC_MAPBACKGROUND, "#(argb,512,512,1)r2t(rendertarget12,1.0);"];
+ctrlSetText [MCC_MAPBACKGROUND, format ["#(argb,%1,%1,1)r2t(rendertarget12,1.0);", missionNamespace getVariable ["MCC_pipResolution", 1024]]];	//resolution: CBA setting Video feed resolution
 "rendertarget12" setPiPEffect _effectParams;
 ctrlsetFocus _control;
 

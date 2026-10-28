@@ -20,7 +20,7 @@ class mcc_uncMain
 	class controls
 	{
 		/*
-		class respawn: MCC_RscButtonMenu
+		class respawn: MCC_RscButtonRound
 		{
 			idc = 0;
 			text = "Respawn";
@@ -28,8 +28,9 @@ class mcc_uncMain
 			y = 0.775 * safezoneH + safezoneY;
 			w = 0.12375 * safezoneW;
 			h = 0.055 * safezoneH;
+			class TextPos {left = 0; top = "((0.055 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};
-		class secondWind: MCC_RscButtonMenu
+		class secondWind: MCC_RscButtonRound
 		{
 			idc = 1;
 			text = "Second wind";
@@ -37,6 +38,7 @@ class mcc_uncMain
 			y = 0.775 * safezoneH + safezoneY;
 			w = 0.12375 * safezoneW;
 			h = 0.055 * safezoneH;
+			class TextPos {left = 0; top = "((0.055 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};
 		*/
 		class info: MCC_RscText

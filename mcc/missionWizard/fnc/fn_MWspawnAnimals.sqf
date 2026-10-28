@@ -3,8 +3,13 @@
 // Example:[_zoneNumber] call MCC_fnc_MWspawnAnimals;
 // Return - amount of animals or animals groups spawned
 //========================================================================================================================================================================================
-private ["_unitPlaced","_zoneNumber","_range","_places","_animalType","_arrayUnits","_group","_priceGroup","_priceUnit","_price","_range","_index"];
-_zoneNumber			= _this select 0;
+private _unitPlaced = 0;
+private _range = 0;
+private _places = [];
+private _animalType = [];
+private _group = grpNull;
+private _index = 0;
+params [["_zoneNumber", 0, [0, ""]]];
 
 if (!isServer) exitWith {};
 

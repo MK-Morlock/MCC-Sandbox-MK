@@ -25,7 +25,7 @@
 		 };\
 		 class MCC_componentsStart {\
 			displayName = "Components";\
-			condition = "((_player == leader (vehicle _player)) &&  (speed (vehicle _player) <= 10) && ([(vehicle _player)] call MCC_fnc_addComponentsACECondition)";\
+			condition = "((vehicle _player != _player) && {_player in [driver (vehicle _player), effectiveCommander (vehicle _player), leader (vehicle _player)]} && {abs (speed (vehicle _player)) <= 10} && {count ([vehicle _player] call MCC_fnc_addComponentsACECondition) > 0})";\
 			statement = "";\
 			insertChildren = "(_this call MCC_fnc_addComponentsACE)";\
 			icon =  "\mcc_sandbox_mod\data\IconRepair.paa";\
@@ -110,7 +110,7 @@ class ReammoBox_F: thingX {
                 displayName = "Change<br/>Role";
                 distance = 5;
                 condition = "((count (_target getVariable ['MCC_kitSelect',[]]) > 0) && (missionNamespace getVariable ['MCC_allowChangingKits',false]))";
-                statement =  "_player setVariable ['MCC_kitSelect',(_target getVariable ['MCC_kitSelect',['all']])]; createDialog 'CP_GEARPANEL'";
+                statement =  "_player setVariable ['MCC_kitSelect',(_target getVariable ['MCC_kitSelect',['all']])]; createDialog ('CP_GEARPANEL' call MCC_fnc_dialogName)";
                 icon = "\a3\ui_f\data\IGUI\Cfg\Actions\reload_ca.paa";
                 showDisabled = 0;
                 priority = 1.2;
@@ -176,14 +176,14 @@ class ReammoBox_F: thingX {
 				};
 
 				class ACE_MCC_withdrawSupplies {
-					displayName = "Materials";
+					displayName = "Supplies";
 					condition = "true";
 					statement = "[(_target getVariable ['mcc_mainBoxSide',sidelogic]), 'materials'] spawn MCC_fnc_logisticsWithdrawBox;";
 					icon = "\mcc_sandbox_mod\data\IconRepair.paa";
 				};
 
 				class ACE_MCC_withdrawfuel {
-					displayName = "Ammo";
+					displayName = "Fuel";
 					condition = "true";
 					statement = "[(_target getVariable ['mcc_mainBoxSide',sidelogic]), 'fuel'] spawn MCC_fnc_logisticsWithdrawBox;";
 					icon = "\mcc_sandbox_mod\data\IconFuel.paa";
@@ -251,7 +251,7 @@ class CAManBase: Man {
 			class ACE_MCC_door_unlock {
 				displayName = "Pick<br/>Lock";
 				condition = "(({_x in items _player} count ['ACE_DefusalKit','ACE_key_lockpick','MCC_multiTool'])!=0) && (([cursorTarget] call MCC_fnc_isDoorLocked)==1)";
-				icon = "\z\ace\addons\vehiclelock\ui\lockpick.paa";
+				icon = "\mcc_sandbox_mod\data\lockpick.paa";	// copy of ACE 3.21.2 ace_vehiclelock\ui\lockpick.paa (GPLv2), bundled so it never depends on the ACE file path
 				statement = "[cursorTarget] spawn MCC_fnc_doorUnlock;";
 			};
 
@@ -281,7 +281,7 @@ class CAManBase: Man {
 
 		class ACE_MCC_survivalInteraction {
 			displayName = "Search";
-			condition = "[] call MCC_fnc_isSurvivalObject";
+			condition = "((missionNamespace getVariable ['MCC_aceSearchMenu',0]) != 1) && {[] call MCC_fnc_isSurvivalObject}";
 			icon = "\A3\ui_f\data\map\markers\military\unknown_CA.paa";
 			showDisabled = 0;
 			statement = "[] spawn MCC_fnc_searchSurvivalObject;";
@@ -295,6 +295,22 @@ class CAManBase: Man {
             icon = "\A3\ui_f\data\map\markers\military\unknown_CA.paa";
         };
 
+		class ACE_MCC_MWIEDDisarm {
+            displayName = "Disarm IED";
+            condition ="(((cursorTarget getVariable ['realIed',objnull]) getVariable ['MCC_MWIEDMode',-1]) == 1) && ((cursorTarget getVariable ['realIed',objnull]) getVariable ['armed',false]) && (_player distance cursorTarget < 8)";
+            statement = "[cursorTarget getVariable ['realIed',objNull], 'random'] spawn MCC_fnc_MWIEDMenu";
+            showDisabled = 0;
+            icon = "\A3\ui_f\data\map\markers\military\unknown_CA.paa";
+        };
+
+		class ACE_MCC_MWIEDCharge {
+            displayName = "Place Charge";
+            condition ="(((cursorTarget getVariable ['realIed',objnull]) getVariable ['MCC_MWIEDMode',-1]) == 3) && ((cursorTarget getVariable ['realIed',objnull]) getVariable ['armed',false]) && (_player distance cursorTarget < 8)";
+            statement = "[cursorTarget getVariable ['realIed',objNull], 'charge'] spawn MCC_fnc_MWIEDMenu";
+            showDisabled = 0;
+            icon = "\A3\ui_f\data\map\markers\military\unknown_CA.paa";
+        };
+
 		class ACE_MCC_SQLMenu {
 			condition = "(leader _player == _player && count units _player > 1 && (missionNameSpace getvariable ['MCC_allowsqlPDA',true]))";
 			displayName = "SQL<br/>Menu";
@@ -302,7 +318,7 @@ class CAManBase: Man {
 			showDisabled = 0;
 
 			class ACE_MCC_openSQLPDA {
-				displayName = "Oped<br/>PDA";
+				displayName = "Open<br/>PDA";
 				icon = "\A3\Ui_f\data\IGUI\Cfg\VehicleToggles\wheelbreakiconon_ca.paa";
 				statement = "_null = [nil,nil,nil,nil,3] execVM '\mcc_sandbox_mod\mcc\dialogs\mcc_PopupMenu.sqf';";
 			};
@@ -430,7 +446,7 @@ class CAManBase: Man {
 				};
 
 				class ACE_MCC_wall {
-					displayName = "Beg Fence";
+					displayName = "Big Fence";
 					icon = "\A3\ui_f\data\map\mapcontrol\Stack_CA.paa";
 					statement = "['wall'] call MCC_fnc_callConstruct";
 				};

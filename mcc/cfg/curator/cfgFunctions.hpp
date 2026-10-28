@@ -16,6 +16,7 @@ class curator
 	class curatorDoorLock {description = "Manage doors status";};
 	class curatorAtmoshphere {description = "Manage atmosphere";};
 	class curatorWarZone {description = "Create war zone effect";};
+	class curatorDeleteMission {description = "Zeus: delete a generated mission";};
 	class curatorGarrisonUnits {description = "Garrison units in the selected buildings";};
 	class curatorDamagePart {description = "Damage part of object/Unit";};
 	class curatorVehicleSpawner {description = "Create a vhicles kiosk";};

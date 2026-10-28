@@ -1,6 +1,4 @@
-private ["_objs"];
-_objs =
-[
+private _objs = [
 	["Land_HelipadEmpty_F",[0,0,0],38.1366,1,0,{},true],	//target
 	["Land_Mound01_8m_F",[6.44922,3.31543,0.299671],66.057,1,0,{}],
 	["Land_Mound01_8m_F",[6.02734,-4.37598,0.299646],120.305,1,0,{}],

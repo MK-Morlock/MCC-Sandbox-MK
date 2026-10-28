@@ -3,8 +3,23 @@
 // Example:[_newLevel] call MCC_fnc_unlock;
 // _newLevel: integer, the current level of the player
 //==================================================================================================================================================================================
-private ["_string","_name","_rank","_displayname","_pic","_weapon","_wepArray","_wep","_weaponName","_weaponPic","_newLevel","_unlockLayer","_levelingLayer","_cfg","_role","_side","_class","_baseLevel"];
-_newLevel = _this select 0;
+private _string = "";
+private "_name";
+private _rank = [];
+private _displayname = "";
+private _pic = "";
+private "_weapon";
+private "_wep";
+private _weaponName = "";
+private _weaponPic = "";
+private _unlockLayer = [];
+private _levelingLayer = [];
+private _cfg = configNull;
+private _role = "";
+private _side = "";
+private _class = [];
+private _baseLevel = 0;
+params ["_newLevel"];
 
 //refister layers
 _unlockLayer = ["MCC_unlock"] call BIS_fnc_rscLayer;

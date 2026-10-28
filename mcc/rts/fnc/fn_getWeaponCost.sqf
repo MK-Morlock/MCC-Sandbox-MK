@@ -7,7 +7,9 @@ Gets a weapon cost by it's effective DPS, range and ammo
 	INTEGER: weapon cost
 
 ==================================================================================================================================*/
-private ["_class","_baseCost","_prices"];
+private _class = "";
+private "_baseCost";
+private _prices = 0;
 #define	MCC_PRICE_FACTOR	0.5
 
 _class = param [0,"",[""]];

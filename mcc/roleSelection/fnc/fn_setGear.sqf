@@ -5,7 +5,16 @@
 // Gear: 0- select, 1-gear, 2-uniform
 // _unit: OBJECT the unit on which it will be effected - must be local
 //================================================================================================================================================================
-private ["_role","_select","_mag","_magazines","_muzzles","_ok","_wepItems","_image","_cfg","_side","_array","_cfgWeapon","_cfgName","_unit"];
+private _role = 0;
+private _select = 0;
+private "_mag";
+private _image = [];
+private _cfg = configNull;
+private "_side";
+private _array = [];
+private "_cfgWeapon";
+private _cfgName = configNull;
+private "_unit";
 disableSerialization;
 _role 	= param [0,2,[0,""]];
 _select	= param [1,0,[0]];
@@ -44,7 +53,7 @@ if (toLower (_unit getvariable ["CP_role","n/a"]) != toLower _role) then {CP_pla
 
 _side = tolower str side _unit;
 
-if !(_side in ["east","west","guer"]) exitWith {systemChat "Player is not in any side"};
+if !(_side in ["east","west","guer"]) exitWith {systemChat "Player is not on any side"};
 
 //get correct weapons Arrays
 _cfg = if (isClass (missionconfigFile >> "MCC_loadouts" >> toLower _role)) then {(missionconfigFile >> "MCC_loadouts" >> toLower _role)} else {(configFile >> "MCC_loadouts" >> toLower _role)};
@@ -197,7 +206,14 @@ if (isnil "CP_playerUniforms") then {
 	};
 [_role] call MCC_fnc_assignGear;
 
-private ["_disp","_magTypes","_cfg","_displayname","_pic","_index","_ctrl","_mag"];
+private "_disp";
+private _magTypes = [];
+private _cfg = configNull;
+private _displayname = "";
+private _pic = "";
+private "_index";
+private _ctrl = controlNull;
+private "_mag";
 _disp = uiNamespace getVariable "CP_GEARPANEL_IDD";
 if (isnil "_disp") exitWith {};
 [_disp] call MCC_fnc_playerStats;

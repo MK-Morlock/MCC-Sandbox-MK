@@ -7,16 +7,18 @@
 //_faction = enemy Faction
 // Return - nothing
 //===============================================================================================================================================================================
-private ["_objPos","_isCQB","_side","_faction","_preciseMarkers","_range","_doc","_sidePlayer","_campaignMission","_maxObjectivesDistance"];
+private _range = 0;
 
-_objPos 		= _this select 0;
-_isCQB 			= _this select 1;
-_side 			= _this select 2;
-_faction 		= _this select 3;
-_sidePlayer 	= _this select 4;
-_preciseMarkers = _this select 5;
-_campaignMission = param [6, false, [false]];
-_maxObjectivesDistance = param [7, 400, [0]];
+params [
+	["_objPos", [0,0,0], [[]]],
+	["_isCQB", false, [false]],
+	["_side", sideUnknown, [sideUnknown]],
+	["_faction", "", [""]],
+	["_sidePlayer", west, [west]],
+	["_preciseMarkers", false, [false]],
+	["_campaignMission", false, [false]],
+	["_maxObjectivesDistance", 400, [0]]
+];
 
 if (_isCQB) then {
 	_range = if (_campaignMission) then {100} else {50};

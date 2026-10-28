@@ -1,7 +1,9 @@
 //==================================================================MCC_fnc_assignChannelServer==================================================================================
 // Example:[]  spawn  MCC_fnc_assignChannelServer;
 //===============================================================================================================================================================================
-private["_unit","_channel","_add"];
+private _unit = objNull;
+private _channel = 0;
+private _add = false;
 _unit = param [0,ObjNull,[ObjNull]];
 _add = param [1,false,[false]];
 _channel = param [2,-1,[0]];

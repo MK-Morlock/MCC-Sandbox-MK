@@ -2,7 +2,10 @@
 */
 
 
-private ["_object","_resualt","_zones","_zoneNumber"];
+private _object = [];
+private _resualt = [];
+private _zones = [];
+private "_zoneNumber";
 
 params [
 	["_module",objNull,[objNull]]
@@ -23,7 +26,7 @@ _zones = [];
 
 _resualt = ["Assign to Zone",[
 			["Zone",_zones],
-			["Behavior",["aggressive","Defensive","Fortify","Default","BIS Defence","BIS Patrol"]]
+			["Behavior",["Aggressive","Defensive","Fortify","Default","BIS Defence","BIS Patrol"]]
 		  ]] call MCC_fnc_initDynamicDialog;
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};

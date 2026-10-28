@@ -8,6 +8,12 @@ _damage			= _this select 2;
 _source			= _this select 3;
 
 if (_damage < 0.0001) exitWith {};
+if (!isDamageAllowed _unit) exitWith {
+	if (_unit getVariable ["MCC_haloInFormation", false]) then {
+		["INFO", "haloFormation", "%1: hit ignored while invulnerable (%2, %3 damage, from %4)", [name _unit, if (_selectionName == "") then {"whole body"} else {_selectionName}, (round (_damage * 100)) / 100, if (isNull _source) then {"collision / fall"} else {typeOf _source}]] call MCC_fnc_log;
+	};
+	if (_selectionName == "") then {damage _unit} else {_unit getHit _selectionName}
+};
 
 if (!alive vehicle _unit) then {
 	unassignVehicle _unit;

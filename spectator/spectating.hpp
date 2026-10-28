@@ -43,7 +43,7 @@
 #define IDC_EVENTLOG	50016
 #define IDC_DEBUG			55100
 
-#define COL_ORANGE		{1, 0.5, 0, 1}
+#define COL_ORANGE		{0.77, 0.51, 0.08, 1}
 #define COL_GRAY			{0.2, 0.2, 0.2, 1}
 
 
@@ -56,7 +56,7 @@ class KEGsRscText
 	style = 0;
 	w = 0.1;
 	h = 0.05;
-	font = "TahomaB";
+	font = "RobotoCondensedBold";
 	sizeEx = 0.04;
 	colorBackground[] = {0, 0, 0, 0};
 	colorDisabled[] = {0,0,0,0.5};
@@ -75,13 +75,13 @@ class KEGsRscListBox
 	style = 0;
 	w = 0.4;
 	h = 0.4;
-	font = "TahomaB";
+	font = "RobotoCondensedBold";
 	sizeEx = 0.04;
 	rowHeight = 0;
 	colorText[] = {1, 1, 1, 1};
 	colorScrollbar[] = {1, 1, 1, 1};
 	colorSelect[] = {0, 0, 0, 1};
-	colorSelect2[] = {1, 0.5, 0, 1};
+	colorSelect2[] = {0.77, 0.51, 0.08, 1};
 	colorSelectBackground[] = {0.6, 0.6, 0.6, 1};
 	colorSelectBackground2[] = {0.2, 0.2, 0.2, 1};
 	colorBackground[] = {0, 0, 0, 1};
@@ -142,10 +142,10 @@ class KEGsRscActiveText {
 	style = 2;
 	h = 0.05;
 	w = 0.15;
-	font = "TahomaB";
+	font = "RobotoCondensedBold";
 	sizeEx = 0.04;
 	color[] = {1, 1, 1, 1};
-	colorActive[] = {1, 0.5, 0, 1};
+	colorActive[] = {0.77, 0.51, 0.08, 1};
 	soundEnter[] = {"", 0.1, 1};
 	soundPush[] = {"", 0.1, 1};
 	soundClick[] = {"", 0.1, 1};
@@ -163,7 +163,7 @@ class KEGsRscMapControl {
 	colorBackground[] = {1, 1, 1, 1};
 	colorOutside[] = {0, 0, 0, 1};
 	colorText[] = {0, 0, 0, 1};
-	font = "TahomaB";
+	font = "RobotoCondensedBold";
 	sizeEx = 0.04;
 	colorSea[] = {0.56, 0.8, 0.98, 0.5};
 	colorForest[] = {0.6, 0.8, 0.2, 0.5};
@@ -456,8 +456,8 @@ class KEGsRscMapControl {
 	scaleMax = 1;
 	scaleDefault = 0.16;
 	maxSatelliteAlpha = 0.85;
-	alphaFadeStartScale = 0.35;
-	alphaFadeEndScale = 0.4;
+	alphaFadeStartScale = 2;
+	alphaFadeEndScale = 2;
 
 	class power {
 		icon = "\A3\ui_f\data\map\mapcontrol\power_CA.paa";
@@ -543,10 +543,10 @@ class KEGsRscSpectate {
 				color[] = {1,1,1,0.6};
 				colorActive[] = {1,1,1,1};
 				colorDisabled[] = {1,1,1,0.3};
-				thumb = "\A3\ui_f\data\ui_scrollbar_thumb_ca.paa";
-				arrowFull = "\A3\ui_f\data\ui_arrow_top_active_ca.paa";
-				arrowEmpty = "\A3\ui_f\data\ui_arrow_top_ca.paa";
-				border = "\A3\ui_f\data\ui_border_scroll_ca.paa";
+				thumb = "\A3\ui_f\data\gui\cfg\scrollbar\thumb_ca.paa";
+				arrowFull = "\A3\ui_f\data\gui\cfg\scrollbar\arrowFull_ca.paa";
+				arrowEmpty = "\A3\ui_f\data\gui\cfg\scrollbar\arrowEmpty_ca.paa";
+				border = "\A3\ui_f\data\gui\cfg\scrollbar\border_ca.paa";
 
 			};
 			onMouseMoving = "[""MouseMoving"",_this] call KEGs_fnc_spectateEvents";
@@ -599,10 +599,10 @@ class KEGsRscSpectate {
 				color[] = {1,1,1,0.6};
 				colorActive[] = {1,1,1,1};
 				colorDisabled[] = {1,1,1,0.3};
-				thumb = "\ca\ui\data\ui_scrollbar_thumb_ca.paa";
-				arrowFull = "\ca\ui\data\ui_arrow_top_active_ca.paa";
-				arrowEmpty = "\ca\ui\data\ui_arrow_top_ca.paa";
-				border = "\ca\ui\data\ui_border_scroll_ca.paa";
+				thumb = "\A3\ui_f\data\gui\cfg\scrollbar\thumb_ca.paa";
+				arrowFull = "\A3\ui_f\data\gui\cfg\scrollbar\arrowFull_ca.paa";
+				arrowEmpty = "\A3\ui_f\data\gui\cfg\scrollbar\arrowEmpty_ca.paa";
+				border = "\A3\ui_f\data\gui\cfg\scrollbar\border_ca.paa";
 			};
 			autoScrollRewind=0;
 			autoScrollDelay=5;
@@ -635,10 +635,10 @@ class KEGsRscSpectate {
 				color[] = {1,1,1,0.6};
 				colorActive[] = {1,1,1,1};
 				colorDisabled[] = {1,1,1,0.3};
-				thumb = "\ca\ui\data\ui_scrollbar_thumb_ca.paa";
-				arrowFull = "\ca\ui\data\ui_arrow_top_active_ca.paa";
-				arrowEmpty = "\ca\ui\data\ui_arrow_top_ca.paa";
-				border = "\ca\ui\data\ui_border_scroll_ca.paa";
+				thumb = "\A3\ui_f\data\gui\cfg\scrollbar\thumb_ca.paa";
+				arrowFull = "\A3\ui_f\data\gui\cfg\scrollbar\arrowFull_ca.paa";
+				arrowEmpty = "\A3\ui_f\data\gui\cfg\scrollbar\arrowEmpty_ca.paa";
+				border = "\A3\ui_f\data\gui\cfg\scrollbar\border_ca.paa";
 			};
 			autoScrollRewind=0;
 			autoScrollDelay=5;
@@ -728,8 +728,8 @@ class KEGsRscSpectate {
 			w = MAPWIDTH; h = MAPHEIGHT;
 			onMouseZChanged = "[""MouseZChangedminimap"",_this] call KEGs_fnc_spectateEvents";
 
-			alphaFadeEndScale = 0.4;
-			alphaFadeStartScale = 0.35;
+			alphaFadeEndScale = 2;
+			alphaFadeStartScale = 2;
 			colorBackground[] = {0.969,0.957,0.949,1};
 			colorCountlines[] = {0.572,0.354,0.188,0.25};
 			colorCountlinesWater[] = {0.491,0.577,0.702,0.3};
@@ -755,14 +755,14 @@ class KEGsRscSpectate {
 			colorText[] = {0,0,0,1};
 			colorTracks[] = {0.84,0.76,0.65,0.15};
 			colorTracksFill[] = {0.84,0.76,0.65,1};
-			font = "TahomaB";
-			fontGrid = "TahomaB";
+			font = "RobotoCondensedBold";
+			fontGrid = "RobotoCondensed";
 			fontInfo = "PuristaMedium";
 			fontLabel = "PuristaMedium";
-			fontLevel = "TahomaB";
+			fontLevel = "RobotoCondensed";
 			fontNames = "PuristaMedium";
-			fontUnits = "TahomaB";
-			maxSatelliteAlpha = 0.45;
+			fontUnits = "RobotoCondensed";
+			maxSatelliteAlpha = 0.85;
 			moveOnEdges = 1;
 			ptsPerSquareCLn = 10;
 			ptsPerSquareCost = 10;
@@ -1113,9 +1113,9 @@ class KEGsRscSpectate {
 		class mapFull : map {
 			colorOutside[] = {0,0,0,1};
 			colorRailWay[] = {0,0,0,1};
-			maxSatelliteAlpha = 0;
-			alphaFadeStartScale = 1;
-			alphaFadeEndScale = 1.1;
+			maxSatelliteAlpha = 0.85;
+			alphaFadeStartScale = 2;
+			alphaFadeEndScale = 2;
 			showCountourInterval = "true";
 			idc = IDC_MAPFULL;
 			x = SafeZoneX;y=SafeZoneY + BORDERSIZE;

@@ -5,7 +5,6 @@
 */
 
 //Not a client
-private ["_cPPEffect","_bPPEffect"];
 if (!hasInterface || isDedicated) exitWith {};
 
 waituntil {!(IsNull (findDisplay 46))};
@@ -16,7 +15,7 @@ missionNamespace setVariable ["MCC_initSupression",true];
 
 //Add onEachFram EH
 ["MCC_initSupression", "onEachFrame", {
-    private ["_pDistance"];
+    private "_pDistance";
 
     //in vehicle and not turned out
     if (vehicle player != player && !(isTurnedOut player)) exitWith {};

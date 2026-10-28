@@ -25,7 +25,27 @@
 
 #define BASE_ANCHOR "UserTexture10m_F"
 
-private ["_allTiles","_yBorder","_yTiles","_xBorder","_selectedTile","_markersEast","_markersWest","_markersGuer","_tempArray","_side","_lastTime","_waitTime","_saveTiles","_fileName","_saveTickets","_saveResources","_saveCivRelation","_saveCAS","_saveAirDrop","_saveArtillery","_saveStartLoc","_saveRTSBuildngs"];
+private _allTiles = [];
+private "_yBorder";
+private "_yTiles";
+private "_xBorder";
+private "_selectedTile";
+private _markersEast = [];
+private _markersWest = [];
+private _markersGuer = [];
+private "_tempArray";
+private "_side";
+private _waitTime = 0;
+private _saveTiles = false;
+private _fileName = "";
+private _saveTickets = false;
+private _saveResources = false;
+private _saveCivRelation = false;
+private _saveCAS = false;
+private _saveAirDrop = false;
+private _saveArtillery = false;
+private _saveStartLoc = false;
+private _saveRTSBuildngs = false;
 
 _fileName = param [0, "mission", [""]];
 _waitTime = param [1, 10, []];
@@ -46,6 +66,9 @@ if (missionNamespace getVariable ["MCC_fnc_saveServerIsrunning",false]) exitWith
 missionNamespace setVariable ["MCC_fnc_saveServerIsrunning",true];
 
 while {true} do {
+	//Write every value first and save the profile once (each write used to save the whole profile: about 60 disk saves
+	//in a few seconds, which froze the game at the campaign start and every save after)
+	MCC_dbDeferSave = true;
 
 
 	//save tiles usualy for campaign
@@ -70,7 +93,7 @@ while {true} do {
 				//categorize to sides
 				_selectedTile = _yTiles select _x;
 				if (_selectedTile != "") then {
-					_markers pushBack [markerPos _selectedTile, markerSize _selectedTile, markerColor _selectedTile,markerAlpha _selectedTile];
+					_markers pushBack [markerPos _selectedTile, markerSize _selectedTile, markerColor _selectedTile,[_selectedTile] call MCC_fnc_campaignTileAlpha];
 				} else {
 					_markers pushBack [];
 				};
@@ -176,5 +199,7 @@ while {true} do {
 		};
 	};
 
+	MCC_dbDeferSave = false;
+	if !(missionNamespace getVariable ["MCC_iniDBenabled", false]) then {saveProfileNamespace};
 	sleep _waitTime;
 };

@@ -1,7 +1,20 @@
 //===============================================================MCC_fnc_vehicleSpawner==================================================================================
 //  manage the actull spawning
 //====================================================================================================================================================================
-private ["_vehicleArray","_action","_selectedVehicle","_cost","_cfgclass","_costAmmo","_costRepair","_costFuel","_ctrl","_array","_mccdialog","_disableCtrl","_costValor","_commander"];
+private _vehicleArray = [];
+private _action = 0;
+private "_selectedVehicle";
+private "_cost";
+private "_cfgclass";
+private _costAmmo = 0;
+private _costRepair = 0;
+private _costFuel = 0;
+private _ctrl = 0;
+private "_array";
+private "_mccdialog";
+private _disableCtrl = false;
+private _costValor = 0;
+private _commander = false;
 #define    MCC_PRICESFACTOR    0.2
 
 _vehicleArray = missionNamespace getVariable ["MCC_private_vehicleArray",[]];
@@ -75,7 +88,10 @@ switch (_action) do
 
     case 1:
     {
-        private ["_spawnPad","_spawnPadPos","_check","_vehicle"];
+        private _spawnPad = objNull;
+        private "_spawnPadPos";
+        private "_check";
+        private _vehicle = objNull;
 
         _spawnPad = missionNamespace getVariable ["MCC_private_spawnPad",objNull];
 
@@ -118,7 +134,7 @@ switch (_action) do
             clearItemCargoGlobal _vehicle;
         };
 
-        [[[_vehicle], {MCC_curator addCuratorEditableObjects [[_this select 0],false];}], "BIS_fnc_spawn", false, false, false] call BIS_fnc_MP;
+        [[_vehicle], {MCC_curator addCuratorEditableObjects [[_this select 0],false];}] remoteExec ["call", 2, false];
         closeDialog 0;
     };
 };

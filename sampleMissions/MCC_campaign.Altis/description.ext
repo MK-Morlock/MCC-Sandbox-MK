@@ -83,7 +83,7 @@ class Params
 
 	class missionNumber
 	{
-		title = "Missions untill campaign ends";
+		title = "Missions until campaign ends";
 		values[] = {10,20,30,40,50};
 		texts[] = {"10","20","30","40","50"};
 		default = 20;

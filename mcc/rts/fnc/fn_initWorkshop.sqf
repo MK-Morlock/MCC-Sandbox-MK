@@ -9,7 +9,16 @@
 #define	MCC_RTS_BARRACKSHOPHELIPAD	"Land_HelipadEmpty_F"
 #define	MCC_RTS_WORKSHOPSIGHN	"Land_Noticeboard_F"
 
-private ["_side","_module","_level","_anchor","_trg","_billboard","_helipad","_class","_billboardPos","_helipadPos"];
+private "_side";
+private "_module";
+private _level = 0;
+private _anchor = objNull;
+private _trg = objNull;
+private _billboard = objNull;
+private _helipad = objNull;
+private _class = "";
+private "_billboardPos";
+private _helipadPos = [];
 params ["_side", "_module","_constType"];
 
 _level = _module getVariable ["mcc_constructionItemTypeLevel",1];
@@ -65,7 +74,7 @@ if (_class != "") then {
 	_billboard attachto [_anchor,_billboardPos];
 	_helipad attachto [_anchor,_helipadPos];
 	_helipad setVariable ["MCC_vehicleSpawnerHelipad",true,true];
-	[[_billboard,[_class,_helipad]], "MCC_fnc_vehicleSpawnerInit", true, true] spawn BIS_fnc_MP;
+	[_billboard,[_class,_helipad]] remoteExec ["MCC_fnc_vehicleSpawnerInit", 0, true];
 
 	_billboard setVariable ["mcc_delete",false,true];
 	_helipad setVariable ["mcc_delete",false,true];
@@ -84,7 +93,14 @@ if (isNull _trg) then {
 
 //repair loop
 [_trg,_module] spawn {
-	private ["_trg","_level","_list","_module","_class","_fix","_vehicle","_damage"];
+	private "_trg";
+	private _level = 0;
+	private "_list";
+	private "_module";
+	private _class = [];
+	private _fix = false;
+	private "_vehicle";
+	private _damage = 0;
 	params ["_trg", "_module"];
 
 	waitUntil {time > 1};

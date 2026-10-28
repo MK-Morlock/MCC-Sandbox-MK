@@ -2,10 +2,10 @@
 //Change weapons and throw utility
 // Example: [] call MCC_fnc_weaponSelect;
 //===========================================================================================================================================================================
-private ["_key","_exit"];
+private _exit = false;
 disableSerialization;
 
-_key = _this select 0;
+params ["_key"];
 _exit = false;
 if (vehicle player != player && _key != 5) exitWith {};
 showCommandingMenu "";
@@ -37,7 +37,12 @@ switch (true) do {
 
 	//Grenade
 	case (_key == 4): {
-		private ["_mags","_allowedMags","_magsItems","_mag","_item","_speed","_index","_utility","_cameraInternal","_model","_ctrl"];
+		private _mags = [];
+		private "_mag";
+		private _index = 0;
+		private _cameraInternal = false;
+		private _model = "";
+		private _ctrl = controlNull;
 		//_cameraInternal = if (cameraView == "INTERNAL") then {true} else {false};
 		showHUD false;
 
@@ -96,7 +101,12 @@ switch (true) do {
 
 	//Explosive - utility
 	case (_key == 5): {
-		private ["_mags","_mag","_model","_speed","_index","_cameraInternal","_ctrl"];
+		private _mags = [];
+		private "_mag";
+		private _model = configNull;
+		private _index = 0;
+		private _cameraInternal = false;
+		private _ctrl = controlNull;
 		//_cameraInternal = if (cameraView == "INTERNAL") then {true} else {false};
 		showHUD false;
 

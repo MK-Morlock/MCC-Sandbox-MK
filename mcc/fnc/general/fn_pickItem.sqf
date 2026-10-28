@@ -4,7 +4,11 @@
 #define MCC_INTEL_ICON	"\a3\ui_f\data\IGUI\Cfg\holdactions\holdAction_search_ca.paa"
 #define MCC_INTELDOWNLOAD_ICON "\A3\ui_f\data\igui\cfg\simpleTasks\types\download_ca.paa"
 
-private["_object", "_action", "_displayName","_isMode","_path"];
+private _object = nil;
+private _action = 0;
+private _displayName = "";
+private _isMode = configNull;
+private _path = "";
 
 _object = _this;
 if (isnil "_object" || isnull _object) exitWith {};
@@ -27,7 +31,7 @@ if (_object getVariable ["MCC_intelItem",false]) then {
 		"Download Data",
 		 MCC_INTELDOWNLOAD_ICON,
 		 MCC_INTELDOWNLOAD_ICON,
-		 "(alive _target) && (_target distance _this < 5)",
+		 "(alive _target) && (_target distance _this < 5) && !(_target getVariable ['MCC_intelItemDone',false])",
 		 "(alive _target) && (_target distance _this < 5)",
 		 {[(_this select 0),1] spawn BIS_fnc_dataTerminalAnimate},
 		 {if ((_this select 4)==12) then {[(_this select 0),3] spawn BIS_fnc_dataTerminalAnimate};if ((_this select 4)==6) then {[(_this select 0),2] spawn BIS_fnc_dataTerminalAnimate}},
@@ -61,5 +65,5 @@ if (_object getVariable ["MCC_intelItem",false]) then {
 	};
 
 
-missionNamespace setVariable ["MCC_pickItem",sideLogic];
-publicvariable "MCC_pickItem";
+//player joining, every new intel objective). A reset within 5 s of a pickup marked the intel task Failed. The side
+//that picked the intel is now kept on the intel object itself (MCC_intelPickedSide, set in pickItem.sqf).

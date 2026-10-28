@@ -1,13 +1,14 @@
-private ["_target", "_cas_name", "_spawnkind", "_plane1", "_distA", "_distB", "_fakeTarget", "_planeCrew", "_planeType", "_randomDirX", "_randomDirY", "_tPos", "_newPos"];
+private _distA = 0;
+private _distB = 0;
+private "_planeCrew";
+private "_randomDirX";
+private "_randomDirY";
+private "_tPos";
+private _newPos = [];
 
-_cas_name = _this select 0;
-_target =  _this select 1;
-_spawnkind = _this select 2;
-_plane1 = _this select 3;
-_planeType = _this select 4;
-_fakeTarget = _this select 5;
+params ["_cas_name", "_target", "_spawnkind", "_plane1", "_planeType", "_fakeTarget"];
 
-diag_log format ["Array = [%1]", _this];
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["Array = [%1]", _this]};
 
 _planeCrew = crew _plane1;
 

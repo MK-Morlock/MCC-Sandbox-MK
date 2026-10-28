@@ -6,12 +6,22 @@
 #define MCC_SAVE_NAME 7012
 
 disableSerialization;
-private ["_type", "_string", "_command", "_mccdialog","_br","_array"];
+private _string = "";
+private _command = "";
+private _mccdialog = controlNull;
+private "_br";
+private "_array";
 _br = toString [0x0D, 0x0A];
 
 MCC_fn_loadZones =
 {
-	private ["_zonesArray","_zonesNumber","_zonesPos","_zonesSize","_zonesDir","_zonesLocation","_size"];
+	private "_zonesArray";
+	private "_zonesNumber";
+	private "_zonesPos";
+	private "_zonesSize";
+	private "_zonesDir";
+	private "_zonesLocation";
+	private "_size";
 	_zonesArray 	= _this select 0;
 	_zonesNumber	= _zonesArray select 0;
 	_zonesPos		= _zonesArray select 1;
@@ -29,7 +39,7 @@ MCC_fn_loadZones =
 		mcc_hc					= _zonesLocation select _x;
 		MCC_Marker_dir 			= _zonesDir select _x;
 
-		diag_log format["Zone Created: %1 - %2",_x, mcc_zone_markposition];
+		if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format["Zone Created: %1 - %2",_x, mcc_zone_markposition]};
 		script_handler = [0] execVM MCC_path +"mcc\general_scripts\mcc_make_the_marker.sqf";
 		waitUntil {str(getMarkerPos mcc_zone_markername) != "[0,0,0]"};
 
@@ -41,7 +51,7 @@ MCC_fn_loadZones =
 };
 
 
-_type = _this select 0;
+params ["_type"];
 _mccdialog = findDisplay MCC_SaveLoadScreen_IDD;
 _string = "";
 MCC_saveIndex = (lbCurSel MCC_SAVE_LIST);
@@ -67,8 +77,7 @@ switch (_type) do {
 
 	case 1: //Save MCC Mission config code to Clipboard
 	{
-		private ["_temp"];
-		_temp = [] call MCC_fnc_saveToMCC;
+		private _temp = [] call MCC_fnc_saveToMCC;
 		MCC_savedZones = str [(missionNamespace getVariable ["MCC_zones_numbers",[]]), mcc_zone_pos, mcc_zone_size, mcc_zone_dir, mcc_zone_locations];
 		MCC_savedZones = [MCC_savedZones, "<null>", "nil"] call MCC_fnc_replaceString;
 
@@ -80,7 +89,7 @@ switch (_type) do {
 				 +   'MCC_settingsVars = ' + (str((call compile _temp) select 5)) + ';' + _br
 				 +   'MCC_savedZones = ' + MCC_savedZones + ';' + _br
 				 +   '[MCC_savedZones] spawn MCC_fn_loadZones;' + _br
-				 +   '[[MCC_savedObjectives, MCC_savedGroups, MCC_savedVehicles, MCC_savedWeather, MCC_savedTime,MCC_settingsVars], "MCC_fnc_loadFromMCC", false, false] spawn BIS_fnc_MP;' + _br;
+				 +   '[MCC_savedObjectives, MCC_savedGroups, MCC_savedVehicles, MCC_savedWeather, MCC_savedTime,MCC_settingsVars] remoteExec ["MCC_fnc_loadFromMCC", 2, false];' + _br;
 
 
 		MCC_output = MCC_output + mcc_safe;
@@ -102,8 +111,7 @@ switch (_type) do {
 		MCC_saveNames set [MCC_saveIndex,_string];
 		_string = ctrlText MCC_SAVE_DIS;
 
-		private ["_temp"];
-		_temp = call compile ([] call MCC_fnc_saveToMCC);
+		private _temp = call compile ([] call MCC_fnc_saveToMCC);
 
 		MCC_savedZones = str [(missionNamespace getVariable ["MCC_zones_numbers",[]]), mcc_zone_pos, mcc_zone_size, mcc_zone_dir, mcc_zone_locations];
 		MCC_savedZones = [MCC_savedZones, "<null>", "nil"] call MCC_fnc_replaceString;
@@ -151,14 +159,14 @@ switch (_type) do {
 			sleep 0.5;
 			closeDialog 0;
 			sleep 0.3;
-			[[_array select 0, _array select 1, _array select 2, _array select 3, _array select 4, _array select 5], "MCC_fnc_loadFromMCC", false, false] spawn BIS_fnc_MP;
+			[_array select 0, _array select 1, _array select 2, _array select 3, _array select 4, _array select 5] remoteExec ["MCC_fnc_loadFromMCC", 2, false];
 			[(_array select 6)] spawn MCC_fn_loadZones;
 			_command = 'mcc_isloading=true;closedialog 0;titleText ["Loading Mission","BLACK FADED",5];' + _string + 'mcc_isloading=false;titleText ["Mission Loaded","BLACK IN",5];';
 
 			[] spawn compile _command;
 
 		} else {
-			hint "Mission load failed! : No MCC Mission configuration pasted from namespace";
+			hint "Mission load failed: no MCC mission configuration pasted from the namespace";
 		};
 	};
 

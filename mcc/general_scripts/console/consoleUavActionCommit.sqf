@@ -4,10 +4,9 @@
 #define MCC_CONSOLE_UAVPIP 9105 
 
 
-private ["_uav","_arguments","_type"];
 disableSerialization;
 
-_type	= _this select 0;
+params ["_type"];
 
 if (_type == 0) then {											//open UAV
 	_time = time + (2 + random 5);
@@ -23,6 +22,7 @@ if (_type == 0) then {											//open UAV
 	if (dialog) then {
 		closedialog 0; 
 		closedialog 0; 
-		_nul=[] execVM MCC_path + "general_scripts\console\conoleUavAction.sqf";
+		// conoleUavAction.sqf does not exist in this addon (dead reference) - logged instead of execVM'ing a missing file
+		["WARN", "consoleUavActionCommit.sqf", "conoleUavAction.sqf is missing from the addon"] call MCC_fnc_log;
 		};
 	};

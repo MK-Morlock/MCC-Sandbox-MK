@@ -4,9 +4,13 @@
 // _pos = position, center of the explosion.
 // _trapvolume = string, "small", "medium", "large"
 //======================================================================================================================================================================
-private ["_pos", "_volume","_bomb","_class","_effected","_dist","_vel","_relVel"];
-_pos = _this select 0;
-_volume = _this select 1;
+private _bomb = objNull;
+private _class = "";
+private _effected = false;
+private _dist = 0;
+private _vel = 0;
+private _relVel = 0;
+params ["_pos", "_volume"];
 
 switch (_volume) do {
 	case "medium":{

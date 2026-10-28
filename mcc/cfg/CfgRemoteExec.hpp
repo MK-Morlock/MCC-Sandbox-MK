@@ -27,6 +27,7 @@ class MCC_fnc_setWeather	{allowedTargets=0;};
 class MCC_fnc_globalSay3D	{allowedTargets=0;};
 class MCC_fnc_globalHint	{allowedTargets=0;};
 class MCC_fnc_globalExecute	{allowedTargets=0;};
+class MCC_fnc_rsMessage	{allowedTargets=0;};
 class MCC_fnc_groupChat	{allowedTargets=0;};
 class MCC_fnc_moveToPos		{allowedTargets=0;};
 class MCC_fnc_pickItem	{allowedTargets=0;};
@@ -115,6 +116,8 @@ class MCC_fnc_artillery {allowedTargets=0;};
 //Group Gen
 class MCC_fnc_groupGenRefresh	{allowedTargets=0;};
 class MCC_fnc_groupSpawn		{allowedTargets=0;};
+class MCC_fnc_groupPlace3D		{allowedTargets=2;};
+class MCC_fnc_restore3D		{allowedTargets=2;};
 class MCC_fnc_groupGenUMRefresh	{allowedTargets=0;};
 //Console
 class MCC_fnc_consoleClickGroupIcon	{allowedTargets=0;};
@@ -126,6 +129,11 @@ class MCC_fnc_MWFindbuildingPos		{allowedTargets=0;};
 class MCC_fnc_MWfindObjectivePos	{allowedTargets=0;};
 class MCC_fnc_MWObjectiveHVT		{allowedTargets=0;};
 class MCC_fnc_MWObjectiveDestroy	{allowedTargets=0;};
+class MCC_fnc_respawnRestore		{allowedTargets=0;};
+class MCC_fnc_assetsData		{allowedTargets=0;};
+class MCC_fnc_generatedMissions		{allowedTargets=2;};
+class MCC_fnc_FLGenerate			{allowedTargets=2;};
+class MCC_fnc_MWCacheDestructible	{allowedTargets=0;};
 class MCC_fnc_MWObjectiveIntel		{allowedTargets=0;};
 class MCC_fnc_MWObjectiveClear		{allowedTargets=0;};
 class MCC_fnc_MWObjectiveDisable	{allowedTargets=0;};
@@ -147,6 +155,11 @@ class MCC_fnc_createConfigs			{allowedTargets=0;};
 class MCC_fnc_campaignInit			{allowedTargets=0;};
 class MCC_fnc_missionDone			{allowedTargets=0;};
 class MCC_fnc_dayCycle				{allowedTargets=0;};
+class mcc_setup					{allowedTargets=0;};
+class mcc_setup_hc					{allowedTargets=0;};
+class MCC_fnc_halt					{allowedTargets=0;};
+class BIS_fnc_halt					{allowedTargets=0;};
+class BIS_fnc_endMissionServer		{allowedTargets=0;};
 //AI
 class MCC_fnc_garrisonBehavior	{allowedTargets=0;};
 class MCC_fnc_paratroops		{allowedTargets=0;};
@@ -246,6 +259,7 @@ class MCC_fnc_medicUseItem	{allowedTargets=0;};
 class MCC_fnc_medicDragCarry {allowedTargets=0;};
 class MCC_fnc_loadWounded 	{allowedTargets=0;};
 class MCC_fnc_medicArea		{allowedTargets=0;};
+class MCC_fnc_medicEnableXEH	{allowedTargets=0;};
 //Helpers
 class MCC_fnc_createHelper 	{allowedTargets=0;};
 class MCC_fnc_deleteHelper		{allowedTargets=0;};
@@ -366,6 +380,7 @@ class MCC_fnc_missionSettings {allowedTargets=0;};
 class MCC_fnc_GAIASettings {allowedTargets=0;};
 class MCC_fnc_settingsCover {allowedTargets=0;};
 class MCC_fnc_settingsMedical {allowedTargets=0;};
+class MCC_fnc_ambientFireExtinguish {allowedTargets=0;};
 class MCC_fnc_moduleCapturePoint {allowedTargets=0;};
 class MCC_fnc_vehicleRespawn {allowedTargets=0;};
 //Curator

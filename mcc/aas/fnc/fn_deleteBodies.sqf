@@ -14,7 +14,7 @@ Example:
 params ["_waitTime"];
 
 _waitTime spawn {
-    private ["_timeOfDeath"];
+    private "_timeOfDeath";
     while {true} do {
         sleep 10;
         {

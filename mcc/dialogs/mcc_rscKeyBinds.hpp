@@ -1,4 +1,4 @@
-class mcc_rscKeyBinds
+class MCCDLG_NAME
 {
 	idd = -1;
 	onLoad = __EVAL("_this execVM '"+MCCPATH+"mcc\dialogs\mcc_rscKeyBinds_init.sqf'");
@@ -18,7 +18,7 @@ class mcc_rscKeyBinds
 		class frame: MCC_RscText
 		{
 			idc = -1;
-			colorBackground[] = { 0, 0, 0,0.9};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 
 			x = 0.29375 * safezoneW + safezoneX;
 			y = 0.225 * safezoneH + safezoneY;
@@ -30,7 +30,7 @@ class mcc_rscKeyBinds
 		{
 			idc = -1;
 			text = "Key Binds:"; //--- ToDo: Localize;
-			colorText[] = {0,1,1,1};
+			colorText[] = {0.77,0.51,0.08,1};
 
 			x = 0.345312 * safezoneW + safezoneX;
 			y = 0.236 * safezoneH + safezoneY;
@@ -44,7 +44,7 @@ class mcc_rscKeyBinds
 			y = 0.28 * safezoneH + safezoneY;
 		};
 
-		class close: MCC_RscButtonMenu
+		class close: MCCBTN_R
 		{
 			idc = -1;
 			text = "close"; //--- ToDo: Localize;
@@ -54,6 +54,7 @@ class mcc_rscKeyBinds
 			y = 0.608 * safezoneH + safezoneY;
 			w = 0.0825 * safezoneW;
 			h = 0.044 * safezoneH;
+			class TextPos {left = 0; top = "((0.044 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 		};
 	};
 };

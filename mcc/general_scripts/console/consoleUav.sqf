@@ -1,11 +1,24 @@
-private ["_uav","_logicMARTA","_radius","_wpcount","_step","_add","_cw","_dir","_lastWP","_spawn","_waypoints","_lastWPpos","_pos","_wp","_currentWP"];
+private _logicMARTA = objNull;
+private _radius = 0;
+private _wpcount = 0;
+private "_step";
+private _add = 0;
+private _cw = false;
+private _dir = 0;
+private "_lastWP";
+private _spawn = [];
+private _waypoints = [];
+private "_lastWPpos";
+private _pos = [];
+private "_wp";
+private "_currentWP";
 // By: Shay_gman
 // Version: 1.1 (May 2012)
 
-_uav = _this select 0;
+params ["_uav"];
 
 //--- UAV ID
-if (isnil "MCC_uavlastID") then {MCC_uav_lastID = -1};
+if (isnil "MCC_uav_lastID") then {MCC_uav_lastID = -1};	// was checking a misspelt name, so the first UAV always hit "undefined variable"
 MCC_uav_lastID = MCC_uav_lastID + 1;
 MCC_uav = _uav;
 _uav setvehiclevarname "MCC_uav";
@@ -37,7 +50,7 @@ _step = 360 / _wpcount;
 _add = 0;
 _cw = true;
 _dir = 0;
-deletewaypoint _lastWP;
+if (!isNil "_lastWP") then {deletewaypoint _lastWP};
 
 _spawn = [] spawn {}; //--- Empty spawn
 while {alive _uav} do {

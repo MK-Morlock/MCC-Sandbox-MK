@@ -11,7 +11,9 @@
 		Nothing
 */
 #include "..\defines.sqf"
-private ["_cratesType","_res","_str"];
+private _cratesType = [];
+private "_res";
+private _str = "";
 
 params [
 	["_side",sideLogic,[sideLogic,""]],
@@ -35,7 +37,7 @@ if (_side == sideLogic || _boxType == "") exitWith {};
 
 //Find crates types
 _cratesType = missionNamespace getVariable ["MCC_logisticsCrates_TypesWest",[]];
-if (count _cratesType <=0) exitWith {diag_log "MCC Logistics: Error MCC_logisticsCrates_TypesWest not defined"};
+if (count _cratesType <=0) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC Logistics: Error MCC_logisticsCrates_TypesWest not defined"}};
 
 //Get side resources
 _res = call compile format ["MCC_res%1",_side];
@@ -48,7 +50,7 @@ switch (tolower _boxType) do
 		if ((_res select 0) >= CRATE_COST) then {
 
 			//Spawn box
-			_str = format ["-%1 <img image='%2' />",CRATE_COST, MCC_ICONAMMO];
+			_str = format ["-%1 <img color='#E60000' image='%2' />",CRATE_COST, MCC_ICONAMMO];
 			_box = (_cratesType select 0) createVehicle position player;
 
 			//reduce cost
@@ -63,13 +65,13 @@ switch (tolower _boxType) do
 		if ((_res select 1) >= CRATE_COST) then {
 
 			//Spawn box
-			_str = format ["-%1 <img image='%2' />",CRATE_COST, MCC_ICONMETERIALS];
+			_str = format ["-%1 <img color='#0080E6' image='%2' />",CRATE_COST, MCC_ICONMETERIALS];
 			_box = (_cratesType select 1) createVehicle position player;
 
 			//reduce cost
 			_res set [1, (_res select 1) - CRATE_COST];
 		} else {
-			_str = "Not Enough Materials";
+			_str = "Not Enough Supplies";
 		};
 	};
 
@@ -78,7 +80,7 @@ switch (tolower _boxType) do
 		if ((_res select 2) >= CRATE_COST) then {
 
 			//Spawn box
-			_str = format ["-%1 <img image='%2' />",CRATE_COST, MCC_ICONFUEL];
+			_str = format ["-%1 <img color='#00E680' image='%2' />",CRATE_COST, MCC_ICONFUEL];
 			_box = (_cratesType select 2) createVehicle position player;
 
 			//reduce cost

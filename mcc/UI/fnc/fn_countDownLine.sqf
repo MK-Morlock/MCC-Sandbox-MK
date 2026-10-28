@@ -4,9 +4,15 @@
 // _min = integer, minimum value.
 // _max = integer, maximum value.
 //========================================================================================================================================================================================
-private ["_elapsed","_max","_line","_char","_i","_segments","_segmentsElapsed","_segmentsRemaining"];
+private _max = nil;
+private _line = "";
+private _char = "";
+private _i = 0;
+private _segments = 0;
+private _segmentsElapsed = 0;
+private _segmentsRemaining = 0;
 
-_elapsed = _this select 0;
+params ["_elapsed"];
 
 if (count(_this) > 1) then {
 	_max = _this select 1;

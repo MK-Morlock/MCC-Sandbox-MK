@@ -6,7 +6,11 @@
 	<OUT>
 		BOOLEAN	success
 =======================================================================================================================================================================*/
-private ["_group","_netID","_null","_succeed","_groupName"];
+private "_group";
+private _netID = "";
+private _null = [];
+private _succeed = false;
+private _groupName = "";
 _netID = param [0,"",[""]];
 _groupName = param [1,"",[""]];
 _idc = param [2,0,[0]];

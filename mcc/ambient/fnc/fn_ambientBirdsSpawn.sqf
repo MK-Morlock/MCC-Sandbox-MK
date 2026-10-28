@@ -12,7 +12,12 @@ params [
 
 #define	 MCC_ANIMALSTYPE ["Seagull","Crowe","Kestrel_random_F"]
 
-private ["_trees","_maxHeight","_type","_animal","_animals","_tree"];
+private _trees = objNull;
+private _maxHeight = 0;
+private "_type";
+private _animal = objNull;
+private _animals = [];
+private "_tree";
 
 if (typeName _pos == typeName objNull) then {
 	_pos = getPos _pos;

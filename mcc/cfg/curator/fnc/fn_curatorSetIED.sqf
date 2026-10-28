@@ -1,8 +1,18 @@
 //============================================================MCC_fnc_curatorSetIED=============================================================================================
 // Make item/object/unit an IED
 //===========================================================================================================================================================================
-private ["_pos","_module","_object","_resualt","_trapvolume","_IEDExplosionType","_IEDDisarmTime","_IEDJammable","_IEDTriggerType","_trapdistance","_iedside","_init"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private "_pos";
+private _module = objNull;
+private "_object";
+private _resualt = [];
+private "_trapvolume";
+private "_IEDExplosionType";
+private "_IEDDisarmTime";
+private _IEDJammable = false;
+private "_IEDTriggerType";
+private "_trapdistance";
+private _iedside = [];
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 _pos = getpos _module;
@@ -52,7 +62,7 @@ if (_object isKindOf "Man") then {
 	_resualt = ["Make unit act as Suicide Bomber",[
 	 						["Explosion Size",["Small","Medium","large"]],
 	 						["Explosion Effect",["Deadly","Disabling","Fake","None"]],
-	 						["Activation Side",["East","West","Resistance"]]
+	 						["Activation Side",["East","West","Resistance"],"",1]
 	 					  ]] call MCC_fnc_initDynamicDialog;
 
 	if (count _resualt == 0) exitWith {deleteVehicle _module};
@@ -62,7 +72,7 @@ if (_object isKindOf "Man") then {
 	_IEDExplosionType 	= (_resualt select 1);
 	_iedside 			= (_resualt select 2) call BIS_fnc_sideType;
 
-	[[_object, _iedside, _trapvolume, _IEDExplosionType], "MCC_fnc_manageSB", _object, false] spawn BIS_fnc_MP;
+	[_object, _iedside, _trapvolume, _IEDExplosionType] remoteExec ["MCC_fnc_manageSB", _object, false];
 
 } else {
 	_resualt = ["Make an object act as an IED",[
@@ -72,7 +82,7 @@ if (_object isKindOf "Man") then {
 	 						["Can be jammed using ECM vehicle",true],
 	 						["Activation Type",["Proximity","Radio/Spotter","Mission Maker Only","Mini-Game(Proximity)","Mini-Game(Manual)"]],
 	 						["Activation Distance",60],
-	 						["Activation Side",["East","West","Resistance"]]
+	 						["Activation Side",["East","West","Resistance"],"",1]
 	 					  ]] call MCC_fnc_initDynamicDialog;
 
 	if (count _resualt == 0) exitWith {deleteVehicle _module};

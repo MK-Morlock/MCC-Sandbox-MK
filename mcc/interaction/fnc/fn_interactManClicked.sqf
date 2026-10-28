@@ -1,6 +1,7 @@
 //=========================================================MCC_fnc_interactManClicked==========================================================================================
 //==============================================================================================================================================================================
-private ["_ctrlData","_suspect","_array"];
+private _ctrlData = "";
+private "_suspect";
 disableSerialization;
 
 _ctrlData	= param [0,"",[""]];
@@ -18,7 +19,7 @@ switch (true) do {
 				[_suspect, true] call ACE_captives_fnc_setHandcuffed;
 			} else {
 				sleep 1.5;
-				[[_suspect, "Acts_ExecutionVictim_Loop", false, 0],"MCC_fnc_setUnitAnim", _suspect, false] spawn BIS_fnc_MP;
+				[_suspect, "Acts_ExecutionVictim_Loop", false, 0] remoteExec ["MCC_fnc_setUnitAnim", _suspect, false];
 			};
 
 			_suspect setVariable ["MCC_disarmed",false,true];

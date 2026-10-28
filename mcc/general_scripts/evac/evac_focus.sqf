@@ -7,13 +7,21 @@
 #define MCC_EVAC_FLIGHTHIGHT 44
 
 disableSerialization;
-private ["_mccdialog","_type","_pos","_control","_index","_comboBox","_insetionArray","_evacVehicles"];
+private _mccdialog = 0;
+private _type = [];
+private _pos = [];
+private _control = controlNull;
+private _index = 0;
+private _comboBox = controlNull;
+private _insetionArray = [];
+private _evacVehicles = [];
 _mccdialog = MCC_SANDBOX2_IDD;
-_evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1",playerside],[]];
+_evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1", call MCC_fnc_evacSide],[]];
 
 missionNameSpace setvariable ["MCC_evacVehicles_index",lbCurSel MCC_EVAC_SELECTED];
-if (count _evacVehicles > 0) then
+if ((lbCurSel MCC_EVAC_SELECTED) >= 0 && {(lbCurSel MCC_EVAC_SELECTED) < count _evacVehicles}) then
 {
+	missionNamespace setVariable ["MCC_evacSelectedObj", _evacVehicles select (lbCurSel MCC_EVAC_SELECTED)];
 
 	_type = _evacVehicles select (lbCurSel MCC_EVAC_SELECTED);
 	_pos = [(getpos _type) select 0, (getpos _type) select 1];

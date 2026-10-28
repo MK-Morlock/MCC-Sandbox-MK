@@ -5,10 +5,15 @@
 #define AIRDROP_TYPE 5509 
 #define AIRDROP_ITEMS 5510 
 
-private ["_action", "_type", "_comboBox", "_mccdialog", "_groupArray","_displayname","_dummy"];
+private "_type";
+private _comboBox = controlNull;
+private _mccdialog = controlNull;
+private "_groupArray";
+private _displayname = "";
+private "_dummy";
 disableSerialization;
 
-_action =_this select 0;
+params ["_action"];
 _mccdialog = findDisplay ExtrasDialog_IDD;	
 
 if (_action==0) then 

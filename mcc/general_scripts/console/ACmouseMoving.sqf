@@ -1,58 +1,25 @@
-//Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-
-
-private ["_params","_ctrl","_posX","_posY","_posNew","_rand","_relDir","_distance","_attahcPosition"];
+private "_ctrl";
+private "_posX";
+private "_posY";
 disableSerialization;
 
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _posX = _params select 1;
 _posY = _params select 2;
 
 if (missionNamespace getVariable ["MCC_ConsoleACMouseButtonDown",false]) then {
-
-	private ["_fov","_ac","_center"];
-
 	#define MCC_ACPos [0.5,0.44]
-
-	_fov = missionNamespace getVariable ["MCC_fakeACFOV",0.8];
-	_ac = missionNamespace getVariable ["MCC_fakeAC",objNull];
-	_center = missionNamespace getVariable ["MCC_fakeACCenter",objNull];
-	_realAc = missionNamespace getVariable ["MCC_ACConsoleUp",objNull];
-
-	if (isNull _ac || isNull _center || !alive _realAc) exitWith {};
-
-	_relDir = [_realAc, _center] call BIS_fnc_relativeDirto;
-	_distance = _realAc distance2d _center;
-
-	if (_relDir < 340 && _relDir > 220 && _distance > 200 && _distance < 2000) then {
-		if (player getVariable ["MCC_lastSoundTime",time] <= time) then {playsound ["MCC_zoom",true];player setVariable ["MCC_lastSoundTime",time+0.12]};
-		if (random 10<0.03) then {playmusic format ["RadioAmbient%1", (floor (random 30) + 1)]};
-
-		_posNew = [((MCC_ACPos select 0) - _posX)*(_fov*150)*(_ac distance _center)/100 , ((MCC_ACPos select 1) - _posY)*(_fov*150)*(_ac distance _center)/100,0];
-		_center setdir (getdir _ac);
-		_center setpos (_center modeltoWorld[(_posNew select 0)*-1,(_posNew select 1),0]);
-	} else {
-		if (_relDir > 340) then {
-			//Left
-			_center setpos (_center modeltoWorld[(-10*_fov),0,0]);
-		} else {
-			//Right
-			_center setpos (_center modeltoWorld[(10*_fov),0,0]);
-		};
-
-		if (_distance < 350) then {
-			//Up
-			_center setpos (_center modeltoWorld[0,(10*_fov),0]);
-		} else {
-			//Down
-			_center setpos (_center modeltoWorld[0,(-10*_fov),0]);
-		};
-
-		_center setdir (getdir _ac);
-		_center setposatl [(getpos _center select 0),(getpos _center select 1),0];
-	};
-
+	private _fov = missionNamespace getVariable ["MCC_fakeACFOV",0.8];
+	private _realAc = missionNamespace getVariable ["MCC_ACConsoleUp",objNull];
+	if (!alive _realAc) exitWith {};
+	private _k = 120 * _fov;
+	(["angles", missionNamespace getVariable ["MCC_acGround", []]] call MCC_fnc_acAim) params ["_az0", "_el0"];
+	private _az = _az0 - ((_posX - (MCC_ACPos select 0)) * _k);
+	private _el = _el0 - ((_posY - (MCC_ACPos select 1)) * _k);
+	(["clamp", _az, _el] call MCC_fnc_acAim) params ["_caz", "_cel"];
+	MCC_acGround = ["ground", _caz, _cel] call MCC_fnc_acAim;
+	if (player getVariable ["MCC_lastSoundTime",time] <= time) then {playsound ["MCC_zoom",true];player setVariable ["MCC_lastSoundTime",time+0.12]};
 	setMousePosition [0.5,0.44];
 };

@@ -1,6 +1,11 @@
-private ["_faction", "_cfgname", "_cfgclass", "_comp", "_startpoint", "_type","_side","_spawnside","_DOC_ARRAY"];
-_faction   = _this select 0;
-_startpoint= _this select 1;
+private _cfgname = "";
+private _cfgclass = "";
+private _comp = configNull;
+private _type = "";
+private _side = "";
+private _spawnside = "";
+private _DOC_ARRAY = [];
+params ["_faction", "_startpoint"];
 
 _type = "";
 _side = "";

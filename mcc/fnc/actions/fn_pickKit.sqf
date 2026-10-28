@@ -1,8 +1,17 @@
 //================================================================MCC_fnc_pickKit===============================================================================================
 //Pick up dead unit kit
 //===========================================================================================================================================================================
-private ["_itemsPlayer","_itemsSuspect","_wepHolder","_backPackSuspect","_backPackPlayer","_vestPlayer","_vestSuspect","_time","_wepSuspect","_wepPlayer","_suspect"];
-_suspect = _this select 0;
+private "_itemsPlayer";
+private "_itemsSuspect";
+private _wepHolder = nil;
+private "_backPackSuspect";
+private "_backPackPlayer";
+private "_vestPlayer";
+private "_vestSuspect";
+private "_time";
+private _wepSuspect = [];
+private _wepPlayer = [];
+params ["_suspect"];
 
 _itemsPlayer  = itemsWithMagazines player;
 _itemsSuspect = itemsWithMagazines _suspect;
@@ -64,7 +73,8 @@ if (_vestPlayer != "") then {
 };
 
 //weapons
-private ["_nearHolders","_holder"];
+private "_nearHolders";
+private "_holder";
 
 _nearHolders = (getpos _suspect nearObjects ["weaponHolderSimulated",5]);
 

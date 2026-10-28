@@ -1,15 +1,21 @@
 //============================================================MCC_fnc_curatorModuleCapturePoint=================================================================================
 // Capture points
 //===========================================================================================================================================================================
-private ["_resualt","_type","_scoreReward","_flag","_radius","_module","_enableHUD","_faction"];
-_module = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
+private _resualt = [];
+private "_type";
+private "_scoreReward";
+private "_flag";
+private "_radius";
+private _module = objNull;
+private "_enableHUD";
+_module = _this param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
 
 //Not curator exit
 if (!(local _module) || isnull curatorcamera) exitWith {};
 //if (player != getAssignedCuratorUnit (missionNamespace getVariable ["MCC_curator",objNull]) || isDedicated) exitWith {};
 
-_resualt = ["Create a cpature point",[["Type",[["Ammo",format ["%1data\IconAmmo.paa",MCC_path]],["Supply",format ["%1data\IconRepair.paa",MCC_path]],["Fuel",format ["%1data\IconFuel.paa",MCC_path]],["Tickets",""]]],
+_resualt = ["Create a capture point",[["Type",[["Ammo",format ["%1data\IconAmmo.paa",MCC_path]],["Supply",format ["%1data\IconRepair.paa",MCC_path]],["Fuel",format ["%1data\IconFuel.paa",MCC_path]],["Tickets",""]]],
 				["Radius",300],
 				["Score Reward",50],
 				["Flag",false],

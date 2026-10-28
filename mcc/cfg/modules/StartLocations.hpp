@@ -22,6 +22,7 @@ class mcc_sandbox_moduleStartLocations : Module_F
 				{
 					name = "$STR_WEST";
 					value = 1;
+					default = 1;
 				};
 				class OPFOR
 				{
@@ -60,7 +61,7 @@ class mcc_sandbox_moduleStartLocations : Module_F
 		class teleportAtStart
 		{
 			displayName = "Insertion";
-			description = "Open Respawn menu at the beging of the mission and Insertion";
+			description = "Open Respawn menu at the beginning of the mission and Insertion";
 			typeName = "NUMBER";
 			class values
 			{
@@ -81,7 +82,7 @@ class mcc_sandbox_moduleStartLocations : Module_F
 				};
 				class halo
 				{
-					name = "H.A.L.O";
+					name = "HALO";
 					value = 3;
 				};
 			};
@@ -89,7 +90,7 @@ class mcc_sandbox_moduleStartLocations : Module_F
 
 		class distractable
 		{
-			displayName = "Distractable";
+			displayName = "Destructible";
 			typeName = "BOOL";
 			class values
 			{

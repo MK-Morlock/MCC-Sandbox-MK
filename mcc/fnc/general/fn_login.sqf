@@ -1,24 +1,23 @@
 /*======================================================================= MCC_fnc_login =========================================================
 =================================================================================================================================================*/
 #define MCCMISSIONMAKERNAME 1020
-private ["_p_mcc_player","_p_mcc_player_name","_p_mcc_request","_isAdmin","_mccChat","_missionMaker","_array"];
+private _mccChat = false;
+private _missionMaker = "";
+private _array = [];
 
 disableSerialization;
 
-_p_mcc_player = _this select 0;
-_p_mcc_player_name = _this select 1;
-_p_mcc_request = _this select 2;
-_isAdmin = _this select 3;
+params ["_p_mcc_player", "_p_mcc_player_name", "_p_mcc_request", "_isAdmin"];
 _mccChat = missionNamespace getVariable ["MCC_Chat",true];
 _missionMaker = missionNamespace getVariable ["mcc_missionmaker",""];
 
 //MM is logging out
 if (_missionMaker == _p_mcc_player_name) exitWith {
 	if (_mccChat) then {
-		[[[netId _p_mcc_player,_p_mcc_player], format["MCC ID %1-> %2 Logged out as Misson Maker.",_p_mcc_request,mcc_missionMaker], false],"MCC_fnc_groupchat",true,false] spawn BIS_fnc_MP;
+		[[netId _p_mcc_player,_p_mcc_player], format["MCC ID %1-> %2 Logged out as Mission Maker.",_p_mcc_request,mcc_missionMaker], false] remoteExec ["MCC_fnc_groupchat", 0, false];
 	};
 	missionNamespace setVariable ["mcc_missionmaker",""];
-	unassignCurator MCC_curator;
+	if (getAssignedCuratorUnit MCC_curator == _p_mcc_player) then {unassignCurator MCC_curator};
 	publicVariable "mcc_missionmaker";
 	ctrlSetText [MCCMISSIONMAKERNAME, format["%1",""]];
 };
@@ -28,11 +27,10 @@ if ((_missionMaker == "") || _isAdmin) exitWith {
 	missionNamespace setVariable ["mcc_missionmaker",_p_mcc_player_name];
 	_missionMaker = missionNamespace getVariable ["mcc_missionmaker",""];
 	if (_mccChat) then {
-		[[[netId _p_mcc_player,_p_mcc_player], format["MCC ID %1-> Access granted to: %2",_p_mcc_request,mcc_missionMaker], false],"MCC_fnc_groupchat",true,false] spawn BIS_fnc_MP;
+		[[netId _p_mcc_player,_p_mcc_player], format["MCC ID %1-> Access granted to: %2",_p_mcc_request,mcc_missionMaker], false] remoteExec ["MCC_fnc_groupchat", 0, false];
 	};
-	unassignCurator MCC_curator;
-	sleep 0.1;
-	_p_mcc_player assignCurator MCC_curator;
+	// keeps a Zeus the player already owns (see MCC_fnc_assignCurator)
+	_p_mcc_player call MCC_fnc_assignCurator;
 
 	publicVariable "mcc_missionmaker";
 	publicVariable "mcc_zone_pos";

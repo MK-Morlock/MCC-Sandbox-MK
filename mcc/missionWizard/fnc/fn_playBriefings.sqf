@@ -3,7 +3,8 @@
 // Example:[_sounds] call MCC_fnc_playBriefings;
 // _sounds = ARRAY of ARRAY example [["soundName",_waitTime],["sound1",0.5],["sound2",0.2]]
 //=======================================================================================================================================================================================*/
-private ["_wait","_sounds"];
+private "_wait";
+private _sounds = [];
 
 _sounds = param [0, [], [[]]];
 

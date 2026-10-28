@@ -16,7 +16,7 @@ if (count (allMissionObjects "MCC_Module_settingsMedicSystem") == 0) then {
 		[
 		    "MCC_medicComplex",
 		    "CHECKBOX",
-		   	["Complex System","Requires mission restart! Complex system replace all the default ArmA items with advanced items such as bandages, epipens exc"],
+		   	["Complex System","Requires mission restart! The complex system replaces all the default\nArma items with advanced items such as bandages, epipens, etc."],
 		    "MCC Medical System",
 		    false,
 		    true
@@ -26,7 +26,7 @@ if (count (allMissionObjects "MCC_Module_settingsMedicSystem") == 0) then {
 		[
 		    "MCC_medicOnlyMedicHeals",
 		    "CHECKBOX",
-		   	["Medic Only Heal","Only medics can use FAK to heal others can only use bandages to stop bleeding"],
+		   	["Medic Only Heal","Only medics can use FAKs to heal; others can only use bandages to stop bleeding"],
 		    "MCC Medical System",
 		   	false,
 		    true
@@ -46,7 +46,7 @@ if (count (allMissionObjects "MCC_Module_settingsMedicSystem") == 0) then {
 		[
 		    "MCC_medicBleedingEnabled",
 		    "CHECKBOX",
-		   	["Bleeding","Players and AI will suffer from bleeding effects and will need to stop bleeding or die over time"],
+		   	["Bleeding","Players and AI will suffer from bleeding effects and will need to stop\nbleeding or die over time"],
 		    "MCC Medical System",
 		    false,
 		    true
@@ -56,7 +56,7 @@ if (count (allMissionObjects "MCC_Module_settingsMedicSystem") == 0) then {
 		[
 		    "MCC_medicBleedingTime",
 		    "SLIDER",
-		   	["Bleeding Time","How long in seconds it will take for unconscious unit to die from bleeding"],
+		   	["Bleeding Time","How long in seconds it will take for an unconscious unit to die from bleeding"],
 		    "MCC Medical System",
 		    [30,1200,300,0],
 		    true

@@ -7,14 +7,23 @@
 #define	HIDDEN	"Simulation_Restart"
 
 
-private ["_enemySides","_group", "_unit", "_spotted", "_spottedWithWeapon", "_nearTargets", "_count", "_nearCount","_leader","_canSee","_scareEffect","_spottedEffect"];
+private _enemySides = [];
+private "_group";
+private "_unit";
+private _spotted = false;
+private _spottedWithWeapon = false;
+private "_nearTargets";
+private _count = 0;
+private "_leader";
+private _canSee = false;
+private _scareEffect = {};
+private _spottedEffect = {};
 
 _spottedWithWeapon = false;
 _count = 0;
 
 _scareEffect = {
-	private ["_blurEffects"];
-	_blurEffects = ppEffectCreate ["ChromAberration", 440];
+	private _blurEffects = ppEffectCreate ["ChromAberration", 440];
 	_blurEffects ppEffectForceInNVG true;
 	_blurEffects ppEffectAdjust [0.05,0.05,true];
 	_blurEffects ppEffectEnable true;
@@ -32,8 +41,7 @@ _scareEffect = {
 };
 
 _spottedEffect = {
-	private ["_blurEffects"];
-	_blurEffects = ppEffectCreate ["RadialBlur", 100];
+	private _blurEffects = ppEffectCreate ["RadialBlur", 100];
 	_blurEffects ppEffectForceInNVG true;
 	_blurEffects ppEffectAdjust [0.05,0.05,0.4,0.4];
 	_blurEffects ppEffectEnable true;

@@ -14,7 +14,7 @@ class MCC_Module_addValor : Module_F
 			displayName = "Credits";
 			description = "How many credit to add";
 			typeName = "NUMBER";
-			property = "valor";
+			property = "MCC_Module_addValor_valor";
 		};
 
 		class ModuleDescription: ModuleDescription{};
@@ -22,7 +22,7 @@ class MCC_Module_addValor : Module_F
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Sync it with one player unit or more to add valor/credits to this unit on mission init";
+		description = "Sync it with one or more player units to add valor/credits to them at mission start";
 		sync[] = {"Anything"};
 
 		class Anything

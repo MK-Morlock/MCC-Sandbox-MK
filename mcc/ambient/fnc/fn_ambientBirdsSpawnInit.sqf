@@ -16,7 +16,7 @@ if ((local _module) && !(isnull curatorcamera)) then {
 if  (!isServer || (missionNamespace getVariable ["MCC_fnc_ambientBirdsSpawnInitRuning",false])) exitWith {};
 missionNamespace setVariable ["MCC_fnc_ambientBirdsSpawnInitRuning",true];
 
-private ["_unit"];
+private "_unit";
 while {(missionNamespace getVariable ["MCC_fnc_ambientBirdsSpawnInitRuning",false])} do {
 	{
 		IF (count units _x > 0) then {

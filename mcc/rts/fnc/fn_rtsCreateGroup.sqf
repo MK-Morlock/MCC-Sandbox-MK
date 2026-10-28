@@ -4,7 +4,18 @@
 //     	_ctrl: CONTROL
 //		_res: resources Needed
 //===================================================================================================================================================================*/
-private ["_res","_side","_groupArray","_group","_obj","_startPos","_units","_emptyPos","_pos","_ehID","_vehicles","_cfg"];
+private _res = [];
+private "_side";
+private _groupArray = [];
+private _group = [];
+private "_obj";
+private "_startPos";
+private _units = {};
+private "_emptyPos";
+private "_pos";
+private "_ehID";
+private _vehicles = [];
+private _cfg = configNull;
 disableSerialization;
 
 params [
@@ -33,7 +44,7 @@ if (count MCC_ConsoleGroupSelected <=0) exitWith {};
 _obj = MCC_ConsoleGroupSelected select 0;
 _pos = getpos _obj findEmptyPosition [10,50];
 
-_startPos = call compile format ["MCC_START_%1",_side];
+_startPos = missionNamespace getVariable (format ["MCC_START_%1", _side]);
 
 
 //Get the ammount of units
@@ -42,7 +53,7 @@ _startPos = call compile format ["MCC_START_%1",_side];
 									["_buildings",[],[[]]]
 								   ];
 
-_units = {side _x == _side && (isPlayer _x || _x getVariable ["MCC_isRTSunit",false] || group _x getVariable ["MCC_canbecontrolled",false])} count allUnits;
+_units = [_side, true] call MCC_fnc_rtsCountPersonnel;
 _emptyPos = count _groupArray;
 
 //Not enough houses
@@ -68,7 +79,7 @@ _vehicles = [];
 	_ehID = _x addMPEventHandler ["mpkilled", {
 												_unit = name (_this select 0);
 												_killer = name (_this select 1);
-												[["MCCNotificationBad",["Unit Down",format ["%1 was killed by %2",_unit,_killer],""]], "bis_fnc_showNotification", _sidePlayer, false] spawn BIS_fnc_MP;
+												["MCCNotificationBad",["Unit Down",format ["%1 was killed by %2",_unit,_killer],""]] remoteExec ["bis_fnc_showNotification", _sidePlayer, false];
 											  }];
 	_unit = _x;
 	{_x addCuratorEditableObjects [[_unit],true]} forEach allCurators;

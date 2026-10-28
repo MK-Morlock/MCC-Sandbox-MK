@@ -7,13 +7,15 @@ class MCC_rts_hq1
 	#endif
 
 	displayName = "HQ";
-	descriptionShort = "Basic short range radio H.Q allows scan for basic missions nearby";
+	descriptionShort = "Basic short range radio HQ allows scan for basic missions nearby";
 	anchorType = "Land_TBox_F";
 	requiredBuildings[] = {};
 	needelectricity = 0;
 	upgradeTo[] = {"MCC_rts_hq2"};
 	buildings[] = {"MCC_rts_barracks1","MCC_rts_house1","MCC_rts_workshop1","MCC_rts_triage1","MCC_rts_tradePost1"};
-	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_addArtilleryAmmo","MCC_rts_evacHelicopterBuy","MCC_rts_scanResourcesBasic","","MCC_rts_scanResourcesCancel",""};
+	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_addArtilleryAmmo","MCC_rts_evacHelicopterBuy"};
+	sideActions[] = {"MCC_rts_scanResourcesBasic"};
+	sideActionsEnd[] = {"MCC_rts_scanResourcesCancel"};
 	fortifications[] = {"MCC_rts_fortSandbagLong","MCC_rts_fortSandbagRound","MCC_rts_fortRazorwire"};
 	missionsBasic[] = {"MCC_rts_missionsSupplyRun","MCC_rts_missionPatrol","MCC_rts_missionsIntel"};
 	missionsAdvanced[] = {"MCC_rts_missionsDestroy","MCC_rts_missionsHVT","MCC_rts_missionsIED","MCC_rts_missionsCapture"};
@@ -32,7 +34,9 @@ class MCC_rts_hq2 : MCC_rts_hq1
 	requiredBuildings[] = {{"workshop",2},{"barracks",1},{"elecPower",1}};
 	needelectricity = 1;
 	upgradeTo[] = {"MCC_rts_hq3"};
-	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_addArtilleryAmmo","MCC_rts_evacHelicopterBuy","MCC_rts_scanResourcesBasic","MCC_rts_scanResourcesAdvanced","","MCC_rts_scanResourcesCancel"};
+	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_addArtilleryAmmo","MCC_rts_evacHelicopterBuy"};
+	sideActions[] = {"MCC_rts_scanResourcesBasic","MCC_rts_scanResourcesAdvanced"};
+	sideActionsEnd[] = {"MCC_rts_scanResourcesCancel"};
 	level = 2;
 	resources[] = {{"ammo",300},{"repair",750},{"food",450},{"time",3}};
 	actionFNC = "MCC_fnc_baseActionClicked";
@@ -68,7 +72,7 @@ class MCC_rts_storage1
 	#endif
 
 	displayName = "Storage Area";
-	descriptionShort = "Increase storage capacity for all key resources by 500 (Food, Medicine, Building Materials, Ammunition and Fuel).";
+	descriptionShort = "Increase storage capacity for all key resources by 500 (Food, Medicine, Supplies, Ammunition and Fuel).";
 	anchorType = "Land_cargo_addon02_V2_F";
 	actions[] = {"","","","","","","","","","","","MCC_rts_destroyLogic"};
 	requiredBuildings[] = {{"workshop",1}};
@@ -486,6 +490,22 @@ class MCC_rts_triage2
 };
 
 class MCC_rts_rtsBuildUIContainerBack
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\back.paa";
+	#else
+	picture = "mcc\rts\data\back.paa";
+	#endif
+
+	displayName = "Exit";
+	descriptionShort = "Exit Build Menu";
+	condition = "";
+	requiredBuildings[] = {};
+	needelectricity = 0;
+	actionFNC = "MCC_fnc_rtsBuildUIContainerBack";
+	resources[] = {};
+};
+class MCC_rts_rtsFortUIContainerBack
 {
 	#ifdef MCCMODE
 	picture = "\mcc_sandbox_mod\mcc\rts\data\back.paa";

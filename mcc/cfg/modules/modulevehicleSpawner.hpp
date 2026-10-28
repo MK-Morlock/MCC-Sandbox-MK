@@ -18,7 +18,7 @@ class mcc_sandbox_modulevehicleSpawner : Module_F
 			displayName = "Vehicles Type";
 			description = "What kind of vehicles the kiosk will spawn";
 			typeName = "STRING";
-			property = "type";
+			property = "mcc_sandbox_modulevehicleSpawner_type";
 
 			class values
 			{
@@ -59,9 +59,9 @@ class mcc_sandbox_modulevehicleSpawner : Module_F
 		class spawnFrom : Combo
 		{
 			displayName = "Side Purchase";
-			description = "Purchase from the entire side or just faction";
+			description = "Purchase from the entire side or just the faction";
 			typeName = "NUMBER";
-			property = "spawnFrom";
+			property = "mcc_sandbox_modulevehicleSpawner_spawnFrom";
 
 			class values
 			{
@@ -84,7 +84,7 @@ class mcc_sandbox_modulevehicleSpawner : Module_F
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Create a vheicles kiosk where players can buy vehicles. Sync one Notice Board object & Sync one Invisible Helipad object With the module";
+		description = "Create a vehicle kiosk where players can buy vehicles. Sync one Notice Board object and one Invisible Helipad object with the module";
 		sync[] = {"Land_Noticeboard_F","Land_HelipadEmpty_F"};
 
 		class Land_Noticeboard_F

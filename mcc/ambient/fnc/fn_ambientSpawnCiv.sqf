@@ -13,7 +13,26 @@
 #define MAX_TRESHOLD_PER_AREA 8
 #define MAX_WP 2
 
-private ["_pos","_counter","_civSpawnDistance","_nearHouses","_civArray","_building","_civClass","_civGroup","_unit","_wp","_unitsArray","_side","_civRelations","_sidePlayer","_civVests","_civUniforms","_civHead","_enemyFaction","_enemySide","_enemyArray"];
+private _pos = [];
+private _counter = 0;
+private _civSpawnDistance = 0;
+private _nearHouses = [];
+private _civArray = [];
+private "_building";
+private "_civClass";
+private _civGroup = grpNull;
+private _unit = objNull;
+private "_wp";
+private _unitsArray = [];
+private _side = [];
+private _civRelations = 0;
+private "_sidePlayer";
+private _civVests = [];
+private _civUniforms = [];
+private _civHead = [];
+private _enemyFaction = "";
+private "_enemySide";
+private _enemyArray = [];
 _pos = param [0, [], [[]]];
 _counter =param [1, 1,[1]];
 _factionCiv	= param [2, "CIV_F", [""]];
@@ -58,9 +77,9 @@ if (_enemyFaction != "") then {
 	_enemyArray = missionNamespace getVariable ["MCC_ambient_enemyArray",[]];
 
 	if (count _enemyArray == 0) then {
-		_enemyArray = [_enemyFaction,"soldier","men"] call MCC_fnc_makeUnitsArray;
+		_enemyArray = [[_enemyFaction,"soldier","men"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 		if(count _enemyArray < 4) then {
-			_enemyArray = [_enemyFaction,"soldier"] call MCC_fnc_makeUnitsArray;
+			_enemyArray = [[_enemyFaction,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 		};
 
 		if (count _enemyArray > 4) then {_enemyArray resize 4};
@@ -71,7 +90,7 @@ if (_enemyFaction != "") then {
 
 if (count _unitsArray <=0) exitWith {};
 
-_side = [(getNumber (configfile >> "CfgFactionClasses" >> _factionCiv >> "side"))] call BIS_fnc_sideType;
+_side = [([_factionCiv] call MCC_fnc_factionSide)] call BIS_fnc_sideType;
 _civArray = missionNamespace getVariable ["MCC_ambientCivilians",[]];
 
 //Find nearest houses
@@ -92,14 +111,16 @@ _deniedZones = (_pos nearEntities ["MCC_Module_ambientCiviliansDenied", 2000]) +
 
 for "_i" from 1 to _counter do {
 	_building = _nearHouses call bis_fnc_selectRandom;
-	_pos = getpos _building;
+	// spawn on the ground next to the building (never on its geometry / roof / wires)
+	_pos = getPosATL _building;
+	_pos set [2, 0];
 
 	//Are we inside denied zone
-	private ["_spawn"];
-	_spawn = true;
+	private _spawn = true;
 	{
 		if (_x distance _pos < ((_x getVariable ["radius",100])*2)) exitWith {_spawn = false};
 	} forEach _deniedZones;
+	if (_spawn && {[_pos, _side] call MCCMK_fnc_inKeepOutZone}) then {_spawn = false};
 
 	if (_spawn) then {_spawn = !([_pos, 200] call MCC_fnc_isVisableToPlayers)};
 
@@ -111,7 +132,7 @@ for "_i" from 1 to _counter do {
 			_civClass = _unitsArray call bis_fnc_selectRandom;
 
 			_civGroup = creategroup _side;
-			_unit = _civGroup createUnit [_civClass select 0,_pos,[],0.5,"NONE"];
+			_unit = _civGroup createUnit [_civClass select 0,_pos,[],5,"NONE"];
 
 			if (_side == civilian) then {
 				//Add coleteral damage EH
@@ -147,8 +168,10 @@ for "_i" from 1 to _counter do {
 			_civGroup setspeedmode "LIMITED";
 			_civGroup setBehaviour "SAFE";
 
+			private _wpHouses = _nearHouses select {private _h = _x; !([getPosATL _h, side _civGroup] call MCCMK_fnc_inKeepOutZone) && {(_deniedZones findIf {_h distance _x < (_x getVariable ["radius", 100])}) < 0}};
+			if (count _wpHouses > 0) then {
 			for "_i" from 0 to MAX_WP do {
-				_building = _nearHouses call bis_fnc_selectRandom;
+				_building = _wpHouses call bis_fnc_selectRandom;
 
 				_wp = _civGroup addWaypoint [(getPos _building), 0];
 				_wp setWaypointType "MOVE";
@@ -159,6 +182,7 @@ for "_i" from 1 to _counter do {
 
 			_wp = _civGroup addWaypoint [_pos,(count waypoints _civGroup)];
 			_wp setWaypointType "Cycle";
+			};
 
 			{_x addCuratorEditableObjects [[_unit],false]} forEach allCurators;
 		} else {
@@ -168,7 +192,7 @@ for "_i" from 1 to _counter do {
 
 			for "_i" from 1 to (random 3 + 2) step 1 do {
 			    	_civClass = _enemyArray call bis_fnc_selectRandom;
-					_unit = _civGroup createUnit [_civClass select 0,_pos,[],0.5,"NONE"];
+					_unit = _civGroup createUnit [_civClass select 0,_pos,[],5,"NONE"];
 					_unit forceAddUniform (_civUniforms call bis_fnc_selectRandom);
 					_unit addVest (_civVests call bis_fnc_selectRandom);
 					_unit addHeadgear (_civHead call bis_fnc_selectRandom);

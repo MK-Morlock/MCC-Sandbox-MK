@@ -3,7 +3,6 @@
 #define MCCDlg_ROWS 36 // determines default text and control height
 #define MCCDlg_COLS 90 // guide for positioning controls
 
-// (Calculate proportion, then /100 to represent as percentage)
 #define MCCDlg_CONTROLHGT ((100/MCCDlg_ROWS)/100)
 #define MCCDlg_COLWIDTH ((100/MCCDlg_COLS)/100)
 
@@ -16,8 +15,8 @@
 
 //-----------------------------------------------------------------------------
 // Fonts
-#define MCCFontM "PuristaMedium"
-#define MCCFontHTML "TahomaB"
+#define MCCFontM "RobotoCondensed"	//(was PuristaMedium)
+#define MCCFontHTML "RobotoCondensed"
 //"CourierNewB64" "TahomaB" "Bitstream" "Zeppelin32"
 
 //-----------------------------------------------------------------------------
@@ -102,14 +101,14 @@ class MCC_RscText
   colorBackground[] = {0,0,0,0};
   colorDisabled[] = {0,0,0,0.5};
   colorShadow[] = {0,0,0,0.5};
-  colorText[] = {1,1,1,1};
+  colorText[] = {0.88,0.89,0.90,1};
   autocomplete = "";
-  colorSelection[] = {1,0,0,1};
+  colorSelection[] = {0.82,0.42,0.37,1};
   fixedWidth = 0;
   font = MCCFontM;
   h = 0.037;
   linespacing = 1;
-  shadow = 1;
+  shadow = 0;
   SizeEx = "(((((safezoneW/safezoneH) min 1.2) / 1.2) / 25) * 1)";
   text = "";
   w = 0.3;
@@ -275,22 +274,22 @@ class MCC_RscButton
 {
   access = 0;
   borderSize = 0;
-  colorBackground[] = {0.350,0.350,0.350,1};
-  colorBackgroundActive[] = {"(profilenamespace getvariable ['GUI_BCG_RGB_R',0.3843])","(profilenamespace getvariable ['GUI_BCG_RGB_G',0.7019])","(profilenamespace getvariable ['GUI_BCG_RGB_B',0.8862])",1};
-  colorBackgroundDisabled[] = {0.95,0.95,0.95,1};
+  colorBackground[] = {0.22,0.24,0.26,1};
+  colorBackgroundActive[] = {0.77,0.51,0.08,1};
+  colorBackgroundDisabled[] = {0.15,0.16,0.17,1};
   colorBorder[] = {0,0,0,1};
-  colorDisabled[] = {0.4,0.4,0.4,1};
-  colorFocused[] = {"(profilenamespace getvariable ['GUI_BCG_RGB_R',0.3843])","(profilenamespace getvariable ['GUI_BCG_RGB_G',0.7019])","(profilenamespace getvariable ['GUI_BCG_RGB_B',0.8862])",1};
-  colorBackgroundFocused[] = {1,1,1,1};
-  colorShadow[] = {0,0,0,1};
-  colorText[] = {1,1,1,1};
-  font = "PuristaMedium";
+  colorDisabled[] = {0.55,0.56,0.57,1};
+  colorFocused[] = {0.30,0.32,0.34,1};
+  colorBackgroundFocused[] = {0.30,0.32,0.34,1};
+  colorShadow[] = {0,0,0,0};
+  colorText[] = {0.88,0.89,0.90,1};
+  font = "RobotoCondensed";
   h = 0.039216;
-  offsetPressedX = 0.002;
-  offsetPressedY = 0.002;
-  offsetX = 0.003;
-  offsetY = 0.003;
-  shadow = 2;
+  offsetPressedX = 0.001;
+  offsetPressedY = 0.001;
+  offsetX = 0;
+  offsetY = 0;
+  shadow = 0;
   sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
   soundClick[] = {"\A3\ui_f\data\sound\RscButton\soundClick",0.07,1};
   soundEnter[] = {"\A3\ui_f\data\sound\RscButton\soundEnter",0.09,1};
@@ -302,6 +301,40 @@ class MCC_RscButton
   w = 0.095589;
   x = 0;
   y = 0;
+};
+
+class MCC_RscSideItem: MCC_RscButton
+{
+	style = 0;
+	colorBackground[] = {0,0,0,0};
+	colorBackgroundActive[] = {1,1,1,0.10};
+	colorBackgroundDisabled[] = {0,0,0,0};
+	colorFocused[] = {0,0,0,0};
+	colorBackgroundFocused[] = {0,0,0,0};
+	colorBorder[] = {0,0,0,0};
+	colorText[] = {0.84,0.85,0.87,1};
+	offsetPressedX = 0;
+	offsetPressedY = 0;
+	sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.9)";
+};
+//Invisible click area: commander console F-keys (over the keys printed on the console picture) and the console video feed
+class MCC_RscButtonConsoleKey: MCC_RscButton
+{
+	text = "";
+	colorText[] = {0,0,0,0};
+	colorBackground[] = {0,0,0,0};
+	colorBackgroundActive[] = {1,1,1,0.08};
+	colorBackgroundDisabled[] = {0,0,0,0};
+	colorFocused[] = {0,0,0,0};
+	colorBackgroundFocused[] = {0,0,0,0};
+	colorShadow[] = {0,0,0,0};
+	colorBorder[] = {0,0,0,0};
+	colorDisabled[] = {0,0,0,0};
+	shadow = 0;
+	offsetPressedX = 0;
+	offsetPressedY = 0;
+	offsetX = 0;
+	offsetY = 0;
 };
 
 class MCC_RscCheckBox
@@ -361,7 +394,7 @@ class MCC_CheckBoxes
 
 	colorBackground[] = {0, 0, 0, 0.2}; // control generic BG color
 
-	font = "PuristaMedium";
+	font = "RobotoCondensed";
 	sizeEx = 0.04;
 
 	onCheckBoxesSelChanged = "hint str _this";
@@ -382,13 +415,13 @@ class MCC_RscButtonMenu : MCC_RscButton
   animTextureOver = "#(argb,8,8,3)color(1,1,1,0.5)";
   animTexturePressed = "#(argb,8,8,3)color(1,1,1,1)";
   color2[] = {1,1,1,1};
-  color[] = {1,1,1,1};
-  colorBackground2[] = {1,1,1,0.5};
-  colorBackground[] = {0.450,0.450,0.450,1};
+  color[] = {0.88,0.89,0.90,1};
+  colorBackground2[] = {0.77,0.51,0.08,1};
+  colorBackground[] = {0.22,0.24,0.26,1};
   colorDisabled[] = {1,1,1,0.25};
-  colorText[] = {1,1,1,1};
+  colorText[] = {0.88,0.89,0.90,1};
   default = 0;
-  font = "PuristaMedium";
+  font = "RobotoCondensed";
   h = 0.039216;
   period = 1.2;
   periodFocus = 1.2;
@@ -397,14 +430,14 @@ class MCC_RscButtonMenu : MCC_RscButton
   shortcuts[] = {};
   size = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
   sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-  soundClick[] = {"\A3\ui_f\data\sound\onclick",0.07,1};
-  soundEnter[] = {"\A3\ui_f\data\sound\onover",0.09,1};
-  soundEscape[] = {"\A3\ui_f\data\sound\onescape",0.09,1};
-  soundPush[] = {"\A3\ui_f\data\sound\new1",0,0};
-  style = "0x02 + 0xC0";
+  soundClick[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundClick",0.09,1};
+  soundEnter[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundEnter",0.09,1};
+  soundEscape[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundEscape",0.09,1};
+  soundPush[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundPush",0.09,1};
+  style = 2;	//centred, like the other MCC buttons
   text = "";
   textureNoShortcut = "#(argb,8,8,3)color(0,0,0,0)";
-  type = 16;
+  type = 1;	//standard button (was a textured shortcut button: text left/top, a different look)
   w = 0.095589;
   x = 0;
   y = 0;
@@ -412,14 +445,14 @@ class MCC_RscButtonMenu : MCC_RscButton
 	{
 		align = "left";
 		color = "#E5E5E5";
-		font = "PuristaLight";
+		font = "RobotoCondensedLight";
 		shadow = "false";
 	};
   class AttributesImage
 	{
 		align = "left";
 		color = "#E5E5E5";
-		font = "PuristaMedium";
+		font = "RobotoCondensed";
 	};
    class HitZone
 	{
@@ -444,7 +477,7 @@ class MCC_RscButtonMenu : MCC_RscButton
 	};
 };
 
-class RscButtonMenuOK : MCC_RscButtonMenu
+class MCC_RscButtonMenuOK : MCC_RscButtonMenu
 {
   idc = 1;
   color2[] = {0,0,0,1};
@@ -460,7 +493,7 @@ class RscButtonMenuOK : MCC_RscButtonMenu
   text = "OK";
 };
 
-class RscButtonMenuCancel : RscButtonMenuOK
+class MCC_RscButtonMenuCancel : MCC_RscButtonMenuOK
 {
   idc = 2;
   color2[] = {0,0,0,1};
@@ -476,7 +509,7 @@ class RscButtonMenuCancel : RscButtonMenuOK
   text = "Cancel";
 };
 
-class RscButtonMenu : MCC_RscButtonMenu
+class MCC_RscButtonMenuStd : MCC_RscButtonMenu
 {
   idc = -1;
   color2[] = {0,0,0,1};
@@ -491,6 +524,102 @@ class RscButtonMenu : MCC_RscButtonMenu
   text = "";
 };
 
+//Rounded-corner button (main console): a picture button (CT_SHORTCUTBUTTON) with a white rounded texture, tinted by
+//the button colour is in the textures (grey, orange under the mouse, dark grey disabled). Only two heights exist so the text can be centred: large 0.0329871 and small 0.0219914 x safezoneH.
+class MCC_RscButtonRound
+{
+	idc = -1;
+	type = 16;
+	style = 0;
+	access = 0;
+	default = 0;
+	shadow = 0;
+	x = 0; y = 0; w = 0.1; h = "0.0329871 * safezoneH";
+	text = "";
+	tooltip = "";
+	font = "RobotoCondensed";
+	size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+	sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+	color[] = {0.88,0.89,0.90,1};
+	colorFocused[] = {0.88,0.89,0.90,1};
+	color2[] = {1,1,1,1};
+	colorDisabled[] = {0.55,0.56,0.57,1};
+	colorBackground[] = {1,1,1,1};
+	colorBackgroundFocused[] = {1,1,1,1};
+	colorBackground2[] = {1,1,1,1};
+	colorBackgroundDisabled[] = {1,1,1,1};
+	animTextureNormal = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
+	animTextureDisabled = "\mcc_sandbox_mod\data\btn_round_d_ca.paa";
+	animTextureOver = "\mcc_sandbox_mod\data\btn_round_o_ca.paa";
+	animTextureFocused = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
+	animTexturePressed = "\mcc_sandbox_mod\data\btn_round_o_ca.paa";
+	animTextureDefault = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
+	textureNoShortcut = "#(argb,8,8,3)color(0,0,0,0)";
+	period = 1.2;
+	periodFocus = 1.2;
+	periodOver = 1.2;
+	soundEnter[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundEnter",0.09,1};
+	soundPush[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundPush",0.09,1};
+	soundClick[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundClick",0.09,1};
+	soundEscape[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundEscape",0.09,1};
+	tooltipColorText[] = {1,1,1,1};
+	tooltipColorBox[] = {1,1,1,1};
+	tooltipColorShade[] = {0,0,0,0.65};
+	class HitZone {left = 0; top = 0; right = 0; bottom = 0;};
+	class ShortcutPos {left = 0; top = 0; w = 0; h = 0;};
+	class TextPos {left = 0; top = "((0.0329871 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};
+	class Attributes {font = "RobotoCondensed"; color = "#E1E3E5"; align = "center"; shadow = 0;};
+	class AttributesImage {font = "RobotoCondensed"; color = "#E1E3E5"; align = "center";};
+};
+
+//Rounded-corner button (main console): a picture button (CT_SHORTCUTBUTTON) with a white rounded texture, tinted by
+//the button colour is in the textures (grey, orange under the mouse, dark grey disabled). Only two heights exist so the text can be centred: large 0.0219914 and small 0.0219914 x safezoneH.
+class MCC_RscButtonRoundSmall
+{
+	idc = -1;
+	type = 16;
+	style = 0;
+	access = 0;
+	default = 0;
+	shadow = 0;
+	x = 0; y = 0; w = 0.1; h = "0.0219914 * safezoneH";
+	text = "";
+	tooltip = "";
+	font = "RobotoCondensed";
+	size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+	sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+	color[] = {0.88,0.89,0.90,1};
+	colorFocused[] = {0.88,0.89,0.90,1};
+	color2[] = {1,1,1,1};
+	colorDisabled[] = {0.55,0.56,0.57,1};
+	colorBackground[] = {1,1,1,1};
+	colorBackgroundFocused[] = {1,1,1,1};
+	colorBackground2[] = {1,1,1,1};
+	colorBackgroundDisabled[] = {1,1,1,1};
+	animTextureNormal = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";
+	animTextureDisabled = "\mcc_sandbox_mod\data\btn_round_wide_d_ca.paa";
+	animTextureOver = "\mcc_sandbox_mod\data\btn_round_wide_o_ca.paa";
+	animTextureFocused = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";
+	animTexturePressed = "\mcc_sandbox_mod\data\btn_round_wide_o_ca.paa";
+	animTextureDefault = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";
+	textureNoShortcut = "#(argb,8,8,3)color(0,0,0,0)";
+	period = 1.2;
+	periodFocus = 1.2;
+	periodOver = 1.2;
+	soundEnter[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundEnter",0.09,1};
+	soundPush[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundPush",0.09,1};
+	soundClick[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundClick",0.09,1};
+	soundEscape[] = {"\A3\ui_f\data\sound\RscButtonMenu\soundEscape",0.09,1};
+	tooltipColorText[] = {1,1,1,1};
+	tooltipColorBox[] = {1,1,1,1};
+	tooltipColorShade[] = {0,0,0,0.65};
+	class HitZone {left = 0; top = 0; right = 0; bottom = 0;};
+	class ShortcutPos {left = 0; top = 0; w = 0; h = 0;};
+	class TextPos {left = 0; top = "((0.0219914 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)) / 2) max 0"; right = 0; bottom = 0;};
+	class Attributes {font = "RobotoCondensed"; color = "#E1E3E5"; align = "center"; shadow = 0;};
+	class AttributesImage {font = "RobotoCondensed"; color = "#E1E3E5"; align = "center";};
+};
+
 class MCC_RscListbox
 {
 	access = 0;
@@ -500,20 +629,20 @@ class MCC_RscListbox
 	autoScrollRewind = 0;
 	autoScrollSpeed = -1;
 	color[] = {1,1,1,1};
-	colorBackground[] = {0,0,0,0.3};
+	colorBackground[] = {0.07,0.08,0.09,0.95};
 	colorDisabled[] = {1,1,1,0.25};
 	colorPictudeDisabled[] = {1,1,1,0.25};
 	colorPicture[] = {1,1,1,1};
 	colorPictureDisabled[] = {1,1,1,1};
 	colorPictureSelected[] = {1,1,1,1};
 	colorScrollbar[] = {1,0,0,0};
-	colorSelect2[] = {0,0,0,1};
-	colorSelect[] = {0,0,0,1};
-	colorSelectBackground2[] = {1,1,1,0.5};
-	colorSelectBackground[] = {0.95,0.95,0.95,1};
+	colorSelect2[] = {1,1,1,1};
+	colorSelect[] = {1,1,1,1};
+	colorSelectBackground2[] = {0.77,0.51,0.08,0.6};
+	colorSelectBackground[] = {0.77,0.51,0.08,1};
 	colorShadow[] = {0,0,0,0.5};
-	colorText[] = {1,1,1,1};
-	font = "PuristaMedium";
+	colorText[] = {0.88,0.89,0.90,1};
+	font = "RobotoCondensed";
 	h = 0.8;
 	maxHistoryDelay = 1;
 	period = 1.2;
@@ -547,6 +676,7 @@ class MCC_RscListbox
 
 class MCC_RscListNbox
 {
+	colorBackground[] = {0.07,0.08,0.09,0.95};
 	access = 0;
 	idc = -1;
 	type = 102;
@@ -559,13 +689,13 @@ class MCC_RscListNbox
 	w = 10 * GUI_GRID_CENTER_W; // Width
 	h = 3 * GUI_GRID_CENTER_H; // Height
 
-	colorSelectBackground[] = {1,0.5,0,1}; // Selected item fill color
-	colorSelectBackground2[] = {0,0,0,1}; // Selected item fill color (oscillates between this and colorSelectBackground)
+	colorSelectBackground[] = {0.77,0.51,0.08,1}; // Selected item fill color
+	colorSelectBackground2[] = {0.77,0.51,0.08,0.6}; // Selected item fill color (oscillates between this and colorSelectBackground)
 
 	sizeEx = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-	font = "PuristaMedium";
+	font = "RobotoCondensed";
 	shadow = 0; // Shadow (0 - none, 1 - directional, color affected by colorShadow, 2 - black outline)
-	colorText[] = {1,1,1,1}; // Text and frame color
+	colorText[] = {0.88,0.89,0.90,1}; // Text and frame color
 	colorDisabled[] = {1,1,1,0.5}; // Disabled text color
 	colorSelect[] = {1,1,1,1}; // Text selection color
 	colorSelect2[] = {1,1,1,1}; // Text selection color (oscillates between this and colorSelect)
@@ -610,19 +740,19 @@ class MCC_RscTree
 	access = 0;
 	borderSize = 0;
 	colorArrow[] = {1,1,1,1};
-	colorBackground[] = {0,0,0,0};
+	colorBackground[] = {0.07,0.08,0.09,0.95};
 	colorBorder[] = {0,0,0,0};
 	colorDisabled[] = {1,1,1,0.25};
-	colorMarked[] = {0.2,0.3,0.7,1};
-	colorMarkedSelected[] = {0,0.5,0.5,1};
+	colorMarked[] = {0,0.3,0.6,1};
+	colorMarkedSelected[] = {0,0.3,0.6,1};
 	colorMarkedText[] = {0,0,0,1};
 	colorSelect[] = {1,1,1,0.7};
 	colorSelectBackground[] = {0,0,0,0.5};
 	colorSelectText[] = {0,0,0,1};
-	colorText[] = {1,1,1,1};
+	colorText[] = {0.88,0.89,0.90,1};
 	expandedTexture = "A3\ui_f\data\gui\rsccommon\rsctree\expandedTexture_ca.paa";
 	expandOnDoubleclick = 1;
-	font = "PuristaMedium";
+	font = "RobotoCondensed";
 	hiddenTexture = "A3\ui_f\data\gui\rsccommon\rsctree\hiddenTexture_ca.paa";
 	maxHistoryDelay = 1;
 	multiselectEnabled = 0;
@@ -656,22 +786,22 @@ class MCC_RscCombo
 	arrowEmpty = "\A3\ui_f\data\GUI\RscCommon\rsccombo\arrow_combo_ca.paa";
 	arrowFull = "\A3\ui_f\data\GUI\RscCommon\rsccombo\arrow_combo_active_ca.paa";
 	color[] = {1,1,1,1};
-	colorActive[] = {1,0,0,1};
-	colorBackground[] = {0,0,0,1};
+	colorActive[] = {0.77,0.51,0.08,1};
+	colorBackground[] = {0.149,0.169,0.188,1};
 	colorDisabled[] = {1,1,1,0.25};
-	colorScrollbar[] = {1,0,0,1};
-	colorSelect[] = {0,0,0,1};
-	colorSelectBackground[] = {1,1,1,0.7};
+	colorScrollbar[] = {0.82,0.42,0.37,1};
+	colorSelect[] = {1,1,1,1};
+	colorSelectBackground[] = {0.77,0.51,0.08,1};
 	colorPictudeDisabled[] = {1,1,1,0.25};
 	colorPicture[] = {1,1,1,1};
-	colorText[] = {0.95,0.95,0.95,1};
+	colorText[] = {0.88,0.89,0.90,1};
 	colorPictureDisabled[] = {1,1,1,1};
 	colorPictureSelected[] = {1,1,1,1};
-	font = "PuristaMedium";
+	font = "RobotoCondensed";
 	h = 0.035;
 	maxHistoryDelay = 1;
 	shadow = 0;
-	sizeEx = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
+	sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.85)";
 	soundCollapse[] = {"\A3\ui_f\data\sound\RscCombo\soundCollapse",0.1,1};
 	soundExpand[] = {"\A3\ui_f\data\sound\RscCombo\soundExpand",0.1,1};
 	soundSelect[] = {"\A3\ui_f\data\sound\RscCombo\soundSelect",0.1,1};
@@ -739,392 +869,21 @@ class MCC_RscStructuredText
 			{
 				align = "left";
 				color = "#ffffff";
-				font = "PuristaMedium";
+				font = "RobotoCondensed";
 				shadow = 1;
 			};
 	};
 
 class MCC_RscMapControl : RscMapControl
-	{
+{
+	//Everything else - colours, fonts, text sizes, map icons, satellite layer - comes from Arma 3's own map control
 	access = 0;
-	alphaFadeEndScale = 0.4;
-	alphaFadeStartScale = 0.35;
-	colorBackground[] = {0.969,0.957,0.949,1};
-	colorCountlines[] = {0.572,0.354,0.188,0.25};
-	colorCountlinesWater[] = {0.491,0.577,0.702,0.3};
-	colorForest[] = {0.624,0.78,0.388,0.5};
-	colorForestBorder[] = {0,0,0,0};
-	colorGrid[] = {0.1,0.1,0.1,0.6};
-	colorGridMap[] = {0.1,0.1,0.1,0.6};
-	colorInactive[] = {1,1,1,0.5};
-	colorLevels[] = {0.286,0.177,0.094,0.5};
-	colorMainCountlines[] = {0.572,0.354,0.188,0.5};
-	colorMainCountlinesWater[] = {0.491,0.577,0.702,0.6};
-	colorMainRoads[] = {0.9,0.5,0.3,1};
-	colorMainRoadsFill[] = {1,0.6,0.4,1};
-	colorNames[] = {0.1,0.1,0.1,0.9};
-	colorOutside[] = {0,0,0,1};
-	colorPowerLines[] = {0.1,0.1,0.1,1};
-	colorRailWay[] = {0.8,0.2,0,1};
-	colorRoads[] = {0.7,0.7,0.7,1};
-	colorRoadsFill[] = {1,1,1,1};
-	colorRocks[] = {0,0,0,0.3};
-	colorRocksBorder[] = {0,0,0,0};
-	colorSea[] = {0.467,0.631,0.851,0.5};
-	colorText[] = {0,0,0,1};
-	colorTracks[] = {0.84,0.76,0.65,0.15};
-	colorTracksFill[] = {0.84,0.76,0.65,1};
-	font = "TahomaB";
-	fontGrid = "TahomaB";
-	fontInfo = "PuristaMedium";
-	fontLabel = "PuristaMedium";
-	fontLevel = "TahomaB";
-	fontNames = "PuristaMedium";
-	fontUnits = "TahomaB";
-	h = "SafeZoneH - 1.5 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
-	maxSatelliteAlpha = 0.45;
-	moveOnEdges = 1;
-	ptsPerSquareCLn = 10;
-	ptsPerSquareCost = 10;
-	ptsPerSquareExp = 10;
-	ptsPerSquareFor = 9;
-	ptsPerSquareForEdge = 9;
-	ptsPerSquareObj = 9;
-	ptsPerSquareRoad = 6;
-	ptsPerSquareSea = 5;
-	ptsPerSquareTxt = 3;
 	scaleDefault = 0.16;
 	scaleMax = 1;
 	scaleMin = 0.001;
-	shadow = 0;
-	showCountourInterval = 0;
-	sizeEx = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-	sizeExGrid = 0.02;
-	sizeExInfo = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
-	sizeExLabel = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
-	sizeExLevel = 0.02;
-	sizeExNames = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8) * 2";
-	sizeExUnits = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
-	stickX[] = {0.2,["Gamma",1,1.5]};
-	stickY[] = {0.2,["Gamma",1,1.5]};
-	style = 48;
-	text = "#(argb,8,8,3)color(1,1,1,1)";
-	type = 101;
-	w = "SafeZoneWAbs";
-	x = "SafeZoneXAbs";
-	y = "SafeZoneY + 1.5 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
-	class ActiveMarker
-		{
-		color[] = {0.3,0.1,0.9,1};
-		size = 50;
-		};
-	class Bunker
-		{
-		coefMax = 4;
-		coefMin = 0.25;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\bunker_ca.paa";
-		importance = "1.5 * 14 * 0.05";
-		size = 14;
-		};
-	class Bush
-		{
-		coefMax = 4;
-		coefMin = 0.25;
-		color[] = {0.45,0.64,0.33,0.4};
-		icon = "\A3\ui_f\data\map\mapcontrol\bush_ca.paa";
-		importance = "0.2 * 14 * 0.05 * 0.05";
-		size = "14/2";
-		};
-	class BusStop
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\busstop_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Chapel
-		{
-		coefMax = 4;
-		coefMin = 0.85;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\Chapel_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Church
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\church_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Command
-		{
-		coefMax = 1;
-		coefMin = 1;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\waypoint_ca.paa";
-		importance =1;
-		size = 18;
-		};
-	class Cross
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\Cross_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class CustomMark
-		{
-		coefMax = 1;
-		coefMin = 1;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\custommark_ca.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Fortress
-		{
-		coefMax = 4;
-		coefMin = 0.25;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\bunker_ca.paa";
-		importance = "2 * 16 * 0.05";
-		size = 16;
-		};
-	class Fountain
-		{
-		coefMax = 4;
-		coefMin = 0.25;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\fountain_ca.paa";
-		importance = "1 * 12 * 0.05";
-		size = 11;
-		};
-	class Fuelstation
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\fuelstation_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Hospital
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\hospital_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Legend
-		{
-		color[] = {0,0,0,1};
-		colorBackground[] = {1,1,1,0.5};
-		font = "PuristaMedium";
-		h = "3.5 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
-		sizeEx = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
-		w = "10 * 					(			((safezoneW / safezoneH) min 1.2) / 40)";
-		x = "SafeZoneX + 					(			((safezoneW / safezoneH) min 1.2) / 40)";
-		y = "SafeZoneY + safezoneH - 4.5 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
-		};
-	class Lighthouse
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\lighthouse_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class LineMarker {
-		lineDistanceMin = 3e-005;
-		lineLengthMin = 5;
-		lineWidthThick = 0.014;
-		lineWidthThin = 0.008;
-		textureComboBoxColor = "#(argb,8,8,3)color(1,1,1,1)";
-	};
-	class power
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\power_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class powersolar
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\powersolar_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class powerwind
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\powerwind_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class powerwave
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\powerwave_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Quay
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\quay_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Rock
-		{
-		coefMax = 4;
-		coefMin = 0.25;
-		color[] = {0.1,0.1,0.1,0.8};
-		icon = "\A3\ui_f\data\map\mapcontrol\rock_ca.paa";
-		importance = "0.5 * 12 * 0.05";
-		size = 12;
-		};
-	class Ruin
-		{
-		coefMax = 4;
-		coefMin = 1;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\ruin_ca.paa";
-		importance = "1.2 * 16 * 0.05";
-		size = 16;
-		};
-	class shipwreck
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\shipwreck_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class SmallTree
-		{
-		coefMax = 4;
-		coefMin = 0.25;
-		color[] = {0.45,0.64,0.33,0.4};
-		icon = "\A3\ui_f\data\map\mapcontrol\bush_ca.paa";
-		importance = "0.6 * 12 * 0.05";
-		size = 12;
-		};
-	class Stack
-		{
-		coefMax = 4;
-		coefMin = 0.9;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\stack_ca.paa";
-		importance = "2 * 16 * 0.05";
-		size = 20;
-		};
-	class Task
-		{
-		coefMax = 1;
-		coefMin = 1;
-		color[] = {"(profilenamespace getvariable ['IGUI_TEXT_RGB_R',0])","(profilenamespace getvariable ['IGUI_TEXT_RGB_G',1])","(profilenamespace getvariable ['IGUI_TEXT_RGB_B',1])","(profilenamespace getvariable ['IGUI_TEXT_RGB_A',0.8])"};
-		colorCanceled[] = {0.7,0.7,0.7,1};
-		colorCreated[] = {1,1,1,1};
-		colorDone[] = {0.7,1,0.3,1};
-		colorFailed[] = {1,0.3,0.2,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\taskIcon_CA.paa";
-		iconCanceled = "\A3\ui_f\data\map\mapcontrol\taskIconCanceled_CA.paa";
-		iconCreated = "\A3\ui_f\data\map\mapcontrol\taskIconCreated_CA.paa";
-		iconDone = "\A3\ui_f\data\map\mapcontrol\taskIconDone_CA.paa";
-		iconFailed = "\A3\ui_f\data\map\mapcontrol\taskIconFailed_CA.paa";
-		importance = 1;
-		size = 27;
-		};
-	class Tourism
-		{
-		coefMax = 4;
-		coefMin = 0.7;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\tourism_ca.paa";
-		importance = "1 * 16 * 0.05";
-		size = 16;
-		};
-	class Transmitter
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\transmitter_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Tree
-		{
-		coefMax = 4;
-		coefMin = 0.25;
-		color[] = {0.45,0.64,0.33,0.4};
-		icon = "\A3\ui_f\data\map\mapcontrol\bush_ca.paa";
-		importance = "0.9 * 16 * 0.05";
-		size = 12;
-		};
-	class ViewTower
-		{
-		coefMax = 4;
-		coefMin = 0.5;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\viewtower_ca.paa";
-		importance = "2.5 * 16 * 0.05";
-		size = 16;
-		};
-	class Watertower
-		{
-		coefMax = 1;
-		coefMin = 0.85;
-		color[] = {1,1,1,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\watertower_CA.paa";
-		importance = 1;
-		size = 24;
-		};
-	class Waypoint
-		{
-		coefMax = 1;
-		coefMin = 1;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\waypoint_ca.paa";
-		importance = 1;
-		size = 24;
-		};
-	class WaypointCompleted
-		{
-		coefMax = 1;
-		coefMin = 1;
-		color[] = {0,0,0,1};
-		icon = "\A3\ui_f\data\map\mapcontrol\waypointCompleted_ca.paa";
-		importance = 1;
-		size = 24;
-		};
-
-	};
+	moveOnEdges = 1;
+	colorOutside[] = {0.439,0.514,0.620,1};
+};
 
 class MCC_RscSlider
 	{
@@ -1166,7 +925,7 @@ class MCC_RscPicture
 		colorBackground[] = {0,0,0,0};
 		colorText[] = {1,1,1,1};
 		fixedWidth = 0;
-		font = "TahomaB";
+		font = "RobotoCondensed";
 		h = 0.15;
 		lineSpacing = 0;
 		shadow = 0;
@@ -1188,7 +947,7 @@ class MCC_RscActivePicture
 		colorActive[] = {1,1,1,1};
 		colorText[] = {0,0,0,1};
 		default = 0;
-		font = "PuristaMedium";
+		font = "RobotoCondensed";
 		h = 0.035;
 		idc = -1;
 		shadow = 2;
@@ -1212,7 +971,7 @@ class MCC_RscFrame
 	{
 		colorBackground[] = {0,0,0,0};
 		colorText[] = {1,1,1,1};
-		font = "PuristaMedium";
+		font = "RobotoCondensed";
 		shadow = 2;
 		sizeEx = 0.02;
 		style = 64;
@@ -1227,14 +986,14 @@ class MCC_RscToolbox {
 	  y = 0.2;
 	  w = 0.2;
 	  h = 0.15;
-	  colorText[] = {1, 0, 0, 1};
+	  colorText[] = {0.82, 0.42, 0.37, 1};
 	  color[] = {0, 1, 0, 1};  //seems nothing to change, but define to avaoid errors
-	  colorTextSelect[] = {0, 0.8, 0, 1};
+	  colorTextSelect[] = {0.56, 0.75, 0.42, 1};
 	  colorSelect[] = {0, 0, 0, 1};
 	  colorTextDisable[] = {0.4, 0.4, 0.4, 1};
 	  colorDisable[] = {0.4, 0.4, 0.4, 1};
 	  colorSelectedBg[] = {0.450,0.450,0.450,1};
-	  font = "PuristaMedium";
+	  font = "RobotoCondensed";
 	  sizeEx = "(			(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.6)";
 };
 class MCC_keyBindsGroup: MCC_RscControlsGroup
@@ -1260,7 +1019,7 @@ class MCC_keyBindsGroup: MCC_RscControlsGroup
 		{
 			idc = -1;
 
-			text = "Comander Console:"; //--- ToDo: Localize;
+			text = "Commander Console:"; //--- ToDo: Localize;
 			x = 0.00515625 * safezoneW;
 			y = 0.077 * safezoneH;
 			w = 0.0973958 * safezoneW;

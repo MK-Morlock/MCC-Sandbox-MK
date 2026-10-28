@@ -1,6 +1,6 @@
 //==================================================================MCC_fnc_setWeather======================================================================================
 // Sets weather  on all clients  - skip time by one hour to make the weather change
-// Example: [[[ Overcast, WindForce, Waves, Rain, Lightnings,fog]],"MCC_fnc_setWeather",true,false] spawn BIS_fnc_MP;
+// Example: [[ Overcast, WindForce, Waves, Rain, Lightnings,fog]] remoteExec ["MCC_fnc_setWeather", true, false];
 // Params:
 //	Overcast: number, 0-1
 //	WindForce: number, 0-1
@@ -10,10 +10,10 @@
 //	Fog: array, [fogValue, fogDecay, fogBase]
 //	Time: integer, how long till effect
 //==============================================================================================================================================================================
-private ["_weather","_time"];
+private _time = 0;
 
-_weather = _this select 0;
-_time = [_weather, 6, 0, [0]] call BIS_fnc_param;
+params ["_weather"];
+_time = _weather param [6, 0, [0]];
 
 /*
 skipTime -24;

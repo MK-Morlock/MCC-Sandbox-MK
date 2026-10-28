@@ -1,15 +1,25 @@
 //==================================================================MCC_fnc_construct_base=============================================================================
 // Example:[_pos, _anchorDir , _anchorType, _BuildTime, _side]  call  MCC_fnc_construct_base;
 //======================================================================================================================================================================
-private ["_cfgClass","_anchorType","_anchorDir","_pos","_objs","_constType","_anchor","_object","_BuildTime","_buildingObjs","_builtArray","_side","_level","_instant","_endTime","_boxName","_boxArray","_box","_text","_res","_displayName","_markerName","_root","_data"];
+private _anchorType = "";
+private _objs = [];
+private _constType = nil;
+private _anchor = nil;
+private "_object";
+private _buildingObjs = [];
+private _builtArray = [];
+private _level = 0;
+private _instant = false;
+private _text = "";
+private _res = [];
+private _displayName = "";
+private _markerName = "";
+private _root = configNull;
+private "_data";
 #define BASE_ANCHOR "UserTexture10m_F"
 #define ANCHOR_ITEM "Land_TreeBin_F"
 
-_pos			= _this select 0;
-_anchorDir 		= _this select 1;
-_cfgClass		= _this select 2;
-_BuildTime		= _this select 3;
-_side			= _this select 4;
+params ["_pos", "_anchorDir", "_cfgClass", "_BuildTime", "_side"];
 
 _instant = if (_BuildTime <=0) then {true} else {false};
 
@@ -66,7 +76,7 @@ _module setVariable ["mcc_delete",false,true];
 _markerName = format ["ConstCounter_%1",["MCC_ConstCounter_",1] call bis_fnc_counter];
 _module setVariable ["mcc_markerName",_markerName,true];
 
-[[[_markerName], _pos, "colorGreen", "loc_Bunker",_displayName,false],"BIS_fnc_markerCreate", _side,false] call BIS_fnc_MP;
+[[_markerName], _pos, "colorGreen", "loc_Bunker",_displayName,false] remoteExec ["BIS_fnc_markerCreate", _side, false];
 
 //Building anim
 if !(_instant) then {
@@ -121,9 +131,9 @@ if (_constType != "hq") then {
 
 										{detach _x; deleteVehicle _x} foreach attachedObjects _obj;
 										deleteVehicle _obj;
-										[[[_side], {player addRating (if (playerside != (_this select 0)) then {500} else {-1000})}], "BIS_fnc_spawn", _source, false] spawn BIS_fnc_MP;
+										[[_side], {player addRating (if (playerside != (_this select 0)) then {500} else {-1000})}] remoteExec ["call", _source, false];
 
-										[[_text,true],"MCC_fnc_globalHint",_side,false] spawn BIS_fnc_MP;
+										[_text,true] remoteExec ["MCC_fnc_globalHint", _side, false];
 
 									} else {0};
 								}
@@ -132,14 +142,22 @@ if (_constType != "hq") then {
 	_anchor AddEventHandler ["HandleDamage",{}];
 };
 
+private _made = [];
 for "_i" from 0 to ((count _objs) - 1) do {
 	_data = _objs select _i;
 	_object = nil;
 	_object = (_data select  0) createVehicle [0,0,0];
 	waituntil {!isnil "_object"};
+	_made pushBack [_object, _data select 1];
+};
+private _offs = [_anchor, _made] call MCC_fnc_rtsGroundOffsets;
+
+for "_i" from 0 to ((count _objs) - 1) do {
+	_data = _objs select _i;
+	_object = (_made select _i) select 0;
 	for "_x" from 1 to 2 do
 	{
-		_object attachTo [_anchor,(_data select  1)];
+		_object attachTo [_anchor,_offs select _i];
 		_object setVectorDirAndUp  (_data select  2);
 	};
 	_object setVariable ["mcc_delete",false,true];

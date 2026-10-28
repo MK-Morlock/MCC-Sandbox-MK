@@ -2,7 +2,17 @@
 	Open the vault (main cargo box)
 */
 
-private ["_mccdialog","_comboBox","_displayname","_pic", "_index", "_array", "_class","_boxName","_tempBox","_displayArray","_prices"];
+private "_mccdialog";
+private _comboBox = controlNull;
+private "_displayname";
+private "_pic";
+private "_index";
+private _array = [];
+private "_class";
+private _boxName = "";
+private _tempBox = objNull;
+private _displayArray = [];
+private _prices = 0;
 _tempBox = param [0,objNull,[objNull,sideUnknown]];
 _prices = param [1,0.5,[0]];
 
@@ -14,7 +24,8 @@ MCC_fnc_mainBoxInitRefreshBox = {
 
 	//Refresh box arrays
 	params ["_tempBox","_prices"];
-	private ["_array","_i"];
+	private _array = [];
+	private "_i";
 	for "_i" from 1 to 12 step 1 do
 	{
 		_array = [_i, _tempBox,"",_prices] call MCC_fnc_boxMakeWeaponsArray;
@@ -26,12 +37,15 @@ MCC_fnc_mainBoxInitRefreshBox = {
 	//endLoadingScreen;
 };
 
-_tempBox setVariable ["MCC_prices",_prices,true];
+//An HQ / FOB object made with MCC_fnc_makeObjectVirtualBox opens its sides shared virtual box.
+if (_tempBox isEqualType objNull && {!(_tempBox getVariable ["MCC_virtualBox",false])} && {(_tempBox getVariable ["MCC_virtualBoxSide",sideUnknown]) isEqualType west} && {(_tempBox getVariable ["MCC_virtualBoxSide",sideUnknown]) != sideUnknown}) then {
+	_tempBox = _tempBox getVariable "MCC_virtualBoxSide";
+};
 
 //if it is a side box
 if (typeName _tempBox isEqualTo typeName sideUnknown) then {
 	//Do we have a box for our side?
-	_boxName = format ["MCC_rtsMainBox%1",playerSide];
+	_boxName = format ["MCC_rtsMainBox%1",[playerSide, _tempBox] select (_tempBox != sideUnknown)];
 
 	if (isnil _boxName) then {
 		_tempBox = "ReammoBox_F" createvehicle [0,0,(random 200)+200];
@@ -45,14 +59,15 @@ if (typeName _tempBox isEqualTo typeName sideUnknown) then {
 	_tempBox = missionNamespace getVariable [_boxName, objNull];
 };
 
+if (!isNull _tempBox) then {_tempBox setVariable ["MCC_prices",_prices,true]};
 
 
-createDialog "MCC_rtsMainBox";
+
+createDialog ("MCC_rtsMainBox" call MCC_fnc_dialogName);
 waituntil {dialog};
 
 //create blur effect
-private ["_blur"];
-_blur = ppEffectCreate ["DynamicBlur", 474];
+private _blur = ppEffectCreate ["DynamicBlur", 474];
 _blur ppEffectEnable true;
 _blur ppEffectAdjust [1];
 _blur ppEffectCommit 0.2;
@@ -127,7 +142,8 @@ _comboBox lbSetCurSel 0;
 
 _blur spawn {
 	disableSerialization;
-	private ["_array","_mccdialog"];
+	private "_array";
+	private "_mccdialog";
 	_mccdialog = uiNamespace getVariable ["MCC_rtsMainBox", displayNull];
 	while {(str (_mccdialog displayCtrl 0) != "No control")} do {
 

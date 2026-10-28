@@ -7,10 +7,19 @@
 // <OUT>
 //		Action
 //===========================================================================================================================================================================
-private ["_player","_vehicle","_params","_actions","_airports","_counter","_searchArray","_sides","_airportName","_airportVars"];
-_vehicle = [_this, 0, objNull, [objNull]] call BIS_fnc_param;
-_player = [_this, 1, objNull, [objNull]] call BIS_fnc_param;
-_params = [_this, 2, [], [[]]] call BIS_fnc_param;
+private _player = objNull;
+private _vehicle = objNull;
+private _params = [];
+private _actions = [];
+private _airports = [];
+private _counter = 0;
+private "_searchArray";
+private _sides = 0;
+private "_airportName";
+private "_airportVars";
+_vehicle = _this param [0, objNull, [objNull]];
+_player = _this param [1, objNull, [objNull]];
+_params = _this param [2, [], [[]]];
 
 
 //Search airports

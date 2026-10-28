@@ -4,7 +4,12 @@
 
 */
 params ["_unit"];
-private ["_grenadesType","_grenade","_grenadePic","_grenadeText","_children","_itemCount"];
+private _grenadesType = [];
+private "_grenade";
+private _grenadePic = "";
+private _grenadeText = "";
+private _children = [];
+private _itemCount = {};
 
 _children = [];
 _grenadesType = [];

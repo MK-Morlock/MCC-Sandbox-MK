@@ -1,14 +1,19 @@
 //===================================================================MCC_fnc_makeBriefing=================================================================================
 //Server Only - create a Logic based briefing
-//Example:[[_string, _type ,_missionTittle],"MCC_fnc_makeBriefing",false,false] call BIS_fnc_MP;
+//Example:[_string, _type ,_missionTittle] remoteExec ["MCC_fnc_makeBriefing", false, false];
 // Params:
 // 	_string: string, the briefing string
 //	_type: interger or string, Integer - pre defined mission type or a string for custom one
 //	_missionTittle:  string,  the mission tittle can get complex string as it will turn it to array such as HTML
 //=========================================================================================
-private ["_type","_string","_tittle","_dummyGroup","_dummy","_missionTittle","_missionInfo","_sidePlayer","_playMusic"];
-_string 		= _this select 0;
-_type 			= _this select 1;
+private _tittle = "";
+private _dummyGroup = grpNull;
+private _dummy = objNull;
+private _missionTittle = [];
+private _missionInfo = [];
+private _sidePlayer = sideUnknown;
+private _playMusic = 0;
+params ["_string", "_type"];
 _missionTittle 	= param [2, [], [[]]];;
 _missionInfo	= param [3, [], [[]]];;
 _sidePlayer =  _missionInfo param [7, sideLogic,[sideLogic]];
@@ -64,5 +69,5 @@ if (count _missionInfo > 0) then {
 if (_playMusic in [0,1]) then {
 	_init = format ["0 = _this spawn {if (!isDedicated && (str playerSide ==  '%4')) then {waituntil {alive player};player createDiaryRecord ['diary', ['%1',(toString %3) + '%2']];(_this getVariable 'missionsInfo') spawn MCC_fnc_MWopenBriefing;}};",_tittle, _string ,_missionTittle, _sidePlayer];
 
-	[[[netid _dummy,_dummy], _init], "MCC_fnc_setVehicleInit", true, false] spawn BIS_fnc_MP;
+	[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, false];
 };

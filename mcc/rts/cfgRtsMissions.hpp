@@ -28,7 +28,7 @@ class MCC_rts_missionPatrol
 	picture = "mcc\rts\data\missions\missionPatrol.paa";
 	#endif
 
-	displayName = "Comabt Patrol";
+	displayName = "Combat Patrol";
 	descriptionShort = "Patrol the certain area - elimate hostiles and clear IEDs";
 	condition = "(missionNamespace getVariable [format ['MCC_rts_missionPatrol_%1', playerSide],false])";
 	requiredBuildings[] = {};

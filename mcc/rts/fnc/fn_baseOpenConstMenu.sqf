@@ -4,7 +4,7 @@
 //     _center: POSITION
 //     _radius: INTEGER
 //==============================================================================================================================================================================
-private ["_disp"];
+private "_disp";
 disableSerialization;
 _disp = uiNamespace getVariable "MCC_LOGISTICS_BASE_BUILD";
 

@@ -17,7 +17,9 @@
 
 #define    MCC_costFactor  0.7
 
-private ["_cfg","_value","_baseCost"];
+private _cfg = configNull;
+private "_value";
+private "_baseCost";
 
 _cfg = configfile >> "CfgVehicles" >> _class;
 _baseCost = _cost;

@@ -1948,9 +1948,9 @@ class MCC_wind1
 	titles[] = {};
 
 	#ifdef MCCMODE
-	sound[] = {"\mcc_sandbox_mod\mcc\sounds\wind0.5.ogg", 0.4, 0.4};
+	sound[] = {"\mcc_sandbox_mod\mcc\sounds\wind1.ogg", 0.4, 0.4};
 	#else
-	sound[] = {"mcc\sounds\wind0.5.ogg", 0.4, 0.4};
+	sound[] = {"mcc\sounds\wind1.ogg", 0.4, 0.4};
 	#endif
 };
 

@@ -1,0 +1,14 @@
+private _zn = ["number"] call MCC_fnc_zoneList;
+if (_zn < 1) exitWith {hint "Choose a zone number first"};
+private _gaia = {((_x getVariable ["GAIA_ZONE_INTEND", []]) param [0, ""]) isEqualTo (str _zn)} count allGroups;
+private _q = format ["Delete zone %1?%2", _zn, if (_gaia > 0) then {format ["<br/>%1 GAIA group%2 use%3 this zone as %4 area and will lose it.", _gaia, ["s", ""] select (_gaia == 1), ["", "s"] select (_gaia == 1), ["their", "its"] select (_gaia == 1)]} else {""}];
+private _ok = ["<t size='0.8' align='center'>" + _q + "</t>", "Delete Zone", nil, true, true] call MCC_fnc_messageBox;
+if !(_ok) exitWith {};
+if (!isNil "mcc_zone_pos" && {count mcc_zone_pos > _zn}) then {mcc_zone_pos set [_zn, [-5000,-5000,0]]};
+if (!isNil "mcc_zone_size" && {count mcc_zone_size > _zn}) then {mcc_zone_size set [_zn, [1,1]]};
+publicVariable "mcc_zone_pos"; publicVariable "mcc_zone_size";
+deleteMarker str _zn; deleteMarker format ["LABEL_%1", _zn];
+[[str _zn], {params ["_m"]; deleteMarkerLocal _m; deleteMarkerLocal format ["LABEL_%1", _m]}] remoteExec ["call", 0];
+["INFO", "deleteZone", "zone %1 deleted (%2 GAIA groups used it)", [_zn, _gaia]] call MCC_fnc_log;
+["fill"] call MCC_fnc_zoneList;
+hint format ["Zone %1 deleted", _zn];

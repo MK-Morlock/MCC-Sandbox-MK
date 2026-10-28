@@ -2,8 +2,10 @@
 // Sets gear to role
 // Example: [_currentWeapon], "MCC_fnc_addWeapon", true, false] spawn BIS_fnc_MP;
 //==============================================================================================================================================================================
-private ["_magazines","_currentWeapon","_mag","_unit"];
-_currentWeapon = _this select 0;
+private "_magazines";
+private "_mag";
+private "_unit";
+params ["_currentWeapon"];
 _unit = param [1,player];
 
 _magazines = (_currentWeapon select 2);

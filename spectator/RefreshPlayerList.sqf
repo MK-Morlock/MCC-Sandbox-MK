@@ -1,4 +1,9 @@
-private [ "_idx", "_name", "_found", "_i", "_OriginalSide","_vm_refreshNumber","_inNameCache"];
+private _idx = 0;
+private _name = nil;
+private _i = 0;
+private _OriginalSide = sideUnknown;
+private _vm_refreshNumber = 0;
+private _inNameCache = nil;
 
 //if ( KEGsRunAbort ) then {
 //	diag_log format ["refresh player start: %1", KEGs_target];

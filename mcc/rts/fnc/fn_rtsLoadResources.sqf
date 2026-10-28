@@ -3,7 +3,16 @@
 //  Parameter(s):
 //     	_ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_resource","_truck","_cratesType","_attachPoint","_loadedCrates","_res","_maxLoad","_nearByCrates","_crate","_fncLoadCrate"];
+private _resource = "";
+private "_truck";
+private _cratesType = [];
+private _attachPoint = configNull;
+private _loadedCrates = [];
+private "_res";
+private _maxLoad = 0;
+private _nearByCrates = [];
+private _crate = objNull;
+private _fncLoadCrate = {};
 #define CRATE_COST 200
 #define ANCHOR_POINT_WEST [0,-0.2,0]
 #define ANCHOR_POINT_EAST [0,-0.9,0]
@@ -18,7 +27,7 @@ _truck = vehicle leader (MCC_ConsoleGroupSelected select 0);
 
 //Find crates types
 _cratesType = missionNamespace getVariable ["MCC_logisticsCrates_TypesWest",[]];
-if (count _cratesType <=0) exitWith {diag_log "MCC Logistics: Error MCC_logisticsCrates_TypesWest not defined"};
+if (count _cratesType <=0) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC Logistics: Error MCC_logisticsCrates_TypesWest not defined"}};
 
 _attachPoint =switch (getnumber(configfile >> "CfgVehicles" >> typeof _truck >> "side" )) do
 				{

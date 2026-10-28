@@ -1,20 +1,6 @@
-/*===================================================================MCC_fnc_crewCount=========================================================================================
-return empty seats of a specific vehicle with or without FFV (firing From Vehicles)
-
-<IN>
-	0:	STRING: vehicle class
-	1: 	STRING:
-			cargo 		- 	Cargo ONLY
-			crew 		-  	Crew Only
-			ffv			-	FFV only
-			allCargo	- 	Cargo + FFV
-			allCrew		- 	Crew + Cargo + FFV
-
-<OUT>
-	INTEGER: number of spaces
-
-==============================================================================================================================================================================*/
-private ["_vehicleClass","_returnType","_cargo"];
+private _vehicleClass = "";
+private _returnType = "";
+private _cargo = 0;
 
 _vehicleClass = param [0,"", [""]];
 _returnType = tolower (param [1,"allCargo", [""]]);

@@ -2,7 +2,13 @@
 // Handle xp for players when rating added
 // Example: [player, rating] call MCC_fnc_handleRating
 //========================================================================================================================================================================
-private ["_rating","_role","_exp","_oldLevel","_level","_newLevel","_valor"];
+private _rating = 0;
+private _role = "";
+private _exp = nil;
+private _oldLevel = 0;
+private _level = [];
+private _newLevel = 0;
+private _valor = 0;
 /*
 //No more then 500 exp per sec
 _rating = (param [1, 0, [0]]) min 1000;
@@ -55,6 +61,6 @@ _newLevel = _level select 0;
 if (MCC_debug) then {systemchat format ["level: %1",_level]};
 
 missionNameSpace setVariable [format ["%1Level",_role], _level];
-[[format ["%1Level",_role], player, _level, "ARRAY"], "MCC_fnc_setVariable", false, false] spawn BIS_fnc_MP;
+[format ["%1Level",_role], player, _level, "ARRAY"] remoteExec ["MCC_fnc_setVariable", 2, false];
 
 _rating

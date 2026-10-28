@@ -1,10 +1,22 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params","_ctrl","_button","_posX","_posY","_shift","_ctrlKey","_alt","_class","_html","_comboBox","_displayname","_index","_pic","_actionsArray"];
+private "_ctrl";
+private "_button";
+private "_posX";
+private "_posY";
+private "_shift";
+private "_ctrlKey";
+private "_alt";
+private "_class";
+private "_comboBox";
+private "_displayname";
+private "_index";
+private "_pic";
+private _actionsArray = [];
 #define MCC_sqlpdaMenu0 (uiNamespace getVariable "MCC_sqlpdaMenu0")
 
 disableSerialization;
 MCC_doubleClicked = true;
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _button = _params select 1;
@@ -23,6 +35,7 @@ if (_button == 0)  then {
 	MCC_sqlpdaMenu0 ctrlShow true;
 	MCC_sqlpdaMenu0 ctrlSetPosition [_posX,_posY,0.0973958 * safezoneW, 0.07* safezoneH];
 	MCC_sqlpdaMenu0 ctrlCommit 0;
+	if (!isNil "MCC_fnc_SQLPDAMenuBg") then {[] call MCC_fnc_SQLPDAMenuBg};
 
 	MCC_sqlpdaMenu0 ctrlRemoveAllEventHandlers "LBSelChanged";
 

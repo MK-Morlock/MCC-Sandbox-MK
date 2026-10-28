@@ -5,30 +5,82 @@
 // _maxSpawn			INTEGER - max groups spawned around the players
 // _faction				STRING - the units' faction
 //==================================================================================================================================================================*/
-private ["_spawnCenters","_player","_spawnpos","_enemyFaction","_spawnDistance","_maxSpawn","_enemySide","_unitsArray","_spawnPos","_roads","_simu","_unit","_maxGroupAmount","_units","_grp","_tile"];
+private _spawnCenters = [];
+private "_player";
+private _spawnpos = [];
+private _enemyFaction = "";
+private _spawnDistance = 0;
+private _maxSpawn = 0;
+private _enemySide = configNull;
+private _unitsArray = [];
+private _spawnPos = [];
+private "_roads";
+private "_simu";
+private "_unit";
+private "_maxGroupAmount";
+private _units = [];
+private _grp = [];
+private "_tile";
 _spawnDistance 	= param [0, 250, [250]];
 _maxSpawn 		= param [1, 12, [12]];
 _enemyFaction	= param [2, "OPF_F", [""]];
-_enemySide 		= (getNumber (configfile >> "CfgFactionClasses" >> _enemyFaction >> "side")) call BIS_fnc_sideType;
+_enemySide 		= ([_enemyFaction] call MCC_fnc_factionSide) call BIS_fnc_sideType;
 
 if (!isServer) exitWith {};
 
-//Let's build the faction unit's array
-{
-	_simu = _x;
-	_unitsArray = [];
-	if (_simu == "soldier") then {
-		// Love the x simulation
-		_unitsArray= [_enemyFaction ,_simu,"men"] call MCC_fnc_makeUnitsArray;
-		_unitsArray = _unitsArray + ( [_enemyFaction ,_simu+"x","men"] call MCC_fnc_makeUnitsArray);
-	} else {
-		// Love the x simulation
-		_unitsArray= [_enemyFaction ,_simu] call MCC_fnc_makeUnitsArray;
-		_unitsArray = _unitsArray + ( [_enemyFaction ,_simu+"x"] call MCC_fnc_makeUnitsArray);
+//Build the faction unit lists for the patrols in one go (performance log: campaign patrols).
+//It used to call MCC_fnc_makeUnitsArray 14 times (7 types x 2), each scanning every unit and vehicle of every loaded
+//mod - slow with many factions. Same rules as before (public classes, the faction, no karts, no VR men, infantry from
+//the Men categories only), so the patrols pick from the same units. Format per entry: [class, [name, picture]].
+private _t0 = diag_tickTime;
+private _lists = createHashMapFromArray [["soldier",[]],["car",[]],["motorcycle",[]],["tank",[]],["helicopter",[]],["airplane",[]],["ship",[]]];
+private _simMap = createHashMapFromArray [
+	["soldier","soldier"],["soldierx","soldier"],["car","car"],["carx","car"],["motorcycle","motorcycle"],["motorcyclex","motorcycle"],
+	["tank","tank"],["tankx","tank"],["helicopter","helicopter"],["helicopterx","helicopter"],["airplane","airplane"],["airplanex","airplane"],
+	["ship","ship"],["shipx","ship"]
+];
+private _factionLower = toLower _enemyFaction;
+private _cfgAll = configFile >> "CfgVehicles";
+private _scanned = 0;
+private _cacheKey = "MCC_campaignPatrolLists2_" + _factionLower;
+private _cached = uiNamespace getVariable [_cacheKey, []];
+if (count _cached > 0) then {
+	//Built earlier in this game session (the config cannot change while the game runs)
+	{_lists set [_x select 0, +(_x select 1)]} forEach _cached;
+} else {
+	//Let the engine pick the faction classes in one call. Walking all classes one by one from a script took 28 s with
+	//89,200 classes loaded and held the frame rate at 2-7 FPS the whole time.
+	private _cond = if (_factionLower == "all") then {"getNumber (_x >> 'scope') == 2"} else {
+		format ["getNumber (_x >> 'scope') == 2 && {toLower getText (_x >> 'faction') == '%1'}", _factionLower]
 	};
-
-	missionNamespace setVariable [format ["MCC_campaignSpawnAIInit_%1",_simu],_unitsArray];
-} foreach ["soldier", "car", "motorcycle", "tank","helicopter", "airplane", "ship"];
+	private _classes = _cond configClasses _cfgAll;
+	_scanned = count _classes;
+	{
+		private _cfg = _x;
+		private _type = _simMap getOrDefault [toLower getText (_cfg >> "simulation"), ""];
+		private _lc = toLower configName _cfg;
+		private _invisibleTarget = ((toLower getText (_cfg >> "displayName")) find "invisible") >= 0
+			|| {(_lc find "targetsoldier") >= 0} || {(_lc find "target_vehicle") >= 0} || {(_lc find "targetvehicle") >= 0}
+			|| {getText (_cfg >> "model") in ["", "\A3\Weapons_f\empty", "\A3\Weapons_F\empty.p3d"]};
+		if (_type != "" && {!_invisibleTarget} && {!(toLower getText (_cfg >> "DLC") in ["kart"])}) then {
+			private _cat = toLower ([_cfg] call MCC_fnc_unitCategory);
+			if (!("vr" in _cat) && {_type != "soldier" || {_cat == "men"}}) then {
+				(_lists get _type) pushBack [configName _cfg, [getText (_cfg >> "displayName"), getText (_cfg >> "picture")]];
+			};
+		};
+	} forEach _classes;
+	uiNamespace setVariable [_cacheKey, (keys _lists) apply {[_x, +(_lists get _x)]}];
+};
+{
+	missionNamespace setVariable [format ["MCC_campaignSpawnAIInit_%1", _x], _lists get _x];
+} forEach (keys _lists);
+private _countsTxt = (keys _lists) apply {format ["%1 %2", _x, count (_lists get _x)]};
+private _msg = format ["campaign patrols: unit lists built in %1 s (%2) | %3", (diag_tickTime - _t0) toFixed 2, if (count _cached > 0) then {"from this session cache"} else {format ["%1 faction classes", _scanned]}, _countsTxt joinString ", "];
+if (isNil "MCC_perfWrite") then {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text ("MCC [PERF] " + _msg)}} else {["campaign", _msg] call MCC_perfWrite};
+{
+	private _l = _lists get _x;
+	if (count _l > 0) then {["INFO", "fn_campaignSpawnAIInit", "patrol %1 list: %2", [_x, (_l apply {format ["%1 (%2)", _x select 0, (_x select 1) select 0]}) joinString ", "]] call MCC_fnc_log};
+} forEach ["airplane", "helicopter"];
 
 while {true} do {
 	//Lets find a random player
@@ -55,9 +107,9 @@ while {true} do {
 
 	//Do we need to spawn more AI group?
 	if 	(
-	     	({(_x getVariable ["MCC_MW_AMBIENT",false])} count allgroups) < _maxGroupAmount &&
 	     	count _spawnCenters > 0 &&
-	     	(missionNamespace getvariable [format ["campaignRep_%1",side _player],50]) > random 100
+	     	{({(_x getVariable ["MCC_MW_AMBIENT",false])} count allgroups) < _maxGroupAmount} &&
+	     	{(missionNamespace getvariable [format ["campaignRep_%1",side _player],50]) > random 100}
 	    ) then {
 
 		_spawnPos = [getpos _player, _spawnDistance, random 360] call BIS_fnc_relPos;
@@ -70,7 +122,7 @@ while {true} do {
 		    	_tile != "" &&
 
 		    	//the darker the tile the more chance he have to spawn enemies
-		    	random 1 < markerAlpha _tile &&
+		    	random 1 < ([_tile] call MCC_fnc_campaignTileAlpha) &&
 
 		    	//Don't spawn on a released tile
 		    	([_spawnPos,600] call MCC_fnc_campaignGetNearestTile) select 1 == _enemySide &&
@@ -102,13 +154,15 @@ while {true} do {
 
 				//Spawn units
 				if (_simu == "soldier") then {
-					_units = [];
-					for "_i" from 0 to ((floor random 10) max 3) step 1 do {
-						_units pushBack ((_unitsArray call BIS_fnc_selectRandom) select 0);
-					};
+					_units = [_unitsArray, 4 + floor random 7] call MCCMK_fnc_buildSquad;
 					_grp = [_spawnPos, _enemySide, _units] call BIS_fnc_spawnGroup;
 				} else {
-					_grp = ([_spawnPos, 200, ((_unitsArray call BIS_fnc_selectRandom) select 0), _enemySide] call MCC_fnc_spawnVehicle) select 2;
+					private _cls = [_unitsArray, "patrol"] call MCCMK_fnc_pickVehicle;
+					if (_cls == "") then {_cls = (_unitsArray call BIS_fnc_selectRandom) select 0};
+					_grp = ([_spawnPos, 200, _cls, _enemySide] call MCC_fnc_spawnVehicle) select 2;
+					private _c = configFile >> "CfgVehicles" >> _cls;
+					private _odd = ((toLower getText (_c >> "displayName")) find "invisible") >= 0 || {((toLower _cls) find "target") >= 0} || {getText (_c >> "model") in ["", "\A3\Weapons_f\empty", "\A3\Weapons_F\empty.p3d"]};
+					[["INFO", "WARN"] select _odd, "fn_campaignSpawnAIInit", "patrol %1: %2 (%3) model %4 at %5, %6 m from %7%8", [_simu, _cls, getText (_c >> "displayName"), getText (_c >> "model"), mapGridPosition _spawnPos, round (_spawnPos distance2D _player), name _player, ["", " - INVISIBLE / TARGET?"] select _odd]] call MCC_fnc_log;
 				};
 
 				_grp setVariable ["GAIA_ZONE_INTEND",[([_spawnPos,1500] call MCC_fnc_campaignGetNearestTile) select 0, ["MOVE","NOFOLLOW"]call BIS_fnc_selectRandom], true];

@@ -8,10 +8,12 @@
 
 #define MCC_LOAD_INPUT 7001
 
-private ["_tempText","_comboBox","_savesArray","_index","_disp"];
+private "_tempText";
+private _comboBox = controlNull;
+private "_index";
 disableSerialization;
 
-_disp = _this select 0;
+params ["_disp"];
 uiNamespace setVariable ["MCC_SaveLoadScreen_IDD", _disp];
 uiNamespace setVariable ["MCC_SaveButton", _disp displayCtrl 0];
 

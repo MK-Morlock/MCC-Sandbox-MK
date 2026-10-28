@@ -17,7 +17,7 @@ class MCC_3dDOCControls:MCC_RscControlsGroup
 		{
 			idc = -1;
 			text = "";
-			colorBackground[] = {0,0,0,0.7};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 			
 			w = 0.275 * safezoneW;
 			h = 0.38485 * safezoneH;			
@@ -44,7 +44,7 @@ class MCC_3dDOCControls:MCC_RscControlsGroup
 			style = MCCST_MULTI;
 			autocomplete = false;
 			access = ReadAndWrite;
-			colorBackground[] = {0,0,0,0.9};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 
 			x = 0.114584 * safezoneW;
 			y = 0.0109958 * safezoneH;
@@ -60,7 +60,7 @@ class MCC_3dDOCControls:MCC_RscControlsGroup
 			style = MCCST_MULTI;
 			autocomplete = false;
 			access = ReadAndWrite;
-			colorBackground[] = {0,0,0,0.9};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 			
 			x = 0.0802087 * safezoneW;
 			y = 0.296884 * safezoneH;
@@ -77,10 +77,10 @@ class MCC_3dDOCControls:MCC_RscControlsGroup
 			y = 0.296884 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			colorText[] = {0,1,1,1};
+			colorText[] = {0.77,0.51,0.08,1};
 			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 		};
-		class MCC_3DCompsaveUIButton: MCC_RscButton
+		class MCC_3DCompsaveUIButton: MCCBTN_R
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\docobject\compositionManagerChnage.sqf'");
@@ -90,10 +90,9 @@ class MCC_3dDOCControls:MCC_RscControlsGroup
 			y = 0.340867 * safezoneH;
 			w = 0.103125 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			tooltip = "Save the composition as the player as an anchor point and radius 200 meters to the profile name space - choose a slot from the above list first"; //--- ToDo: Localize;
-			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			tooltip = "Save the composition (the player as the anchor point, 200 m radius) to the profile namespace - choose a slot from the list above first"; //--- ToDo: Localize;
 		};
-		class MCC_3DComploadUIButton: MCC_RscButton
+		class MCC_3DComploadUIButton: MCCBTN_R
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\docobject\compositionManagerChnage.sqf'");
@@ -103,8 +102,7 @@ class MCC_3dDOCControls:MCC_RscControlsGroup
 			y = 0.340867 * safezoneH;
 			w = 0.0973958 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			tooltip = "Load a composition from the profile name space to the init line of the choosen vehicle- choose a slot from the above list first"; //--- ToDo: Localize;
-			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			tooltip = "Load a composition from the profile namespace into the init line of the chosen vehicle - choose a slot from the list above first"; //--- ToDo: Localize;
 		};
 	};
 };

@@ -7,7 +7,17 @@
  	ARRAY
  	0: ARRAY - borders tiles
 ========================================================================================================================================================================================*/
-private ["_pos","_natural","_centerTile","_centerTileSide","_allTiles","_yTiles","_markerColor","_notAcceptedColors","_yBorder","_xBorder","_bordersArray"];
+private _pos = objNull;
+private _natural = false;
+private _centerTile = [];
+private "_centerTileSide";
+private _allTiles = [];
+private "_yTiles";
+private "_markerColor";
+private _notAcceptedColors = [];
+private "_yBorder";
+private "_xBorder";
+private _bordersArray = [];
 _pos = param [0,objNull,[objNull,[],sideLogic]];
 _natural = param [1,false,[false]];
 
@@ -43,7 +53,7 @@ _bordersArray = [];
 //create boxes
 _yBorder = (count _allTiles)-1;
 
-private ["_markersSurronding"];
+private _markersSurronding = [];
 for "_y" from 0 to _yBorder step 1 do {
 	_yTiles = _allTiles select _y;
 	_xBorder = (count _yTiles)-1;

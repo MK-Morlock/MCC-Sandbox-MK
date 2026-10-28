@@ -1,40 +1,37 @@
 //===================================================================MCC_fnc_evacDelete======================================================================================
 // Delete the given vehicle or it's driver
-// Example:[[option, evac],"MCC_fnc_evacDelete",true,false] spawn BIS_fnc_MP;
+// Example:[option, evac] remoteExec ["MCC_fnc_evacDelete", true, false];
 // Params:
 // 	option number, 0- delete driver, 1 - spawn driver, 2- delete vehicle, driver and gunners.
 // 	evac: object, the evac vehicle
 //==============================================================================================================================================================================
-private ["_option","_evac","_heliType","_evac_p","_evac_p_type"];
-_option	= [_this, 0, 0, [0]] call BIS_fnc_param;
-_evac	= [_this, 1, objNull, [objNull]] call BIS_fnc_param;
-
-if (isnull _evac || !isServer) exitWith {};
-
-_heliType		= typeof _evac;
-_evac_p 		= driver _evac;
-_evac_p_type 	= getText (configFile >> "CfgVehicles" >> _heliType >> "crew");
-
+private _option = _this param [0, 0, [0]];
+private _evac = _this param [1, objNull, [objNull]];
+if (isNull _evac || {!isServer}) exitWith {};
+private _crewClass = getText (configFile >> "CfgVehicles" >> typeOf _evac >> "crew");
 switch (_option) do {
-		case 0:		//Delete pilot
-	{
-		if (isnil "_evac_p") exitWith {};
-		_evac_p action ["getOut", vehicle _evac_p];
-		sleep 2;
-		deletegroup (group _evac);	//case we want to delete the pilot
-		deletevehicle _evac_p;
+	case 0: {
+		private _p = driver _evac;
+		if (isNull _p || {isPlayer _p}) exitWith {};
+		private _g = group _p;
+		moveOut _p;
+		deleteVehicle _p;
+		if (count (units _g) == 0) then {deleteGroup _g};
 	};
-	case 1:
-	{
-	_evac_p = (group _evac) createUnit [_evac_p_type, getpos _evac, [], 0, "NONE"];		//spawn pilot
-	_evac_p assignAsDriver _evac;
-	_evac_p moveindriver _evac;
+	case 1: {
+		if (alive (driver _evac)) exitWith {};
+		if (!isNull (driver _evac)) then {private _dp = driver _evac; moveOut _dp; deleteVehicle _dp};
+		private _side = _evac getVariable ["MCC_evacSide", (getNumber (configFile >> "CfgVehicles" >> typeOf _evac >> "side")) call BIS_fnc_sideType];
+		private _g = createGroup _side;
+		private _p = _g createUnit [_crewClass, getPos _evac, [], 0, "NONE"];
+		_p assignAsDriver _evac;
+		_p moveInDriver _evac;
+		_g setBehaviour "CARELESS";
+		_g setCombatMode "YELLOW";
+		_p setSkill 1;
 	};
-	case 2:
-	{
-		{deleteVehicle _x} forEach (crew _evac);
-		deletegroup (group _evac);	//case we want to delete the whole shabang
-		deletevehicle _evac;
-		deletevehicle _evac_p;
+	case 2: {
+		{if (isPlayer _x) then {moveOut _x} else {private _g = group _x; deleteVehicle _x; if (count (units _g) == 0) then {deleteGroup _g}}} forEach (crew _evac);
+		deleteVehicle _evac;
 	};
 };

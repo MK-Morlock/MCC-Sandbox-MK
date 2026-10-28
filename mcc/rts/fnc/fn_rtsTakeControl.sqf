@@ -3,7 +3,9 @@
 //  Parameter(s):
 //     _ctrl: CONTROL
 //==============================================================================================================================================================================
-private ["_group","_targetUnit","_leader","_isLeader","_oldUnit"];
+private "_group";
+private "_targetUnit";
+private "_oldUnit";
 _res = param [1, [], [[]]];
 
 if (count MCC_ConsoleGroupSelected <=0) exitWith {};
@@ -29,7 +31,8 @@ _group = creategroup (side _targetUnit);
 closeDialog 0;
 waitUntil {!dialog};
 
-private ["_camera","_ppgrain"];
+private _camera = "";
+private "_ppgrain";
 _camera = "Camera" camcreate [(getpos _targetUnit) select 0, (getpos _targetUnit) select 1,((getpos _targetUnit) select 2) + 100];
 _camera cameraeffect ["internal","back"];
 _camera camPrepareFOV 0.900;
@@ -73,11 +76,12 @@ MCC_backToplayerIndex = _targetUnit addaction ["<t color=""#CC0000"">Back To Pla
 _ok = _targetUnit addEventHandler ["Killed", format ["[_this select 0] execVM '%1mcc\general_scripts\unitManage\backToPlayer.sqf'",MCC_path]];
 
 if (MCC_PrevHijacked_Group != "") then {
-	[player] joinSilent _group;
+	// back into the controlled unit's own group (_group here is the temporary group deleted above - joining it hung the waitUntil)
+	[player] joinSilent (groupFromNetID MCC_PrevHijacked_Group);
 	waituntil {group player == (groupFromNetID MCC_PrevHijacked_Group)};
 
 	if (isMultiplayer) then {
-		[[2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group Player), netID player]], "MCC_fnc_globalExecute", leader group player, false] spawn BIS_fnc_MP;
+		[2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group Player), netID player]] remoteExec ["MCC_fnc_globalExecute", leader group player, false];
 	} else {
 		(group player) selectLeader player;
 	};

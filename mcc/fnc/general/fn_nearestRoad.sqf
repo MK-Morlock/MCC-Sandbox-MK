@@ -15,31 +15,29 @@
 	OBJECT	- Nearest road object on success
 	NULL	- If no road object is found within given radius
 */
-private ["_position", "_radius", "_blacklisted"];
-_position	= [_this, 0, [0, 0, 0], [[]]] call BIS_fnc_param;
-_radius		= [_this, 1, 50, [0]] call BIS_fnc_param;
-_blacklisted	= [_this, 2, [], [[]]] call BIS_fnc_param;
+private _position = _this param [0, [0, 0, 0], [[]]];
+private _radius = _this param [1, 50, [0]];
+private _blacklisted = _this param [2, [], [[]]];
 
 //Near roads
-private "_nearRoads";
+private _nearRoads = [];
 _nearRoads = _position nearRoads _radius;
 
 //The return value
-private ["_road","_nearRoadsFinalSorted"];
-_road = objNull;
-_nearRoadsFinalSorted = [];
+private _road = objNull;
+private _nearRoadsFinalSorted = [];
 
 //Are there any road segment within radius?
 if (count _nearRoads > 0) then {
 	//New list, excluding blacklisted road segments
-	private "_nearRoadsFinal";
+	private _nearRoadsFinal = [];
 	_nearRoadsFinal = [];
 
 	//Loop near roads and extract valid ones to new list, if blacklisted roads is not empty
 	if (count _blacklisted > 0) then {
 		{
 			//The current road
-			private "_current";
+			private _current = objNull;
 			_current = _x;
 
 			//Is road blacklisted?

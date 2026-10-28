@@ -4,10 +4,12 @@
 //     _var:string "ammo","repair","fuel","food", "med", "time"
 //     _level: INTEGER the ammount of reousrces to reduce
 //==============================================================================================================================================================================
-private ["_resToCheck","_var","_level","_res"];
+private "_resToCheck";
+private "_var";
+private "_level";
 //removes resources
 
-_res = _this select 0;
+params ["_res"];
 _resToCheck = call compile format ["MCC_res%1",playerSide];
 {
 	_var   = _x select 0;

@@ -1,5 +1,10 @@
-private ["_unit","_index","_type","_pistol","_magazines","_ammoCount","_items"];
-_unit =  _this select 0;
+private "_index";
+private "_type";
+private _pistol = "";
+private _magazines = [];
+private _ammoCount = 0;
+private _items = [];
+params ["_unit"];
 _index = _this select 2;
 _type = _this select 3;
 

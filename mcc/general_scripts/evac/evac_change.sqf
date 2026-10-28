@@ -6,7 +6,10 @@
 #define MCC_EVAC_FLIGHTHIGHT 44
 
 disableSerialization;
-private ["_evacArray","_insetionArray","_mccdialog","_type"];
+private _evacArray = [];
+private _insetionArray = [];
+private _mccdialog = 0;
+private _type = 0;
 _mccdialog = MCC_SANDBOX2_IDD;
 
 _type = lbCurSel MCC_EVAC_TYPE;

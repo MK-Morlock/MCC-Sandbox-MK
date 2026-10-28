@@ -1,6 +1,6 @@
 /*================================================================MCC_fnc_mineSingle======================================================================================
 	Create a mine field
-	Example:[[IEDkind,IEDMarkerName,centerPos,minefieldSize],"MCC_fnc_mineSingle",true,false] call BIS_fnc_MP;
+	Example:[IEDkind,IEDMarkerName,centerPos,minefieldSize] remoteExec ["MCC_fnc_mineSingle", 0, false];
  	Params:
  		IEDkind: string, minefield type: "apv" - AP minefield with warining signs, "ap" - AP minefield without warining signs. "apbv" -  AP bouncing minefield with
  		warining signs, "apb"-  AP bouncing minefield without warining signs, "atv" - AT minefield with warining signs, "at"-  AT minefield without warining signs
@@ -13,13 +13,15 @@
 =======================================================================================================================================================================*/
 
 //Made by Shay_Gman (c) 09.10
-private ["_trapkind", "_iedMarkerName", "_fakeIed","_zoneX","_zoneY","_startingPos","_visable",
-		"_mcc_zone_pos","_mcc_zone_size","_mineClass","_minePos"];
+private _fakeIed = "";
+private "_zoneX";
+private "_zoneY";
+private _startingPos = [];
+private _visable = false;
+private _mineClass = "";
+private _minePos = [];
 
-_trapkind = _this select 0;
-_iedMarkerName = _this select 1;
-_mcc_zone_pos = _this select 2;
-_mcc_zone_size = _this select 3;
+params ["_trapkind", "_iedMarkerName", "_mcc_zone_pos", "_mcc_zone_size"];
 _startingPos = [];
 
 switch (_trapkind) do

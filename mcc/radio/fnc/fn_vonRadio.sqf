@@ -1,7 +1,11 @@
 //==================================================================MCC_fnc_vonRadio=============================================================================================
 // Example:[]  spawn  MCC_fnc_vonRadio;
 //===============================================================================================================================================================================
-private ["_text","_channelID","_fncKeyDown","_fncKeyUp","_ctrlText"];
+private _text = "";
+private _channelID = -1;
+private _fncKeyDown = {};
+private _fncKeyUp = {};
+private _ctrlText = "";
 
 if (isDedicated) exitWith {};
 if !(missionNameSpace getVariable ["MCC_VonRadio",false]) exitWith {};

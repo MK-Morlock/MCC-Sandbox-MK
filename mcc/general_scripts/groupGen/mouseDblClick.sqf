@@ -1,5 +1,15 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params","_ctrl","_button","_posX","_posY","_shift","_ctrlKey","_alt","_mccdialog","_html","_comboBox","_displayname","_index"];
+private _ctrl = controlNull;
+private _button = 0;
+private _posX = 0;
+private _posY = 0;
+private _shift = false;
+private _ctrlKey = false;
+private _alt = false;
+private _mccdialog = displayNull;
+private _comboBox = controlNull;
+private _displayname = "";
+private _index = 0;
 #define MCC_MINIMAP 9000
 
 #define MCC_GroupGenWPCombo_IDC 9015
@@ -9,7 +19,8 @@ private ["_params","_ctrl","_button","_posX","_posY","_shift","_ctrlKey","_alt",
 
 disableSerialization;
 MCC_doubleClicked = true;
-_params = _this select 0;
+MCC_mapDblClickTime = diag_tickTime;
+params ["_params"];
 
 _ctrl = _params select 0;
 _button = _params select 1;
@@ -43,7 +54,7 @@ if ((_button == 0) && (count MCC_GroupGenGroupSelected > 0) && !_ctrlKey)  then 
 		_displayname =  _x;
 		_index = _comboBox lbAdd _displayname;
 	} foreach ["Move", "Destroy", "Get In", "Search & Destroy", "Join Group", "Join Group As Leader", "Get Out", "Cycle Waypoints", "Load", "Unload", "Troops Unload", "Hold", "Senetry"
-			   ,"Guard","Support","Get In Nearest","Dismiss","Helicopter - Land","Helicopter - Get in","Artillery - Fire Mission","Loiter"];
+			   ,"Guard","Support","Get In Nearest","Dismiss","Helicopter - Land","Helicopter - Get in","Artillery - Fire Mission","Loiter","Taru - Pick up pod","Taru - Winch drop pod","Taru - Parachute pod","Taru - Release pod"];
 	_comboBox lbSetCurSel 0;
 
 
@@ -80,12 +91,12 @@ if ((_button == 0) && (count MCC_GroupGenGroupSelected > 0) && !_ctrlKey)  then 
 //Quick WP
 if (_button == 0 && _ctrlKey && (count MCC_GroupGenGroupSelected > 0)) then
 {
-	private "_pos";
+	private _pos = [];
 
 	_pos = _ctrl ctrlmapscreentoworld [_posX,_posY];
 
 	//Call the server to handle WP
-	[[1,_pos,[0,"NO CHANGE","NO CHANGE","UNCHANGED","UNCHANGED","true","",0],MCC_GroupGenGroupSelected],"MCC_fnc_manageWp", false, false] spawn BIS_fnc_MP;
+	[1,_pos,[0,"NO CHANGE","NO CHANGE","UNCHANGED","UNCHANGED","true","",0],MCC_GroupGenGroupSelected] remoteExec ["MCC_fnc_manageWp", 2, false];
 };
 
 MCC_doubleClicked = false;

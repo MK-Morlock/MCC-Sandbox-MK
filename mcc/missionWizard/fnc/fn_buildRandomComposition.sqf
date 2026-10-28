@@ -31,7 +31,8 @@ while {str _spawnPos == "[-500,-500,0]" || (count (_spawnPos nearRoads 50) > 2)}
 if (count _spawnPos <3) then {_spawnPos set [2,0]};
 */
 
-private ["_compostion","_compTypeName"];
+private _compostion = [];
+private _compTypeName = "";
 
 _compTypeName = switch (tolower _compType) do
 						{

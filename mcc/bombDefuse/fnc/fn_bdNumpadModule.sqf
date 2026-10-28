@@ -6,11 +6,21 @@
     _serialNumber - INTEGER
 */
 
-private ["_difficulty","_ctrlGroup","_display","_idc","_buttons","_buttonsCombinations","_ratio","_ctrl","_posX","_posY","_ctrls","_serialNumber","_answers","_symbol","_index","_showSymbols"];
+private "_display";
+private "_idc";
+private "_buttons";
+private _buttonsCombinations = [];
+private "_ratio";
+private _ctrl = controlNull;
+private _posX = 0;
+private _posY = 0;
+private _ctrls = [];
+private _answers = [];
+private "_symbol";
+private _index = 0;
+private _showSymbols = [];
 disableSerialization;
-_difficulty = _this select 0;
-_ctrlGroup = _this select 1;
-_serialNumber = _this select 2;
+params ["_difficulty", "_ctrlGroup", "_serialNumber"];
 
 _display = ctrlParent _ctrlGroup;
 _idc = ctrlIDC _ctrlGroup *1000;

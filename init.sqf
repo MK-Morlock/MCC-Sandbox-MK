@@ -1,4 +1,8 @@
-private ["_string","_null","_nul","_dummyGroup","_dummy","_name","_keyDown","_savesArray"];
+private _null = scriptNull;
+private _nul = scriptNull;
+private _dummy = objNull;
+private _name = "";
+private _keyDown = -1;
 MCC_isMode = isClass (configFile >> "CfgPatches" >> "mcc_sandbox");	//check if MCC is mod version
 MCC_isACE = isClass (configFile >> "CfgPatches" >> "ace_common");
 MCC_isCBA = isClass (configFile >> "CfgPatches" >> "cba_main");
@@ -13,6 +17,22 @@ if (MCC_isMode) then {
 } else {
 	MCC_path = "";
 	enableSaving [false, false];
+};
+
+//-------------------- RPT diagnostics banner (search the RPT for "MCC [") --------------------
+["BUILD", "init.sqf", "MCC init started - build: MCC Sandbox MK 1.0 | game %1 | mission %2 on %3 | server=%4 dedicated=%5 interface=%6 | ACE=%7 CBA=%8 debug=%9", [productVersion select 2, missionName, worldName, isServer, isDedicated, hasInterface, MCC_isACE, MCC_isCBA, MCC_debug]] call MCC_fnc_log;
+if (missionNamespace getVariable ["MCC_debug", false]) then {MCC_targetWatchEH = addMissionEventHandler ["EntityCreated", {
+	params ["_e"];
+	if !(_e isKindOf "CAManBase") exitWith {};
+	private _cls = toLower typeOf _e;
+	private _dn = toLower getText (configFile >> "CfgVehicles" >> typeOf _e >> "displayName");
+	if (["target", "invisible", "dummy", "virtual"] findIf {_cls find _x >= 0 || {_dn find _x >= 0}} < 0) exitWith {};
+	private _st = "";
+	isNil {_st = str (call compile "diag_stacktrace")};
+	["WARN", "targetWatch", "invisible target-type soldier created: %1 (%2) side %3 group %4 at %5 | created by: %6", [typeOf _e, getText (configFile >> "CfgVehicles" >> typeOf _e >> "displayName"), side group _e, groupId group _e, (getPosATL _e) apply {round _x}, _st select [0, 1500]]] call MCC_fnc_log;
+}];};
+if (isNil "MCC_logEndedEH") then {
+	MCC_logEndedEH = addMissionEventHandler ["Ended", {[] call MCC_fnc_logSummary}];
 };
 
 //******************************************************************************************
@@ -37,7 +57,7 @@ if (isnil "CP_XPperLevel") then {CP_XPperLevel = 4000};				//Base Xp needed for 
 if (isnil "CP_expNotifications") then {CP_expNotifications = true};	//Show Exp gaining notifications
 
 //-------------------- Group Markers (Role Selection) --------------------------------------------------
-if (isnil "MCC_groupMarkers") then {MCC_groupMarkers = true};		//Show group markers on map
+if (isnil "MCC_groupMarkers") then {MCC_groupMarkers = false};		//Show group markers on map
 
 //--------------------Default flags (Role selection)-------------------------------------------------------
 if (isnil "CP_flagWest") then {CP_flagWest = "\a3\Data_f\Flags\flag_nato_co.paa"};
@@ -133,28 +153,28 @@ mccPresetsVehicle = [
 					,['Clear Cargo', 'clearMagazineCargo _this; clearWeaponCargo _this; clearItemCargo _this;']
 					,['Add Crew (UAV)','if (isServer) then {createVehicleCrew _this;group _this setvariable ["MCC_canbecontrolled",true,true];};']
 					,['Add Cargo Units', 'if (isServer) then {[_this] call MCC_fnc_populateVehicle};']
-					,['ECM - can jamm IED','if (isServer) then {_this setvariable ["MCC_ECM",true,true]};']
+					,['ECM - can jam IEDs','if (isServer) then {_this setvariable ["MCC_ECM",true,true]};']
 					,['Logistic Vehicle - create FOB','_this addAction ["<t color=""#99FF00"">Create FOB </t>", "'+MCC_path+'mcc\roleSelection\scripts\createFOB.sqf",[],6,false, false,"teamSwitch","(driver vehicle _target == _this) && (speed (vehicle _target) == 0)"];']
 					,['Disable Simulation','_this enableSimulation false;']
-					,['Can be controled using MCC Console', '(group _this) setvariable ["MCC_canbecontrolled",true,true];']
+					,['Can be controlled using MCC Console', '(group _this) setvariable ["MCC_canbecontrolled",true,true];']
 					,['Recruitable', '_this addAction [format ["Recruit %1", name _this], "'+MCC_path+'mcc\general_scripts\hostages\hostage.sqf",[2],6,false,true];']
 					,['Join player', '[_this] join (group player);']
 					,['Set Renegade', '_this addrating -2001;']
-					,['Set Mobile Respawn(West)','[west,_this] call BIS_fnc_addRespawnPosition;']
-					,['Set Mobile Respawn(East)','[east,_this] call BIS_fnc_addRespawnPosition;']
-					,['Set Mobile Respawn(Guer)','[resistance,_this] call BIS_fnc_addRespawnPosition;']
+					,['Set Mobile Respawn (West)','[west,_this] call BIS_fnc_addRespawnPosition;']
+					,['Set Mobile Respawn (East)','[east,_this] call BIS_fnc_addRespawnPosition;']
+					,['Set Mobile Respawn (Guer)','[resistance,_this] call BIS_fnc_addRespawnPosition;']
 					,['', '']
 					,['======= Artillery =======','']
 					,['Ambient Artillery - Cannon', '[0,_this] spawn MCC_fnc_amb_Art;']
 					,['Ambient Artillery - Rockets', '[1,_this] spawn MCC_fnc_amb_Art;']
 					,['Ambient AA - Cannon/Rockets', '[2,_this] spawn MCC_fnc_amb_Art;']
-					,['Ambient AA - Search Light', '[3,_this] spawn MCC_fnc_amb_Art;']
+					,['Ambient AA - Searchlight', '[3,_this] spawn MCC_fnc_amb_Art;']
 					,['======= General =======','']
 					,['Destroy Vehicles', '_this setdamage 1;']
 					,['Flip Vehicles', '[_this ,0, 90] call bis_fnc_setpitchbank;']
 					,['Virtual Arsenal (BIS)', 'if (isServer) then {["AmmoboxInit",[_this,true]] call BIS_fnc_arsenal};']
-					,['Destroyable by satchels only', '_this addEventHandler ["handledamage", {if ((_this select 4) in ["SatchelCharge_Remote_Ammo","DemoCharge_Remote_Ammo"]) then {(_this select 0) setdamage 1;(_this select 3) addRating 1500} else {0}}];']
-					,['God mod', '_this allowDamage false;']
+					,['Destructible by satchels only', '_this addEventHandler ["handledamage", {if ((_this select 4) in ["SatchelCharge_Remote_Ammo","DemoCharge_Remote_Ammo"]) then {(_this select 0) setdamage 1;(_this select 3) addRating 1500} else {0}}];']
+					,['God mode', '_this allowDamage false;']
 					,['Aircraft Carrier Console', '[_this,"Aircraft Carrier Console","","","(alive _target) && (_target distance _this < 5)","(alive _target) && (_target distance _this < 5)",{},{},{[] spawn MCC_fnc_LHDspawnMenuInit},{},[],3,10,false,false] call bis_fnc_holdActionAdd;']
 					,['', '']
 					,['======= Effects =======','']
@@ -178,13 +198,13 @@ mccPresetsUnits = [
 					,['Remove All Weapons', 'removeAllWeapons _this;']
 					,['Remove All Items', 'removeAllItems _this;']
 					,['Unconscious (MCC medic system)', '[_this,_this] spawn MCC_fnc_unconscious']
-					,['Can be controled using MCC Console', '(group _this) setvariable ["MCC_canbecontrolled",true,true];']
-					,['God mod', '_this allowDamage false;']
+					,['Can be controlled using MCC Console', '(group _this) setvariable ["MCC_canbecontrolled",true,true];']
+					,['God mode', '_this allowDamage false;']
 					,['', '']
 					,['======= General =======','']
 					,['Kill Unit', '_this setdamage 1;']
 					,['Flip Unit', '[_this ,0, 90] call bis_fnc_setpitchbank;']
-					,['Kille by satchels only', '_this addEventHandler ["handledamage", {if ((_this select 4) in ["SatchelCharge_Remote_Ammo","DemoCharge_Remote_Ammo"]) then {(_this select 0) setdamage 1;(_this select 3) addRating 1500} else {0}}];']
+					,['Killed by satchels only', '_this addEventHandler ["handledamage", {if ((_this select 4) in ["SatchelCharge_Remote_Ammo","DemoCharge_Remote_Ammo"]) then {(_this select 0) setdamage 1;(_this select 3) addRating 1500} else {0}}];']
 					,['', '']
 					,['======= Effects =======','']
 					,['Sandstorm','[_this] call BIS_fnc_sandstorm;']
@@ -202,8 +222,8 @@ mccPresetsObjects = [
 					,['Destroy Object', '_this setdamage 1;']
 					,['Flip Object', '[_this ,0, 90] call bis_fnc_setpitchbank;']
 					,['Virtual Arsenal (BIS)', '["AmmoboxInit",[_this,true]] call BIS_fnc_arsenal']
-					,['Destroyable by satchels only', '_this addEventHandler ["handledamage", {if ((_this select 4) in ["SatchelCharge_Remote_Ammo","DemoCharge_Remote_Ammo"]) then {(_this select 0) setdamage 1;(_this select 3) addRating 1500} else {0}}];']
-					,['God mod', '_this allowDamage false;']
+					,['Destructible by satchels only', '_this addEventHandler ["handledamage", {if ((_this select 4) in ["SatchelCharge_Remote_Ammo","DemoCharge_Remote_Ammo"]) then {(_this select 0) setdamage 1;(_this select 3) addRating 1500} else {0}}];']
+					,['God mode', '_this allowDamage false;']
 					,['Aircraft Carrier Console', '[_this,"Aircraft Carrier Console","","","(alive _target) && (_target distance _this < 5)","(alive _target) && (_target distance _this < 5)",{},{},{[] spawn MCC_fnc_LHDspawnMenuInit},{},[],3,10,false,false] call bis_fnc_holdActionAdd;']
 					,['', '']
 					,['======= Effects =======','']
@@ -241,6 +261,7 @@ MCC_SUPPLY_CRATEITEMBIG = [MCC_logisticsCrates_TypesWest select 4, MCC_logistics
 
 //----------------------gaia------------------------------------------------------
 call compile preprocessfile format ["%1gaia\gaia_init.sqf",MCC_path];
+["STAGE", "init.sqf", "GAIA initialised (cache=%1)", [missionNamespace getVariable ["MCC_GAIA_CACHE", false]]] call MCC_fnc_log;
 
 
 //-----------------------Bon artillery --------------------------------------------
@@ -323,7 +344,7 @@ MCC_colorsarray = [["Black","ColorBlack"],["White","ColorWhite"],["Red","ColorRe
 MCC_spawn_empty =[["No",true],["Yes",false]];
 mcc_spawnbehavior = "";
 MCC_spawn_behaviors = [
-                      ["aggressive", "MOVE","AI will patrol the zone and pursuit known enemies outside the zone"],
+                      ["Aggressive", "MOVE","AI will patrol the zone and pursuit known enemies outside the zone"],
 					  ["Defensive","NOFOLLOW","AI will patrol the zone but will not pursuit known enemies outside the zone"],
 					  ["Fortify","FORTIFY","AI will look for empty building and static weapons and dig inside"],
 					  ["None","bis","Regular ArmA AI behavior"],
@@ -332,7 +353,7 @@ MCC_spawn_behaviors = [
 					  ];
 
 MCC_GAIA_spawn_behaviors = [
-                      ["aggressive", "MOVE","AI will patrol the zone and pursuit known enemies outside the zone"],
+                      ["Aggressive", "MOVE","AI will patrol the zone and pursuit known enemies outside the zone"],
 					  ["Defensive","NOFOLLOW","AI will patrol the zone but will not pursuit known enemies outside the zone"],
 					  ["Fortify","FORTIFY","AI will look for empty building and static weapons and dig inside"]
 					  ];
@@ -438,7 +459,7 @@ MCC_UMPIPView = 0;
 MCC_isBroadcasting = false;
 MCC_UMisJoining = false;
 
-MCC_align3D 		= false; //Align to surface in 3D editor?
+MCC_align3D 		= true; //Align to surface in 3D editor?
 MCC_smooth3D		= false; //Smooth placing
 MCC3DRuning			= false;
 MCC_align3DText 	= "Enabled";
@@ -521,7 +542,7 @@ MCC_MWMissionType = ["None",
 					 "Destroy Vehicle",
 					 "Destroy AA",
 					 "Destroy Artillery",
-					 "Destroy Weapon Cahce",
+					 "Destroy Weapon Cache",
 					 "Destroy Fuel Depot",
 					 "Destroy Radar/Radio",
 					 "Acquire Intel",
@@ -552,6 +573,7 @@ MCC_MWmissionsCenter = [];
 
 //StratigicMap
 MCC_MWObjectivesNames	= []; 	//placeHolder for objectives
+if (isNil "MCC_activeMarkers") then {MCC_activeMarkers = []};	//map markers made through MCC (markers menu reads it before the first marker exists)
 MCC_MWMissions			= []; 	//Store all the mission objectives = (MCC_MWMissions select 0) select 1 - will select the 2nd objective from the 1st mission
 
 //====================================================================================MCC Engine Init============================================================================================================================
@@ -665,6 +687,8 @@ MCC_3DobjectsCounter	= -1;
 //Lets create our MCC subject in the diary
 _index = player createDiarySubject ["MCCZones","MCC Zones"];
 
+["STAGE", "init.sqf", "engine init done (settings, presets, menus, arrays) - starting server-side init"] call MCC_fnc_log;
+
 //Server Side
 if ( isServer ) then {
 	//Create Custom radio channels
@@ -771,17 +795,17 @@ if ( isServer ) then {
 		{
 			_str = "<t size='1' font = 'puristaLight' color='#FFFFFF'>" + format ["%1 is no longer the commander",_name] + "</t>";
 			_command = format ['["MCC_woosh",true] spawn BIS_fnc_playSound; ["%1",0,0.2,5,1,0.0] spawn bis_fnc_dynamictext;',_str];
-			[[2,compile _command], "MCC_fnc_globalExecute", true, false] spawn BIS_fnc_MP;
+			[2,compile _command] remoteExec ["MCC_fnc_globalExecute", 0, false];
 
 			MCC_server setVariable [format ["CP_commander%1",(player getVariable ["CP_side",  playerside])],"", true];
 		};
 	};
 
-	private "_id";
+	private _id = -1;
 	_id = ["BIS_id", "onPlayerDisconnected", "MCC_missionMakerDC"] call BIS_fnc_addStackedEventHandler;
 
 	//Create a center to stand on while respawn is off
-	private "_dummyObject";
+	private _dummyObject = objNull;
 	_dummyObject = "Land_Pier_F" createvehicle [-9999, -9999, -1];
 	_dummyObject setVariable ["mccIgnore",true];
 	_dummyObject setpos [-9999, -9999, -1];
@@ -799,26 +823,22 @@ if ( isServer ) then {
 
 	_id = addMissionEventHandler ["EntityKilled",{_this spawn MCC_fnc_handleKilled}];
 
-	//----------------------iniDB------------------------------------------------------
-	if (isclass(configFile >> "CfgPatches" >> "inidbi2")) then {
-		private "_names";
-		MCC_iniDBenabled = true;
-		//call compile preProcessFile "\inidbi\init.sqf";
+	//----------------------Persistent DB (extDB3)--------------------------------------
+	// MCC_fnc_initExtDB3 sets MCC_iniDBenabled itself (true if extDB3 connects, false if it
+	// falls back to profileNamespace) and publicVariables it, so nothing else here has to.
+	[] call MCC_fnc_initExtDB3;
 
-		//get allowed players from iniDB
-		_names = [format ["%1_SERVER",missionName], "allowedPlayers", "MCC_allowedPlayers", "read",[],"DEFAULT_SERVER"] call MCC_fnc_handleDB;
+	if (MCC_iniDBenabled) then {
+		private _names = [format ["%1_SERVER",missionName], "allowedPlayers", "MCC_allowedPlayers", "read",[],"DEFAULT_SERVER"] call MCC_fnc_handleDB;
 		if (count _names == 0) then 	{
-			_null = [format ["%1_SERVER",missionName], "allowedPlayers", "MCC_allowedPlayers", "write",missionNameSpace getVariable ["MCC_allowedPlayers",[]],"DEFAULT_SERVER"] call MCC_fnc_handleDB;
+			[format ["%1_SERVER",missionName], "allowedPlayers", "MCC_allowedPlayers", "write",missionNameSpace getVariable ["MCC_allowedPlayers",[]],"DEFAULT_SERVER"] call MCC_fnc_handleDB;
 			MCC_allowedPlayers = [];
 		} else {
 			MCC_allowedPlayers = _names;
 		};
 
-		publicVariable "MCC_allowedPlayers";;
-	} else {
-		MCC_iniDBenabled = false;
+		publicVariable "MCC_allowedPlayers";
 	};
-	publicVariable "MCC_iniDBenabled"
 } else {
 	if (isMultiplayer) then {
 		waituntil {!isnil "MCC_iniDBenabled"};
@@ -827,17 +847,21 @@ if ( isServer ) then {
 	};
 };
 
+["STAGE", "init.sqf", "server-side init block done - starting PV handlers"] call MCC_fnc_log;
+
 // Handler code for the server for MP purpose
 _null=[] execVM MCC_path + "mcc\pv_handling\mcc_pv_handler.sqf";
 _null=[] execVM MCC_path + "mcc\pv_handling\mcc_extras_pv_handler.sqf";
 
-diag_log format ["%1 - MCC Headless Client available: %2", time, MCC_isHC];
-diag_log format ["%1 - MCC Local Headless Client: %2", time, MCC_isLocalHC];
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["%1 - MCC Headless Client available: %2", time, MCC_isHC]};
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["%1 - MCC Local Headless Client: %2", time, MCC_isLocalHC]};
 
 
 //******************************************************************************************************************************
 //											CP Stuff
 //******************************************************************************************************************************
+
+["STAGE", "init.sqf", "starting role selection (CP) init"] call MCC_fnc_log;
 
 //---------------------------------------------
 //		Server Init
@@ -875,12 +899,15 @@ if (isServer || isdedicated) then {
 //											Client side init
 //******************************************************************************************************************************
 
+["STAGE", "init.sqf", "starting client-side init (JIP sync, player setup)"] call MCC_fnc_log;
+
 //=============================Sync with server when JIP======================
-MCC_groupGenGroupStatus = [west,east,resistance,civilian];
+MCC_groupGenGroupStatus = [west,east,resistance,civilian,"players"];
 
 if (isPlayer player && !isServer && !(MCC_isLocalHC) && (missionNameSpace getVariable ["MCC_syncOn",true])) then {
 	0 spawn {
-		private ["_html","_loop"];
+		private _html = "";
+		private _loop = 0;
 		waituntil {!(IsNull (findDisplay 46))};
 		waituntil {! isnil "MCC_fnc_countDownLine"};
 		mcc_sync_status = false;
@@ -952,6 +979,9 @@ if (hasInterface) then {
 
 
 		if (local player) then {
+			//Fatigue / stamina: apply the current choice to the first spawn (respawns are handled in save_gear.sqf)
+			player enableStamina !(missionNamespace getVariable ["MCC_disableFatigue",false]);
+
 			//Save gear EH
 			_eh = player addEventHandler ["killed",{[player] execVM MCC_path + "mcc\general_scripts\save_gear.sqf";}];
 			player setVariable ["MCC_EH_Killed",_eh];
@@ -960,7 +990,7 @@ if (hasInterface) then {
 			_eh = player addEventHandler ["HandleHeal",{_this spawn {
 											params ["_unit","_healer"];
 											if ((_unit != _healer) && (missionNamespace getVariable ["CP_activated",false])) then {
-												[[getPlayerUID _healer,200,"For Healing"], "MCC_fnc_addRating", _healer, false] spawn BIS_fnc_MP;
+												[getPlayerUID _healer,200,"For Healing"] remoteExec ["MCC_fnc_addRating", _healer, false];
 											};
 
 											if (missionNamespace getVariable ["MCC_medicSystemEnabled",false]) then {
@@ -974,6 +1004,16 @@ if (hasInterface) then {
 										if (missionNamespace getVariable ["MCC_medicSystemEnabled",false]) then {0} else {false};
 									}];
 			player setVariable ["MCC_EH_HandleHeal",_eh];
+
+			//Vaults and weapon shops are only traded through the MCC dialog: block the normal inventory on them,
+			//otherwise sold items could be taken back for free (valor point farming)
+			_eh = player addEventHandler ["InventoryOpened",{
+				params ["", ["_container", objNull], ["_container2", objNull]];
+				private _blocked = ({!isNull _x && {_x getVariable ["MCC_vaultNoInventory",false]}} count [_container, _container2]) > 0;
+				if (_blocked) then {systemChat "This is a vault/shop - trade through the MCC menu."};
+				_blocked
+			}];
+			player setVariable ["MCC_EH_InventoryOpened",_eh];
 
 			//Handle repsawn
 		  	_eh = player addEventHandler ["Respawn", {
@@ -1001,7 +1041,7 @@ if (hasInterface) then {
 
 			//Curator
 			if(isMultiplayer) then {
-				[compile format ["MCC_curator addCuratorEditableObjects [[objectFromNetID '%1'],true]", netID player], "BIS_fnc_spawn", false, false] call BIS_fnc_MP;
+				[[], compile format ["MCC_curator addCuratorEditableObjects [[objectFromNetID '%1'],true]", netID player]] remoteExec ["call", 2, false];
 			};
 		};
 
@@ -1025,7 +1065,12 @@ if (hasInterface) then {
 				player addEventHandler ["firedMan", {
 													//Breach door
 													if (_this select 5 in (missionNamespace getvariable ["MCC_breacingAmmo",[]])) then {
-														private ["_door","_animation","_phase","_closed","_tempArray","_object"];
+														private "_door";
+														private "_animation";
+														private "_phase";
+														private "_closed";
+														private _tempArray = [];
+														private _object = objNull;
 														_object = cursorTarget;
 														_tempArray = [_object]  call MCC_fnc_isDoor;
 														_door = _tempArray select 0;
@@ -1056,8 +1101,8 @@ if (hasInterface) then {
 //===============Delete Groups (server and HC client only)====================
 if (isServer || MCC_isLocalHC) then {
 	[] spawn {
-		//Let the mission load first
-		while {time <120} do {sleep 1};
+		//Let the mission load first (was 120 s - groups killed in the first two minutes never respawned)
+		waitUntil {sleep 1; time > 15};
 
 		_gaia_respawn = [];
 		while {true} do {
@@ -1128,6 +1173,18 @@ if (isnil "MCC_terrainPref") then
 	profileNamespace setVariable ["MCC_terrainPref", MCC_terrainPref];
 };
 
+//============= Zeus after loading a savegame ===========================
+// Loading a save can leave Zeus with only the vanilla assets (modded factions/MCC modules gone). Re-add every active addon.
+if (isServer) then {
+	addMissionEventHandler ["Loaded", {
+		{_x addCuratorAddons activatedAddons} forEach allCurators;
+		["INFO", "init.sqf", "savegame loaded - Zeus addons re-added to %1 curator(s)", [count allCurators]] call MCC_fnc_log;
+	}];
+};
+
 //============= Init MCC done===========================
 MCC_initDone = true;
+["STAGE", "init.sqf", "MCC init finished"] call MCC_fnc_log;
+if (isServer) then {["monitor"] call MCC_fnc_perfLog};	//performance diagnostics (CBA: MCC General > Performance log)
 endLoadingScreen;
+if (isServer) then {[] spawn {sleep 10; private _tw = time + 120; waitUntil {sleep 1; !(missionNamespace getVariable ["MCC_isCampaignRuning", false]) || {missionNamespace getVariable ["MCCMK_campaignSetupDone", false]} || {time > _tw}}; private _f = []; {_f pushBackUnique (faction (leader _x))} forEach allGroups; if (!isNil "MCC_MWEnemyFaction") then {_f pushBackUnique MCC_MWEnemyFaction}; {if (_x isEqualType "" && {_x != ""}) then {[_x] call MCCMK_fnc_preloadFaction}} forEach _f}};

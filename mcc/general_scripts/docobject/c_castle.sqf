@@ -1,6 +1,4 @@
-private ["_objs"];
-_objs =
-[
+private _objs = [
 		["Land_Castle_01_house_ruin_F",[-18.6621,0.886719,-0.6],126.858,1,0,{}],
 	["Land_Castle_01_house_ruin_F",[19.8789,7.41016,-0.6],340.029,1,0,{}],
 	["Logic",[10.7051,20.2051,0],0,1,0,{}],

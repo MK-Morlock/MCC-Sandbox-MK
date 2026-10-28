@@ -7,7 +7,9 @@ Parameters: [_player <Unit>,  _rally<Object>]
 _player:			unit and the Group that will have access to the respawn tent
 _rally: 			object serve as the rally point
 ************************************************************/
-private ["_squad","_rally","_player"];
+private "_squad";
+private _rally = objNull;
+private _player = objNull;
 
 if (isServer) then {
 	_player = param [0,objNull,[objNull,missionNamespace]];

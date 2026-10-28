@@ -21,32 +21,40 @@ class UnitList;
 
 //--------------------------Dialogs----------------------------------------------------
 #include "\mcc_sandbox_mod\mcc\dialogs\mcc_dialogs.hpp"
-#include "\mcc_sandbox_mod\mcc\dialogs\mcc_saveLoadScreen.hpp"
-#include "\mcc_sandbox_mod\mcc\dialogs\mcc_3d_dialog.hpp"
-#include "\mcc_sandbox_mod\mcc\Dialogs\mcc_boxGen.hpp"
+#include "\mcc_sandbox_mod\mcc\dialogs\mcc_buttons3D.hpp"
+#include "\mcc_sandbox_mod\mcc\dialogs\mcc_dialogVariants.hpp"
+#include "\mcc_sandbox_mod\mcc\dialogs\mcc_dialogVariants2.hpp"
+#include "\mcc_sandbox_mod\mcc\dialogs\mcc_3dMap.hpp"
 #include "\mcc_sandbox_mod\mcc\Dialogs\mcc_groupsGen.hpp"
-#include "\mcc_sandbox_mod\mcc\Dialogs\mcc_MWMainDialog.hpp"
 #include "\mcc_sandbox_mod\mcc\Dialogs\MCC_FrontLineDialog.hpp"
 
 //----Console-----------------
-#include "\mcc_sandbox_mod\mcc\Dialogs\mcc_playerConsole.hpp"
-#include "\mcc_sandbox_mod\mcc\Dialogs\MCC_playerConsole2.hpp"
-#include "\mcc_sandbox_mod\mcc\Dialogs\MCC_playerConsole3.hpp"
+#include "\mcc_sandbox_mod\mcc\Dialogs\mcc_consoleDialogVariants.hpp"
 #include "\mcc_sandbox_mod\mcc\Dialogs\mcc_playerConsoleLoading.hpp"
-#include "\mcc_sandbox_mod\mcc\Dialogs\mcc_missionSettings.hpp"
 
 //----PDA-----------------
+#define MCCBTN_S MCC_RscButtonRoundSmall
+#define MCCBTN_R MCC_RscButtonRound
+#define MCCDLG_NAME MCC_SQLPDA
 #include "\mcc_sandbox_mod\mcc\Dialogs\sqlPDA\mcc_SQLPDA.hpp"
+#undef MCCDLG_NAME
+#undef MCCBTN_S
+#undef MCCBTN_R
+#define MCCBTN_S MCC_RscButtonRoundSmall3D
+#define MCCBTN_R MCC_RscButtonRound3D
+#define MCCDLG_NAME MCC_SQLPDAButtons
+#include "\mcc_sandbox_mod\mcc\Dialogs\sqlPDA\mcc_SQLPDA.hpp"
+#undef MCCDLG_NAME
+#undef MCCBTN_S
+#undef MCCBTN_R
 
 //----Mission Wizard-----------------
-#include "\mcc_sandbox_mod\mcc\Dialogs\MCCMW_briefingMap.hpp"
 
 //----Curator-----------------
 #include "\mcc_sandbox_mod\mcc\Dialogs\mcc_curatorInitDefines.hpp"
 #include "\mcc_sandbox_mod\mcc\Dialogs\mcc_curatorInit.hpp"
 
 //----Key Settings-----------------
-#include "\mcc_sandbox_mod\mcc\Dialogs\mcc_rscKeyBinds.hpp"
 
 //--------------------------------CP------------------------------------------------
 #define CPPATH "\mcc_sandbox_mod\"
@@ -55,14 +63,27 @@ class UnitList;
 #include "\mcc_sandbox_mod\mcc\roleSelection\cfg.hpp"
 
 //--------------------------Campaign----------------------------------------------------
+#define MCCBTN_S MCC_RscButtonRoundSmall
+#define MCCBTN_R MCC_RscButtonRound
+#define MCCDLG_NAME MCC_VEHICLESPAWNER
 #include "\mcc_sandbox_mod\mcc\Dialogs\campaign\mcc_vehicleSpawner.hpp"
+#undef MCCDLG_NAME
+#undef MCCBTN_S
+#undef MCCBTN_R
+#define MCCBTN_S MCC_RscButtonRoundSmall3D
+#define MCCBTN_R MCC_RscButtonRound3D
+#define MCCDLG_NAME MCC_VEHICLESPAWNERButtons
+#include "\mcc_sandbox_mod\mcc\Dialogs\campaign\mcc_vehicleSpawner.hpp"
+#undef MCCDLG_NAME
+#undef MCCBTN_S
+#undef MCCBTN_R
 
 //--------------------------Dynamic dialog--------------------------
-#include "\mcc_sandbox_mod\mcc\Dialogs\dynamicDialog\dynamicDialogUI.hpp"
+#include "\mcc_sandbox_mod\mcc\dialogs\mcc_assetsDialogVariants.hpp"
 
 
 //--------------------------Others----------------------------------------------------
-#include "\mcc_sandbox_mod\bon_artillery\dialog\Artillery.hpp"
+#include "\mcc_sandbox_mod\bon_artillery\dialog\ArtilleryVariants.hpp"
 #include "\mcc_sandbox_mod\hcam\hcam.hpp"
 #include "\mcc_sandbox_mod\spectator\spectating.hpp"
 
@@ -94,6 +115,7 @@ class CfgFunctions
 		#include "\mcc_sandbox_mod\mcc\bombDefuse\cfgFunctions.hpp"
 		#include "\mcc_sandbox_mod\mcc\survive\cfgFunctions.hpp"
 		#include "\mcc_sandbox_mod\mcc\HUD\cfgFunctions.hpp"
+		#include "\mcc_sandbox_mod\mcc\assets\cfgFunctions.hpp"
 		#include "\mcc_sandbox_mod\mcc\roleSelection\cfgFunctions.hpp"
 		#include "\mcc_sandbox_mod\mcc\interaction\cfgFunctions.hpp"
 		#include "\mcc_sandbox_mod\mcc\radio\cfgFunctions.hpp"
@@ -110,6 +132,68 @@ class CfgFunctions
 		#include "\mcc_sandbox_mod\mcc\medic\cfgFunctions.hpp"
 		#include "\mcc_sandbox_mod\mcc\roads\cfgFunctions.hpp"
 		#include "\mcc_sandbox_mod\mcc\ai\cfgFunctions.hpp"
+	};
+	class MCCMK
+	{
+		tag = "MCCMK";
+		class squad
+		{
+			file = "\mcc_sandbox_mod\mcc\fnc\squad";
+			class unitJob {};
+			class jobInfo {};
+			class groupType {};
+			class factionGroups {};
+			class buildSquad {};
+			class vehicleProfile {};
+			class matchVehicle {};
+			class factionVehicles {};
+			class factionVehicle {};
+			class pickVehicle {};
+			class preloadFaction {};
+		};
+		class ui
+		{
+			file = "\mcc_sandbox_mod\mcc\fnc\mkui";
+			class missionStatusHUD {};
+			class supportLine {};
+			class strikeMarker {};
+			class airdropList {};
+			class supplyAircraft {};
+			class supplyAutoHeli {};
+			class airdropAirList {};
+			class airdropFit {};
+			class classMass {};
+			class airdropFitHint {};
+			class airdropShowList {};
+			class airdropLive {};
+			class paradropPanel {};
+			class paradropPick {};
+			class paradropOpen {};
+			class casAircraft {};
+			class casAirList {};
+			class panelRemember {};
+		};
+		class air
+		{
+			file = "\mcc_sandbox_mod\mcc\fnc\mkair";
+			class aircraftRamp {};
+			class aircraftDoors {};
+		};
+		class ai
+		{
+			file = "\mcc_sandbox_mod\mcc\fnc\mkai";
+			class inKeepOutZone {};
+		};
+		class tiles
+		{
+			file = "\mcc_sandbox_mod\mcc\fnc\mktiles";
+			class tileQueue {};
+			class tileRequest {};
+			class tileSnapshot {};
+			class tileBuildLocal {};
+			class tileUpdateLocal {};
+			class tilesInRadius {};
+		};
 	};
 };
 
@@ -150,8 +234,10 @@ class CfgNotifications
 
 class RscTitles
 {
+	#include "\mcc_sandbox_mod\mcc\dialogs\mcc_broadcastRsc.hpp"
 	#include "\mcc_sandbox_mod\mcc\dialogs\mcc_InteractionRsc.hpp"
 	#include "\mcc_sandbox_mod\mcc\dialogs\compass.hpp"
+	#include "\mcc_sandbox_mod\mcc\dialogs\mcc_3dPanel.hpp"
 	#include "\mcc_sandbox_mod\hcam\hcam.hpp"
 	#include "\mcc_sandbox_mod\mcc\dialogs\mcc_3dObject.hpp"
 	#include "\mcc_sandbox_mod\mcc\dialogs\sqlPDA\MCC_SQLPDA_rsc.hpp"
@@ -159,7 +245,7 @@ class RscTitles
 	#include "\mcc_sandbox_mod\mcc\HUD\cfg.hpp"
 
 	//----medic-----------------
-	#include "mcc\medic\dialogs\mcc_uncMain.hpp"
+	#include "\mcc_sandbox_mod\mcc\medic\dialogs\mcc_uncMain.hpp"
 };
 
 class CfgDebriefing
@@ -177,6 +263,8 @@ class CfgGroups
 {
 	#include "\mcc_sandbox_mod\mcc\compositions\cfgGroups.hpp"
 };
+
+#include "\mcc_sandbox_mod\mcc\cfg\cfgGroupIcons.hpp"
 
 class cfgVehicles
 {

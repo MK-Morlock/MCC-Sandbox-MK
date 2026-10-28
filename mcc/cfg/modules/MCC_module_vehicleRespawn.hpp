@@ -11,35 +11,35 @@ class MCC_module_vehicleRespawn : Module_F
 		class abondanDistance : Edit
 		{
 			displayName = "Abandon Distance";
-			description = "How far must a unit be before vehicle is forced to respawn if empty, leave empty for none";
+			description = "How far away a unit must be before an empty vehicle is forced to respawn (leave empty for none)";
 			typeName = "NUMBER";
 			defaultValue = 300;
-			property = "abondanDistance";
+			property = "MCC_module_vehicleRespawn_abondanDistance";
 		};
 
 		class waitTime : Edit
 		{
 			displayName = "Wait Time";
-			description = "How long before vehicle respawn in seconds";
+			description = "How long before the vehicle respawns, in seconds";
 			typeName = "NUMBER";
 			defaultValue = 5;
-			property = "waitTime";
+			property = "MCC_module_vehicleRespawn_waitTime";
 		};
 
 		class tickets : Edit
 		{
 			displayName = "Respawns";
-			description = "How many time can the vehicle repsawn, leave empty for infinite";
+			description = "How many times the vehicle can respawn, leave empty for infinite";
 			typeName = "NUMBER";
-			property = "tickets";
+			property = "MCC_module_vehicleRespawn_tickets";
 		};
 
 		class destroyEffect : Checkbox
 		{
 			displayName = "Explosion Effect";
-			description = "Vehicle wreck will explode before delete";
+			description = "The vehicle wreck will explode before it is deleted";
 			typeName = "BOOL";
-			property = "destroyEffect";
+			property = "MCC_module_vehicleRespawn_destroyEffect";
 		};
 
 		class respawnDisabled : Checkbox
@@ -47,16 +47,16 @@ class MCC_module_vehicleRespawn : Module_F
 			displayName = "Disabled Vehicles";
 			description = "Respawn Disabled Vehicles";
 			typeName = "BOOL";
-			property = "respawnDisabled";
+			property = "MCC_module_vehicleRespawn_respawnDisabled";
 		};
 
 		class code : Edit
 		{
 			displayName = "Code";
-			description = "Code to execute on respawn vehicle refers as _this";
+			description = "Code to execute on respawn; the vehicle is referred to as _this";
 			typeName = "STRING";
 			defaultValue = "";
-			property = "code";
+			property = "MCC_module_vehicleRespawn_code";
 		};
 
 		class ModuleDescription: ModuleDescription{};

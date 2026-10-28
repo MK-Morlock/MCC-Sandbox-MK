@@ -5,10 +5,11 @@
 // MCC_pointB = position, end position of the line
 // MCC_IEDLineCount = integer, uniq number, can't have two markers with the same number
 //==================================================================================================================================================================================
-private ["_start", "_end", "_marker","_dist","_dir","_center","_lineMarkerName"];
-_start = _this select 0;
-_end = _this select 1;
-_marker = _this select 2;
+private "_dist";
+private "_dir";
+private _center = [];
+private _lineMarkerName = "";
+params ["_start", "_end", "_marker"];
 _lineMarkerName = format ["line_%1", _marker];
 _dist = _start distance _end;
 _dir = ((_end select 0) - (_start select 0)) atan2

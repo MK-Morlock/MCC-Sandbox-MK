@@ -58,7 +58,7 @@ class MCCCuratorInit_Dialog {
 		class Background: MCC_RscText
 		{
 			moving = 1;
-			colorBackground[] = {0,0,0,0.7};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 			idc = 10001;
 			x = "6.5 * 					(			((safezoneW / safezoneH) min 1.2) / 40) + 		(safezoneX + (safezoneW - 					((safezoneW / safezoneH) min 1.2))/2)";
 			y = "9.5 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25) + 		(safezoneY + (safezoneH - 					(			((safezoneW / safezoneH) min 1.2) / 1.2))/2)";
@@ -89,7 +89,7 @@ class MCCCuratorInit_Dialog {
 			class controls	{};
 		};
 
-		class ButtonOK: RscButtonMenuOK
+		class ButtonOK: MCC_RscButtonMenuOK
 		{
 			moving = 1;
 			x = "28.5 * 					(			((safezoneW / safezoneH) min 1.2) / 40) + 		(safezoneX + (safezoneW - 					((safezoneW / safezoneH) min 1.2))/2)";
@@ -98,7 +98,7 @@ class MCCCuratorInit_Dialog {
 			h = "1 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
 		};
 
-		class ButtonCancel: RscButtonMenuCancel
+		class ButtonCancel: MCC_RscButtonMenuCancel
 		{
 			moving = 1;
 			x = "6.5 * 					(			((safezoneW / safezoneH) min 1.2) / 40) + 		(safezoneX + (safezoneW - 					((safezoneW / safezoneH) min 1.2))/2)";
@@ -137,7 +137,11 @@ class MCCCuratorInit_Dialog {
 			h = "1 * 					(			(			((safezoneW / safezoneH) min 1.2) / 1.2) / 25)";
 		};
 
+		#define MCCBTN_S MCC_RscButtonRoundSmall
+		#define MCCBTN_R MCC_RscButtonRound
 		#include "mcc_boxGen.hpp"
+		#undef MCCBTN_S
+		#undef MCCBTN_R
 
 	};
 };

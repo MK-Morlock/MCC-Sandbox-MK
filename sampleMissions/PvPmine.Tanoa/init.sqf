@@ -41,14 +41,16 @@ if (!isDedicated && hasInterface) then {
 	waituntil {player getVariable ["cpReady",false]};
 
 	if (profileNamespace getVariable ["MCC_PRtutorialPR",true]) then {
-		_answer = ["<img size='10' img image='PRmap.paa' align='center'/>
+		_answer = ["<img size='10' img image='\mcc_sandbox_mod\mcc\helpers\data\PRmap.paa' align='center'/>
 					<br/>This is Advance and Secure (AAS) mission where two sides are fighting to capture the island.
 					<br/>Each side will have a commander and limited resources to help him capture the island.
 					<br/>The capture points can only be captured in a specific order and the mission will end once all one side tickets reached zero or the mission time runs out.
 					<br />Squad commanders can build FOB and other players can use the trucks utilize logistics to build the FOB or other battlefield emplacements
-					<br/>You can assign yourself as a side commander or a squad leader by pressing on the <t color='#FF6A32'>Squad Dialog</t> button.
+					<br/>You can assign yourself as a side commander or a squad leader by pressing on the <t color='#C48214'>Squad Dialog</t> button.
 					<br/><br/>Do you want to disable this message in the future?","Mission","Yes","No"] call BIS_fnc_guiMessage;
 
 		waituntil {!isnil "_answer"};
+		// remember the answer ("Yes" = do not show again) - it was never saved before
+		profileNamespace setVariable ["MCC_PRtutorialPR", !_answer];
 	};
 };

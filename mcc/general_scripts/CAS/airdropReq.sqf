@@ -3,21 +3,34 @@
 #define MCC_AIRDROPCLASSCONTROL 1032
 #define MCC_AIRDROPARRAYCONTROL 1033
 
-private ["_action", "_type", "_comboBox", "_mccdialog","_displayname","_dummy","_index","_insertionType","_fn_refresh"];
+private _type = 0;
+private _comboBox = controlNull;
+private _mccdialog = displayNull;
+private _displayname = "";
+private _dummy = "";
+private _index = 0;
+private _insertionType = 0;
+private _fn_refresh = {};
 disableSerialization;
 
-_action =_this select 0;
+params ["_action", ["_sel", -1]];
 _mccdialog = (uiNamespace getVariable "MCC_groupGen_Dialog");
 
 _fn_refresh = {
 	#define MCC_AIRDROPTYPECONTROL 1031
 	#define MCC_AIRDROPCLASSCONTROL 1032
 	#define MCC_AIRDROPARRAYCONTROL 1033
-	private ["_type", "_comboBox", "_mccdialog", "_groupArray","_displayname","_index","_newGroupArray"];
+	private _type = 0;
+	private _comboBox = controlNull;
+	private _mccdialog = displayNull;
+	private _groupArray = [];
+	private _displayname = "";
+	private _index = 0;
+	private _newGroupArray = [];
 	disableSerialization;
 
 	_mccdialog = (uiNamespace getVariable "MCC_groupGen_Dialog");
-	_type = lbCurSel MCC_AIRDROPTYPECONTROL;
+	_type = if (_sel >= 0) then {_sel} else {lbCurSel (_mccdialog displayCtrl MCC_AIRDROPTYPECONTROL)};
 	if (_type == -1) exitWith {};
 	switch (_type) do		//Which unit do we want
 	{
@@ -49,7 +62,9 @@ _fn_refresh = {
 	_newGroupArray = [];
 	//if slingload show only sligloadable vehicles
 	if ((missionNamespace getVariable ["MCC_airdropIsParachute",0]) == 1) then {
-		private ["_maxMass","_vehicleClass","_dummyObject"];
+		private _maxMass = configNull;
+		private _vehicleClass = "";
+		private _dummyObject = objNull;
 		_maxMass = if (isClass (configFile >> "CfgPatches" >> "A3_Air_F_Heli_Heli_Transport_03")) then {
 			switch (toLower mcc_sidename) do {
 			    case "east": {12000};
@@ -73,6 +88,8 @@ _fn_refresh = {
 		_newGroupArray = _groupArray;
 	};
 
+	if (_gen != (missionNamespace getVariable ["MCC_airdropGen", 0])) exitWith {};
+	isNil {
 	_comboBox = _mccdialog displayCtrl MCC_AIRDROPCLASSCONTROL;
 	lbClear _comboBox;
 	if (_type<4) then
@@ -92,40 +109,53 @@ _fn_refresh = {
 		} foreach _newGroupArray;
 	};
 	_comboBox lbSetCurSel 0;
+	};
 };
 
+MCC_airdropGen = (missionNamespace getVariable ["MCC_airdropGen", 0]) + 1;
+private _gen = MCC_airdropGen;
 if (_action==0) exitWith 		//Refresh list
 {
-	call _fn_refresh;
+	[_sel] call MCCMK_fnc_airdropList;
 };
 
 if (_action==1) exitWith 		//Add airdrop to list
 {
-	_index = lbCurSel MCC_AIRDROPCLASSCONTROL;
+	_index = lbCurSel (_mccdialog displayCtrl MCC_AIRDROPCLASSCONTROL);
 	if (_index == -1) exitWith {};
-
-	_dummy = lbData [MCC_AIRDROPCLASSCONTROL,_index];
-	MCC_airDropArray set [count MCC_airDropArray , _dummy];
-
-	_comboBox = _mccdialog displayCtrl MCC_AIRDROPARRAYCONTROL;		//added objects
-	lbClear _comboBox;
-	{
-		_displayname = getText(configFile >> "CfgVehicles" >> _x >> "displayname") ;
-		_comboBox lbAdd _displayname;
-	} foreach MCC_airDropArray;
-	_comboBox lbSetCurSel 0;
+	_dummy = (_mccdialog displayCtrl MCC_AIRDROPCLASSCONTROL) lbData _index;
+	if (isNil "MCC_airDropArray") then {MCC_airDropArray = []};
+	private _n = count MCC_airDropArray;
+	if ((missionNamespace getVariable ["MCCMK_adLive", false]) && {_n > 0} && {(MCC_airDropArray select (_n - 1)) == _dummy}) exitWith {
+		MCCMK_adLive = false;
+		[] call MCCMK_fnc_airdropShowList;
+	};
+	if ((missionNamespace getVariable ["MCC_airdropIsParachute", 0]) == 0) then {
+		private _cAir = _mccdialog displayCtrl 1038;
+		private _carrier = if (lbCurSel _cAir >= 0) then {_cAir lbData (lbCurSel _cAir)} else {""};
+		if (_carrier == "") exitWith {};
+		private _fit = [_carrier, MCC_airDropArray + [_dummy]] call MCCMK_fnc_airdropFit;
+		if (_fit select 0) exitWith {};
+		[_carrier, _fit] call MCCMK_fnc_airdropFitHint;
+		_dummy = "";
+	};
+	if (_dummy == "") exitWith {};
+	MCC_airDropArray = MCC_airDropArray + [_dummy];
+	MCCMK_adLive = false;
+	[] call MCCMK_fnc_airdropShowList;
 };
 
 if (_action==2) exitWith 				//Clear Airdrop
 {
 	MCC_airDropArray = [];
-	_comboBox = _mccdialog displayCtrl MCC_AIRDROPARRAYCONTROL;		//added objects
-	lbClear _comboBox;
+	MCCMK_adLive = false;
+	[] call MCCMK_fnc_airdropShowList;
 };
 
 if (_action==3) exitWith 				//Changed insertion
 {
 	_insertionType = _this select 1;
+	_sel = -1;
 
 	if (_insertionType == 0) then {
 
@@ -139,5 +169,6 @@ if (_action==3) exitWith 				//Changed insertion
 		for "_i" from 1033 to 1036 do {ctrlshow [_i, false]};
 	};
 
-	call _fn_refresh;
+	[] call MCCMK_fnc_airdropAirList;
+	[] call MCCMK_fnc_airdropList;
 };

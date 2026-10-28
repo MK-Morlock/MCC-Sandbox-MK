@@ -1,7 +1,31 @@
-private
-["_CfgVehicles",  "_type",  "_i",  "_CfgVehicle",   "_vehicleClass","_vehicleDisplayName","_cfgclass","_faction","_u_Fortifications_idx","_u_Dead_bodies_idx","_u_furniture_idx"
-	,"_u_market_idx","_u_misc_idx","_u_sighns_idx","_u_warfare_idx","_u_wrecks_idx", "_u_submerged_idx", "_u_ruins_idx","_u_military_idx","_u_flags_idx"
-	,"_u_garbage_idx","_vehiclesclass","_u_lamp_idx","_u_smallItems_idx","_u_container_idx","_u_helpers_idx","_u_training_idx","_u_mines_idx"];
+private _CfgVehicles = configNull;
+private _type = "";
+private _i = 0;
+private _CfgVehicle = configNull;
+private _vehicleClass = "";
+private _vehicleDisplayName = "";
+private _cfgclass = configNull;
+private _faction = "";
+private _u_Fortifications_idx = 0;
+private _u_Dead_bodies_idx = 0;
+private _u_furniture_idx = 0;
+private _u_market_idx = 0;
+private _u_misc_idx = 0;
+private _u_sighns_idx = 0;
+private _u_warfare_idx = 0;
+private _u_wrecks_idx = 0;
+private _u_submerged_idx = 0;
+private _u_ruins_idx = 0;
+private _u_military_idx = 0;
+private _u_flags_idx = 0;
+private _u_garbage_idx = 0;
+private _vehiclesclass = "";
+private _u_lamp_idx = 0;
+private _u_smallItems_idx = 0;
+private _u_container_idx = 0;
+private _u_helpers_idx = 0;
+private _u_training_idx = 0;
+private _u_mines_idx = 0;
 
 _u_Fortifications_idx		= 0;
 _u_Dead_bodies_idx			= 0;

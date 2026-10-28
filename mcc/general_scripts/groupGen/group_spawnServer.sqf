@@ -1,18 +1,23 @@
 //Made by Shay_Gman (c) 09.10
 
-private ["_pos","_unitsArray","_counter","_unitClass","_side","_group","_unit","_type","_unitType","_name","_safepos","_leader","_loc","_waterSpawn"];
+private "_unitClass";
+private _side = 0;
+private _group = grpNull;
+private _unit = objNull;
+private "_unitType";
+private _name = "";
+private _safepos = [];
+private "_leader";
+private "_waterSpawn";
 
-_pos = _this select 0;
-_unitsArray = _this select 1;
-_counter = _this select 2;
-_loc = _this select 3;
+params ["_pos", "_unitsArray", "_counter", "_loc"];
 if (surfaceIsWater _pos) then {_waterSpawn = 2} else {_waterSpawn = 0};
 if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_loc == 1) ) ) then
 {
 	_unitClass = (_unitsArray select 0) select 0;
 	_unitType = (_unitsArray select 0) select 1;
 
-	diag_log format ["%1 - spawning Groep Editor objects [%2]", time, _unitClass];
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["%1 - spawning Group Editor objects [%2]", time, _unitClass]};
 
 	_side =  getNumber (configFile >> "CfgVehicles" >> _unitClass >> "side");
 	switch (_side) do	{

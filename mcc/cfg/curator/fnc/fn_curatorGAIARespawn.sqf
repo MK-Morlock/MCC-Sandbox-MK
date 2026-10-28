@@ -1,7 +1,10 @@
 /*==========================================================MCC_fnc_curatorGAIARespawn====================================================================================
 // Sets a group or unit to respawns certain number of times
 ========================================================================================================================================================================*/
-private ["_module","_resualt","_object","_respawns"];
+private _module = objNull;
+private _resualt = [];
+private _object = [];
+private _respawns = 0;
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {deleteVehicle _module};
 
@@ -41,7 +44,8 @@ _object = _object select 1;
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};
 
-_respawns = (_resualt select 0);
+_respawns = round (_resualt select 0);	// the dialog slider returns a fraction
+if (_respawns < 1) exitWith {[objNull, "Respawns must be at least 1"] call bis_fnc_showCuratorFeedbackMessage; deleteVehicle _module};
 
 if (typeName _object == typeName grpNull) then {
 	[_object,_respawns] spawn GAIA_fnc_respawnSet;

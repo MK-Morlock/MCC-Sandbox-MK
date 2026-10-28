@@ -16,8 +16,8 @@
 
 disableserialization;
 
-_mode = [_this,0,"Open",[displaynull,""]] call bis_fnc_param;
-_this = [_this,1,[]] call bis_fnc_param;
+_mode = _this param [0, "Open", [displaynull,""]];
+_this = _this param [1, []];
 _fullVersion = missionnamespace getvariable ["BIS_fnc_arsenal_fullGarage",false];
 
 #define IDC_RSCDISPLAYGARAGE_TAB_CAR		-1
@@ -54,10 +54,10 @@ switch _mode do {
 	///////////////////////////////////////////////////////////////////////////////////////////
 	case "Open": {
 		if !(isnull (uinamespace getvariable ["BIS_fnc_arsenal_cam",objnull])) exitwith {"Garage Viewer is already running" call bis_fnc_logFormat;};
-		missionnamespace setvariable ["BIS_fnc_arsenal_fullGarage",[_this,0,false,[false]] call bis_fnc_param];
+		missionnamespace setvariable ["BIS_fnc_arsenal_fullGarage",_this param [0, false, [false]]];
 
 		with missionnamespace do {
-			BIS_fnc_garage_center = [_this,1,missionnamespace getvariable ["BIS_fnc_garage_center",player],[objnull]] call bis_fnc_param;
+			BIS_fnc_garage_center = _this param [1, missionnamespace getvariable ["BIS_fnc_garage_center",player], [objnull]];
 		};
 		with uinamespace do {
 			_displayMission = [] call (uinamespace getvariable "bis_fnc_displayMission");
@@ -149,8 +149,7 @@ switch _mode do {
 	case "Preload": {
 		//--- 3DEN specific, load only animations and textures
 		["bis_fnc_garage_preload"] call bis_fnc_startloadingscreen;
-		private ["_data"];
-		_data = [];
+		private _data = [];
 		_center = (missionnamespace getvariable ["BIS_fnc_arsenal_center",player]);
 		_centerFaction = faction _center;
 		{
@@ -417,7 +416,9 @@ systemChat "TabSelectLeft";
 
 	///////////////////////////////////////////////////////////////////////////////////////////
 	case "SelectItem": {
-		private ["_ctrlList","_index","_cursel"];
+		private "_ctrlList";
+		private "_index";
+		private "_cursel";
 		_display = _this select 0;
 		_ctrlList = _this select 1;
 		_idc = _this select 2;
@@ -1287,7 +1288,7 @@ systemChat "TabSelectLeft";
 	///////////////////////////////////////////////////////////////////////////////////////////
 	case "loadVehicle": {
 		disableserialization;
-		_vehClass = [_this,0,"",[""]] call bis_fnc_param;
+		_vehClass = _this param [0, "", [""]];
 		_vehCfg = configfile >> "cfgvehicles" >> _vehClass;
 		if (isclass _vehCfg) then {
 			_vehID = -1;

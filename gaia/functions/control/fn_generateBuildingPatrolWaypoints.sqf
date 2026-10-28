@@ -31,12 +31,16 @@ _nr =0;
 	_i=0;
 	while {str(_x buildingPos _i) != "[0,0,0]"} do {_i = _i + 1;};
 	
-	_wp = _group addWaypoint [(getPos _x), 0];
-	_wp setWaypointType "MOVE"; 
-	_wp setWaypointHousePosition random(_i);
-	_wp waypointAttachObject _x;		
-	
-	_nr= _nr +1;
+	//Only buildings that have positions to go to (street lamps and the like are "houses" too: "This house contains no
+	//positions" in the RPT)
+	if (_i > 0) then {
+		_wp = _group addWaypoint [(getPos _x), 0];
+		_wp setWaypointType "MOVE"; 
+		_wp setWaypointHousePosition (floor random _i);
+		_wp waypointAttachObject _x;		
+		
+		_nr= _nr +1;
+	};
 	
 	}	foreach _buildings;
 

@@ -19,6 +19,7 @@ class ambient {
 	class ambientFireStart {description = "Starts fire at the given position";};
 	class ambientFireClientSide {description = "Client side: Light and sounds effects";};
 	class ambientFireInit {description = "Init ambient fire";};
+	class ambientFireExtinguish {description = "Put out ambient fires (all, or within a radius) and stop them spreading";};
 	class ambientFirePlayerFiredEH {description = "Init EH on each client to have a small chance projectiles will start fire";};
 	class isVisableToPlayers {description = "Check if an object/unit is visable by players";};
 };

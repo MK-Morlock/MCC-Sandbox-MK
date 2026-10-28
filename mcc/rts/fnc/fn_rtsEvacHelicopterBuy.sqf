@@ -1,9 +1,12 @@
 /*============================================= MCC_fnc_rtsEvacHelicopterBuy
 	Spawn evac helicopter of not available
 =================================================================================*/
-private ["_ctrl","_res","_side","_varName","_evacHeliArray"];
+private _res = [];
+private "_side";
+private _varName = "";
+private "_evacHeliArray";
 disableSerialization;
-_ctrl = _this select 0;
+params ["_ctrl"];
 _res = param [1, [], [[]]];
 _side = playerSide;
 

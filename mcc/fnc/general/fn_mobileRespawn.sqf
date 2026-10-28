@@ -5,10 +5,8 @@
 // _respawnMarker = string "RESPAWN_WEST", "RESPAWN_EAST", "RESPAWN_GUERRILA"
 // _respawnStart = position, the default respawn point if the mobile one is destroyed.
 //==================================================================================================================================================================================
-private ["_dummy", "_respawnMarker", "_respawnStart","_safePos"];
-_dummy = _this select 0;
-_respawnMarker = _this select 1;
-_respawnStart = _this select 2;
+private _safePos = [];
+params ["_dummy", "_respawnMarker", "_respawnStart"];
 while {(Alive _dummy)} do
 	{
 		_safePos = [(getPos _dummy),1,10,1,0,900,0] call BIS_fnc_findSafePos;

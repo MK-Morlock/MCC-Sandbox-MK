@@ -22,7 +22,7 @@ corpseRemovalMaxTime = 300;
 
 wreckLimit = 15;
 wreckRemovalMinTime = 60;
-wreckRemovalMaxTime = 1200
+wreckRemovalMaxTime = 1200;
 
 class Header
 {

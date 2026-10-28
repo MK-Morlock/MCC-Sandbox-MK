@@ -4,33 +4,41 @@
 
 //--------------------------Dialogs----------------------------------------------------
 #include "mcc\dialogs\mcc_dialogs.hpp"
+#include "mcc\dialogs\mcc_buttons3D.hpp"
 
-#include "mcc\dialogs\mcc_saveLoadScreen.hpp"
-#include "mcc\dialogs\mcc_3d_dialog.hpp"
-#include "mcc\Dialogs\mcc_boxGen.hpp"
+#include "mcc\dialogs\mcc_dialogVariants.hpp"
+#include "mcc\dialogs\mcc_dialogVariants2.hpp"
+#include "mcc\dialogs\mcc_3dMap.hpp"
 #include "mcc\Dialogs\mcc_groupsGen.hpp"
-#include "mcc\Dialogs\mcc_MWMainDialog.hpp"
 #include "mcc\Dialogs\MCC_FrontLineDialog.hpp"
 
 //----Console-----------------
-#include "mcc\Dialogs\mcc_playerConsole.hpp"
-#include "mcc\Dialogs\MCC_playerConsole2.hpp"
-#include "mcc\Dialogs\MCC_playerConsole3.hpp"
+#include "mcc\Dialogs\mcc_consoleDialogVariants.hpp"
 #include "mcc\Dialogs\mcc_playerConsoleLoading.hpp"
-#include "mcc\Dialogs\mcc_missionSettings.hpp"
 
 //----PDA-----------------
+#define MCCBTN_S MCC_RscButtonRoundSmall
+#define MCCBTN_R MCC_RscButtonRound
+#define MCCDLG_NAME MCC_SQLPDA
 #include "mcc\Dialogs\sqlPDA\mcc_SQLPDA.hpp"
+#undef MCCDLG_NAME
+#undef MCCBTN_S
+#undef MCCBTN_R
+#define MCCBTN_S MCC_RscButtonRoundSmall3D
+#define MCCBTN_R MCC_RscButtonRound3D
+#define MCCDLG_NAME MCC_SQLPDAButtons
+#include "mcc\Dialogs\sqlPDA\mcc_SQLPDA.hpp"
+#undef MCCDLG_NAME
+#undef MCCBTN_S
+#undef MCCBTN_R
 
 //----Mission Wizard-----------------
-#include "mcc\Dialogs\MCCMW_briefingMap.hpp"
 
 //----Curator-----------------
 #include "mcc\Dialogs\mcc_curatorInitDefines.hpp"
 #include "mcc\Dialogs\mcc_curatorInit.hpp"
 
 //----Key Settings-----------------
-#include "mcc\Dialogs\mcc_rscKeyBinds.hpp"
 
 //---- test I should delete it at the end
 #include "mcc\dialogs\test.hpp"
@@ -42,13 +50,25 @@
 #include "mcc\roleSelection\cfg.hpp"
 
 //--------------------------Campaign----------------------------------------------------
+#define MCCBTN_S MCC_RscButtonRoundSmall
+#define MCCBTN_R MCC_RscButtonRound
+#define MCCDLG_NAME MCC_VEHICLESPAWNER
 #include "mcc\Dialogs\campaign\mcc_vehicleSpawner.hpp"
+#undef MCCDLG_NAME
+#undef MCCBTN_S
+#undef MCCBTN_R
+#define MCCBTN_S MCC_RscButtonRoundSmall3D
+#define MCCBTN_R MCC_RscButtonRound3D
+#define MCCDLG_NAME MCC_VEHICLESPAWNERButtons
+#include "mcc\Dialogs\campaign\mcc_vehicleSpawner.hpp"
+#undef MCCDLG_NAME
+#undef MCCBTN_S
+#undef MCCBTN_R
 
 //--------------------------Dynamic dialog--------------------------
-#include "mcc\Dialogs\dynamicDialog\dynamicDialogUI.hpp"
 
 //--------------------------Others----------------------------------------------------
-#include "bon_artillery\dialog\Artillery.hpp"
+#include "bon_artillery\dialog\ArtilleryVariants.hpp"
 #include "spectator\spectating.hpp"
 
 //--------------------------features----------------------------------------------------
@@ -91,6 +111,68 @@ class CfgFunctions
 		#include "mcc\logistics\cfgFunctions.hpp"
 		#include "mcc\UI\cfgFunctions.hpp"
 		#include "mcc\roads\cfgFunctions.hpp"
+	};
+	class MCCMK
+	{
+		tag = "MCCMK";
+		class squad
+		{
+			file = "mcc\fnc\squad";
+			class unitJob {};
+			class jobInfo {};
+			class groupType {};
+			class factionGroups {};
+			class buildSquad {};
+			class vehicleProfile {};
+			class matchVehicle {};
+			class factionVehicles {};
+			class factionVehicle {};
+			class pickVehicle {};
+			class preloadFaction {};
+		};
+		class ui
+		{
+			file = "mcc\fnc\mkui";
+			class missionStatusHUD {};
+			class supportLine {};
+			class strikeMarker {};
+			class airdropList {};
+			class supplyAircraft {};
+			class supplyAutoHeli {};
+			class airdropAirList {};
+			class airdropFit {};
+			class classMass {};
+			class airdropFitHint {};
+			class airdropShowList {};
+			class airdropLive {};
+			class paradropPanel {};
+			class paradropPick {};
+			class paradropOpen {};
+			class casAircraft {};
+			class casAirList {};
+			class panelRemember {};
+		};
+		class air
+		{
+			file = "mcc\fnc\mkair";
+			class aircraftRamp {};
+			class aircraftDoors {};
+		};
+		class ai
+		{
+			file = "mcc\fnc\mkai";
+			class inKeepOutZone {};
+		};
+		class tiles
+		{
+			file = "mcc\fnc\mktiles";
+			class tileQueue {};
+			class tileRequest {};
+			class tileSnapshot {};
+			class tileBuildLocal {};
+			class tileUpdateLocal {};
+			class tilesInRadius {};
+		};
 	};
 };
 
@@ -137,6 +219,7 @@ class CfgMarkers
 
 class RscTitles
 {
+	#include "mcc\dialogs\mcc_broadcastRsc.hpp"
 	titles[]={"img"};
 
 	class img
@@ -163,6 +246,7 @@ class RscTitles
 
 	#include "mcc\dialogs\mcc_InteractionRsc.hpp"
 	#include "mcc\dialogs\compass.hpp"
+	#include "mcc\dialogs\mcc_3dPanel.hpp"
 	#include "mcc\dialogs\mcc_3dObject.hpp"
 	#include "mcc\dialogs\sqlPDA\MCC_SQLPDA_rsc.hpp"
 	#include "mcc\survive\dialogs\mcc_rscSurviveStats.hpp"

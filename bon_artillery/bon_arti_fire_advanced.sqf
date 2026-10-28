@@ -2,10 +2,9 @@
 
 if(not isServer) exitWith{};
 
-private ['_lasertarget'];
+private "_lasertarget";
 
-_requestor = _this select 0;
-_side = _this select 1;
+params ["_requestor", "_side"];
 
 _cannons_to_fire = _requestor getVariable "requesting_cannons";
 _cannons_available = _cannons_to_fire;

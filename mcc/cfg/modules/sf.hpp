@@ -15,9 +15,9 @@ class mcc_sandbox_moduleSF : Module_F
 		class hcam_actionKey : Combo
 		{
 			displayName = "User custom key:";
-			description = "Which user's custom key will activate the helmet cam";
+			description = "Which custom user key will activate the helmet cam";
 			typeName = "NUMBER"; // Value type, can be "NUMBER", "STRING" or "BOOL"
-			property = "hcam_actionKey";
+			property = "mcc_sandbox_moduleSF_hcam_actionKey";
 
 			class values
 			{

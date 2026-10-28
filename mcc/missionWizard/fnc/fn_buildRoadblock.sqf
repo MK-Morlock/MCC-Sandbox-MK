@@ -7,11 +7,17 @@
 // _side: side
 // Return - handler
 //========================================================================================================================================================================================
-private ["_dummyObject","_unitsArray","_dir","_pos","_faction","_side","_type","_group","_unit"];
-_pos 		= _this select 0;
-_dir 		= _this select 1;
-_faction 	= _this select 2;
-_side	 	= _this select 3;
+private _dummyObject = [];
+private _unitsArray = [];
+private _type = "";
+private _group = grpNull;
+private _unit = objNull;
+params [
+	["_pos", [0,0,0], [[]]],
+	["_dir", 0, [0]],
+	["_faction", "", [""]],
+	["_side", sideUnknown, [sideUnknown]]
+];
 
 if (isnil "_dir") then {_dir = 0};
 
@@ -20,7 +26,8 @@ waituntil {alive _dummyObject};
 
 if (MCC_debug) then
 {
-	private ["_marker","_name"];
+	private _marker = "";
+	private _name = "";
 	_name = FORMAT ["Rpdblock_%1", ["roadblockMarker",1] call bis_fnc_counter];
 	_marker = createMarkerLocal[_name, _pos];
 	_marker setMarkerTypeLocal "mil_dot";
@@ -33,7 +40,7 @@ if (MCC_debug) then
 [_pos,30,0,3,_faction,str _side] call MCC_fnc_garrison;
 
 //Lets spawn someone to take care of traffic
-_unitsArray 	= [_faction,"soldier"] call MCC_fnc_makeUnitsArray;		//Let's build the faction unit's array
+_unitsArray 	= [[_faction,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;		//Let's build the faction unit's array
 
 if (count _unitsArray >= 4) then {
 	_type = _unitsArray select round (random 4);

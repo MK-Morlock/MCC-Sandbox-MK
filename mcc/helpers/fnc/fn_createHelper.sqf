@@ -3,9 +3,8 @@
 //===============================================================================================================================================================================
 #define MCC_HELPER "UserTexture1m_F"
 
-private ["_object","_text"];
-_object = _this select 0;
-_text	= _this select 1;
+
+params ["_object", "_text"];
 
 if (!isServer) exitWith {};
 

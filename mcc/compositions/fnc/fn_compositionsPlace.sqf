@@ -20,17 +20,21 @@ params [
 	["_azi",0,[0]],
 	["_script",[],[[]]]
 ];
-private ["_objs","_multiplyMatrixFunc","_posX", "_posY","_configName"];
+private _multiplyMatrixFunc = {};
+private _posX = 0;
+private _posY = 0;
+private _configName = configNull;
 _posX = _pos select 0;
 _posY = _pos select 1;
 
 _multiplyMatrixFunc =
 {
-	private ["_array1", "_array2", "_result"];
+	private _array1 = [];
+	private _array2 = [];
+	private _result = [];
 	_array1 = _this select 0;
 	_array2 = _this select 1;
 
-	diag_log format ["MCC DEBUG: %1", [_array1,_array2]];
 
 	_result =
 	[
@@ -46,11 +50,18 @@ _configName = configFile >> "CfgGroups" >> "Empty";
 	_configName = _configName >> _x;
 } forEach _script;
 
-diag_log format ["MCC DEBUG: %1",_configName];
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["MCC DEBUG: %1",_configName]};
 
 for "_i" from 0 to ((count _configName) - 1) do
 {
-	private ["_obj", "_type", "_relPos", "_azimuth", "_fuel", "_damage", "_newObj", "_vehicleinit"];
+	private _obj = configNull;
+	private _type = "";
+	private _relPos = [];
+	private _azimuth = 0;
+	private _fuel = nil;
+	private _damage = nil;
+	private _newObj = objNull;
+	private _vehicleinit = nil;
 	_obj = _configName select _i;
 
 	if (isClass _obj) then {
@@ -59,10 +70,12 @@ for "_i" from 0 to ((count _configName) - 1) do
 		_azimuth = getNumber (_obj >> "dir");
 		_vehicleinit = getText (_obj >> "code");
 
-		private ["_rotMatrix", "_newRelPos", "_newPos"];
+		private _rotMatrix = [];
+		private _newRelPos = [];
+		private _newPos = [];
 		_rotMatrix =[[cos _azi, sin _azi],[-(sin _azi), cos _azi]];
 		_newRelPos = [_rotMatrix, _relPos] call _multiplyMatrixFunc;
-		private ["_z"];
+		private _z = 0;
 		if ((count _relPos) > 2) then {_z = _relPos select 2} else {_z = 0};
 		_newPos = [_posX + (_newRelPos select 0), _posY + (_newRelPos select 1), _z];
 		_newObj = _type createVehicle _newPos;
@@ -70,10 +83,11 @@ for "_i" from 0 to ((count _configName) - 1) do
 		_newObj setPos _newPos;
 		if (!isNil "_fuel") then {_newObj setFuel _fuel};
 		if (!isNil "_damage") then {_newObj setDamage _damage};
-		if (!isNil "_vehicleinit") then {
+		if (!isNil "_vehicleinit" && {_vehicleinit != ""}) then {
 			_newObj spawn compile _vehicleinit;
 		};
 
 		{_x addCuratorEditableObjects [[_newObj],true]} forEach allCurators;
 	};
+	if ((_i % 10 == 9) && {canSuspend}) then {sleep 0.01};
 };

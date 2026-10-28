@@ -16,7 +16,18 @@ _this params [
 	["_index",-1,[0]]
 ];
 
-private ["_object","_cargoItems","_item","_dummy","_objectMass","_weapons","_magazines","_items","_classNames","_counter","_pos","_class"];
+private _object = objNull;
+private _cargoItems = [];
+private "_item";
+private _dummy = objNull;
+private "_objectMass";
+private "_weapons";
+private "_magazines";
+private "_items";
+private "_classNames";
+private "_counter";
+private "_pos";
+private "_class";
 
 _object =  player getVariable ["interactWith",objNull];
 _objectMass = _object getVariable ["MCC_logisticsObjectMass",_object call MCC_fnc_logisticsCargoGetMass];
@@ -42,7 +53,9 @@ if ((_item select 0) == (_ctrl lbData _index)) then {
 		[_dummy,_object] spawn {
 			params ["_dummy","_vehicle"];
 
-			private ["_class","_para","_velocity"];
+			private _class = "";
+			private _para = objNull;
+			private "_velocity";
 			_class = "I_parachute_02_F";
 			_para = createVehicle [_class, getpos _dummy,[],0,"CAN_COLLIDE"];
 			_para attachTo [_dummy, [0,0,0]];

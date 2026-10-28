@@ -10,7 +10,11 @@
 ====================================================================================================================================================================
 */
 
-private ["_cargoItems","_sparePart","_display","_ctrl","_index"];
+private _cargoItems = [];
+private _sparePart = "";
+private "_display";
+private _ctrl = controlNull;
+private _index = configNull;
 params [
     ["_object",objNull,[objNull]]
 ];
@@ -28,7 +32,7 @@ if (count _cargoItems <=0 && !(_object getVariable ["MCC_logisticsCargoInit",fal
 };
 
 while {dialog} do {closeDialog 0};
-0 = createDialog "MCC_logisticsCargo";
+0 = createDialog ("MCC_logisticsCargo" call MCC_fnc_dialogName);
 waitUntil {dialog};
 
 disableSerialization;
@@ -41,7 +45,8 @@ _ctrl ctrlAddEventHandler ["LBDblClick",{_this spawn MCC_fnc_logisticsCargoUnloa
 [{
     params ["_args", "_handler"];
     _args params ["_object", "_ctrl"];
-    private ["_cargoItems","_index"];
+    private _cargoItems = [];
+    private _index = configNull;
     // Display closed or vehicle deleted
     if (isNull _ctrl || {isNull _object || {!alive _object}}) exitWith {
         [_handler] call CBA_fnc_removePerFrameHandler;

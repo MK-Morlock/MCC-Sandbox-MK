@@ -11,10 +11,22 @@
 #define MCC_TRIGGERS_STAT_DEACTIVE 3075
 
 disableSerialization;
-private ["_dlg","_type","_size","_zoneY","_activate","_cond","_angle","_shape","_text","_pos","_nul","_triggerSelected","_timeMin","_timeMax","_stateCond","_stateDiac"];
+private "_dlg";
+private "_size";
+private "_activate";
+private "_cond";
+private "_shape";
+private _text = controlNull;
+private "_pos";
+private _nul = [];
+private "_triggerSelected";
+private _timeMin = controlNull;
+private _timeMax = controlNull;
+private _stateCond = controlNull;
+private _stateDiac = controlNull;
 
 _dlg = (uiNamespace getVariable "MCC_groupGen_Dialog");
-_type = _this select 0;
+params ["_type"];
 
 switch (_type) do
 {
@@ -63,7 +75,7 @@ switch (_type) do
 		[0, _pos, _size, _activate, _cond, Mshape, _text, toArray MCC_capture_var,_timeMin,_timeMax,_stateCond,_stateDiac] execVM MCC_path + "mcc\general_scripts\triggers\triggers_execute.sqf";
 
 		while {dialog} do {closedialog 0};
-		_ok = createDialog "mcc_groupGen";
+		_ok = createDialog (['mcc_groupGen', 'mcc_groupGenButtons'] select (profileNamespace getVariable ['MCC_consoleButtons', false]));
 	};
 	   
    case 2:	//Mapclick Move trigger

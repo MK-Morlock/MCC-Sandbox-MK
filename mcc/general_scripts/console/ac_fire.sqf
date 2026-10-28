@@ -1,10 +1,15 @@
-private ["_primaryTarget","_missileStart","_missileType","_missileSpeed","_perSecondChecks","_target","_missile","_travelTime",
-		"_steps","_relDirHor","_relDirVer","_fireLight","_velocityForCheck","_targetIsHeliEmpty","_light","_tr"];
-_primaryTarget = _this select 0; //target for the missile
-_missileStart = _this select 1; //position where te missile will be spawned
-_missileType = _this select 2; //type of the missile
-_missileSpeed = _this select 3; //speed of the missile
-_light = _this select 4;		//0 - none, 1 - smoke, 2 - light
+private _perSecondChecks = 0;
+private "_target";
+private _missile = objNull;
+private "_travelTime";
+private _steps = 0;
+private _relDirHor = [];
+private "_relDirVer";
+private _fireLight = "";
+private "_velocityForCheck";
+private _targetIsHeliEmpty = false;
+private _tr = "";
+params ["_primaryTarget", "_missileStart", "_missileType", "_missileSpeed", "_light"];		//0 - none, 1 - smoke, 2 - light
 _targetIsHeliEmpty = false;
 
 _perSecondChecks = 25; //direction checks per second
@@ -51,8 +56,7 @@ if (_light==1) then
 		_fireLight lightAttachObject [_missile, [0, -0.5, 0]];
 
 		_missile spawn	{
-				private ["_missile"];
-				_missile = _this;
+				private _missile = _this;
 				while {alive _missile} do {
 					_tr = "#particlesource" createVehicle getpos _missile;
 					_tr setParticleCircle [0, [0, 0, 0]];

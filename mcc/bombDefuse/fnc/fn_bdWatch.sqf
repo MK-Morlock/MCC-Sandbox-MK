@@ -8,11 +8,21 @@
 
 #define IDC_BASE 100
 
-private ["_difficulty","_ctrlGroup","_display","_endTime","_watchCtrl","_strikesCtrl","_ratio","_timeLeft","_s","_m","_ms","_html","_ls","_defused","_noModules","_time"];
+private "_display";
+private "_endTime";
+private _watchCtrl = controlNull;
+private _strikesCtrl = controlNull;
+private "_ratio";
+private "_timeLeft";
+private _s = [];
+private _m = [];
+private _ms = [];
+private _html = "";
+private _ls = "";
+private _defused = false;
+private _time = 0;
 disableSerialization;
-_difficulty = _this select 0;
-_ctrlGroup = _this select 1;
-_noModules = _this select 2;
+params ["_difficulty", "_ctrlGroup", "_noModules"];
 _time = param [3, -1, [0]];
 
 _display = ctrlParent _ctrlGroup;

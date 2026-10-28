@@ -13,7 +13,7 @@ class MCC_Module_settingsMissionWizard : Module_F
 			displayName = "Objectives Variable";
 			description = "Which variable will change";
 			typeName = "NUMBER";
-			property = "Variable";
+			property = "MCC_Module_settingsMissionWizard_Variable";
 
 			class values
 			{
@@ -87,10 +87,39 @@ class MCC_Module_settingsMissionWizard : Module_F
 		class VariableClass : Edit
 		{
 			displayName = "Variable Class";
-			description = "Array contains all the variable classes";
+			description = "Class names for the list chosen in Objectives Variable, e.g. [""O_officer_F"",""C_Nikos""]. Objects synced to this module are added (and removed from the map at start). Left at the default with nothing synced, the list is not changed.";
 			typeName = "STRING";
 			defaultValue = '["B_officer_F","O_officer_F","I_officer_F","C_Nikos"]';
-			property = "displayName";
+			property = "MCC_Module_settingsMissionWizard_displayName";
+		};
+
+		class enemyFaction : Edit
+		{
+			control = "MCC_AttributeFactionOptional";	//drop-down of all loaded factions (mod factions included)
+			displayName = "Enemy Faction (Mission Generator)";
+			description = "Enemy faction the Mission Generator starts on in this mission (you can still change it in its Rival Faction list). Not set: a faction of the side opposite the player.";
+			typeName = "STRING";
+			defaultValue = """""";
+			property = "MCC_Module_settingsMissionWizard_enemyFaction";
+		};
+
+		class civFaction : Edit
+		{
+			control = "MCC_AttributeFactionOptional";
+			displayName = "Civilian Faction (Mission Generator)";
+			description = "Civilian faction the Mission Generator starts on in this mission (you can still change it). Leave empty for the first in the list, as before.";
+			typeName = "STRING";
+			defaultValue = """""";
+			property = "MCC_Module_settingsMissionWizard_civFaction";
+		};
+
+		class players : Edit
+		{
+			displayName = "# Players (Mission Generator)";
+			description = "Starting value of the Mission Generator # Players slider in this mission (more players = more enemies and a larger area). 0 = leave the slider as it is.";
+			typeName = "NUMBER";
+			defaultValue = 0;
+			property = "MCC_Module_settingsMissionWizard_players";
 		};
 
 		class ModuleDescription: ModuleDescription{};

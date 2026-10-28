@@ -49,7 +49,7 @@ MCC_fnc_curatorDrawLine_mapEH = [((findDisplay 312) displayCtrl 50), "draw", {
     _thisArgs params ["_object", "_text", "_icon", "_color"];
 
     private _pos2d = (((findDisplay 312) displayCtrl 50) ctrlMapScreenToWorld getMousePosition);
-    _mapCtrl drawIcon [_icon, _color, _pos2d, 30, 30, 0, _text, 1, 0.04, "TahomaB", "center"];
+    _mapCtrl drawIcon [_icon, _color, _pos2d, 30, 30, 0, _text, 1, 0.04, "RobotoCondensed", "center"];
     _mapCtrl drawLine [getPos _object, _pos2d, _color];
 }, [_object, _text, _icon, _color, 0]] call CBA_fnc_addBISEventHandler;
 

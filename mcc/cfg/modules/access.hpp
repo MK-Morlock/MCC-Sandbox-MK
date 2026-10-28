@@ -15,9 +15,9 @@ class mcc_sandbox_module : Module_F
 		class names : Edit
 		{
 			displayName = "MCC Operators";
-			description = "Enter the player's UID of the players that will have access to MCC. Example ['123213',12312321','1322131231']";
+			description = "Enter the UIDs of the players who will have access to MCC. Example: ['123213','12312321','1322131231']";
 			defaultValue = """[]""";
-			property = "names";
+			property = "mcc_sandbox_module_names";
 		};
 
 		class allowAdmin : Checkbox
@@ -25,7 +25,7 @@ class mcc_sandbox_module : Module_F
 			displayName = "Admin Access";
 			description = "Allow admin or host access to MCC";
 			typeName = "BOOL";
-			property = "allowAdmin";
+			property = "mcc_sandbox_module_allowAdmin";
 		};
 
 		class ModuleDescription: ModuleDescription{};
@@ -33,7 +33,7 @@ class mcc_sandbox_module : Module_F
 
 	class ModuleDescription: ModuleDescription
 	{
-		description = "Who will have MCC access. Enter the players UID as an array  Example ['123213',12312321','1322131231'] or sync with roles"; // Short description, will be formatted as structured text
+		description = "Who will have MCC access. Enter the players' UIDs as an array. Example: ['123213','12312321','1322131231'] or sync with roles"; // Short description, will be formatted as structured text
 		sync[] = {"BLUFORunit"};
 
 		class BLUFORunit
@@ -41,7 +41,7 @@ class mcc_sandbox_module : Module_F
 			description[] = { // Multi-line descriptions are supported
 				"Sync with any player's role that you want to have MCC access"
 			};
-			displayName = "MCC Contoller"; // Custom name
+			displayName = "MCC Controller"; // Custom name
 			icon = "iconMan"; // Custom icon (can be file path or CfgVehicleIcons entry)
 			optional = 1; // Synced entity is optional
 			duplicate = 1; // Multiple entities of this type can be synced

@@ -9,10 +9,15 @@
 #define MCC_CONSOLEINFOTEXT (uiNamespace getVariable "MCC_CONSOLEINFOTEXT")
 
 
-private ["_mccdialog","_control","_target","_mempoints","_veh","_option","_effectParams","_leader"];
+private "_mccdialog";
+private _control = controlNull;
+private _mempoints = [];
+private "_veh";
+private _effectParams = [];
+private "_leader";
 disableSerialization;
 
-_option = _this select 0;
+params ["_option"];
 //Cleanup previos camera
 if (!isnil "MCC_consoleLiveFeedCam")  then
 {
@@ -47,7 +52,7 @@ switch (_option) do
 {
 	// Normal
 	case 0: {
-		_effectParams = [3, 0.1,1, 1, 0, [0,0,0,0], [1.1,0.7,1.1,1.1], [1.0,0.7,1.0,1.1]];
+		_effectParams = [0];	//vanilla camera picture (as Arma UAV feeds)
 	};
 
 	// Night vision
@@ -57,7 +62,7 @@ switch (_option) do
 
 	// Thermal imaging
 	case 2: {
-		_effectParams = [2, 1,1, 1, 0, [0,0,0,0], [1.1,0.7,1.1,1.1], [1.0,0.7,1.0,1.1]];
+		_effectParams = [2];	//vanilla thermal (as Arma UAV feeds)
 	};
 };
 _mccdialog = MCC_SQLPDA;
@@ -68,6 +73,7 @@ MCC_CONSOLEINFOLIVEFEED ctrlShow false;
 MCC_sqlpdaMenu0 ctrlShow false;
 MCC_sqlpdaMenu1 ctrlShow false;
 MCC_sqlpdaMenu2 ctrlShow false;
+if (!isNil "MCC_fnc_SQLPDAMenuBg") then {[] call MCC_fnc_SQLPDAMenuBg};
 
 ctrlShow [MCC_MINIMAP,false];
 ctrlShow [23,false];

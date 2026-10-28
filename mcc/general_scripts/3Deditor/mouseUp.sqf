@@ -1,8 +1,18 @@
 //Returns the control, the pressed button, the x and y coordinates and the state of Shift, Ctrl and Alt.
-private ["_params", "_ctrl", "_pressed", "_posX", "_posY", "_shift", "_ctrlKey", "_alt", "_eib_marker","_pointB","_nearObjectsA","_nearObjectsB"];
+private "_ctrl";
+private "_pressed";
+private "_posX";
+private "_posY";
+private "_shift";
+private "_ctrlKey";
+private "_alt";
+private "_eib_marker";
+private "_pointB";
+private "_nearObjectsA";
+private "_nearObjectsB";
 disableSerialization;
  
-_params = _this select 0;
+params ["_params"];
 
 _ctrl = _params select 0;
 _pressed = _params select 1;
@@ -23,7 +33,7 @@ if (MCC_ambushPlacing && _pressed!=1) then //Ambush group placing
 			{
 				hint "Ambush Captured."; 
 				MCC_capture_var = MCC_capture_var 
-					+ FORMAT ["[[%1 , ""%2"" , ""%3"", %4, %5, %6, %7, %8],""MCC_fnc_ambushSingle"",true,false] call BIS_fnc_MP;", MCC_pointA, IEDAmbushspawnname, mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside]
+					+ FORMAT ["[%1 , ""%2"" , ""%3"", %4, %5, %6, %7, %8] remoteExec [""MCC_fnc_ambushSingle"", 0, false];", MCC_pointA, IEDAmbushspawnname, mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside]
 					+ FORMAT ["_eib_marker = createMarkerlocal [%2 select 0 ,%1];", MCC_pointA, IedName]
 					+         "_eib_marker setMarkerTypelocal ""mil_ambush"";"
 					+         "_eib_marker setMarkerColorlocal ""ColorRed"""		  
@@ -39,7 +49,7 @@ if (MCC_ambushPlacing && _pressed!=1) then //Ambush group placing
 				_eib_marker setMarkerTextlocal (IedName select 0);
 				_eib_marker setMarkerdirlocal IEDDir-90;
 				mcc_safe=mcc_safe + FORMAT ["
-				[[%1 , '%2' , '%3', %4, %5, %6, %7, %8],'MCC_fnc_ambushSingle',false,false] call BIS_fnc_MP;
+				[%1 , '%2' , '%3', %4, %5, %6, %7, %8] remoteExec ['MCC_fnc_ambushSingle', 2, false];
 				sleep 1;
 				_eib_marker = createMarkerlocal [%4 select 0 ,%1];
 				_eib_marker setMarkerTypelocal 'mil_ambush';
@@ -56,7 +66,7 @@ if (MCC_ambushPlacing && _pressed!=1) then //Ambush group placing
 				, MCC_IEDisSpotter
 				, iedside
 				];
-				[[MCC_pointA , IEDAmbushspawnname,mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside],"MCC_fnc_ambushSingle",false,false] call BIS_fnc_MP;
+				[MCC_pointA , IEDAmbushspawnname,mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside] remoteExec ["MCC_fnc_ambushSingle", 2, false];
 			};
 		MCC_ambushPlacing = false; 							
 	};
@@ -67,7 +77,7 @@ if (_shift && _pressed!=1) then //Sync with shift key
 	_nearObjectsB = MCC_pointB nearObjects [MCC_dummy,50];
 	if (count _nearObjectsA > 0 && count _nearObjectsB > 0) then
 	{
-		[[MCC_pointA , MCC_pointB],"MCC_fnc_iedSync",true,false] call BIS_fnc_MP;
+		[MCC_pointA , MCC_pointB] remoteExec ["MCC_fnc_iedSync", 0, false];
 	};
 };
 

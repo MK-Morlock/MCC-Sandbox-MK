@@ -16,7 +16,7 @@ class MCC_Module_AAS : MCC_Module_Base
 		{
 			displayName = "$STR_Module__AAS_side1_displayName";
 			typeName = "NUMBER";
-			property = "side1";
+			property = "MCC_Module_AAS_side1";
 			defaultValue = "1";
 			class values
 			{
@@ -43,7 +43,7 @@ class MCC_Module_AAS : MCC_Module_Base
 		{
 			displayName = "$STR_Module__AAS_side2_displayName";
 			typeName = "NUMBER";
-			property = "side2";
+			property = "MCC_Module_AAS_side2";
 			class values
 			{
 				class BLUFOR
@@ -71,7 +71,7 @@ class MCC_Module_AAS : MCC_Module_Base
 			description = "$STR_Module__AAS_bleedTickets_description";
 			typeName = "NUMBER";
 			defaultValue = 2;
-			property = "bleedTickets";
+			property = "MCC_Module_AAS_bleedTickets";
 		};
 
 		class ModuleDescription: ModuleDescription{};

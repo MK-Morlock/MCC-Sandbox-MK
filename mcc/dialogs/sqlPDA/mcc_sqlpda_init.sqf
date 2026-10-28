@@ -1,7 +1,28 @@
-private ["_disp","_comboBox","_scale","_array"];
+private "_comboBox";
+private "_scale";
+private "_array";
 disableSerialization;
 
-_disp = _this select 0;
+params ["_disp"];
+["start"] call MCC_fnc_consoleCampaignTiles;	//no campaign territory overlay on the PDA map
+MCC_fnc_SQLPDAMenuBg = {
+	disableSerialization;
+	private _d = uiNamespace getVariable ["MCC_SQLPDA", displayNull];
+	if (isNull _d) exitWith {};
+	{
+		_x params ["_m", "_bg"];
+		private _c = _d displayCtrl _m;
+		private _b = _d displayCtrl _bg;
+		if (ctrlShown _c && {((ctrlPosition _c) select 2) > 0}) then {
+			(ctrlPosition _c) params ["_px", "_py", "_pw", "_ph"];
+			_b ctrlSetPosition [_px - 0.003 * safezoneW, _py - 0.004 * safezoneH, _pw + 0.006 * safezoneW, _ph + 0.008 * safezoneH];
+			_b ctrlShow true;
+			_b ctrlCommit 0;
+		} else {
+			if (ctrlShown _b) then {_b ctrlShow false};
+		};
+	} forEach [[0, 31], [1, 32], [2, 33]];
+};
 uiNamespace setVariable ["MCC_SQLPDA", _disp];
 uiNamespace setVariable ["MCC_sqlpdaMenu0", _disp displayCtrl 0];
 uiNamespace setVariable ["MCC_sqlpdaMenu1", _disp displayCtrl 1];
@@ -23,73 +44,68 @@ uiNamespace setVariable ["MCC_sqlpdaCloseLF", _disp displayCtrl 25];
 	_x ctrlshow false;
 } foreach [MCC_sqlpdaMenu0,MCC_sqlpdaMenu1,MCC_sqlpdaMenu2,MCC_CONSOLEINFOLIVEFEED,MCC_CONSOLEINFOTEXT,MCC_sqlpdaCloseLF];
 
-_scale = switch (player getvariable ["MCC_sqlPDAScale",0]) do {
-    case 0: {
-    	 [
-    	 	[0.116146,0.434,0.2,0.5],	//pic
-    	 	[0.14,0.526,0.153,0.32],	//bcg
-    	 	[0.14,0.526,0.153,0.32],	//map
-    	 	[0.2,0.85,0.035,0.043],		//close
-    	 	[0.2,0.85,0.035,0.043],		//close LF
-    	 	[0.24,0.85,0.035,0.043],	//Scale
-    	 	[0.16,0.85,0.035,0.043]		//bckg
-    	 ];
-    };
-
-    case 1: {
-    	 [
-    	 	[0.116146,0.434,0.35,0.53],	//pic
-    	 	[0.156,0.533,0.27,0.341],	//bcg
-    	 	[0.156,0.533,0.27,0.341],	//map
-    	 	[0.275,0.885,0.04,0.043],	//close
-    	 	[0.275,0.885,0.04,0.043],	//close LF
-    	 	[0.34,0.885,0.04,0.043],	//Scale
-    	 	[0.21,0.885,0.04,0.043]		//bckg
-    	 ];
-    };
-
-    case 2: {
-    	 [
-    	 	[0.15,0.05,0.6,0.9],		//pic
-    	 	[0.22,0.23,0.465,0.55],		//bcg
-    	 	[0.22,0.23,0.465,0.55],		//map
-    	 	[0.4,0.8,0.08,0.06],		//close
-    	 	[0.4,0.8,0.08,0.06],		//close LF
-    	 	[0.55,0.8,0.08,0.06],		//Scale
-    	 	[0.25,0.8,0.08,0.06]		//bckg
-    	 ];
-    };
-};
+//Three sizes (plus button), all the same shape: the frame picture is drawn 4:3, so its height is worked out from its
+//width in screen pixels and it is never stretched out of shape (the old picture was squashed, and stretched further at
+//each size). The bottom stays above the squad bar. Everything else is placed inside the frame by fractions of it.
+private _sizeIdx = (player getvariable ["MCC_sqlPDAScale",0]) min 2 max 0;
+private _fw = [0.24, 0.34, 0.5] select _sizeIdx;		//frame width (part of the safe zone width)
+private _fwUI = _fw * safezoneW;
+private _fhUI = ((_fwUI / pixelW) * 0.75) * pixelH;	//4:3 in screen pixels
+private _fx = 0.0373 * safezoneW + safezoneX;	//left edge lined up with the squad bar under it
+private _fy = (0.9 * safezoneH + safezoneY) - _fhUI;	//bottom at 90 % of the safe zone, clear of the squad bar
+private _in = {params ["_rx","_ry","_rw","_rh"]; [_fx + _rx * _fwUI, _fy + _ry * _fhUI, _rw * _fwUI, _rh * _fhUI]};
+private _screen = [0.075, 0.09, 0.85, 0.71] call _in;	//the screen opening of the frame picture
+private _btnAt = {[(_this - 0.025), 0.875, 0.05, 0.05] call _in};	//raised buttons together in the middle of the tray, a little smaller (like the MK-CC keys)
+_scale = [
+	[_fx, _fy, _fwUI, _fhUI],	//pic
+	_screen,				//bcg (live feed picture)
+	_screen,				//map
+	0.50 call _btnAt,		//close
+	0.50 call _btnAt,		//close live feed
+	0.56 call _btnAt,		//scale
+	0.44 call _btnAt		//pin to screen
+];
 
 _ctrl = (_disp displayCtrl 24);
 
 if ((player getvariable ["MCC_sqlPDAScale",0])==2) then {
-	_ctrl ctrlsetText (MCC_path + "mcc\dialogs\sqlpda\data\zoomOut.paa");
+	_ctrl ctrlsetText (MCC_path + "mcc\dialogs\sqlpda\data\pda_btn_zoomOut_ca.paa");
 } else {
-	_ctrl ctrlsetText (MCC_path + "mcc\dialogs\sqlpda\data\zoomIn.paa");
+	_ctrl ctrlsetText (MCC_path + "mcc\dialogs\sqlpda\data\pda_btn_zoomIn_ca.paa");
 };
 
 {
-	_array = _scale select _foreachIndex;
 	_ctrl = (_disp displayCtrl _x);
-	_ctrl ctrlSetPosition [(_array select 0) * safezoneW + safezoneX, (_array select 1) * safezoneH + safezoneY, (_array select 2) * safezoneW , (_array select 3) * safezoneH];
+	_ctrl ctrlSetPosition (_scale select _foreachIndex);
 	_ctrl ctrlCommit 0;
 } forEach [21,22,9120,23,25,24,26];
+["init", "pda"] call MCC_fnc_consoleMapLayers;
 sleep 0.5;
 
-(_disp displayCtrl 24) ctrlAddEventHandler ["ButtonClick","player setvariable ['MCC_sqlPDAScale',(((player getvariable ['MCC_sqlPDAScale',0])+1) mod 3)]; 0 spawn {closedialog 0; waituntil {!dialog}; createDialog 'MCC_SQLPDA'}"];
+(_disp displayCtrl 24) ctrlAddEventHandler ["ButtonClick","player setvariable ['MCC_sqlPDAScale',(((player getvariable ['MCC_sqlPDAScale',0])+1) mod 3)]; 0 spawn {closedialog 0; waituntil {!dialog}; createDialog ('MCC_SQLPDA' call MCC_fnc_dialogName)}"];
 
 MCC_fnc_SQLPDAMenuClear =
 {
 	MCC_sqlpdaMenu0 ctrlShow false;
 	MCC_sqlpdaMenu1 ctrlShow false;
 	MCC_sqlpdaMenu2 ctrlShow false;
+	[] call MCC_fnc_SQLPDAMenuBg;
 };
 
 MCC_fnc_SQLPDAMenuclicked =
 {
-	private ["_disp","_comboBox","_ctrlIDC","_index","_posX","_posY","_array","_child","_path","_markerName","_text","_respawPositions","_conType","_available",
-	         "_errorMessege","_errorMessegeIndex"];
+	private "_disp";
+	private "_comboBox";
+	private "_ctrlIDC";
+	private "_index";
+	private "_posX";
+	private "_posY";
+	private _array = [];
+	private "_child";
+	private _path = "";
+	private "_markerName";
+	private "_text";
+	private "_conType";
 
 	_ctrl 		= _this select 0;
 	_index 		= _this select 1;
@@ -159,7 +175,7 @@ MCC_fnc_SQLPDAMenuclicked =
 			_text = uinamespace getVariable "MCC_sqlpdaMenu1Data";
 			if (_ctrlData == "MinefieldAP") then {_path = "";_text = ""} else {if (playerside == east) then {_path = "b_"} else {_path = "o_"}};
 
-			[[_markerName, _path, MCC_ConsoleWPpos, uinamespace getVariable "MCC_sqlpdaMenu1Data",_text, time, "default"] ,"MCC_fnc_PDAcreatemarker", playerside,false] call BIS_fnc_MP;
+			[_markerName, _path, MCC_ConsoleWPpos, uinamespace getVariable "MCC_sqlpdaMenu1Data",_text, time, "default"] remoteExec ["MCC_fnc_PDAcreatemarker", playerside, false];
 		};
 
 		//Menu - enemy - markers - Size set
@@ -173,7 +189,7 @@ MCC_fnc_SQLPDAMenuclicked =
 			//Create marker
 			_markerName = (getplayerUID player) + (uinamespace getVariable "MCC_sqlpdaMenu1Data") + str floor time;
 			_path = if (playerside == east) then {"b_"} else {"o_"};
-			[[_markerName, _path, MCC_ConsoleWPpos, uinamespace getVariable "MCC_sqlpdaMenu1Data", uinamespace getVariable "MCC_sqlpdaMenu2Data", time, "default"] ,"MCC_fnc_PDAcreatemarker", playerside,false] call BIS_fnc_MP;
+			[_markerName, _path, MCC_ConsoleWPpos, uinamespace getVariable "MCC_sqlpdaMenu1Data", uinamespace getVariable "MCC_sqlpdaMenu2Data", time, "default"] remoteExec ["MCC_fnc_PDAcreatemarker", playerside, false];
 		};
 
 //------------------------------------------------------------------------------------Menu - support----------------------------------------------------------------------------------------------------------------------
@@ -208,7 +224,7 @@ MCC_fnc_SQLPDAMenuclicked =
 			//Create marker
 			_markerName = (getplayerUID player) + (uinamespace getVariable "MCC_sqlpdaMenu1Data") + str floor time;
 			_path = "";
-			[[_markerName, _path, MCC_ConsoleWPpos, uinamespace getVariable "MCC_sqlpdaMenu1Data", _text, time, "default"] ,"MCC_fnc_PDAcreatemarker", playerside,false] call BIS_fnc_MP;
+			[_markerName, _path, MCC_ConsoleWPpos, uinamespace getVariable "MCC_sqlpdaMenu1Data", _text, time, "default"] remoteExec ["MCC_fnc_PDAcreatemarker", playerside, false];
 		};
 
 //------------------------------------------------------------------------------------Menu - Construct----------------------------------------------------------------------------------------------------------------------
@@ -267,6 +283,7 @@ MCC_fnc_SQLPDAMenuclicked =
 	_comboBox lbSetCurSel 0;
 
 	_child ctrlAddEventHandler ["LBSelChanged","_this call MCC_fnc_SQLPDAMenuclicked"];
+	[] call MCC_fnc_SQLPDAMenuBg;
 };
 
 
@@ -301,8 +318,10 @@ MCC_fnc_mapDrawWPPDA =
 			_wpArray = waypoints (group _leader);
 			if (count _wpArray > 0)then
 			{
-				private ["_wp","_wPos","_wType"];
-				MCC_lastPos = nil;
+				private "_wp";
+				private "_wPos";
+				private "_wType";
+				private _lastPos = nil;
 				_texture = gettext (configfile >> "CfgMarkers" >> "waypoint" >> "icon");
 				for [{_i= currentWaypoint (group _leader)},{_i < count _wpArray},{_i=_i+1}] do 	//Draw the current WP
 				{
@@ -327,15 +346,15 @@ MCC_fnc_mapDrawWPPDA =
 							"center"
 						];
 
-						if (isnil "MCC_lastPos") then {MCC_lastPos = [(getpos _leader) select 0,(getpos _leader) select 1]};
+						if (isNil "_lastPos") then {_lastPos = [(getpos _leader) select 0,(getpos _leader) select 1]};
 
 						_map drawLine [
-							MCC_lastPos,
+							_lastPos,
 							_wPos,
 							[0,0,1,1]
 						];
 
-						MCC_lastPos = _wPos;
+						_lastPos = _wPos;
 					};
 				};
 			};
@@ -345,7 +364,25 @@ MCC_fnc_mapDrawWPPDA =
 
 _disp call
 {
-	private ["_handler","_markerSupport","_markerAutonomous","_markerColor","_markerNaval","_markerRecon","_haveGPS","_leader","_groupStatus","_wpArray","_behaviour","_groupControl","_haveGPS","_groupName","_markerType","_markerInf","_markerMech","_markerArmor","_markerAir"];
+	private _handler = controlNull;
+	private _markerSupport = "";
+	private _markerAutonomous = "";
+	private _markerColor = [];
+	private _markerNaval = "";
+	private _markerRecon = "";
+	private _haveGPS = nil;
+	private "_leader";
+	private "_groupStatus";
+	private _wpArray = [];
+	private "_behaviour";
+	private _groupControl = configNull;
+	private _haveGPS = nil;
+	private _groupName = "";
+	private "_markerType";
+	private _markerInf = "";
+	private _markerMech = "";
+	private _markerArmor = "";
+	private _markerAir = "";
 
 	_handler = (_disp displayCtrl 9120) ctrladdeventhandler ["draw","_this call MCC_fnc_mapDrawWPPDA;"];
 
@@ -429,7 +466,7 @@ _disp call
 
 					_x setGroupIconParams [_markerColor,_groupName ,1,true];
 
-					_unitsCount = [group _leader] call MCC_fnc_countGroupHC;
+					_unitsCount = [group _leader] call MCC_fnc_countGroupHC; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 					_unitsSize = 0;
 					_markerType = nil;
 					if (_unitsCount select 0 > 0) then {_markerType = _markerInf; _unitsSize = _unitsSize + (1*(_unitsCount select 0))};
@@ -443,7 +480,7 @@ _disp call
 
 					if (isnil "_markerType") then
 					{
-						_unitsCount = [group _leader] call MCC_fnc_countGroup;
+						_unitsCount = [group _leader] call MCC_fnc_countGroup; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 						if (_unitsCount select 0 > 0) then {_markerType = _markerInf; _unitsSize = _unitsSize + (1*(_unitsCount select 0))};
 						if (_unitsCount select 1 > 0) then {_markerType = _markerMech; _unitsSize = _unitsSize + (3*(_unitsCount select 1))};
 						if (_unitsCount select 2 > 0) then {_markerType = _markerArmor; _unitsSize = _unitsSize + (3*(_unitsCount select 2))};
@@ -470,9 +507,8 @@ _disp call
 
 					if (! isnil "_groupStatus") then 					//Draw group status
 						{
-							private ["_time","_status"];
-							_time 		= _groupStatus select 1;
-							_status 	= _groupStatus select 0;
+							private _time = _groupStatus select 1;
+							private _status = _groupStatus select 0;
 
 							if (abs (time - _time) < 180) then
 								{

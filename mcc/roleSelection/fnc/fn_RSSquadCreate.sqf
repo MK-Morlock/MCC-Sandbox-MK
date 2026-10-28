@@ -6,7 +6,9 @@
 	<OUT>
 		Nothing
 =========================================================================================================================================================*/
-private ["_name","_groups","_groupsNamesArray","_group","_groupName"];
+private _name = [];
+private "_groups";
+private _group = grpNull;
 #define CP_maxSquads 12
 
 //close name edits
@@ -26,7 +28,7 @@ _groups	 = switch (player getVariable ["CP_side", playerside]) do {
 
 //is there room to make another squad
 if ((count _groups) >= CP_maxSquads) exitWith {
-	[9999,format ["Max number of squads reached %1/%2", count _groups, CP_maxSquads],3,true] spawn MCC_fnc_setIDCText;
+	[9999,format ["Maximum number of squads reached (%1/%2)", count _groups, CP_maxSquads],3,true] spawn MCC_fnc_setIDCText;
 };
 
 _name = ["Alpha","Bravo","Charlie","Delta","Echo","Foxtrot","Golf","Hotel","India","Juliett","Kilo","Lima","Mike","November","Oscar","Papa"] select (count _groups);
@@ -53,11 +55,11 @@ switch (player getVariable ["CP_side",playerside]) do {
 		publicvariable "CP_guerGroups";
 	};
 
-	case default {
+	default {
 		CP_westGroups pushBack [_group,_name];
 		publicvariable "CP_westGroups";
 	};
 };
 
 _group setVariable ["name",_name,true];
-[9999,format ["Squad %1 Created", _name, _group],3,true] spawn MCC_fnc_setIDCText;
+[9999,format ["Squad %1 created", _name, _group],3,true] spawn MCC_fnc_setIDCText;

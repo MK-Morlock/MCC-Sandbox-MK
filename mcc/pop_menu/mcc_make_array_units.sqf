@@ -1,4 +1,12 @@
-private ["_CfgVehicles","_type","_i","_CfgVehicle","_vehicleClass","_simulation","_simTypesUnits","_faction","_tempArray"];
+private _CfgVehicles = configNull;
+private _type = "";
+private _i = 0;
+private _CfgVehicle = configNull;
+private _vehicleClass = "";
+private _simulation = "";
+private _simTypesUnits = [];
+private _faction = nil;
+private _tempArray = [];
 
 _faction = missionNamespace getVariable ["mcc_faction",""];
 
@@ -26,7 +34,10 @@ for "_i" from 1 to (count _CfgVehicles - 1) do {
 	_CfgVehicle = _CfgVehicles select _i;
 
 	//Keep going when it is a public entry
-	if ((getNumber(_CfgVehicle >> "scope") == 2)) then {
+	private _mdl = toLower (getText (_CfgVehicle >> "model"));
+	private _invisible = ((["TargetSoldierBase", "TargetBase", "Target_Base_F", "InvisibleTarget_Base_F"] findIf {(configName _CfgVehicle) isKindOf _x}) >= 0) || {(_mdl find "empty") >= 0} || {(_mdl find "invisible") >= 0};
+	if (_invisible && {getNumber (_CfgVehicle >> "scope") == 2} && {missionNamespace getVariable ["MCC_debug", false]}) then {diag_log format ["MCC [DEBUG] spawn lists | invisible target left out: %1 (%2)", configName _CfgVehicle, getText (_CfgVehicle >> "displayName")]};
+	if ((getNumber(_CfgVehicle >> "scope") == 2) && {!_invisible}) then {
 
 		_vehicleDisplayName 	= getText(_CfgVehicle >> "displayname");
 		_cfgclass 			= (configName (_CfgVehicle));

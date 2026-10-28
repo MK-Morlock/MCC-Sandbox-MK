@@ -22,10 +22,20 @@
 #define BON_ARTY_MISSIONTYPE 999921
 disableSerialization;
 
-private ["_arti_settings","_index","_shellsleft","_cannon","_comboBox","_artidialog","_displayname","_comboBox","_allAmmo","_ammoTypes","_ctrl","_selectedCannon","_ammo","_isCommander"];
+private "_arti_settings";
+private "_shellsleft";
+private "_cannon";
+private _comboBox = controlNull;
+private _artidialog = controlNull;
+private _displayname = "";
+private _comboBox = controlNull;
+private "_allAmmo";
+private _ammoTypes = [];
+private _selectedCannon = controlNull;
+private "_ammo";
+private _isCommander = false;
 
-_ctrl	= _this select 0;
-_index 	= _this select 1;
+params ["_ctrl", "_index"];
 _artidialog = findDisplay BON_ARTY_DIALOG;
 
 //is the player the commander or just using the artillery computer

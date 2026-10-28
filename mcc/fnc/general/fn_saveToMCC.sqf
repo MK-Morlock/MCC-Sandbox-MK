@@ -6,14 +6,27 @@
 // Returns:
 //     <Nothing>
 //==============================================================================================================================================================================
- private ["_arrayGroups","_triggersArray","_allItems","_arrayVehicles","_object","_side","_array","_pos","_newString","_finalString","_checkedGroups","_isKindofUnit","_allGroupsOutput",
-		  "_curatorObjectives","_allCuratorObjectives","_logics","_init"];
+ private _arrayGroups = [];
+ private "_triggersArray";
+ private "_allItems";
+ private _arrayVehicles = [];
+ private "_object";
+ private "_side";
+ private "_pos";
+ private "_newString";
+ private _checkedGroups = [];
+ private _isKindofUnit = false;
+ private _allGroupsOutput = [];
+ private _curatorObjectives = [];
+ private _allCuratorObjectives = [];
+ private "_logics";
+ private _init = "";
 
 _checkedGroups	= [];
 _arrayGroups 	= [];
 _arrayVehicles 	= [];
 
-_allItems		= curatorEditableObjects MCC_curator;
+_allItems		= []; {_allItems append (curatorEditableObjects _x)} forEach allCurators; _allItems = _allItems arrayIntersect _allItems;	// every Zeus, not just MCC\'s (players may keep their own Zeus)
 _triggersArray 	= MCC_triggers;
 _allGroupsOutput = [];
 _allVehiclesOutput = [];
@@ -93,7 +106,10 @@ MCC_output = MCC_output + "[[";
 
 if (count _curatorObjectives > 0) then
 {
-	private ["_attachedUnitInit","_attachedUnit","_newName","_class"];
+	private _attachedUnitInit = "";
+	private _attachedUnit = objNull;
+	private _newName = "";
+	private "_class";
 	_allCuratorObjectives = [];
 	_tempArray =[];
 
@@ -171,7 +187,13 @@ if (count _curatorObjectives > 0) then
 MCC_output = MCC_output + "],[";
 
 //Groups
-private ["_group","_blackListVehicles","_refinedGroup","_tempArray","_groupArrayGeneral","_groupArrayUnits","_vars"];
+private "_group";
+private _blackListVehicles = [];
+private _refinedGroup = [];
+private _tempArray = [];
+private _groupArrayGeneral = [];
+private _groupArrayUnits = [];
+private _vars = [];
 
 {
 	_group 	= _x select 0;
@@ -235,7 +257,7 @@ private ["_group","_blackListVehicles","_refinedGroup","_tempArray","_groupArray
 			_init 	= _object getvariable ["vehicleinit",""];
 			if (_object getVariable ["isIED",false]) then {_init = _init + FORMAT [";_this setVariable ['syncedObject', %1];",_object getVariable ["syncedObject", [0,0,0]]]};
 
-			_init = [_init, '"', "'"] call MCC_fnc_replaceString;
+			_init = [_init, (toString [34]), "'"] call MCC_fnc_replaceString;
 			_tempArray = [typeof _object, _pos, getDir _object, rank _object,skill _object, damage _object, fuel vehicle _object, _init];
 
 			if (count crew _object > 0) then
@@ -273,7 +295,8 @@ private ["_group","_blackListVehicles","_refinedGroup","_tempArray","_groupArray
 
 		_groupArrayGeneral set [count _groupArrayGeneral, _groupArrayUnits];
 
-		private ["_wpArray","_wp"];
+		private _wpArray = [];
+		private "_wp";
 		if ((count (waypoints _group) > 0) && (count (waypoints _group) > currentWaypoint _group)) then
 		{
 			_wpArray = [];
@@ -313,7 +336,7 @@ if ((count _arrayVehicles) > 0) then
 
 		if (!isnil "_type") then
 		{
-			_init = [_init, '"', "'"] call MCC_fnc_replaceString;
+			_init = [_init, (toString [34]), "'"] call MCC_fnc_replaceString;
 			_tempArray = [_side, _type, _pos, getDir _object, _init];
 
 			_tempArray set [5,(weaponCargo _object)];
@@ -414,9 +437,9 @@ if (count _triggersArray >0) then
 				+ format ["             type=""%1"";",((triggerActivation _object) select 1)] + _br
 				+         "             age=""UNKNOWN"";" + _br
 				+ format ["             text=""%1"";", triggerText _object] + _br
-				+ format ["             expCond=""%1"";", [_newString select 0, '"', "'"] call MCC_fnc_replaceString] + _br
-				+ format ["             expActiv=""%1"";", [_newString select 1, '"', "'"] call MCC_fnc_replaceString] + _br
-				+ format ["             expDesactiv=""%1"";",[_newString select 2, '"', "'"] call MCC_fnc_replaceString] + _br;
+				+ format ["             expCond=""%1"";", [_newString select 0, (toString [34]), "'"] call MCC_fnc_replaceString] + _br
+				+ format ["             expActiv=""%1"";", [_newString select 1, (toString [34]), "'"] call MCC_fnc_replaceString] + _br
+				+ format ["             expDesactiv=""%1"";",[_newString select 2, (toString [34]), "'"] call MCC_fnc_replaceString] + _br;
 
 
 		if (!isnil {_object getvariable "text"}) then
@@ -479,3 +502,4 @@ if (count allMapMarkers > 0) then
 
 
 
+*/

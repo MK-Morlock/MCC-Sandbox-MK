@@ -1,7 +1,12 @@
-private ["_disp","_exp","_idc","_displayname","_updateRoles","_sidePlayer","_activeSides","_role"];
+private "_exp";
+private _idc = 0;
+private "_displayname";
+private "_sidePlayer";
+private _activeSides = [];
+private _role = "";
 disableSerialization;
 
-_disp = _this select 0;
+params ["_disp"];
 uiNamespace setVariable ["CP_GEARPANEL_IDD", _disp];
 uiNamespace setVariable ["CP_ticketsWestText", _disp displayCtrl 1];
 uiNamespace setVariable ["CP_ticketsEastText", _disp displayCtrl 2];
@@ -70,7 +75,7 @@ _sidePlayer = player getVariable ["CP_side", side player];
 CP_flag ctrlSetText (missionNamespace getVariable [format ["CP_flag%1", _sidePlayer],""]);
 
 //Mission Name
-CP_missionName ctrlSetText missionName;
+CP_missionName ctrlSetText (if (briefingName != "") then {briefingName} else {missionName regexReplace ["%20", " "]});
 
 
 //Sets sides Tickets
@@ -88,12 +93,13 @@ private _roleLevel = missionNamespace getVariable [format  ["%1Level",_role],[]]
 
 //No level found read DB
 if (count _roleLevel <= 0) then {
-	private ["_cfgName","_cfg"];
+	private _cfgName = "";
+	private _cfg = configNull;
 
 	//Get rank from the server
 	["MCCplayerRank", player, "N/A", "STRING"] remoteExec ["MCC_fnc_getVariable",2];
 	waituntil {! isnil "MCCplayerRank"};
-	if (MCC_debug) then {systemchat format ["player Rank : %1",MCCplayerRank]};
+	if (MCC_debug) then {systemchat format ["Player rank: %1",MCCplayerRank]};
 
 	_cfg = if (isClass (missionconfigFile >> "MCC_loadouts" )) then {(missionconfigFile >> "MCC_loadouts")} else {(configFile >> "MCC_loadouts")};
 
@@ -147,7 +153,7 @@ _createRoleButton = {
 
 	//Group Info
 	 if (count units player < _minPlayersForKit) then {
-		_ctrl ctrlSetTooltip format ["Need %1 more squad mates to unlock",abs (_minPlayersForKit - count units player),_minPlayersForKit];
+		_ctrl ctrlSetTooltip format ["Need %1 more squadmates to unlock",abs (_minPlayersForKit - count units player),_minPlayersForKit];
 	};
 	_ctrl ctrlCommit 0;
 
@@ -168,7 +174,21 @@ _createRoleButton = {
 	_ctrl ctrlCommit 0;
 };
 
-private ["_cfg","_displayname","_pic","_availableRoles","_minPlayersForKit","_maxKitsInGroup","_maxKitsInSide","_hight","_roleSummery","_idc","_ctrlGroup","_xPos","_yPos","_space","_cfgName"];
+private _cfg = configNull;
+private _displayname = "";
+private _pic = "";
+private _availableRoles = [];
+private _minPlayersForKit = 0;
+private _maxKitsInGroup = 0;
+private _maxKitsInSide = 0;
+private "_hight";
+private _roleSummery = [];
+private "_idc";
+private _ctrlGroup = controlNull;
+private _xPos = 0;
+private "_yPos";
+private "_space";
+private _cfgName = "";
 
 _availableRoles = [];
 _cfg = if (isClass (missionconfigFile >> "MCC_loadouts" )) then {(missionconfigFile >> "MCC_loadouts")} else {(configFile >> "MCC_loadouts")};
@@ -206,7 +226,19 @@ for "_i" from 0 to (count _cfg -1) do {
 [CP_GEARPANEL_IDD] call MCC_fnc_playerStats;
 
 0 spawn {
-	private ["_array","_disp","_activeSides","_commander","_commanderName","_oldCommander","_cfg","_cfgName","_minPlayersForKit","_maxKitsInSide","_maxKitsInGroup","_countRole","_idc"];
+	private "_array";
+	private "_disp";
+	private _activeSides = [];
+	private "_commander";
+	private _commanderName = "";
+	private _oldCommander = "";
+	private _cfg = configNull;
+	private _cfgName = "";
+	private _minPlayersForKit = 0;
+	private _maxKitsInSide = 0;
+	private _maxKitsInGroup = 0;
+	private _countRole = {};
+	private _idc = 0;
 	disableSerialization;
 
 	_cfg = if (isClass (missionconfigFile >> "MCC_loadouts" )) then {(missionconfigFile >> "MCC_loadouts")} else {(configFile >> "MCC_loadouts")};
@@ -215,7 +247,7 @@ for "_i" from 0 to (count _cfg -1) do {
 	while {dialog && (missionNamespace getVariable ["CP_gearPanelOpen",false])} do {
 		_disp = CP_GEARPANEL_IDD;
 
-		missionNamespace setVariable ["MCCActiveSpawnPosArray",[player] call BIS_fnc_getRespawnPositions];
+		missionNamespace setVariable ["MCCActiveSpawnPosArray",[player] call MCC_fnc_respawnObjects];
 
 		//Load available resources
 		_array = call compile format ["MCC_res%1",playerside];

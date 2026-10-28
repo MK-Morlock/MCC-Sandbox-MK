@@ -7,7 +7,10 @@
 	<OUT>
 		Nothing
 ===========================================================================================*/
-private ["_ammo","_item","_itemClass","_attach"];
+private _ammo = "";
+private _item = objNull;
+private _itemClass = "";
+private _attach = false;
 _itemClass = param [0,"",[""]];
 _attach = param [1,true,[true]];
 

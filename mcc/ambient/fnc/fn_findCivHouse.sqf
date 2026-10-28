@@ -7,12 +7,19 @@
 //<OUT>
 //	_nearhouses ARRAY of objects - good houses found
 //===========================================================================================================================================================================
-private ["_pos","_nearHouses","_civSpawnDistance","_house"];
-_pos = [_this, 0, [], [[]]] call BIS_fnc_param;
-_civSpawnDistance = [_this, 1, 250, [250]] call BIS_fnc_param;
+private _pos = [];
+private _nearHouses = objNull;
+private _civSpawnDistance = 0;
+private _house = objNull;
+_pos = _this param [0, [], [[]]];
+_civSpawnDistance = _this param [1, 250, [250]];
 
 //Find nearest houses
 _nearHouses = nearestObjects [_pos,["House","Church","FuelStation"],_civSpawnDistance];
+
+// Only real buildings: power lines, wires, pylons, walls and fences are also "House" objects (and some sit in the air),
+// so ambient civilians used to spawn on power-line wires and fall. A usable building has at least one building position.
+_nearHouses = _nearHouses select {!isNull _x && {count (_x buildingPos -1) > 0}};
 
 
 //If vanila island make sure

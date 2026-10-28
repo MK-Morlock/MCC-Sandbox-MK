@@ -1,4 +1,13 @@
-private ["_Cfgside","_i","_j","_Cfgfaction","_k","_Cfgtype","_cfgname","_factionDisplayName","_CfgfactionName","_groupName","_groupDisplayname","_CfgGroup","_cfgentry"];
+private _Cfgside = configNull;
+private _i = 0;
+private _j = 0;
+private _Cfgfaction = configNull;
+private _k = 0;
+private _Cfgtype = configNull;
+private _cfgname = "";
+private _factionDisplayName = "";
+private _CfgfactionName = "";
+private _CfgGroup = configNull;
 params [
 	["_refresh",true,[true]]
 ];
@@ -77,6 +86,9 @@ call mcc_make_array_units;
 
 GEN_DOC1 = [];
 GEN_DOC1 = [mcc_faction,0]  call mcc_make_array_comp;
+
+//Asset preset of this faction (console Assets page)
+if (hasInterface && {!isNil "MCC_fnc_assetsData"} && {isNil "MCC_assetsFirstApply"}) then {MCC_assetsFirstApply = true; ["apply", [call MCC_fnc_MWEnemyFaction]] call MCC_fnc_assetsData};	//presets follow the Mission Generator enemy faction
 
 //if not refresh exit now
 if (!_refresh) exitWith {};

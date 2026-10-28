@@ -5,7 +5,11 @@
 =========================================================================================================================================
 */
 
-private ["_object","_vehicle","_objectMass","_cargoItems","_vehicleMass"];
+private "_object";
+private "_vehicle";
+private "_objectMass";
+private _cargoItems = [];
+private "_vehicleMass";
 _object = (param [0,"",["",objNull]]);
 _vehicle = (param [1,"",["",objNull]]);
 

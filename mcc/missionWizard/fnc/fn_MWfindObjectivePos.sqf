@@ -7,12 +7,22 @@
 // Return - pos
 //================================================================================================================================================================*/
 
-private ["_missionCenter","_isCQB","_minObjectivesDistance","_buildingsArray","_farEnough","_range","_flatPos","_availablePos","_time","_radius","_markerName","_objectivesMarkers","_ambient"];
+private _buildingsArray = [];
+private _farEnough = false;
+private _range = 0;
+private _availablePos = [];
+private _time = 0;
+private _radius = 0;
+private _markerName = "";
+private _objectivesMarkers = [];
+private _ambient = "";
 
-_missionCenter 			= _this select 0;
-_isCQB 					= _this select 1;
-_minObjectivesDistance 	= _this select 2;
-_maxObjectivesDistance 	= param [3,500,[500]];
+params [
+	["_missionCenter", [0,0,0], [[]]],
+	["_isCQB", false, [false]],
+	["_minObjectivesDistance", 0, [0]],
+	["_maxObjectivesDistance", 500, [500]]
+];
 
 _farEnough = false;
 _range = 100;
@@ -47,15 +57,15 @@ while {(count _availablePos) == 0 && (_range < (_maxObjectivesDistance*3))} do {
 
 if (missionNamespace getVariable ["MCC_debug",false]) then {
 	systemChat format ["found position: %1, have time: %2, farenough: %3",(count _availablePos) > 0, time < _time,_farEnough];
-	diag_log format ["found position: %1, have time: %2, farenough: %3",(count _availablePos) > 0, time < _time,_farEnough];
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["found position: %1, have time: %2, farenough: %3",(count _availablePos) > 0, time < _time,_farEnough]};
 };
 
 if (count _availablePos == 0) exitWith {
-	diag_log "MCC: Mission Wizard Error: No mission objective's postion found, make a bigger zone";
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC: Mission Wizard Error: No position found for the mission objective. Make a bigger zone."};
 	/*
 	MCC_MWisGenerating = false;
 	publicVariable "MCC_MWisGenerating";
-	0 = ["MCC: Mission Wizard Error: No mission objective's postion found, make a bigger zone"] spawn MCC_fnc_halt;
+	0 = ["MCC: Mission Wizard Error: No position found for the mission objective. Make a bigger zone."] spawn MCC_fnc_halt;
 	*/
 	_availablePos
 };

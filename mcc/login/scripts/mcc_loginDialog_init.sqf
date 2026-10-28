@@ -1,4 +1,7 @@
-private ["_mccdialog","_comboBox","_displayname","_it","_x","_index"];
+private _mccdialog = controlNull;
+private _comboBox = controlNull;
+private _displayname = "";
+private _x = 0;
 disableSerialization;
 MCC_GUI1initDone = false;
 
@@ -15,7 +18,9 @@ MCC_GUI1initDone = false;
 #define MCC_keyBindsMCCinteractionIDC 8419
 
 //Mission Maker
-private ["_text","_key","_textKey","_mmName"];
+private _text = "";
+private _key = [];
+private _mmName = "";
 _mmName = if (mcc_missionmaker != "") then {mcc_missionmaker} else {"Not Assigned"};
 ctrlSetText [MCCMISSIONMAKERNAME, format["%1",_mmName]];
 
@@ -48,30 +53,6 @@ lbClear _comboBox;
 _comboBox lbSetCurSel (MCC_terrainPref select 1); // set viewdistance index to current vd
 
 
-//Show key Binds
-for [{_x=8415},{_x<=8421},{_x=_x+1}]  do
-{
-	if (MCC_isCBA) then {
-		_text = "Use CBA Controls";
-		ctrlEnable [_x, false];
-		(_mccdialog displayCtrl _x) ctrlSetTooltip "";
-	} else {
-		_key = MCC_keyBinds select (_x-8415);
-
-		_text = "";
-		if (_key select 0) then {_text = "Shift + "};
-		if (_key select 1) then {_text = _text + "Ctrl + "};
-		if (_key select 2) then {_text = _text + "Alt + "};
-
-		_text = format ["%1%2",_text,keyName (_key select 3)];
-	};
-
-	ctrlsettext [_x, _text];
-};
-
-
-//Disable cover system client side
-ctrlEnable [8499,missionNamespace getVariable ["MCC_cover",false]];
 
 sleep 1;
 MCC_GUI1initDone = true;
@@ -85,7 +66,7 @@ while {(str (finddisplay 2990) != "no display")} do
 	if (isnil "mcc_fps_running") then {mcc_fps_running = false};
 	if !(mcc_fps_running) then
 	{
-		[[1],"MCC_fnc_FPS",true,false] spawn BIS_fnc_MP;
+		[1] remoteExec ["MCC_fnc_FPS", 0, false];
 		sleep 0.5;
 	};
 

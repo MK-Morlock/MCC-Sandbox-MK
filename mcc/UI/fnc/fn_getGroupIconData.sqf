@@ -9,7 +9,22 @@
 //		_unitsSizeMarker: STRING - marker cfg name
 //===============================================================================================================================================================================
 
-private ["_side","_group","_markerColor","_markerInf","_markerRecon","_markerSupport","_markerAutonomous","_markerMech","_markerArmor","_markerAir","_markerNaval","_groupName","_unitsCount","_unitsSize","_markerType","_unitsSizeMarker"];
+private "_side";
+private _group = grpNull;
+private "_markerColor";
+private _markerInf = "";
+private _markerRecon = "";
+private _markerSupport = "";
+private _markerAutonomous = "";
+private _markerMech = "";
+private _markerArmor = "";
+private _markerAir = "";
+private _markerNaval = "";
+private _groupName = "";
+private _unitsCount = [];
+private _unitsSize = 0;
+private "_markerType";
+private _unitsSizeMarker = "";
 _group = param [0,grpNull,[grpNull,missionNamespace]];
 
 if (isNull _group) exitWith {};
@@ -70,7 +85,7 @@ _groupName = _group getVariable ["name",""];
 
 if (_groupName == "") then	{_groupName = groupID _group};
 
-_unitsCount = [_group] call MCC_fnc_countGroupHC;
+_unitsCount = [_group] call MCC_fnc_countGroupHC; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 _unitsSize = 0;
 
 _markerType = nil;
@@ -85,7 +100,7 @@ if (_unitsCount select 7 > 0) then {_markerType = _markerAutonomous; _unitsSize 
 
 if (isnil "_markerType") then
 {
-	_unitsCount = [group _leader] call MCC_fnc_countGroup;
+	_unitsCount = [group _leader] call MCC_fnc_countGroup; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 	if (_unitsCount select 0 > 0) then {_markerType = _markerInf; _unitsSize = _unitsSize + (1*(_unitsCount select 0))};
 	if (_unitsCount select 1 > 0) then {_markerType = _markerMech; _unitsSize = _unitsSize + (3*(_unitsCount select 1))};
 	if (_unitsCount select 2 > 0) then {_markerType = _markerArmor; _unitsSize = _unitsSize + (3*(_unitsCount select 2))};

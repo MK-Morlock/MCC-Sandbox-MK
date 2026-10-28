@@ -1,5 +1,6 @@
-private ["_cannon","_type","_dummypos"];
-_type = _this select 0;
+private "_cannon";
+private _dummypos = [];
+params ["_type"];
 
 switch (_type)  do {
 		case 0: {

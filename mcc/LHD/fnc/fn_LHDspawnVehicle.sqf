@@ -20,10 +20,17 @@ params [
 	["_operator", 0, [0]]
 ];
 
-private ["_ctrl","_display","_ctrlPos","_vehiclesArray","_index","_ship","_side","_hideCtrls"];
+private _ctrl = controlNull;
+private "_display";
+private "_ctrlPos";
+private _vehiclesArray = [];
+private _index = controlNull;
+private "_ship";
+private "_side";
+private "_hideCtrls";
 _ship = (missionNamespace getVariable ["MCC_interatedLHD",objNull]);
 
-if (isNull _ship) exitWith {diag_log "MCC_fnc_LHDspawnVehicle: Null ship"};
+if (isNull _ship) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC_fnc_LHDspawnVehicle: Null ship"}};
 
 _side = _ship getVariable ["MCC_side",sideLogic];
 _display = uiNamespace getVariable ["MCC_LHD_MENU", displayNull];
@@ -147,7 +154,15 @@ switch (_function) do
 
 	case "updateVehicleClass":
 	{
-		private ["_selectedVehicle","_cfgclass","_costAmmo","_costRepair","_costFuel","_costValor","_array","_purchaseEnable","_cost"];
+		private _selectedVehicle = controlNull;
+		private "_cfgclass";
+		private _costAmmo = 0;
+		private _costRepair = 0;
+		private _costFuel = 0;
+		private _costValor = 0;
+		private "_array";
+		private _purchaseEnable = false;
+		private "_cost";
 		_vehiclesArray = missionNamespace getVariable ["MCC_fnc_LHDspawnMenuInitArray", []];
 
 		if (count _vehiclesArray <= 0) exitWith {};
@@ -220,7 +235,24 @@ switch (_function) do
 
 	case "spawn":
 	{
-		private ["_vehicleClass","_direction","_cargo","_dummy","_str","_null","_isCUPLHD","_boundingBox","_boundingBoxIndecator","_costAmmo","_costRepair","_costFuel","_costValor","_array","_cost","_vehiclesArray","_selectedVehicle","_cfgclass"];
+		private _vehicleClass = controlNull;
+		private "_direction";
+		private "_cargo";
+		private _dummy = "";
+		private _str = "";
+		private _null = [];
+		private "_isCUPLHD";
+		private "_boundingBox";
+		private _boundingBoxIndecator = 0;
+		private _costAmmo = 0;
+		private _costRepair = 0;
+		private _costFuel = 0;
+		private _costValor = 0;
+		private "_array";
+		private "_cost";
+		private _vehiclesArray = [];
+		private _selectedVehicle = controlNull;
+		private "_cfgclass";
 
 		if (_selection isEqualTo "" || _selection isEqualTo []) exitWith {};
 
@@ -265,7 +297,7 @@ switch (_function) do
 		_cargo = nil;
 
 		// If valid class, spawn the vehicle, then move it into position
-		if !(isClass (configFile >> "CfgVehicles" >> _vehicleClass)) exitWith {diag_log format["MCC: MCC_fnc_LHDspawnVehicle: ERROR %1 Vehicle Not in config", _vehicleClass]};
+		if !(isClass (configFile >> "CfgVehicles" >> _vehicleClass)) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format["MCC: MCC_fnc_LHDspawnVehicle: ERROR %1 Vehicle Not in config", _vehicleClass]}};
 
 		//Check if available
 		_dummy = "HeliH" createVehicleLocal [0,0,0];
@@ -286,7 +318,7 @@ switch (_function) do
 		_maxDistance = _boundingBox select _boundingBoxIndecator;
 
 		if (count (nearestObjects [getPosASL _dummy, ["Land","Air","Ship"], _maxDistance]) > 0 || (_selection isEqualTo "")) then {
-			_str = "<t size='0.8' t font = 'puristaLight' color='#FFFFFF'>" + "Not enough space" + "</t>";
+			_str = "<t size='0.8' font='PuristaLight' color='#FFFFFF'>" + "Not enough space" + "</t>";
 			_null = [_str,0,1.1,2,0.1,0.0] spawn bis_fnc_dynamictext;
 
 			deleteVehicle _cargo;
@@ -372,10 +404,7 @@ switch (_function) do
 				_displayName = getText (configFile >> "CfgVehicles" >> _vehicleClass >> "displayName");
 
 				// For each vehicle add an action to detach from the ship - MP compliant
-				[
-					[_cargo,[format ["%1 %2",localize "STR_CUP_CFG_RELEASEVEHICLE", _displayName], {[_this, "CUP_fnc_detachFromShip", _this select 0, false, true] call BIS_fnc_MP},nil, 1.5, false, true]],
-					"addAction", true, true
-				] call BIS_fnc_MP;
+				[_cargo,[format ["%1 %2",localize "STR_CUP_CFG_RELEASEVEHICLE", _displayName], {_this remoteExec ["CUP_fnc_detachFromShip", _this select 0, false];},nil, 1.5, false, true]] remoteExec ["addAction", 0, true];
 			};
 			*/
 		};

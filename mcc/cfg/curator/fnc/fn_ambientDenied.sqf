@@ -1,7 +1,8 @@
 //============================================================MCC_fnc_ambientDenied====================================================================================
 // Restrict zone for ambient AI
 //===========================================================================================================================================================================
-private ["_module","_resualt"];
+private _module = objNull;
+private _resualt = [];
 _module = param [ 0, objNull, [objNull]];
 if (isNull _module) exitWith {deleteVehicle _module};
 

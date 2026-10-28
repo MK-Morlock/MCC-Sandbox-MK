@@ -1,10 +1,21 @@
 //==================================================================MCC_fnc_SetPitchBankYaw======================================================================================
 // by ffur2007slx2_5
 //=======================================================================================================================
-private ["_object","_rotations","_aroundX","_aroundY","_aroundZ","_dirX","_dirY","_dirZ","_upX","_upY","_upZ","_dir","_up","_dirXTemp","_upXTemp"];
+private "_aroundX";
+private "_aroundY";
+private "_aroundZ";
+private _dirX = 0;
+private _dirY = 0;
+private _dirZ = 0;
+private _upX = 0;
+private _upY = 0;
+private _upZ = 0;
+private _dir = [];
+private _up = [];
+private "_dirXTemp";
+private "_upXTemp";
 
-_object = _this select 0;
-_rotations = _this select 1;
+params ["_object", "_rotations"];
 _aroundX = _rotations select 0;
 _aroundY = _rotations select 1;
 _aroundZ = (360 - (_rotations select 2)) - 360;

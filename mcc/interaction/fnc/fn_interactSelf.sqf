@@ -2,8 +2,9 @@
 // Interaction with self
 // Example: [] spawn MCC_fnc_interactSelf;
 //========================================================================================================================================================================
-private ["_suspect","_men","_rand","_factor","_null","_suspectCorage","_keyName","_pos","_server"];
-_suspect 	= _this select 0;
+private _null = [];
+private _server = objNull;
+params ["_suspect"];
 if ((missionNamespace getVariable ["MCC_isACE",false])  && (missionNamespace getVariable ["MCC_isMode",false])) exitWith {};
 
 disableSerialization;
@@ -31,7 +32,7 @@ if (vehicle player == player) then {
 
 		//SQL PDA
 		if (missionNamespace getvariable ["MCC_allowsqlPDA",true]) then {
-			_array pushBack ["createDialog 'MCC_SQLPDA'","Squad Leader PDA","\A3\Ui_f\data\IGUI\Cfg\VehicleToggles\wheelbreakiconon_ca.paa"];
+			_array pushBack ["createDialog ('MCC_SQLPDA' call MCC_fnc_dialogName)","Squad Leader PDA","\A3\Ui_f\data\IGUI\Cfg\VehicleToggles\wheelbreakiconon_ca.paa"];
 		};
 
 		//Rally point

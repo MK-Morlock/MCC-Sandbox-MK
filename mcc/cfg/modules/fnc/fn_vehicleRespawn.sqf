@@ -20,14 +20,26 @@
 	[this,100,360,10,false,"hint 'dead'"] spawn MCC_fnc_vehicleRespawn
 */
 
-private ["_object","_abondanDistance","_waitTime","_tickets","_destroyEffect","_code","_vehName","_vehDir","_vehPos","_vehtype","_abandoned","_respawnDisabled","_nearFOB"];
+private _object = objNull;
+private _abondanDistance = 0;
+private _waitTime = 0;
+private _tickets = 0;
+private _destroyEffect = false;
+private _code = "";
+private "_vehName";
+private "_vehDir";
+private "_vehPos";
+private "_vehtype";
+private "_abandoned";
+private _respawnDisabled = false;
+private _nearFOB = {};
 if (!isServer) exitWith {};
 
 _object = param [0,objNull,[objNull]];
 
 //did we get here from the module or from call?
 if (typeName (_object getVariable ["abondanDistance",true]) == typeName 0) exitWith {
-	private ["_vehicles"];
+	private "_vehicles";
 	_abondanDistance = _object getVariable ["abondanDistance",-1];
 	_waitTime = _object getVariable ["waitTime",5];
 	_tickets = _object getVariable ["tickets",-1];

@@ -1,6 +1,9 @@
 //KEGs_fnc_freeLookMovementHandler = 
 //{
-	private ["_dX", "_dY", "_mouseScroll", "_zfactor"];
+	private _dX = 0;
+	private _dY = 0;
+	private _mouseScroll = 0;
+	private _zfactor = 0;
 
 	mouseDeltaX = mouseLastX - (KEGsMouseCoord select 0);
 	mouseDeltaY = mouseLastY - (KEGsMouseCoord select 1);	

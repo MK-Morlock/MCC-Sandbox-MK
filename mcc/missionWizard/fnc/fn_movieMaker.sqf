@@ -21,11 +21,20 @@ create a movie scene made of intro if needed and a zoom in on an object
 				  	["More example Text","<t size='1.0' font='PuristaBold'>%1</t><br/>",0]
 				]
 =======================================================================================================================================================*/
-private ["_sfx","_blur","_cam","_camPos","_targetPos","_fnc_tranzEffect","_target","_units","_timeEnd","_endCinimeticEH"];
+private "_sfx";
+private "_blur";
+private _cam = "";
+private _camPos = [];
+private _targetPos = [];
+private _fnc_tranzEffect = {};
+private "_target";
+private "_units";
+private "_timeEnd";
+private _endCinimeticEH = controlNull;
 params ["_object","_taskDescription","_sfxName","_zoomStart","_zoomEnd","_shotDuration","_trazDuration","_specialIntro","_sounds","_music","_plainText","_distance"];
 
 MCC_fnc_tranzEffect = {
-	params ["_cutText","_duration","_adjust"];parsetext
+	params ["_cutText","_duration","_adjust"];
 
 	cutText ["", _cutText, _duration];
 	private _blur = ppEffectCreate ["dynamicBlur", 450];
@@ -82,6 +91,9 @@ _endCinimeticEH = (findDisplay 46) displayAddEventHandler ["KeyDown", {
 		_cam = missionNamespace getVariable ["MCC_fnc_movieMaker_cam",nil];
 		_cam cameraeffect ["terminate", "back"];
 		camDestroy _cam;
+		camUseNVG false;		// the intro's night vision / thermal view used to stay on after the cinematic ("graphics look weird")
+		false setCamUseTi 0;
+		showCinemaBorder false;
 
 		missionNamespace setVariable ["MCC_fnc_movieMaker_running",false];
 	};
@@ -116,7 +128,7 @@ if (_specialIntro != "none") then {
 		case "track":
 		{
 			[_units,_cam,_trazDuration] spawn {
-				private ["_target"];
+				private "_target";
 				params ["_units","_cam","_trazDuration"];
 
 				while {(missionNamespace getVariable ["MCC_MWcenematicIntroFirstScene",false]) && (missionNamespace getVariable ["MCC_fnc_movieMaker_running",false])} do {
@@ -154,7 +166,7 @@ if (_specialIntro != "none") then {
 			// Move camera in a circle
 			[position _object, 600, 600, random 360, round random 1,_cam] spawn {
 				params ["_pos", "_alt", "_rad", "_ang", "_dir","_cam"];
-				private ["_coords"];
+				private _coords = [];
 
 				while {(missionNamespace getVariable ["MCC_MWcenematicIntroFirstScene",false]) && (missionNamespace getVariable ["MCC_fnc_movieMaker_running",false])} do {
 					_coords = [_pos, _rad, _ang] call BIS_fnc_relPos;
@@ -186,7 +198,14 @@ if (_specialIntro != "none") then {
 	//get daytime data
 	if !(missionNamespace getVariable ["MCC_fnc_movieMaker_running",false]) exitWith {};
 
-	private ["_date","_tYear","_tMonth","_tDay","_tTimeH","_tTime","_tTimeM","_output"];
+	private "_date";
+	private "_tYear";
+	private "_tMonth";
+	private "_tDay";
+	private "_tTimeH";
+	private _tTime = "";
+	private "_tTimeM";
+	private _output = [];
 	_date = date;
 	_tYear 	= _date select 0;
 	_tMonth = _date select 1;
@@ -216,7 +235,7 @@ if (_specialIntro != "none") then {
 		[worldName,"<t size='1.0' font='PuristaBold'>%1</t><br/>",5]
 	];
 
-	[_output,safezoneX,0,"<t color='#FFFFFFFF' align='left'>%1</t>"] call BIS_fnc_typeText;
+	[_output,safezoneX + 0.03 * safezoneW,0,"<t color='#FFFFFFFF' align='left'>%1</t>"] call BIS_fnc_typeText;
 	sleep 5;
 
 	//Sounds
@@ -227,11 +246,11 @@ if (_specialIntro != "none") then {
 	//Briefings
 	if !(missionNamespace getVariable ["MCC_fnc_movieMaker_running",false]) exitWith {};
 	_timeEnd = time + _shotDuration;
-	[_plainText,safezoneX,0,"<t color='#FFFFFFFF' align='left'>%1</t>"] call BIS_fnc_typeText;
+	[_plainText,safezoneX + 0.03 * safezoneW,0,"<t color='#FFFFFFFF' align='left'>%1</t>"] call BIS_fnc_typeText;
 
 	waituntil {time >= _timeEnd};
 
-	sleep 1-_trazDuration;
+	sleep ((1 - _trazDuration) max 0);
 
 	//Fade out
 	["BLACK OUT",_trazDuration,100] call MCC_fnc_tranzEffect;
@@ -267,7 +286,7 @@ if (_specialIntro != "none") then {
 	_cam camCommitPrepared (((count (toArray _taskDescription))*0.011) max _shotDuration);
 
 	//Briefings
-	[[[_taskDescription,"<t size='0.7' font='PuristaMedium'>%1</t>",0]],safezoneX,0,"<t color='#E2EEE0' align='left'>%1</t>"] call BIS_fnc_typeText;
+	[[[_taskDescription,"<t size='0.7' font='PuristaMedium'>%1</t>",0]],safezoneX + 0.03 * safezoneW,0,"<t color='#E2EEE0' align='left'>%1</t>"] call BIS_fnc_typeText;
 
 	waitUntil {time > _timeEnd};
 };
@@ -285,5 +304,10 @@ ppEffectDestroy _sfx;
 
 _cam cameraeffect ["terminate", "back"];
 camDestroy _cam;
+
+// back to the normal view: the intro's night vision / thermal filter used to stay on after the cinematic
+camUseNVG false;
+false setCamUseTi 0;
+showCinemaBorder false;
 
 missionNamespace setVariable ["MCC_fnc_movieMaker_running",true];

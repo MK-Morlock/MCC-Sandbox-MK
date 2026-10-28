@@ -1,6 +1,6 @@
 //===================================================================MCC_fnc_garrison======================================================================================
 //Populate soldiers inside empty houses
-//Example:[[center,radius,action,intanse,faction,side,_groupUnits],"MCC_fnc_garrison",true,false] call BIS_fnc_MP;
+//Example:[center,radius,action,intanse,faction,side,_groupUnits] remoteExec ["MCC_fnc_garrison", true, false];
 // Params:
 // 	center: array, center of the town to garrison.
 //	radius: number,radius in meters units will garrison buildings.
@@ -11,22 +11,44 @@
 //	_groupUnits (optional) if broadcast will build all units in the same group
 //=========================================================================================
 
-private ["_center","_radius","_spawnVehicles","_intanse","_faction","_unitsArray","_vehiclesArray","_SpawnUnit","_SpawnVehicle","_group","_unitsCount","_vehiclesCount","_buildingsArray","_buildingscount","_side","_spawnBuilding","_spawnPos","_unit","_type","_vehiclesNumber","_roads","_road","_vehicle","_vehicleClass","_groupUnits","_static","_locked","_roadPos"];
+private _center = [];
+private _radius = 0;
+private _spawnVehicles = false;
+private _intanse = 0;
+private _faction = "";
+private _unitsArray = [];
+private _vehiclesArray = [];
+private _group = grpNull;
+private _unitsCount = 0;
+private _vehiclesCount = 0;
+private _buildingsArray = objNull;
+private _buildingscount = 0;
+private _side = nil;
+private _spawnPos = [];
+private _unit = objNull;
+private _type = "";
+private _vehiclesNumber = 0;
+private _roads = [];
+private _road = objNull;
+private _vehicle = objNull;
+private _groupUnits = false;
+private _locked = false;
+private _roadPos = [];
 
 disableSerialization;
 
-_center			= [_this, 0, []] call BIS_fnc_param;
-_radius			= [_this, 1, 100] call BIS_fnc_param;
+_center			= _this param [0, []];
+_radius			= _this param [1, 100];
 _spawnVehicles 	= if (typeName (_this select 2) == typeName 0) then {(_this select 2)==1} else {_this select 2};
-_intanse		= [_this, 3, 5] call BIS_fnc_param;
-_faction		= [_this, 4, "CIV_F"] call BIS_fnc_param;
-_side			= [_this, 5, civilian] call BIS_fnc_param;
-_groupUnits 	= [_this, 6, false] call BIS_fnc_param;
-_locked			= [_this, 7, false] call BIS_fnc_param;
+_intanse		= _this param [3, 5];
+_faction		= _this param [4, "CIV_F"];
+_side			= _this param [5, civilian];
+_groupUnits 	= _this param [6, false];
+_locked			= _this param [7, false];
 
-_unitsArray 	= [_faction,"soldier","men"] call MCC_fnc_makeUnitsArray;		//Let's build the faction unit's array
+_unitsArray 	= [[_faction,"soldier","men"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;	//no pilots / crews / divers (a fighter pilot stood in a building)		//Let's build the faction unit's array
 if(count _unitsArray < 4) then {
-	_unitsArray = [_faction,"soldier"] call MCC_fnc_makeUnitsArray;
+	_unitsArray = [[_faction,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
 };
 
 _vehiclesArray	= [_faction,"carx","car"] call MCC_fnc_makeUnitsArray;		//Let's build the faction vehicles's array
@@ -52,6 +74,9 @@ if (typeName _side == "STRING") then {
 };
 
 if (isnil "_side") exitWith {};
+if (count _unitsArray == 0) exitWith {
+	["WARN", "MCC_fnc_garrison", "faction %1 has no soldiers to garrison with", [_faction]] call MCC_fnc_log;
+};
 
 if (_buildingscount < 1) exitwith {hint "No buildings found"};	//No available buildings? stop the script!
 {
@@ -68,10 +93,13 @@ if (_buildingscount < 1) exitwith {hint "No buildings found"};	//No available bu
 			if (random 30 < _intanse) then {
 				//No other unit in the spawn position?
 				if (count (nearestObjects [_spawnPos, ["Man"], 1])<1) then {
-					_type = _unitsArray select round (random 4);
+					// (was "_unitsArray select round (random 4)": only the first 5 types, and nothing at all - plus a
+					//  script error - when the faction had fewer than 5)
+					_type = selectRandom _unitsArray;
 					if !(_groupUnits) then {_group = creategroup _side};
 					_unit = _group createUnit [_type select 0,_spawnPos,[],0.5,"NONE"];
-					waituntil {alive _unit};
+					if (isNull _unit) then {continue};
+					waituntil {alive _unit || isNull _unit};
 					_unit setpos _spawnPos;
 
 					//Put it on safe
@@ -105,7 +133,9 @@ if (_buildingscount < 1) exitwith {hint "No buildings found"};	//No available bu
 
 //vehicles
 if (_spawnVehicles) then	{
-	private ["_roadConnectedTo","_connectedRoad","_dir"];
+	private _roadConnectedTo = [];
+	private _connectedRoad = nil;
+	private _dir = nil;
 
 	_vehiclesNumber=round((_buildingscount*_intanse)/12);
 	if (_vehiclesNumber > 8) then {_vehiclesNumber = 8};

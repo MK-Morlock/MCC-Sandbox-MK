@@ -5,7 +5,8 @@
 
 	<OUT>
 ==============================================================================================================================================================================*/
-private ["_group","_groups"];
+private "_group";
+private "_groups";
 _idc = param [0,0,[0]];
 
 _groups	 = switch (player getVariable ["CP_side", playerside]) do {

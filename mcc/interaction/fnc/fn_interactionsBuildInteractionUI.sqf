@@ -9,7 +9,14 @@
 ===========================================================================================*/
 disableSerialization;
 params ["_actions","_layer"];
-private ["_disp","_angle","_angleDif","_ctrl","_radius","_xPos","_yPos","_buttonCtrlGroup"];
+private "_disp";
+private _angle = 0;
+private "_angleDif";
+private _ctrl = controlNull;
+private "_radius";
+private "_xPos";
+private "_yPos";
+private _buttonCtrlGroup = controlNull;
 
 while {dialog} do {closeDialog 0; sleep 0.01};
 playSound "click";

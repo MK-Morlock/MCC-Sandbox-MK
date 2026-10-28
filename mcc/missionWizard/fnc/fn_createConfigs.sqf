@@ -4,8 +4,19 @@
 // 	_faction		STRING faction string
 // Return - nothing
 //=============================================================================================================================================================================
-private ["_Cfgside","_i","_j","_Cfgfaction","_k","_Cfgtype","_cfgname","_CfgfactionName","_groupName","_groupDisplayname","_CfgGroup","_cfgentry"];
-_faction = [_this, 0, "OPF_F", [""]] call BIS_fnc_param;
+private _Cfgside = configNull;
+private _i = 0;
+private _j = 0;
+private _Cfgfaction = configNull;
+private _k = 0;
+private _Cfgtype = configNull;
+private _cfgname = "";
+private _CfgfactionName = "";
+private _groupName = "";
+private _groupDisplayname = "";
+private _CfgGroup = configNull;
+private _cfgentry = "";
+params [["_faction", "OPF_F", [""]]];
 
 //Create the groups type array
 #define CONFIG (configFile >> "CfgGroups" )
@@ -59,8 +70,26 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 									_groupDisplayname = getText (_CfgGroup >> "name");
 									_cfgentry = format ["configFile >> ""CfgGroups"" >>""%1"">>""%2"">>""%3"">>""%4""",(configname (_Cfgside)),(configname (_Cfgfaction)),(configname (_Cfgtype)),(configname (_CfgGroup))];
 
-									private ["_man","_diver","_recon","_sniper","_menSupport","_story","_car","_armored","_air","_extreme","_simulation",
-											 "_autonomos","_carSuppory","_ship","_submarine","_static","_CfgUnit","_unitName","_unitClass","_count"];
+									private _man = 0;
+									private _diver = 0;
+									private _recon = 0;
+									private _sniper = 0;
+									private _menSupport = 0;
+									private _story = 0;
+									private _car = 0;
+									private _armored = 0;
+									private _air = 0;
+									private _extreme = [];
+									private _simulation = "";
+									private _autonomos = 0;
+									private _carSuppory = 0;
+									private _ship = 0;
+									private _submarine = 0;
+									private _static = 0;
+									private _CfgUnit = configNull;
+									private _unitName = "";
+									private _unitClass = "";
+									private _count = 0;
 									_man = 0;
 									_diver = 0;
 									_recon = 0;
@@ -83,7 +112,7 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 										if (isClass(_CfgUnit)) then
 										{
 												_unitName 	= getText (_CfgUnit >> "vehicle");
-												_unitClass 	= getText (configfile >> "CfgVehicles" >> _unitName  >> "vehicleClass");
+												_unitClass 	= [_unitName] call MCC_fnc_unitCategory;	//mod vehicleClass names mapped to MCCs (GitHub #48)
 												_simulation	= tolower (getText (configfile >> "CfgVehicles" >> _unitName  >> "simulation"));
 												_count = _count + 1;
 												//Search by vehicleClass

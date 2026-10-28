@@ -1,6 +1,6 @@
 // By: Shay_gman
 
-class MCC_VEHICLESPAWNER
+class MCCDLG_NAME
 {
 	idd = -1;
 	movingEnable = 1;
@@ -26,7 +26,7 @@ class MCC_VEHICLESPAWNER
 					y = 6.14673e-009 * safezoneH;
 					w = 0.407344 * safezoneW;
 					h = 0.341 * safezoneH;
-					colorBackground[] = {0,0,0,0.8};
+					colorBackground[] = {0.11,0.12,0.13,0.96};
 				};
 				class RscFrame_2: MCC_RscFrame
 				{
@@ -56,7 +56,7 @@ class MCC_VEHICLESPAWNER
 					w = 0.273281 * safezoneW;
 					h = 0.044 * safezoneH;
 				};
-				class SpawnButton: MCC_RscButton
+				class SpawnButton: MCCBTN_R
 				{
 					idc = 102;
 					onButtonClick = "[1] spawn MCC_fnc_vehicleSpawner";
@@ -66,8 +66,9 @@ class MCC_VEHICLESPAWNER
 					y = 0.275 * safezoneH;
 					w = 0.139219 * safezoneW;
 					h = 0.055 * safezoneH;
+					class TextPos {left = 0; top = "((0.055 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//text centred at this height
 				};
-				class close: MCC_RscButton
+				class close: MCCBTN_R
 				{
 					idc = -1;
 					onButtonClick = "closeDialog 0;";
@@ -100,7 +101,7 @@ class MCC_VEHICLESPAWNER
 					w = 0.0257812 * safezoneW;
 					h = 0.044 * safezoneH;
 					colorText[] = {0,0.5,0.9,10};
-					tooltip = "Materials"; //--- ToDo: Localize;
+					tooltip = "Supplies"; //--- ToDo: Localize;
 				};
 				class fuelPic: MCC_RscPicture
 				{
@@ -239,7 +240,7 @@ class MCC_VEHICLESPAWNER
 					w = 0.0154689 * safezoneW;
 					h = 0.033 * safezoneH;
 					colorText[] = {0,0.5,0.9,10};
-					tooltip = "Materials"; //--- ToDo: Localize;
+					tooltip = "Supplies"; //--- ToDo: Localize;
 				};
 				class MCC_Fuel: MCC_RscPicture
 				{

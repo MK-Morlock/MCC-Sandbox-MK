@@ -1,11 +1,21 @@
-private ["_mccdialog","_comboBox","_displayname","_pic", "_index", "_array", "_class", "_type", "_magazines", "_muzzles", "_cfg", "_count"];
+private _mccdialog = controlNull;
+private _comboBox = controlNull;
+private "_displayname";
+private "_pic";
+private "_index";
+private "_array";
+private "_class";
+private _magazines = [];
+private _muzzles = [];
+private _cfg = configNull;
+private _count = 0;
 #define boxGen_IDD 2995
 
 #define ALLGEAR_IDD 8500
 #define BOXGEAR_IDD 8501
 #define GEARCLASS_IDD 8502
 
-_type = _this select 0;
+params ["_type"];
 MCC_gearDialogClassIndex = lbCurSel GEARCLASS_IDD;
 disableSerialization;
 _mccdialog = findDisplay boxGen_IDD;
@@ -193,9 +203,6 @@ if (_type == 4) then //Generate
 	closedialog 0; 
 	hint "click on map"; 
 	onMapSingleClick "_nul=[""B_supplyCrate_F"",_pos] call MCC_3D_PLACER;closeDialog 0;onMapSingleClick """";";	
-	if (! isnil "Object3D") then {deletevehicle Object3D};
-	Object3D = "B_supplyCrate_F" createvehicle [0,0,0];	
-	Object3D enableSimulation false;
 	MCC3DRuning = true;
 	while {MCC3DRuning} do
 		{
@@ -203,7 +210,7 @@ if (_type == 4) then //Generate
 		while {!MCC3DgotValue && MCC3DRuning} do {sleep 0.2};
 		if (MCC3DRuning) then 
 			{
-			 mcc_safe = mcc_safe + FORMAT ["[[%1, %2, %3, %4,%5,%6],'MCC_fnc_boxGenerator',true,false] spawn BIS_fnc_MP;
+			 mcc_safe = mcc_safe + FORMAT ["[%1, %2, %3, %4,%5,%6] remoteExec ['MCC_fnc_boxGenerator', 0, false];
 						sleep 1;"								 
 						,MCC3DValue select 0
 						,MCC3DValue select 1
@@ -212,7 +219,7 @@ if (_type == 4) then //Generate
 						,tempBoxItems
 						,tempBoxRucks
 						];	
-			[[MCC3DValue select 0, MCC3DValue select 1, tempBoxWeapons, tempBoxMagazine,tempBoxItems,tempBoxRucks],"MCC_fnc_boxGenerator",true,false] spawn BIS_fnc_MP;
+			[MCC3DValue select 0, MCC3DValue select 1, tempBoxWeapons, tempBoxMagazine,tempBoxItems,tempBoxRucks] remoteExec ["MCC_fnc_boxGenerator", 0, false];
 			MCC_3Dterminate = true;  
 			};
 		sleep 0.1;

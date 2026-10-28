@@ -3,8 +3,9 @@
 //  Parameter(s):
 //     	_ctrl: CONTROL
 //===================================================================================================================================================================*/
-private ["_BuildTime","_obj","_res"];
-_obj = _this select 0;
+private _BuildTime = 0;
+private _res = [];
+params ["_obj"];
 _res = param [1,[],[[]]];
 
 _BuildTime = 5;

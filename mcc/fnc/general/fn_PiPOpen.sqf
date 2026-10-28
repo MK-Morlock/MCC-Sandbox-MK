@@ -4,8 +4,8 @@
 // _control = control name
 //==================================================================================================================================================================================
 disableSerialization;
-private ["_control"];
-_control	= _this select 0;
+
+params ["_control"];
 
 _control ctrlsettext "a3\ui_f\data\igui\rsctitles\static\feedstatic_12_ca.paa";
 uiSleep 0.03;

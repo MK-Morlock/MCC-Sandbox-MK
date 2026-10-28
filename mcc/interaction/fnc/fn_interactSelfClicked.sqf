@@ -1,9 +1,16 @@
 //=========================================================MCC_fnc_interactSelfClicked==========================================================================================
 //==============================================================================================================================================================================
-private ["_ctrl","_ctrlData","_suspect","_child","_array","_pos","_path","_layer","_cfg","_index"];
+private _ctrlData = "";
+private "_suspect";
+private _array = [];
+private _pos = objNull;
+private _path = "";
+private _layer = 0;
+private _cfg = configNull;
+private "_index";
 disableSerialization;
 
-_ctrl 		= _this select 0;
+params ["_ctrl"];
 _ctrlData	= param [1,"",[""]];
 _suspect = (player getVariable ["interactWith",[]]) select 0;
 
@@ -246,7 +253,8 @@ switch (true) do {
 
 		//Detonate explosive function
 		MCC_fnc_ordnanceDetonatePlayer = {
-			private ["_charges","_utility"];
+			private _charges = [];
+			private "_utility";
 			params ["_index"];
 			_charges = player getVariable ["MCC_utilityActiveCharges",[]];
 			if (count _charges > 0 ) then {
@@ -268,7 +276,8 @@ switch (true) do {
 	};
 
 	case (_ctrlData in ["CowsSlot","PointerSlot","MuzzleSlot","UnderBarrelSlot"]): {
-		private ["_items","_assignedItems"];
+		private _items = nil;
+		private _assignedItems = [];
 		_assignedItems = [];
 		_array = [
 					 ["[(missionNamespace getVariable ['MCC_interactionLayer_2',[]]),3] spawn MCC_fnc_interactionsBuildInteractionUI","Back",format ["%1mcc\interaction\data\iconBack.paa",MCC_path]]

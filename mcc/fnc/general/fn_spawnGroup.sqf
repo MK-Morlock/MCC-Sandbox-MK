@@ -30,14 +30,18 @@ scriptName "Functions\spawning\fn_spawnGroup.sqf";
 */
 
 //Validate parameter count
-if ((count _this) < 3) exitWith {debugLog "Log: [spawnGroup] Function requires at leat 3 parameters!"; grpNull};
+if ((count _this) < 3) exitWith {debugLog "Log: [spawnGroup] Function requires at least 3 parameters!"; grpNull};
 
-private ["_pos", "_side","_vehicles"];
-_pos = [_this, 0, [], [[]]] call BIS_fnc_param;
-_side = [_this, 1, sideUnknown] call BIS_fnc_param;
+private _pos = [];
+private _side = sideUnknown;
+private _vehicles = [];
+_pos = _this param [0, [], [[]]];
+_side = _this param [1, sideUnknown];
 
-private ["_chars", "_charsType", "_types"];
-_chars = [_this, 2, [], [[], 0, configFile]] call BIS_fnc_param;
+private _chars = configNull;
+private _charsType = "";
+private _types = [];
+_chars = _this param [2, [], [[], 0, configFile]];
 _charsType = typeName _chars;
 if (_charsType == (typeName [])) then
 {
@@ -59,20 +63,17 @@ else
 	};
 };
 
-private ["_positions", "_ranks", "_skillRange", "_ammoRange", "_randomControls"];
-_positions = [_this, 3, [], [[]]] call BIS_fnc_param;
-_ranks = [_this, 4, [], [[]]] call BIS_fnc_param;
-_skillRange = [_this, 5, [], [[]]] call BIS_fnc_param;
-_ammoRange = [_this, 6, [], [[]]] call BIS_fnc_param;
-_randomControls = [_this, 7, [-1, 1], [[]]] call BIS_fnc_param;
+private _positions = _this param [3, [], [[]]];
+private _ranks = _this param [4, [], [[]]];
+private _skillRange = _this param [5, [], [[]]];
+private _ammoRange = _this param [6, [], [[]]];
+private _randomControls = _this param [7, [-1, 1], [[]]];
 
 //Fetch the random controls.
-private ["_minUnits", "_chance"];
-_minUnits = _randomControls select 0;
-_chance = _randomControls select 1;
+private _minUnits = _randomControls select 0;
+private _chance = _randomControls select 1;
 
-private ["_azimuth"];
-_azimuth = [_this, 8, 0, [0]] call BIS_fnc_param;
+private _azimuth = _this param [8, 0, [0]];
 
 //Check parameter validity.
 //TODO: Check for valid skill and ammo ranges?
@@ -100,11 +101,14 @@ if (_charsType == (typeName configFile)) then
 
 	for "_i" from 0 to ((count _chars) - 1) do
 	{
-		private ["_item"];
-		_item = _chars select _i;
+		private _item = _chars select _i;
 
 		if (isClass _item) then
 		{
+			if (getText(_item >> "vehicle") == "" || {!isClass (configFile >> "CfgVehicles" >> getText(_item >> "vehicle"))}) then {
+				["WARN", "fn_spawnGroup", "group %1: unit entry %2 has unknown vehicle '%3' - skipped", [configName _chars, configName _item, getText(_item >> "vehicle")]] call MCC_fnc_log;
+				continue;
+			};
 			_types = _types + [getText(_item >> "vehicle")];
 			_ranks = _ranks + [getText(_item >> "rank")];
 			_positions = _positions + [getArray(_item >> "position")];
@@ -112,15 +116,13 @@ if (_charsType == (typeName configFile)) then
 	};
 };
 
-private ["_grp"];
-_grp = createGroup _side;
+private _grp = createGroup _side;
 
 //Create the units according to the selected types.
 for "_i" from 0 to ((count _types) - 1) do
 {
 	//See if this unit should be skipped.
-	private ["_skip"];
-	_skip = false;
+	private _skip = false;
 	if (_minUnits != -1) then
 	{
 		//Has the mandatory minimum been reached?
@@ -133,16 +135,17 @@ for "_i" from 0 to ((count _types) - 1) do
 
 	if (!_skip) then
 	{
-		private ["_unit", "_type"];
+		private _unit = objNull;
+		private _type = "";
 		_type = _types select _i;
 		_vehicles = [];
 
 		//If given, use relative position.
-		private ["_itemPos"];
+		private _itemPos = [];
 		if ((count _positions) > 0) then
 		{
-			private ["_relPos"];
-			_relPos = _positions select _i;
+			private _relPos = _positions param [_i, []];
+			if !(_relPos isEqualTypeArray [0,0] || {_relPos isEqualTypeArray [0,0,0]}) then {_relPos = [(_i mod 4) * 3, floor (_i / 4) * -3]};	// group entry without a usable position[]
 			_itemPos = [(_pos select 0) + (_relPos select 0), (_pos select 1) + (_relPos select 1)];
 		}
 		else
@@ -166,7 +169,7 @@ for "_i" from 0 to ((count _types) - 1) do
 		{_x addCuratorEditableObjects [[_unit],false]} forEach allCurators;
 
 		//If given, set the unit's rank.
-		if ((count _ranks) > 0) then
+		if ((count _ranks) > 0 && {(_ranks param [_i, ""]) != ""}) then
 		{
 			[_unit,_ranks select _i] call bis_fnc_setRank;
 		};
@@ -174,10 +177,9 @@ for "_i" from 0 to ((count _types) - 1) do
 		//If a range was given, set a random skill.
 		if ((count _skillRange) > 0) then
 		{
-			private ["_minSkill", "_maxSkill", "_diff"];
-			_minSkill = _skillRange select 0;
-			_maxSkill = _skillRange select 1;
-			_diff = _maxSkill - _minSkill;
+			private _minSkill = _skillRange select 0;
+			private _maxSkill = _skillRange select 1;
+			private _diff = _maxSkill - _minSkill;
 
 			_unit setUnitAbility (_minSkill + (random _diff));
 		};
@@ -185,10 +187,9 @@ for "_i" from 0 to ((count _types) - 1) do
 		//If a range was given, set a random ammo count.
 		if ((count _ammoRange) > 0) then
 		{
-			private ["_minAmmo", "_maxAmmo", "_diff"];
-			_minAmmo = _ammoRange select 0;
-			_maxAmmo = _ammoRange select 1;
-			_diff = _maxAmmo - _minAmmo;
+			private _minAmmo = _ammoRange select 0;
+			private _maxAmmo = _ammoRange select 1;
+			private _diff = _maxAmmo - _minAmmo;
 
 			_unit setVehicleAmmo (_minAmmo + (random _diff));
 		};

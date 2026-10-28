@@ -7,9 +7,13 @@
 #define MCC_SETTING_EMPTY 8006
 #define MCC_ZONE_LOC 8007
 
-private ["_type","_groupArray","_3d", "_dlg","_tempText","_presetText","_pos"];
+private "_type";
+private "_groupArray";
+private "_tempText";
+private "_presetText";
+private "_pos";
 disableSerialization;
-_3d = _this select 0;
+params ["_3d"];
 
 if (mcc_missionmaker == (name player)) then 
 {
@@ -30,7 +34,7 @@ if (mcc_missionmaker == (name player)) then
 				if (MCC_capture_state) then
 				{
 					 MCC_capture_var = MCC_capture_var + FORMAT ["
-										[[%1, %2, '%3', '%4', '%5', %6, '%7', '%8', %9],'MCC_fnc_simpleSpawn',true,false] spawn BIS_fnc_MP;		
+										[%1, %2, '%3', '%4', '%5', %6, '%7', '%8', %9, %10] remoteExec ['MCC_fnc_simpleSpawn', 2, false];		
 										"
 										,MCC3DValue select 0
 										,MCC3DValue select 1
@@ -41,20 +45,19 @@ if (mcc_missionmaker == (name player)) then
 										,MCC_unitInit
 										,MCC_unitName
 										,mcc_hc
+										,MCC3DValue param [2, false]
 										];
 				}	
 				else
 				{
 					_pos = MCC3DValue select 0; 
 					
-					if (!isnil "Object3D" && (mcc_spawntype=="VEHICLE")) then 
-					{
-						private "_time"; 
-						_time = time + 7; 
-						waitUntil {(_pos distance Object3D > 8) || (time >_time)};
-					};
 					
-					[[MCC3DValue select 0, MCC3DValue select 1, mcc_spawnname, mcc_spawntype, mcc_spawnfaction, mcc_spawnwithcrew,MCC_unitInit,MCC_unitName,mcc_hc],"MCC_fnc_simpleSpawn",true,false] spawn BIS_fnc_MP;		
+					if (mcc_spawntype == "GROUP3D") then {
+						[MCC3DValue select 0, MCC_3D_groupCfg, mcc_hc, mcc_sidename, MCC3DValue select 1, (MCC3DValue select 0) param [2, 0], missionNamespace getVariable ["MCC_3D_beh", "hold"], missionNamespace getVariable ["MCC_3D_cmd", false]] remoteExec ["MCC_fnc_groupPlace3D", 2, false];
+					} else {
+					[MCC3DValue select 0, MCC3DValue select 1, mcc_spawnname, mcc_spawntype, mcc_spawnfaction, mcc_spawnwithcrew,(if (isNil "MCC_3D_cargoInit") then {MCC_unitInit} else {[MCC_unitInit] call MCC_3D_cargoInit}),MCC_unitName,mcc_hc, MCC3DValue param [2, false], missionNamespace getVariable ["MCC_3D_beh", "hold"], missionNamespace getVariable ["MCC_3D_cmd", false]] remoteExec ["MCC_fnc_simpleSpawn", if (mcc_hc == 0) then {2} else {[2] + ([missionNamespace getVariable ["MCC_ownerHC", objNull]] select {!isNull _x})}, false];
+					};		
 				};
 			};
 			sleep 0.1;
@@ -74,8 +77,25 @@ if (mcc_missionmaker == (name player)) then
 	if (_3d == 1) then //Case we are changing the object
 	{
 		if (!MCC3DInitDone) exitWith {};
+		if ((lbText [MCC_UNIT_TYPE, lbCurSel MCC_UNIT_TYPE]) == "Infantry Groups") exitWith {
+			private _gi = lbCurSel MCC_UNIT_CLASS;
+			if (isNil "MCC_3D_groupArray" || {_gi < 0} || {_gi >= count MCC_3D_groupArray}) exitWith {};
+			private _entry = MCC_3D_groupArray select _gi;
+			mcc_spawntype = "GROUP3D";
+			MCC_3D_groupCfg = _entry select 2;
+			mcc_spawnname = _entry param [3, ""];
+			mcc_spawndisplayname = format ["%1 (%2 Units)", _entry param [3, ""], _entry param [4, ""]];
+			mcc_hc = (MCC_ZoneLocation select (lbCurSel MCC_ZONE_LOC)) select 1;
+			private _cfg = if (MCC_3D_groupCfg isEqualType "") then {call compile MCC_3D_groupCfg} else {MCC_3D_groupCfg};
+			private _data = [];
+			for "_i" from 0 to ((count _cfg) - 1) do {
+				private _u = _cfg select _i;
+				if (isClass _u) then {_data pushBack [getText (_u >> "vehicle"), getArray (_u >> "position"), 0]};
+			};
+			if (!isNil "MCC_3D_makePreviewParts") then {[_data, mcc_spawndisplayname] call MCC_3D_makePreviewParts};
+		};
 		
-		_type = lbCurSel MCC_UNIT_TYPE;
+		_type = lbValue [MCC_UNIT_TYPE, lbCurSel MCC_UNIT_TYPE];
 		switch (_type) do	
 			{
 			   case 0:	//Infantry
@@ -400,25 +420,12 @@ if (mcc_missionmaker == (name player)) then
 		MCC_empty_index = (lbCurSel MCC_SETTING_EMPTY);
 		mcc_hc = (MCC_ZoneLocation select (lbCurSel MCC_ZONE_LOC)) select 1;
 		
-		if (! isnil "Object3D") then {deletevehicle Object3D};
-		if (mcc_spawntype == "MINES") then	
-		{
-				Object3D = createMine [mcc_spawnname,[0,0,500], [], 0];
-				Object3D enableSimulationGlobal true;
-				Object3D AddEventHandler ["HandleDamage", {False}];
-		}
-		else	
-		{
-			Object3D = mcc_spawnname createvehicleLocal [0,0,500];	
-			if (isnull Object3D) then {Object3D = "Sign_Arrow_Direction_F" createvehicle [0,0,500]}; 
-			Object3D enableSimulationGlobal true;
-			Object3D AddEventHandler ["HandleDamage", {False}];
-		};
+		if (!isNil "MCC_3D_makePreview") then {[mcc_spawnname, mcc_spawntype] call MCC_3D_makePreview};
 	};
 		
 	if (_3d == 2) then //Case we adding presets
 	{	
-		_type = lbCurSel MCC_UNIT_TYPE;
+		_type = lbValue [MCC_UNIT_TYPE, lbCurSel MCC_UNIT_TYPE];
 		_presets = [];
 		if (_type in [0]) then {_presets = mccPresetsUnits};
 		if (_type in [1,2,3,4,5,6]) then {_presets = mccPresetsVehicle}; 

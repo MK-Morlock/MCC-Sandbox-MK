@@ -1,7 +1,15 @@
 //===========================================================MCC_fnc_pickItem=============================================================================================
 //  _objet = object (the picable object)
 //======================================================================================================================================================================
-private["_object", "_caller", "_index","_displayName","_text","_shared","_delete","_markers","_tittle"];
+private _object = objNull;
+private _caller = objNull;
+private _index = 0;
+private _displayName = "";
+private "_text";
+private "_shared";
+private _delete = false;
+private _markers = [];
+private "_tittle";
 _object = param [0,objNull,[objNull]];
 _caller =  param [1,objNull,[objNull]];
 _index 	=  param [2,0,[0]];
@@ -67,11 +75,12 @@ if !(_text isEqualTo "") then {
 					[_oldText,"<t size='1.0' font='PuristaMedium'>%1</t><br/>",5]
 				];
 
-				[_output,safezoneX,0,"<t color='#FFFFFFFF' align='left'>%1</t>"] spawn BIS_fnc_typeText;
+				[_output,safezoneX + 0.03 * safezoneW,0,"<t color='#FFFFFFFF' align='left'>%1</t>"] spawn BIS_fnc_typeText;
 			}] remoteExec ["call", _shared];
 };
 
 //Hint we are done
+_object setVariable ["MCC_intelPickedSide", side group _caller, true];
 missionNamespace setVariable ["MCC_pickItem",playerSide];
 publicvariable "MCC_pickItem";
 

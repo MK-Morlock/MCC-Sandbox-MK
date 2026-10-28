@@ -15,7 +15,7 @@ class MCC_Module_settingsMedicSystem : Module_F
 		class medicComplex
 		{
 			displayName = "Complex System";
-			description = "Complex system replace all the default ArmA items with advanced items such as bandages, epipens exc";
+			description = "The complex system replaces all the default Arma items with advanced items such as bandages, epipens, etc.";
 			typeName = "NUMBER";
 			class values
 			{
@@ -36,7 +36,7 @@ class MCC_Module_settingsMedicSystem : Module_F
 		class medicBleedingEnabled
 		{
 			displayName = "Bleeding";
-			description = "PLayers and AI will suffer from bleeding effects";
+			description = "Players and AI will suffer from bleeding effects";
 			typeName = "NUMBER";
 			class values
 			{
@@ -57,7 +57,7 @@ class MCC_Module_settingsMedicSystem : Module_F
 		class onlyMedicsCanHeal
 		{
 			displayName = "Medic Heal";
-			description = "Only medics can use FAK to heal others can only use bandages to stop bleeding";
+			description = "Only medics can use FAKs to heal; others can only use bandages to stop bleeding";
 			typeName = "NUMBER";
 			class values
 			{
@@ -78,7 +78,7 @@ class MCC_Module_settingsMedicSystem : Module_F
 		class BleedingTime
 		{
 			displayName = "Bleeding Time";
-			description = "How long in seconds it will take for unconscious unit to die from bleeding";
+			description = "How long in seconds it will take for an unconscious unit to die from bleeding";
 			typeName = "NUMBER";
 			class values
 			{
@@ -130,7 +130,7 @@ class MCC_Module_settingsMedicSystem : Module_F
 		class medicXPmesseges
 		{
 			displayName = "Kill Messages";
-			description = "While role selection is active players will get notify when killing another player or AI";
+			description = "While Role Selection is active, players will be notified when killing another player or AI";
 			typeName = "NUMBER";
 			class values
 			{

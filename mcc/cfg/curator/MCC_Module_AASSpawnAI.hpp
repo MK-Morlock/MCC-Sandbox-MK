@@ -14,17 +14,18 @@ class MCC_Module_AASSpawnAI : MCC_Module_Base
 	{
 		class faction1 : Edit
 		{
+			control = "MCC_AttributeFaction";	//drop-down of all loaded factions (mod factions included)
 			displayName = "$STR_Module__AASSpawnAI_faction1_displayName";
 			description = "$STR_Module__AASSpawnAI_faction1_description";
 			defaultValue = """BLU_F""";
-			property = "faction1";
+			property = "MCC_Module_AASSpawnAI_faction1";
 		};
 
 		class enemySide : Combo
 		{
 			displayName = "$STR_Module__AASSpawnAI_enemySide_displayName";
 			typeName = "NUMBER";
-			property = "enemySide";
+			property = "MCC_Module_AASSpawnAI_enemySide";
 
 			class values
 			{
@@ -51,7 +52,7 @@ class MCC_Module_AASSpawnAI : MCC_Module_Base
 		{
 			displayName = "$STR_Module__AASSpawnAI_autoBalance_description";
 			description = "$STR_Module__AASSpawnAI_autoBalance_description";
-			property = "autoBalance";
+			property = "MCC_Module_AASSpawnAI_autoBalance";
 		};
 
 		class minAI : Edit
@@ -60,7 +61,7 @@ class MCC_Module_AASSpawnAI : MCC_Module_Base
 			description = "$STR_Module__AASSpawnAI_minAI_description";
 			typeName = "NUMBER";
 			defaultValue = 10;
-			property = "minAI";
+			property = "MCC_Module_AASSpawnAI_minAI";
 		};
 
 		class spawnAIDefensive : Checkbox
@@ -68,7 +69,7 @@ class MCC_Module_AASSpawnAI : MCC_Module_Base
 			displayName = "$STR_Module__AASSpawnAI_spawnAIDefensive_displayName";
 			description = "$STR_Module__AASSpawnAI_spawnAIDefensive_description";
 			typeName = "BOOL";
-			property = "spawnAIDefensive";
+			property = "MCC_Module_AASSpawnAI_spawnAIDefensive";
 		};
 
 		class searchRadius : Edit
@@ -77,7 +78,7 @@ class MCC_Module_AASSpawnAI : MCC_Module_Base
 			description = "$STR_Module__AASSpawnAI_searchRadius_description";
 			typeName = "NUMBER";
 			defaultValue = 300;
-			property = "searchRadius";
+			property = "MCC_Module_AASSpawnAI_searchRadius";
 		};
 
 		class useRoles : Checkbox
@@ -85,7 +86,7 @@ class MCC_Module_AASSpawnAI : MCC_Module_Base
 			displayName = "$STR_Module__AASSpawnAI_useRoles_displayName";
 			description = "$STR_Module__AASSpawnAI_useRoles_description";
 			typeName = "BOOL";
-			property = "useRoles";
+			property = "MCC_Module_AASSpawnAI_useRoles";
 		};
 
 		class spawnVehicles : Checkbox
@@ -93,7 +94,7 @@ class MCC_Module_AASSpawnAI : MCC_Module_Base
 			displayName = "$STR_Module__AASSpawnAI_spawnVehicles_displayName";
 			description = "$STR_Module__AASSpawnAI_spawnVehicles_description";
 			typeName = "BOOL";
-			property = "spawnVehicles";
+			property = "MCC_Module_AASSpawnAI_spawnVehicles";
 		};
 
 		class ModuleDescription: ModuleDescription{};

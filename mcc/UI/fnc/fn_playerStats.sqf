@@ -1,8 +1,14 @@
 //==================================================================MCC_fnc_playerStats=========================================================================================
 //==============================================================================================================================================================================
 //Gear stats
-private ["_display","_armor","_weight","_load","_role","_oldLevel","_html","_item"];
-_display = _this select 0;
+private _armor = 0;
+private _weight = 0;
+private _load = 0;
+private _role = "";
+private "_oldLevel";
+private _html = "";
+private "_item";
+params ["_display"];
 
 _role = player getvariable ["CP_role",""];
 _oldLevel = call compile format  ["%1Level select 0",_role];

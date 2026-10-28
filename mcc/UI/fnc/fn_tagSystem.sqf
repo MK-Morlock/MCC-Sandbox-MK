@@ -15,7 +15,7 @@ if (!hasInterface) exitWith {};
 			if (((worldToScreen (visiblePosition _unit)) select 0 > (0 * safezoneW + safezoneX)) && ((worldToScreen (visiblePosition _unit)) select 0 <(1 * safezoneW + safezoneX)) && player distance _unit < 3500) then {
 
 				if !(lineIntersects [ eyePos player, getPosASL _unit, player, _unit]) then {
-					private ["_size"];
+					private "_size";
 					_texture = [_unit getVariable ["icon",""]] call BIS_fnc_textureMarker;
 
 					_markerColor = [0.8,0,0,0.8];

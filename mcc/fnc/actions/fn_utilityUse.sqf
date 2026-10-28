@@ -3,8 +3,14 @@
 // Example: [] call MCC_fnc_utilityUse;
 ========================================================================================================================================================================*/
 
-private ["_utility","_vel","_dir","_handPos","_item","_mag","_itemClass","_charges","_cfg","_putCfg","_putCfgArray","_putCfgName","_magMuzzle","_ins","_interaction"];
-_primaryMod = _this select 0;
+private "_utility";
+private "_handPos";
+private "_mag";
+private _itemClass = "";
+private _charges = [];
+private "_ins";
+private _interaction = false;
+params ["_primaryMod"];
 _interaction = param [1,false,[false]];
 
 _mag 		= (player getVariable ["MCC_utilityItem",["",""]]) select 0;
@@ -36,7 +42,15 @@ _utility = _itemClass createvehicle (player modelToWorld [(_handPos select 0),(_
 0 = [_utility,(owner player)] remoteExec ["setOwner", 2];
 
 //Stick it to a vehicle
-private ["_vehicle","_relPos","_handPos","_upFront","_headPos","_objects","_closeObject","_relDir","_n"];
+private "_vehicle";
+private "_relPos";
+private "_handPos";
+private "_upFront";
+private "_headPos";
+private "_objects";
+private "_closeObject";
+private _relDir = [];
+private _n = 0;
 _headPos = player selectionPosition "head";
 _upFront = player modelToWorld [(_headPos select 0),(_headPos select 1)+2,(_headPos select 2)];
 _objects = (lineintersectsWith [ATLToASL (player modelToWorld _headPos), ATLToASL _upFront, objNull, objNull, true]);
@@ -101,10 +115,9 @@ if (!(_mag in magazines player) && !(_mag in items player) && !_interaction) the
 };
 
 if (_itemClass in ["MCC_ammoBox"]) then {
-	[[_utility, "Hold %1 to resupply"], "MCC_fnc_createHelper", false] call BIS_fnc_MP;
+	[_utility, "Hold %1 to resupply"] remoteExec ["MCC_fnc_createHelper", 2, false];
 	_utility spawn	{
-		private ["_t"];
-		_t = time + 600;
+		private _t = time + 600;
 		while {alive _this && time < _t} do {sleep 5};
 		if (alive _this) exitWith {deleteVehicle _this};
 	};

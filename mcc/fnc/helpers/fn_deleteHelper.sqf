@@ -3,8 +3,8 @@
 //==============================================================================================================================================================================
 #define MCC_HELPER "UserTexture1m_F"
 
-private ["_object"];
-_object = _this select 0;
+
+params ["_object"];
 if (isnil "_object") exitWith {};
 if (isnull _object) exitWith {};
 

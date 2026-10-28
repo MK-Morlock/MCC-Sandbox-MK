@@ -1,34 +1,38 @@
 /*================================================================= MCC_fnc_addComponentsACE =================================================================
-Add components childrens to ACE
-Internal use onlt
+Builds the ACE "Components" child actions: one toggle per component returned by MCC_fnc_addComponentsACECondition.
+Internal use only (ACE insertChildren: [_target, _player, _params])
 ==============================================================================================================================================================
 */
-private ["_actions","_cfgAnimationSources","_array","_searchArray","_sides","_airportName","_airportVars"];
-_this params [
-	["_vehicle", objNull, [objNull]],
+params [
+	["_target", objNull, [objNull]],
 	["_player", objNull, [objNull]],
-	["_params",[], [[]]]
+	["_params", [], [[]]]
 ];
 
-
-//Search components
-_array = [];
-_cfgAnimationSources = "getText (_x >> 'source') == 'user' && getText (_x >> 'displayName') != ''" configClasses (configFile >> "CfgVehicles" >> typeof vehicle _player >> "AnimationSources");
+private _vehicle = vehicle _player;
+private _children = [];
 
 {
-	_array pushBack
-        [
-            [
-                getText (_x >> "displayName"),
-                getText (_x >> "displayName"),
-                "",
-                compile format ["vehicle player animateSource [%1,%2]",str configName _x, 1-((vehicle player) animationPhase configName _x) ],
-                {true}
-            ] call ace_interact_menu_fnc_createAction,
-            [],
-            _player
-        ];
+	private _source = configName _x;
+	private _isOn = (_vehicle animationSourcePhase _source) > 0.5;
+	_children pushBack [
+		[
+			format ["MCC_component_%1", _source],
+			format ["%1 (%2)", getText (_x >> "displayName"), ["off", "on"] select _isOn],
+			"",
+			{
+				params ["", "_player", "_args"];
+				_args params ["_source"];
+				private _veh = vehicle _player;
+				_veh animateSource [_source, [1, 0] select ((_veh animationSourcePhase _source) > 0.5)];
+			},
+			{true},
+			{},
+			[_source]
+		] call ace_interact_menu_fnc_createAction,
+		[],
+		_vehicle
+	];
+} forEach ([_vehicle] call MCC_fnc_addComponentsACECondition);
 
-} forEach _cfgAnimationSources;
-
-_array
+_children

@@ -11,6 +11,12 @@
 #define MCC_MWFortificationMARKERSIDC 6017
 #define MCC_MWDebugComboIDC 6019
 #define MCC_MWArtilleryIDC 6021
+#define MCC_FLDepthIDC 6030
+#define MCC_FLTaskIDC 6031
+#define MCC_FLAttackerIDC 6032
+#define MCC_FLAttackStartIDC 6033
+#define MCC_FLReinforcementIDC 6034
+#define MCC_FLReinforcementWaitIDC 6035
 
 class MCCFrontLineDialog
 {
@@ -33,7 +39,7 @@ class MCCFrontLineDialog
 		class MCCMWDialogFrame: MCC_RscText
 		{
 			idc = -1;
-			colorBackground[] = { 0.051, 0.051, 0.051,1};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 
 			x = 0.225 * safezoneW + safezoneX;
 			y = 0.11515 * safezoneH + safezoneY;
@@ -47,12 +53,12 @@ class MCCFrontLineDialog
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.6)";
 
 			x = 0.230729 * safezoneW + safezoneX;
-			y = 0.46 * safezoneH + safezoneY;
+			y = 0.4575 * safezoneH + safezoneY;
 			w = 0.303646 * safezoneW;
-			h = 0.0549786 * safezoneH;
+			h = 0.0425 * safezoneH;
 		};
 
-		class MCCMWDialogClose: MCC_RscButtonMenu
+		class MCCMWDialogClose: MCC_RscButtonRound
 		{
 			idc = -1;
 			text = "Close"; //--- ToDo: Localize;
@@ -66,7 +72,7 @@ class MCCFrontLineDialog
 
 
 		//Generate
-		class MCC_MWGenerate: MCC_RscButton
+		class MCC_MWGenerate: MCC_RscButtonRound
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[0] execVM '"+MCCPATH+"mcc\missionWizard\scripts\FrontLineInit.sqf'");
@@ -76,8 +82,7 @@ class MCCFrontLineDialog
 			y = 0.83 * safezoneH + safezoneY;
 			w = 0.085 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			tooltip = "Click and hold left mouse button to draw the front line"; //--- ToDo: Localize;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			tooltip = "Draw the line on the map, then click the side the attack comes from"; //--- ToDo: Localize;
 		};
 
 		class MCC_mapBackground : MCC_RscText
@@ -125,7 +130,7 @@ class MCCFrontLineDialog
 				{
 					idc = -1;
 					text = "";
-					colorBackground[] = { 0.150, 0.150, 0.150,1};
+					colorBackground[] = {0.11,0.12,0.13,0.96};
 
 					w = 0.538542 * safezoneW;
 					h = 0.32 * safezoneH;
@@ -140,7 +145,7 @@ class MCCFrontLineDialog
 					y = 0.0109958 * safezoneH;
 					w = 0.15 * safezoneW;
 					h = 0.0329871 * safezoneH;
-					colorText[] = {0,1,1,1};
+					colorText[] = {0.77,0.51,0.08,1};
 					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
 				};
 
@@ -161,7 +166,7 @@ class MCCFrontLineDialog
 				{
 					idc = FACTIONCOMBO;
 					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
-					onLBSelChanged = __EVAL("[0] execVM '"+MCCPATH+"mcc\pop_menu\mcc_guiTab1Change.sqf'");
+					onLBSelChanged = "profileNamespace setVariable ['MCC_FLFactionIndex', _this select 1]";	//was the console faction script, which closed this window
 					onSetFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText 'Who are we fighting here'";
 					onKillFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText ''";
 
@@ -377,7 +382,7 @@ class MCCFrontLineDialog
 				{
 					idc = MCC_MWIEDMARKERSIDC;
 					onCheckBoxesSelChanged = "[_this,3,'MCC_FLIEDmarkersTittleIndex','profile'] spawn MCC_fnc_checkBox;";
-					onSetFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText 'Minefields visable on map'";
+					onSetFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText 'Minefields visible on map'";
 					onKillFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText ''";
 
 					columns = 2;
@@ -441,7 +446,7 @@ class MCCFrontLineDialog
 				{
 					idc = MCC_MWFortificationMARKERSIDC;
 					onCheckBoxesSelChanged = "[_this,3,'MCC_FLFortificationsmarkersCombo','profile'] spawn MCC_fnc_checkBox;";
-					onSetFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText 'Fortifications visable on map'";
+					onSetFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText 'Fortifications visible on map'";
 					onKillFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText ''";
 
 					columns = 2;
@@ -451,6 +456,138 @@ class MCCFrontLineDialog
 
 					x = 0.263542 * safezoneW;
 					y = 0.0879658 * safezoneH;
+					w = 0.0859375 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+
+				class MCC_FLDepthTittle: MCC_RscText
+				{
+					idc = -1;
+					text = "Depth:";
+					x = 0.189063 * safezoneW;
+					y = 0.120953 * safezoneH;
+					w = 0.06875 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+				class MCC_FLDepthCombo: MCC_RscCombo
+				{
+					idc = MCC_FLDepthIDC;
+					onLBSelChanged = "profileNamespace setVariable ['MCC_FLDepthIndex',_this select 1]";
+					tooltip = "How far behind the line the defence reaches: Shallow 600 m, Standard 1.5 km, Deep 3 km (adds a fallback line)";
+					x = 0.263542 * safezoneW;
+					y = 0.120953 * safezoneH;
+					w = 0.0859375 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+
+				class MCC_FLTaskTittle: MCC_RscText
+				{
+					idc = -1;
+					text = "Task:";
+					x = 0.189063 * safezoneW;
+					y = 0.15394 * safezoneH;
+					w = 0.06875 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+				class MCC_FLTaskCombo: MCC_RscCombo
+				{
+					idc = MCC_FLTaskIDC;
+					onLBSelChanged = "profileNamespace setVariable ['MCC_FLTaskIndex',_this select 1]";
+					tooltip = "Break through task for the attacking side(s): done when 80% of the strongpoints are cleared";
+					x = 0.263542 * safezoneW;
+					y = 0.15394 * safezoneH;
+					w = 0.0859375 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+
+				class MCC_FLAttackerTittle: MCC_RscText
+				{
+					idc = -1;
+					text = "Attacker:";
+					x = 0.189063 * safezoneW;
+					y = 0.186927 * safezoneH;
+					w = 0.06875 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+				class MCC_FLAttackerCombo: MCC_RscCombo
+				{
+					idc = MCC_FLAttackerIDC;
+					onLBSelChanged = "";
+					tooltip = "Optional AI force that assaults the line - see Attack starts. None = defenders only";
+					x = 0.263542 * safezoneW;
+					y = 0.186927 * safezoneH;
+					w = 0.0859375 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+
+				class MCC_FLAttackStartTittle: MCC_RscText
+				{
+					idc = -1;
+					text = "Attack starts:";
+					x = 0.189063 * safezoneW;
+					y = 0.219914 * safezoneH;
+					w = 0.06875 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+				class MCC_FLAttackStartCombo: MCC_RscCombo
+				{
+					idc = MCC_FLAttackStartIDC;
+					onLBSelChanged = "profileNamespace setVariable ['MCC_FLAttackStartIndex',_this select 1]";
+					tooltip = "When the Attacker force advances: when a player comes within 1.5 km of the line (at most 15 min), immediately, or after a fixed time";
+					x = 0.263542 * safezoneW;
+					y = 0.219914 * safezoneH;
+					w = 0.0859375 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+
+				class MCC_FLReinforcementTittle: MCC_RscText
+				{
+					idc = -1;
+					text = "Reinforcements:";
+					x = 0.189063 * safezoneW;
+					y = 0.252902 * safezoneH;
+					w = 0.06875 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+				class MCC_FLReinforcementCombo: MCC_RscCombo
+				{
+					idc = MCC_FLReinforcementIDC;
+					onLBSelChanged = "profileNamespace setVariable ['MCC_FLReinforcementIndex',_this select 1]";
+					tooltip = "Defender reinforcements from behind the line when the defence is worn down (as in the Mission Generator)";
+					x = 0.263542 * safezoneW;
+					y = 0.252902 * safezoneH;
+					w = 0.0859375 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+
+				class MCC_FLReinforcementWaitTittle: MCC_RscText
+				{
+					idc = -1;
+					text = "Reinforce when:";
+					x = 0.189063 * safezoneW;
+					y = 0.28589 * safezoneH;
+					w = 0.06875 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+				class MCC_FLReinforcementWaitCombo: MCC_RscCombo
+				{
+					idc = MCC_FLReinforcementWaitIDC;
+					onLBSelChanged = "profileNamespace setVariable ['MCC_FLReinforcementWaitIndex',_this select 1]";
+					tooltip = "Players are near: reinforcements only start once a player comes near the line (MCC default, saves performance). Always: also in an AI vs AI fight with no player nearby";
+					x = 0.263542 * safezoneW;
+					y = 0.28589 * safezoneH;
 					w = 0.0859375 * safezoneW;
 					h = 0.0219914 * safezoneH;
 					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";

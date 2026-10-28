@@ -1,7 +1,11 @@
 //==================================================================MCC_fnc_curatorAddValor============================================================================
 // Add valor to the selected units
 //==============================================================================================================================================================
-private ["_module","_valor","_object","_side","_resualt"];
+private _module = objNull;
+private _valor = 0;
+private _object = [];
+private "_side";
+private _resualt = [];
 
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {};
@@ -34,7 +38,7 @@ if (typeName (_module getVariable ["valor",true]) isEqualTo typeName 100) then {
 	if (count _object <2) then {
 		_resualt = ["Add Credit",[
 				["Credits",5000],
-				["Player Side",["East","West","Resistance","Civilians"]]
+				["Player Side",["East","West","Resistance","Civilians"],"",1]
 			  ]] call MCC_fnc_initDynamicDialog;
 
 		if (count _resualt == 0) exitWith {deleteVehicle _module};

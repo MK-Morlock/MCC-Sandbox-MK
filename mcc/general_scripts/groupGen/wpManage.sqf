@@ -1,11 +1,8 @@
 //Made by Shay_Gman (c) 09.10
 
-private ["_pos","_wpArray","_group","_wp"];
+private "_wp";
 
-_action 	= _this select 0; 
-_pos 		= _this select 1; 
-_wpArray 	= _this select 2;
-_group 		= _this select 3;
+params ["_action", "_pos", "_wpArray", "_group"];
 
 switch (_action) do { 			//Add WP
 	case 0:  

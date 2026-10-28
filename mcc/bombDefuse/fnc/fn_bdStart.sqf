@@ -1,7 +1,14 @@
 /*=================================================================MCC_fnc_bdStart==================================================================================
   randomize the defuse bomb panel
 */
-private ["_difficulty","_modules","_noModules","_isEngineer","_disarmTime","_pos","_target","_realIED"];
+private _difficulty = [];
+private _modules = [];
+private "_noModules";
+private _isEngineer = configNull;
+private "_disarmTime";
+private "_pos";
+private _target = objNull;
+private "_realIED";
 _targetIsRealIED = param [1,false,[true]];
 
 if (_targetIsRealIED) then {

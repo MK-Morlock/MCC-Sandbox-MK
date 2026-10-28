@@ -3,7 +3,8 @@
 // Example: [] call MCC_fnc_GAIASettings;
 // _group1 = group, the group name
 //===========================================================================================================================================================================
-private ["_module","_var","_name","_string","_desc","_action","_preTask","_pos","_side"];
+private _module = objNull;
+private _var = 0;
 
 _module = param [0, objNull, [objNull]];
 if (isNull _module) exitWith {deleteVehicle _module};
@@ -43,12 +44,12 @@ if !(local _module) exitWith {};
 
 _resualt = ["Settings GAIA",[
  						["AI skill",10],
- 						["AI Aimming",10],
+ 						["AI Aiming",10],
  						["AI Spotting",10],
  						["AI Commanding",10],
  						["AI Use Smoke Grenades",["Never","Rarely","Sometimes","Often"]],
  						["Cache Distance",10000],
- 						["GAIA controlls all units",false]
+ 						["GAIA controls all units",false]
  					  ]] call MCC_fnc_initDynamicDialog;
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};

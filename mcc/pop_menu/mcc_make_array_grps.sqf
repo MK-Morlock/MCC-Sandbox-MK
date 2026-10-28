@@ -1,9 +1,13 @@
-private ["_Cfgside","_side", "_faction", "_type","_classtype","_cfgname", "_cfgclass", "_spawnside","_grp_array","_indexar","_Cfgfaction","_factionClassName",
-         "_cfg","_unitCfg"];
-_side      = _this select 0; // Not used!
-_faction   = _this select 1;
-_type      = _this select 2;
-_classtype = _this select 3;
+private _Cfgside = configNull;
+private _cfgname = "";
+private _cfgclass = "";
+private _grp_array = [];
+private _indexar = 0;
+private _Cfgfaction = configNull;
+private _factionClassName = "";
+private _cfg = configNull;
+private _unitCfg = configNull;
+params ["_side", "_faction", "_type", "_classtype"];
 _grp_array = [];
 _indexar   = 0;
 
@@ -48,7 +52,11 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 
 							   if (isClass(_cfgclasstype)) then
 							   {
-									if ((getText(_cfgclasstype >> "faction"))== _faction) then
+									// Same rule the group-type list uses (mcc_faction_choice.sqf): the group's own faction, or - for mods such as S.O.G. Prairie Fire
+									// whose groups have no "faction" entry - the CfgGroups faction class it sits in. Before, those types were listed but always empty,
+									// so spawning showed "Cannot spawn an empty group".
+									private _grpFaction = getText(_cfgclasstype >> "faction");
+									if (_grpFaction == _faction || {_grpFaction == "" && {configName _Cfgfaction == _faction}}) then
 									{
 										_cfgname  =  getText(_cfgclasstype >> "name");
 
@@ -61,7 +69,8 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 										};
 
 										//Lets count the units in a group
-										private ["_count","_CfgUnit"];
+										private _count = 0;
+										private _CfgUnit = configNull;
 										_count = 0;
 										for "_n" from 0 to ((count _cfgclasstype) - 1) do
 										{

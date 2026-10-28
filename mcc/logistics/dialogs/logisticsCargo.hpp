@@ -1,4 +1,4 @@
-class MCC_logisticsCargo
+class MCCDLG_NAME
 {
 	idd = 8888745412;
 	onLoad = "uiNamespace setVariable ['MCC_logisticsCargo', (_this select 0)];";
@@ -12,7 +12,7 @@ class MCC_logisticsCargo
 			y = 0.291 * safezoneH + safezoneY;
 			w = 0.185625 * safezoneW;
 			h = 0.363 * safezoneH;
-			colorBackground[] = {0,0,0,0.7};
+			colorBackground[] = {0.11,0.12,0.13,0.96};
 		};
 
 		class cargoItems: MCC_RscListbox
@@ -41,7 +41,7 @@ class MCC_logisticsCargo
 			h = 0.033 * safezoneH;
 		};
 
-		class CancelButton: MCC_RscButton
+		class CancelButton: MCCBTN_R
 		{
 			idc = -1;
 			action = "closeDialog 0";

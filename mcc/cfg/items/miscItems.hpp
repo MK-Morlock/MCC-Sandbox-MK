@@ -110,7 +110,7 @@ class MCC_fuelCan_empty : Item_Base_F
 	value = 10;
 	count = 1;
 	mass = 10;
-}
+};
 
 class MCC_fuelbot : Item_Base_F
 {

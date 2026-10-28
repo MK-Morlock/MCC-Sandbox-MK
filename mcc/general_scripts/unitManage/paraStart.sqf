@@ -1,8 +1,16 @@
-private ["_unit","_plane","_positions","_dir","_isHalo","_jumpReady","_unitPosition","_dropPos","_isCargo","_y","_x","_pos","_vehicle","_init","_time","_light"];
-_plane 		= _this select 0;												//where from
-_unit 		= _this select 1;												//Who is jumping
-_unitNumber	= _this select 2;												//what is his jumper number
-_dropPos	= _this select 3;												//where is the LZ
+private _positions = [];
+private _dir = 0;
+private _isHalo = false;
+private "_jumpReady";
+private "_unitPosition";
+private _isCargo = false;
+private "_y";
+private "_x";
+private "_pos";
+private _vehicle = nil;
+private "_time";
+private _light = "";
+params ["_plane", "_unit", "_unitNumber", "_dropPos"];												//where is the LZ
 _isCargo	= false; 
 
 _positions 	= [[-0.5,-2.5,-2.23],[0.5,-2.5,-2.23],[-0.5,-1,-2.23],[0.5,-1,-2.23],[-0.5,0.5,-2.23],[0.5,0.5,-2.23],

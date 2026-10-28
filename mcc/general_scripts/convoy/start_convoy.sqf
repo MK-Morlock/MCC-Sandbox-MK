@@ -1,10 +1,10 @@
-if (isnil "MCC_convoyVehicles") exitWith {systemchat "You must spawn a convoy first"};
+if (((missionNamespace getVariable ["MCC_convoyVehicles", []]) select {!isNull _x}) isEqualTo []) exitWith {systemchat "You must spawn a convoy first"};
 if !mcc_isloading then
 {
 	if (MCC_capture_state) then
 	{
 		MCC_capture_var=MCC_capture_var + FORMAT ["
-							[[[%1, %2 , %3, %4], %5 select 0],""MCC_fnc_startConvoy"",true,false] call BIS_fnc_MP;
+							[[%1, %2 , %3, %4], %5 select 0] remoteExec [""MCC_fnc_startConvoy"", 0, false];
 							"
 							,point2
 							,point3
@@ -16,6 +16,6 @@ if !mcc_isloading then
 	else
 	{
 		hint "Convoy is moving";
-		[[[point2,point3,point4,point5],vip select 0],"MCC_fnc_startConvoy",true,false] call BIS_fnc_MP;
+		[[point2,point3,point4,point5],vip select 0] remoteExec ["MCC_fnc_startConvoy", 0, false];
 	};
 };

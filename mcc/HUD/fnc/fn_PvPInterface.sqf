@@ -5,7 +5,15 @@
 */
 
 disableSerialization;
-private ["_tickets","_ctrlPos","_flagTexture","_unit","_side","_faction","_factioName","_time","_ctrl"];
+private _tickets = [];
+private "_ctrlPos";
+private _flagTexture = "";
+private _unit = objNull;
+private "_side";
+private _faction = "";
+private _factioName = "";
+private "_time";
+private _ctrl = controlNull;
 while {(missionNamespace getVariable ["MCC_UIModuleTickets",false])} do {
 
 	//Create progress bar

@@ -4,7 +4,13 @@
     Nothing
 */
 
-private ["_target","_cam","_fov","_leftDownPos","_uav","_keyDown","_mouseMoving"];
+private _target = "";
+private _cam = "";
+private _fov = 0;
+private "_leftDownPos";
+private _uav = objNull;
+private _keyDown = controlNull;
+private _mouseMoving = controlNull;
 if (!hasInterface || isDedicated) exitWith {};
 
 waituntil {!(IsNull (findDisplay 46))};
@@ -47,7 +53,20 @@ _uav dowatch _target;
 
 MCC_fnc_ConsoleACControlHandler = {
 	disableSerialization;
-	private ["_keyNightVision","_keysBanned","_keyForward","_keyBack","_keyLeft","_keyRight","_mode","_input","_NVGstate","_camTarget","_pos","_relDir","_posNew","_camTargetPos","_posX","_posY","_uav"];
+	private "_keyNightVision";
+	private _keysBanned = [];
+	private "_keyForward";
+	private "_keyBack";
+	private "_keyLeft";
+	private "_keyRight";
+	private "_mode";
+	private "_input";
+	private _camTarget = objNull;
+	private _posNew = [];
+	private "_camTargetPos";
+	private "_posX";
+	private "_posY";
+	private _uav = objNull;
 	_keyNightVision	= actionKeys "NightVision";
 	_keysBanned		= [1,15];
 	_keyForward		= actionKeys "carForward";

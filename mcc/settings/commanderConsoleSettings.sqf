@@ -3,7 +3,7 @@
 [
     "MCC_allowConsole",
     "CHECKBOX",
-    ["Commander Conosle Enabled","Player can become a side commander from the MCC respawn screen"],
+    ["Commander Console Enabled","Player can become a side commander from the MCC respawn screen"],
    "MCC Commander Console",
     true,
     true
@@ -13,9 +13,18 @@
 [
     "MCC_allowRTS",
     "CHECKBOX",
-    ["RTS","Enable Real Time Strategy mod from the commander console, build, expend and conquare"],
+    ["RTS","Enable Real Time Strategy mod from the commander console, build,\nexpand and conquer"],
     "MCC Commander Console",
     true,
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_rtsPersonnelMode",
+    "LIST",
+    ["Personnel that use food and bunks","Which soldiers count towards the RTS personnel limit, hourly food use and bunks."],
+    ["MCC Commander Console","RTS / Base"],
+    [[0,1,2],["Players and controllable groups","Also AI in players' squads","All friendly AI on the side"],0],
     true
 ] call CBA_Settings_fnc_init;
 
@@ -25,7 +34,7 @@
 [
     "MCC_defaultSupplyDropsEnabled",
     "CHECKBOX",
-    ["Purcase air drop","Commander can trade resources for air Drops - works only on mission restart"],
+    ["Purchase air drop","Commander can trade resources for air Drops - works only on mission restart"],
     ["MCC Commander Console","Air support"],
     true,
     true
@@ -37,7 +46,7 @@
     "SLIDER",
     ["AC-130 uptime","How long in seconds can an AC-130 stay in the air before he is RTB"],
     ["MCC Commander Console","Air support"],
-    [0, 1200, 300, 0],
+    [0, 1200, 360, 0],
     true
 ] call CBA_Settings_fnc_init;
 
@@ -45,7 +54,7 @@
 [
     "MCC_defaultCASEnabled",
     "CHECKBOX",
-    ["Purcase CAS","Commander can trade resources for close air support - works only on mission restart"],
+    ["Purchase CAS","Commander can trade resources for close air support - works only on\nmission restart"],
     ["MCC Commander Console","Air support"],
     true,
     true
@@ -86,7 +95,7 @@
 [
     "MCC_ConsoleLiveFeedHelmetsOnly",
     "CHECKBOX",
-    ["Restrict live feed","Restrict live feed to vehicles and units wearing one of the specific helmets only"],
+    ["Restrict live feed","Restrict live feed to vehicles and units wearing one of the specific\nhelmets only"],
     ["MCC Commander Console","Live Feed"],
     false,
     true
@@ -96,12 +105,12 @@
 [
     "MCC_ConsoleLiveFeedHelmets",
     "EDITBOX",
-    ["Live feed helmets","Restrict live feed to vehicles and units wearing one of the specific helmets only"],
+    ["Live feed helmets","Restrict live feed to vehicles and units wearing one of the specific\nhelmets only"],
     ["MCC Commander Console","Live Feed"],
     '["H_HelmetB","H_HelmetB_paint","H_HelmetB_light","H_HelmetO_ocamo","H_HelmetLeaderO_ocamo","H_HelmetSpecO_ocamo","H_HelmetSpecO_blk"]',
     true,
     {
         params ["_value"];
-        MCC_ConsoleLiveFeedHelmets = call compile _value;
+        MCC_ConsoleLiveFeedHelmets = [_value, '["H_HelmetB","H_HelmetB_paint","H_HelmetB_light","H_HelmetO_ocamo","H_HelmetLeaderO_ocamo","H_HelmetSpecO_ocamo","H_HelmetSpecO_blk"]', "MCC_ConsoleLiveFeedHelmets"] call MCC_fnc_parseSetting;
     }
 ] call CBA_Settings_fnc_init;
