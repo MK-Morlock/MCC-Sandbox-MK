@@ -1,45 +1,48 @@
-
-#define MCC_SANDBOX4_IDD 4000
 #define MCC_UM_LIST 3069
 #define MCC_UM_PIC 3070
 #define MCC_MINIMAP 9000
 
 disableSerialization;
 
-private ["_type", "_name", "_worldPos","_dummy", "_unitpos", "_ok", "_markerColor", "_leader", "_markerType", "_tempMarkers", "_tempLines", "_tempVehicles",
-		"_targetUnit","_oldUnit","_group","_params","_ctrl","_pressed","_shift","_ctrlKey","_mccdialog","_comboBox","_nul","_dummyUnit","_control","_cam","_sideMarker","_side"];
+private ["_type", "_name", "_worldPos","_dummy", "_unitpos", "_ok", "_markerColor", "_leader", "_markerType", "_tempMarkers", "_tempLines", "_tempVehicles","_indices",
+		"_targetUnit","_oldUnit","_group","_params","_ctrl","_pressed","_shift","_ctrlKey","_mccdialog","_comboBox","_nul","_dummyUnit","_control","_cam","_side"];
 
-_mccdialog = findDisplay MCC_SANDBOX4_IDD;
+_mccdialog = (uiNamespace getVariable "MCC_groupGen_Dialog");
 _comboBox = _mccdialog displayCtrl MCC_UM_LIST;
 _type = _this select 0;
+_indices = lbSelection _comboBox;
 
-	switch (_type) do
-	{
-		case 0: //Teleport
-		{
-		mapClick = false; 
-			hint "Click on the map"; 
-			onMapSingleClick " 	hint format ['%1 teleported', UMName];
-								teleportPos = _pos; 
-								mapClick = true;
-								onMapSingleClick """";";
-			waituntil {mapClick};
-			if (MCC_UMUnit==0) then 
+switch (_type) do {
+	//Teleport
+	case 0:{
+		mapClick = false;
+		hint "Click on the map";
+		onMapSingleClick " 	hint format ['%1 teleported', UMName];
+							teleportPos = _pos;
+							mapClick = true;
+							onMapSingleClick """";";
+		waituntil {mapClick};
+		if (MCC_UMUnit==0) then {
+			{
+				[[[netID _x,_x],teleportPos], "MCC_fnc_moveToPos", _x, false] spawn BIS_fnc_MP;
+			} foreach MCC_selectedUnits;
+		} else {
+			{
 				{
-					{[[[netID _x,_x],teleportPos], "MCC_fnc_moveToPos", true, false] spawn BIS_fnc_MP} foreach MCC_selectedUnits;
-				} else 
-					{
-						{{[[[netID _x,_x],teleportPos], "MCC_fnc_moveToPos", true, false] spawn BIS_fnc_MP} foreach (units _x);} foreach MCC_selectedUnits;
-					};
+					[[[netID _x,_x],teleportPos], "MCC_fnc_moveToPos", _x, false] spawn BIS_fnc_MP;
+					sleep 0.2;
+				} foreach (units _x);
+			} foreach MCC_selectedUnits;
 		};
-		
+	};
+
 		case 1:	//Teleport to LHD
 		{
 			_worldPos = deck modelToWorld [0,0,0];
-			if (MCC_UMUnit==0) then 
+			if (MCC_UMUnit==0) then
 			{
 				{[[[netID _x,_x],[_worldPos select 0, _worldPos select 1, 15.9]], "MCC_fnc_moveToPos", true, false] spawn BIS_fnc_MP} foreach MCC_selectedUnits;
-			} 
+			}
 			else
 			{
 				{{[[[netID _x,_x],[_worldPos select 0, _worldPos select 1, 15.9]], "MCC_fnc_moveToPos", true, false] spawn BIS_fnc_MP} foreach (units _x);} foreach MCC_selectedUnits;
@@ -48,215 +51,220 @@ _type = _this select 0;
 
 		case 2:	//Hijak unit
 		{
-			if (MCC_UMUnit==0) then 
+			if (MCC_UMUnit==0) then
 			{
 				_targetUnit = MCC_UMunitsNames select (lbCurSel MCC_UM_LIST);	//Hijacked unit
 				if (isplayer _targetUnit) exitwith {hint "Can't hijak other players"};
-				Prev_Player = player; 
-				Prev_Side = side player; 
-				_oldUnit = player; 
-				_group = creategroup (side _targetUnit); 
-				//_dummyUnit = _group createUnit ["RU_Assistant", position player,[], 0, "NONE"];
+				if (isNil "_targetUnit" || isNull _targetUnit) exitWith {};
+				MCC_PrevHijacked_Group = netID (group _targetUnit);
+				MCC_Prev_HijackedGroupIsLeader = if (leader group _targetUnit == _targetUnit) then {true} else {false};
+
+				MCC_Prev_Player = player;
+				MCC_Prev_Group = group Player;
+				MCC_Prev_GroupIsLeader = if (leader group player == player) then {true} else {false};
+				MCC_Prev_Side = side player;
+				_oldUnit = player;
+				_group = creategroup (side _targetUnit);
 				[_targetUnit] joinSilent _group;
-				//setPlayable _dummyUnit;
-				//selectPlayer _dummyUnit;	//Make the switch
+
+				closeDialog 0;
+				private ["_camera","_ppgrain"];
+				_camera = "Camera" camcreate [(getpos _targetUnit) select 0, (getpos _targetUnit) select 1,((getpos _targetUnit) select 2) + 100];
+				_camera cameraeffect ["internal","back"];
+				_camera camPrepareFOV 0.900;
+				_camera camsetTarget _targetUnit;
+				_camera campreparefocus [-1,-1];
+				_camera camCommitPrepared 0;
+				_camera camcommit 0.01;
+				cameraEffectEnableHUD true;
+
+				_ppgrain = ppEffectCreate ["radialBlur", 100];
+				_ppgrain ppEffectAdjust [0.5, 0.5, 0.3, 0.3];
+				_ppgrain ppEffectCommit 0;
+				_ppgrain ppEffectEnable true;
+
+				playsound "MCC_woosh";
+				for "_i" from floor(((getpos _targetUnit) select 2) + 100) to 0 step -3 do
+				{
+					_camera camsetpos [(getpos _targetUnit) select 0, (getpos _targetUnit) select 1,_i];
+					_camera camcommit 0.01;
+					sleep 0.01;
+				};
+
+				_camera cameraEffect ["TERMINATE", "BACK"];
+				camdestroy _camera;
+				_camera = nil;
+
+
+
 				removeSwitchableUnit _oldUnit;
 				_group selectLeader player;
 				selectPlayer _targetUnit;
-				//deleteVehicle _dummyUnit;
+
 				deletegroup _group;
-				MCC_backToplayerIndex = _targetUnit addaction ["Back to player", MCC_path + "mcc\general_scripts\unitManage\backToPlayer.sqf",[], 0,false, false, "teamSwitch","vehicle _target == vehicle _this"];
-				mcc_actionInedx = player addaction ["> Mission generator", MCC_path + "mcc\dialogs\mcc_PopupMenu.sqf",[], 0,false, false, "teamSwitch","vehicle _target == vehicle _this"];
-				_ok = _targetUnit addEventHandler ["Killed", "[_this select 0] joinSilent (Prev_Group);selectPlayer Prev_Player;"];
-				/*
-				[player] joinSilent grpNull;
-				[player] joinSilent _group;
-				[_targetUnit] joinSilent _group;
-				_group selectLeader player;
-				_null = _targetUnit addaction ["Back to player", "\mcc_sandbox_mod\mcc\general_scripts\unitManage\backToPlayer.sqf"];
-				[_oldUnit] joinSilent grpNull; 
-				setPlayable _targetUnit;
-				selectPlayer _targetUnit;	//Make the switch
-				removeSwitchableUnit _oldUnit;
-				_oldUnit setcaptive true; 
-				_ok = _targetUnit addEventHandler ["Killed", "[_this select 0] joinSilent (Prev_Group);selectPlayer Prev_Player;"];*/
+
+				_ppgrain ppEffectEnable false;
+				MCC_hijack_effect = ppEffectCreate ["radialBlur", 100];
+				MCC_hijack_effect ppEffectAdjust [0.05, 0.05, 0.5, 0.35];
+				MCC_hijack_effect ppEffectCommit 0;
+				MCC_hijack_effect ppEffectEnable true;
+
+				MCC_backToplayerIndex = _targetUnit addaction ["<t color=""#CC0000"">Back To Player</t>", MCC_path + "mcc\general_scripts\unitManage\backToPlayer.sqf",[], 0,false, false, "","vehicle _target == vehicle _this"];
+
+				_string = "(vehicle _target == vehicle _this) && (getplayerUID player in (missionNamespace getvariable ['MCC_allowedPlayers',[]]) || 'all' in  (missionNamespace getvariable ['MCC_allowedPlayers',[]]) || (serverCommandAvailable '#kick' && missionNamespace getvariable ['MCC_allowAdmin',true]) || (isServer && missionNamespace getvariable ['MCC_allowAdmin',true]) || (player getvariable ['MCC_allowed',false]))";
+				mcc_actionInedx = player addaction ["<t color=""#99FF00"">--= MCC =--</t>",MCC_path + "mcc\dialogs\mcc_PopupMenu.sqf",[nil,nil,nil,nil,0], 0,false, false, "",_string];
+				player setVariable ["MCC_allowed",true,true];
+				_ok = _targetUnit addEventHandler ["Killed", format ["[_this select 0] execVM '%1mcc\general_scripts\unitManage\backToPlayer.sqf'",MCC_path]];
+
+				if (MCC_PrevHijacked_Group != "") then
+				{
+					[player] joinSilent (groupFromNetID MCC_PrevHijacked_Group);
+					waituntil {group player == (groupFromNetID MCC_PrevHijacked_Group)};
+					if (MCC_Prev_HijackedGroupIsLeader) then
+					{
+						if (isMultiplayer) then
+						{
+							[[2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group Player), netID player]], "MCC_fnc_globalExecute", true, false] spawn BIS_fnc_MP;
+						}
+						else
+						{
+							(group player) selectLeader player;
+						};
+					};
+				};
 			}
 			else
 			{hint "Can only hijak units not groups"};
 		};
-			
+
 		case 3:	//Markers
 		{
-			if (!MCC_trackMarker) then 
+			MCC_trackMarker = !MCC_trackMarker;
+
+			if (MCC_trackMarker) then
 			{
-				MCC_trackMarker = true; 
-				while {MCC_trackMarker} do 
+				MCC_trackMarkerHandler = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 9000) ctrladdeventhandler ["draw","_this call MCC_fnc_trackUnits;"];
+				MCC_trackMarkerHandlerMap = (findDisplay 12 displayCtrl 51) ctrladdeventhandler ["draw","_this call MCC_fnc_trackUnits; _this call MCC_fnc_mapDrawWP;"];
+			}
+			else
+			{
+				if (!isnil "MCC_trackMarkerHandler") then
 				{
-					_tempMarkers = [];
-					_tempLines = [];
-					_tempVehicles = [];
-						{
-							_leader = leader _x; 
-									
-									{
-										switch (format ["%1", side  _x]) do 
-											{
-											case "EAST": //East
-												{
-												_markerColor = "ColorRed";
-												_sideMarker = "o"
-												}; 
-												
-											case "WEST": //West
-												{
-												_markerColor = "ColorBlue";
-												_sideMarker = "b"
-												};
-												
-											case "GUER": //Resistance
-												{
-												_markerColor = "ColorGreen";
-												_sideMarker = "n";
-												};
-											case "CIVILIAN": //Civilian
-												{
-												_markerColor = "ColorWhite";
-												_sideMarker = "n";
-												};	
-											};
-											
-											if ((vehicle _x) != _x) then 
-											{
-												if (!((vehicle _x) in _tempVehicles)) then
-												{
-													_tempVehicles set [count _tempVehicles, vehicle _x];
-													_markerType = format ["%1_unknown", _sideMarker];
-													if ((vehicle _x) iskindof "Car") then {_markerType = format ["%1_mech_inf", _sideMarker]; };
-													if ((vehicle _x) iskindof "Tank") then {_markerType = format ["%1_armor", _sideMarker]; };
-													if ((vehicle _x) iskindof "Air") then {_markerType = format ["%1_air", _sideMarker]; };
-													if ((vehicle _x) iskindof "Boat") then {_markerType = format ["%1_recon", _sideMarker]; };
-													createMarkerLocal [format["%1", _x], getpos (vehicle _x)];
-													format["%1", _x] setMarkerTypelocal _markerType;
-													format["%1", _x] setMarkerColorlocal _markerColor;
-													_tempMarkers set [count _tempMarkers, format["%1", _x]];
-												};
-											} 
-											else
-											{
-												createMarkerLocal [format["%1", _x], getpos _x];
-												format["%1", _x] setMarkerTypelocal "mil_dot";
-												format["%1", _x] setMarkerColorlocal _markerColor;
-												_tempMarkers set [count _tempMarkers, format["%1", _x]];
-												if ( _x != _leader) then 
-												{
-													[getpos _x , getpos _leader ,format ["%1", _x]] call MCC_fnc_drawLine;
-													_tempLines set [count _tempLines, format["line_%1", _x]];
-												};
-											};
-									} foreach (units _x); 
-										
-						} count allGroups;
-						
-						sleep 3; 
-						{
-						deletemarkerlocal _x;
-						} count _tempMarkers;
-						{
-							deletemarkerlocal _x;
-						} count _tempLines;
+					((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 9000) ctrlRemoveEventHandler ["draw",MCC_trackMarkerHandler];
 				};
-					//Incase we came down here let's clean up
-					{
-					deletemarkerlocal _x;
-					} count _tempMarkers;
-					{
-						deletemarkerlocal _x;
-					} count _tempLines;
-			} else {
-				MCC_trackMarker = false; 
+
+				if (!isnil "MCC_trackMarkerHandlerMap") then
+				{
+					(findDisplay 12 displayCtrl 51) ctrlRemoveEventHandler ["draw",MCC_trackMarkerHandlerMap];
 				};
+			};
 		};
-		
+
 		case 4:	//Indevidual Marker
 		{
-		if ((lbCurSel MCC_UM_LIST)>=0) then 
+			if ((lbCurSel MCC_UM_LIST)>=0) then
 			{
-			if (MCC_UMisJoining) then {					//Joining
-				MCC_UMisJoining = false;
-				if (MCC_UMUnit==0) then 
+				if (MCC_UMisJoining) then //Joining
+				{
+					MCC_UMisJoining = false;
+					if (MCC_UMUnit==0) then
 					{
 						UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST);
 						//[UMJoin] joinSilent grpNull;
 						[UMJoin] joinSilent (group UMName);
-						} else {
-								UMName = UMgroupNames select (lbCurSel MCC_UM_LIST);
-								//(units UMName) joinSilent grpNull;
-								(units UMJoin) joinSilent UMName;
-								deletegroup UMName;
-							};
-			};
-			if (MCC_UMUnit==0) then 
-				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)} 
-				else {UMName = leader (UMgroupNames select (lbCurSel MCC_UM_LIST))};
+					}
+					else
+					{
+						UMName = UMgroupNames select (lbCurSel MCC_UM_LIST);
+						//(units UMName) joinSilent grpNull;
+						(units UMJoin) joinSilent UMName;
+						deletegroup UMName;
+					};
+				};
+
+				private "_name";
+				if (MCC_UMUnit==0) then
+				{
+					_name =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST);
+				}
+				else
+				{
+					_name = leader (UMgroupNames select (lbCurSel MCC_UM_LIST));
+				};
+
+				//Do not refresh if we haven't picked another group
+				if (isnil "UMName") then {UMName = _name};
+
+				UMName = _name;
 				deletemarkerlocal "currentUnitSelected";
 				createMarkerLocal ["currentUnitSelected", getpos UMName];
 				"currentUnitSelected" setMarkerTypelocal "Select";
 				"currentUnitSelected" setMarkerColorlocal "ColorRed";
 				_control = _mccdialog displayCtrl MCC_MINIMAP;
-				_control ctrlMapAnimAdd [1, 0.3, getpos UMName];
+				_control ctrlMapAnimAdd [0.5, (ctrlMapScale ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl MCC_MINIMAP)), getpos UMName];
 				ctrlMapAnimCommit _control;
-				
-				if (! isnil "MCC_PIPcam") then {
-					if (MCC_PIPcam != ObjNull) then {
+
+				if (! isnil "MCC_PIPcam") then
+				{
+					if (MCC_PIPcam != ObjNull) then
+					{
 						MCC_PIPcam cameraEffect ["TERMINATE", "BACK"];
 						camDestroy MCC_PIPcam;
-						};
-				};
-					
-				MCC_PIPcam = "camera" camCreate getPos player;
-				waitUntil {MCC_PIPcam != ObjNull};
-				
-				MCC_PIPcam attachTo [vehicle (UMName),[10,15,10]]; // ->todo: grab this from a custom config
-				if(vehicle (UMName) isKindOf "Man") then {MCC_PIPcam  camSetFov 0.15} else {MCC_PIPcam  camSetFov 0.8}; 
-				MCC_PIPcam  camSetTarget vehicle (UMName);
-				MCC_PIPcam cameraEffect ["INTERNAL", "BACK", "rendertarget10"];
-				MCC_PIPcam camCommit 1; // commit Changes
-				
-				private ["_effectParams"];
-				_effectParams = switch (MCC_UMPIPView) do {
-					// Normal
-					case 0: {
-						[3, 1, 1, 1, 0.1, [0, 0.4, 1, 0.1], [0, 0.2, 1, 1], [0, 0, 0, 0]]
-					};
-					
-					// Night vision
-					case 1: {
-						[1]
-					};
-					
-					// Thermal imaging
-					case 2: {
-						[2]
 					};
 				};
-	
-				// Set effect
-				"rendertarget10" setPiPEffect _effectParams;
+
 				_control = _mccdialog displayCtrl MCC_UM_PIC;
 				[_control] call MCC_fnc_pipOpen;
+
+				MCC_PIPcam = "camera" camCreate getPos player;
+				waitUntil {alive MCC_PIPcam};
+
+				MCC_PIPcam attachTo [vehicle (UMName),[10,15,10]]; // ->todo: grab this from a custom config
+				if(vehicle (UMName) isKindOf "Man") then {MCC_PIPcam  camSetFov 0.15} else {MCC_PIPcam  camSetFov 0.8};
+				MCC_PIPcam  camSetTarget vehicle (UMName);
+				MCC_PIPcam cameraEffect ["INTERNAL", "BACK", "rendertarget10"];
+				MCC_PIPcam camCommit 0; // commit Changes
+
+				private ["_effectParams"];
+				_effectParams = switch (MCC_UMPIPView) do
+								{
+									// Normal
+									case 0:
+									{
+										[3, 1, 1, 1, 0.1, [0, 0.4, 1, 0.1], [0, 0.2, 1, 1], [0, 0, 0, 0]]
+									};
+
+									// Night vision
+									case 1:
+									{
+										[1]
+									};
+
+									// Thermal imaging
+									case 2:
+									{
+										[2]
+									};
+								};
+
+				sleep 0.1;
+				// Set effect
+				"rendertarget10" setPiPEffect _effectParams;
+				_control ctrlsettext"#(argb,512,512,1)r2t(rendertarget10,1.0);";
+				sleep 0.1;
 				_control ctrlsettext"#(argb,512,512,1)r2t(rendertarget10,1.0);";
 			};
 		};
-		
+
 		case 5:	//High command: Assighn Commander
 		{
-		if ((lbCurSel MCC_UM_LIST)>=0) then 
+		if ((lbCurSel MCC_UM_LIST)>=0) then
 			{
-			if (MCC_UMUnit==1) then 
+			if (MCC_UMUnit==1) then
 				{
 				hint "Only units can be assighned as high commanders";
-				} 
-				else 
+				}
+				else
 				{
 				UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST);
 				[[[netID UMName,UMName],0],"MCC_fnc_highCommand",true,false] call BIS_fnc_MP;
@@ -266,167 +274,127 @@ _type = _this select 0;
 
 		case 6:	//High command: Clear ALL groups
 		{
-		if ((lbCurSel MCC_UM_LIST)>=0) then 
+		if ((lbCurSel MCC_UM_LIST)>=0) then
 			{
-			if (MCC_UMUnit==0) then 
-				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)} 
+			if (MCC_UMUnit==0) then
+				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)}
 				else {UMName = leader (UMgroupNames select (lbCurSel MCC_UM_LIST))};
-			hint "cleared all High Command units"; 
+			hint "cleared all High Command units";
 			[[[netID UMName,UMName],1],"MCC_fnc_highCommand",true,false] call BIS_fnc_MP;
 			};
 		};
-		
+
 		case 7:	//High command: Add group
 		{
-		if ((lbCurSel MCC_UM_LIST)>=0) then 
+		if ((lbCurSel MCC_UM_LIST)>=0) then
 			{
-			if (MCC_UMUnit==0) then 
-				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)} 
+			if (MCC_UMUnit==0) then
+				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)}
 				else {UMName = leader (UMgroupNames select (lbCurSel MCC_UM_LIST))};
-			hint "Group Added"; 
+			hint "Group Added";
 			[[[netID UMName,UMName],2],"MCC_fnc_highCommand",true,false] call BIS_fnc_MP;
 			};
 		};
 
 		case 8:	//Multi-Selection
 		{
-			_params = _this select 1;
-
-			_ctrl = _params select 0;
-			_pressed = _params select 1;
-			_shift = _params select 4;
-			_ctrlKey = _params select 5;
-			
 			if (MCC_UMUnit==0) then // Units selection
 			{
-				if (_ctrlKey) then 
+				MCC_selectedUnits = [];
 				{
-					if !((MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)) in MCC_selectedUnits) then
-					{
-						MCC_selectedUnits = MCC_selectedUnits + [MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)];
-						lbSetColor [MCC_UM_LIST, (lbCurSel MCC_UM_LIST), [0, 1, 1, 1]];
-						//hint format ["%1", MCC_selectedUnits];						
-					} 
-					else 
-					{
-						MCC_selectedUnits = MCC_selectedUnits - [MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)];
-						lbSetColor [MCC_UM_LIST, (lbCurSel MCC_UM_LIST), [1, 1, 1, 1]];
-						//hint format ["%1", MCC_selectedUnits];
-					};
-				} 
-				else 
-				{
-					MCC_selectedUnits = [MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)];
-					for [{_x=0},{_x<(lbSize MCC_UM_LIST)},{_x=_x+1}] do {
-						lbSetColor [MCC_UM_LIST, _x, [1, 1, 1, 1]];
-						}
-					lbSetColor [MCC_UM_LIST, (lbCurSel MCC_UM_LIST), [0, 1, 1, 1]];
-					//hint format ["%1", MCC_selectedUnits];
-				};
-			};
-						
-			if (MCC_UMUnit==1) then // Groups selection
+					MCC_selectedUnits set [count MCC_selectedUnits, MCC_UMunitsNames select _x];
+				} foreach _indices;
+			}
+			else
 			{
-				if (_ctrlKey && ((lbCurSel MCC_UM_LIST) != -1)) then 
+				MCC_selectedUnits = [];
 				{
-					if !((UMgroupNames select (lbCurSel MCC_UM_LIST)) in MCC_selectedUnits) then
-					{
-						MCC_selectedUnits = MCC_selectedUnits + [UMgroupNames select (lbCurSel MCC_UM_LIST)];
-						lbSetColor [MCC_UM_LIST, (lbCurSel MCC_UM_LIST), [0, 1, 1, 1]];
-					} 
-					else 
-					{
-						MCC_selectedUnits = MCC_selectedUnits - [UMgroupNames select (lbCurSel MCC_UM_LIST)];
-						lbSetColor [MCC_UM_LIST, (lbCurSel MCC_UM_LIST), [1, 1, 1, 1]];
-					};
-				}
-				else 
-				{
-					MCC_selectedUnits = [UMgroupNames select (lbCurSel MCC_UM_LIST)];
-					for [{_x=0},{_x<(lbSize MCC_UM_LIST)},{_x=_x+1}] do 
-					{
-						lbSetColor [MCC_UM_LIST, _x, [1, 1, 1, 1]];
-					};  //MCC BUG -> missing ;
-					lbSetColor [MCC_UM_LIST, (lbCurSel MCC_UM_LIST), [0, 1, 1, 1]];
-					//hint format ["%1", MCC_selectedUnits];
-				};
+					MCC_selectedUnits set [count MCC_selectedUnits, UMgroupNames select _x];
+				} foreach _indices;
 			};
 		};
-		
+
 		case 9:	//HALO
 		{
+			/*
 			hint "click on the map to start the Parachute";
-			MCC_click = false; 
+			MCC_click = false;
 			onMapSingleClick " 	hint format ['%1 Paradroped', MCC_UMunitsNames];
 								MCC_pos = _pos;
-								MCC_click = true; 
+								MCC_click = true;
 								onMapSingleClick """";";
-			waituntil {MCC_click}; 					
-			if (MCC_UMUnit==0) then {
-				{
-					[[MCC_pos,[netId _x,_x],true,5000,_forEachIndex],"MCC_fnc_paradrop",_x,false] call BIS_fnc_MP;
-					sleep 0.5; 
-				} foreach MCC_selectedUnits;
-					} else {
-							{
-								{
-									[[MCC_pos,[netId _x,_x],true,5000,_forEachIndex],"MCC_fnc_paradrop",_x,false] call BIS_fnc_MP;
-									sleep 0.5; 
-								} foreach units _x;
-							} foreach MCC_selectedUnits;
-						};
-		};
-				
-		case 10:	//Parachute
-		{
-			hint "click on the map to start the Parachute";
-			MCC_click = false; 
-			onMapSingleClick " 	hint format ['%1 Paradroped', MCC_UMunitsNames];
-								MCC_pos = _pos;
-								MCC_click = true; 
-								onMapSingleClick """";";
-			waituntil {MCC_click}; 					
-			if (MCC_UMUnit==0) then 
+			waituntil {MCC_click};
+			if (MCC_UMUnit==0) then
 			{
 				{
-					[[MCC_pos,[netId _x,_x],false,800,_forEachIndex],"MCC_fnc_paradrop",_x,false] call BIS_fnc_MP;
-					sleep 0.5; 
+					[[MCC_pos,[netId _x,_x],true,5000,_forEachIndex],"MCC_fnc_paradrop",_x,false] call BIS_fnc_MP;
+					sleep 0.5;
 				} foreach MCC_selectedUnits;
-			} 
-			else 
+			}
+			else
 			{
 				{
 					{
-						[[MCC_pos,[netId _x,_x],false,800,_forEachIndex],"MCC_fnc_paradrop",_x,false] call BIS_fnc_MP;
-						sleep 0.5; 
+						[[MCC_pos,[netId _x,_x],true,5000,_forEachIndex],"MCC_fnc_paradrop",_x,false] call BIS_fnc_MP;
+						sleep 0.5;
 					} foreach units _x;
 				} foreach MCC_selectedUnits;
 			};
+			*/
+			MCC_UMparadropIsHalo = 2; //HALO
+			MCC_UMParadropRequestMarker = true;
+			hint "click and dragto start the Drop";
 		};
-		
+
+		case 10:	//Parachute
+		{
+			_answer = ["<t font='TahomaB'>Parachut or drop-pods?</t>","","Parachut","Drop-pods"] call BIS_fnc_guiMessage;
+			waituntil {!isnil "_answer"};
+			if (_answer) then {
+				MCC_UMparadropIsHalo = 0; //Drop pods
+			} else {
+				MCC_UMparadropIsHalo = 1; //Parachute
+			};
+			MCC_UMParadropRequestMarker = true;
+			hint "click and dragto start the Drop";
+		};
+
 		case 11:	//Broadcast
 		{
 			hint "Live feed is broadcasting";
-			if (MCC_UMUnit==0) then 
-				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)} 
+			if (MCC_UMUnit==0) then
+				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)}
 				else {UMName = leader (UMgroupNames select (lbCurSel MCC_UM_LIST))};
 			[[[netid UMName,UMName], MCC_UMPIPView],"MCC_fnc_broadcast",true,false] spawn BIS_fnc_MP;
 		};
-		
+
 		case 12:	//Delete
 		{
-			if (MCC_UMUnit==0) then 
+			if (!dialog || (count MCC_selectedUnits == 0 && isnil "MCC_GroupGenGroupSelected")) exitWith {}; //For some reason when closing MCC it fire type = 12
+			if (MCC_UMUnit==0) then
+			{
 				{
-					{while {!(isnull _x) && !(isplayer _x)} do {deletevehicle vehicle _x}} foreach MCC_selectedUnits;
-					} else {
-						{{while {!(isnull _x) && !(isplayer _x)} do {deletevehicle vehicle _x};}foreach units _x} foreach MCC_selectedUnits;
-						};
+					while {!(isnull _x) && !(isplayer _x)} do {deletevehicle vehicle _x; sleep 0.1};
+				} foreach MCC_selectedUnits;
+			}
+			else
+			{
+				private ["_units"];
+				//Do we delete because we have pushed the delete button?
+				_units = if (MCC_UMUnit==3) then {MCC_GroupGenGroupSelected} else {MCC_selectedUnits};
+
+				{
+					{
+						while {!(isnull _x) && !(isplayer _x)} do {deletevehicle vehicle _x; sleep 0.1};
+					} foreach units _x
+				} foreach _units;
+			};
 		};
-		
+
 		case 13:	//Join
 		{
-			hint "Click on the unit or group to select it then click on the unit or group you want it to join to"; 
-			if (MCC_UMUnit==0) then 
+			hint "Click on the unit or group to select it then click on the unit or group you want it to join to";
+			if (MCC_UMUnit==0) then
 				{
 					UMJoin=  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST);
 					} else {
@@ -434,104 +402,83 @@ _type = _this select 0;
 						};
 			MCC_UMisJoining = true;
 		};
-		
+
 		case 14:	//Parachute
 		{
-			hint "Units paracuted"; 
-			if (MCC_UMUnit==0) then 
+			hint "Units paracuted";
+			if (MCC_UMUnit==0) then
 				{
 					{while {!(isnull _x) && !(isplayer _x)} do {deletevehicle vehicle _x}} foreach MCC_selectedUnits;
 					} else {
 						{while {!(isnull _x) && !(isplayer _x)} do {deletevehicle vehicle _x};}foreach units MCC_selectedUnits;
 						};
 		};
-		
+
+		case 15:	//Kick
+		{
+			if (MCC_UMUnit==0) then
+			{
+				if (count MCC_selectedUnits > 1) then
+				{
+					systemchat "Select a single player unit";
+				}
+				else
+				{
+					if (isPlayer (MCC_selectedUnits select 0)) then
+					{
+						private ["_answer","_name","_playerUID"];
+						_name 		= name (MCC_selectedUnits select 0);
+						_playerUID	= getPlayerUID (MCC_selectedUnits select 0);
+						_answer = [format ["<t font='TahomaB'>Are you sure you want to kick %1?</t>",_name],"Kick Player" ,nil,true] call BIS_fnc_guiMessage;
+						waituntil {!isnil "_answer"};
+						if (_answer) then
+						{
+							 serverCommand format["#kick %1",_playerUID];
+							 systemchat format["%1 has been kicked from the server",_name];
+						};
+					};
+				};
+			}
+			else
+			{
+				systemchat "Select a single player unit";
+			};
+		};
+
+		case 16:	//Ban
+		{
+			if (MCC_UMUnit==0) then
+			{
+				if (count MCC_selectedUnits > 1) then
+				{
+					systemchat "Select a single player unit";
+				}
+				else
+				{
+					if (isPlayer (MCC_selectedUnits select 0)) then
+					{
+						private ["_answer","_name","_playerUID"];
+						_name 		= name (MCC_selectedUnits select 0);
+						_playerUID	= getPlayerUID (MCC_selectedUnits select 0);
+						_answer = [format ["<t font='TahomaB'>Are you sure you want to ban %1?</t>",_name],"Ban Player" ,nil,true] call BIS_fnc_guiMessage;
+						waituntil {!isnil "_answer"};
+						if (_answer) then
+						{
+							 serverCommand format["#exec ban %1",_playerUID];
+							 serverCommand format["#kick %1",_playerUID];
+							 systemchat format["%1 has been ban from the server",_name];
+						};
+					};
+				};
+			}
+			else
+			{
+				systemchat "Select a single player unit";
+			};
+		};
+
 		default //default - no match
 		{
 			player globalchat format ["Access Denied: type %1", _type];
 		};
 	};
-	
-
-if (_type == 8 || _type == 4) exitWIth {}; // Fail safe for loading list only if unit deleted or houn other
-//-------------------------------Reset list managment--------------------------------------------------------------------------------------------------------------
-MCC_UMunitsNames = [];
-UMgroupNames = [];
-_comboBox = _mccdialog displayCtrl MCC_UM_LIST;
-lbClear _comboBox;
-if (MCC_UMstatus == 0) then //player
-	{
-		if (MCC_UMUnit==0) then 
-			{
-				{
-				if ((isPlayer _x) && (alive _x)) then	//unit
-					{
-						_displayname = name _x;
-						_comboBox lbAdd _displayname;
-						MCC_UMunitsNames = MCC_UMunitsNames + [_x];
-					};
-				} forEach  allUnits;
-			} else
-				{
-					{
-					if (isPlayer (leader _x)) then	//group
-						{
-							_displayname =  format ["%1", _x];
-							_comboBox lbAdd _displayname;
-							UMgroupNames = UMgroupNames + [_x];
-						};
-					} forEach  allgroups;
-				};
-	};
-	
-switch (MCC_UMstatus) do
-{
-	case 1:		
-	{
-		_side = east;
-	};
-	
-	case 2:		
-	{
-		_side = west;
-	};
-	
-	case 3:		
-	{
-		_side = resistance;
-	};
-	
-	default
-	{
-		_side = civilian;
-	};
-};
-
-if (MCC_UMUnit==0) then 
-{
-	{
-		if ( (alive _x) && ( (side _x) == _side ) && !(isPlayer _x) ) then	//Unit
-		{
-			_displayname = getText (configfile >> "CfgVehicles" >> typeOf (vehicle _x)  >> "displayName"); 
-			if ((_x != vehicle _x) && ((driver (vehicle _x))==_x)) then {_displayname = format ["%1 (Driver)",_displayname]};
-			if ((_x != vehicle _x) && ((gunner (vehicle _x))==_x)) then {_displayname =  format ["%1 (Gunner)",_displayname]};
-			if ((_x != vehicle _x) && ((commander (vehicle _x))==_x)) then {_displayname =  format ["%1 (Commander)",_displayname]};
-			_comboBox lbAdd _displayname;
-			MCC_UMunitsNames = MCC_UMunitsNames + [_x];
-		};
-	} forEach allUnits;
-} 
-else
-{
-	{
-		if ((side (leader _x) == _side) && !(isPlayer leader _x)) then	//group
-		{
-			_displayname =  format ["%1", _x];
-			_comboBox lbAdd _displayname;
-			UMgroupNames = UMgroupNames + [_x];
-		};
-	} forEach  allgroups;
-};	
-
-
-	

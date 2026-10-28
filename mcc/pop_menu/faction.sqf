@@ -10,5 +10,4 @@ if (MCC_faction_index != (lbCurSel MCC_FACTION)) then	{
 
 
 
- 
-		
+

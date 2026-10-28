@@ -4,8 +4,8 @@ private ["_mccdialog","_comboBox","_displayname","_pic", "_index","_planeName","
 // Version: 1.1 (April 2013)
 #define mcc_playerConsole2_IDD 5000
 
-#define MCC_CONSOLE_UAVPIP 9106 
-#define MCC_CONSOLE_UAVMISSILELEFTTEXT 9107  
+#define MCC_CONSOLE_UAVPIP 9106
+#define MCC_CONSOLE_UAVMISSILELEFTTEXT 9107
 #define MCC_CONSOLE_UAVPIP_BCKG 9108
 #define MCC_CONSOLE_UAV_MISSILE_COUNT 9110
 #define MCC_CONSOLE_VISION_TEXT 9111
@@ -46,7 +46,7 @@ ctrlShow [MCC_CONSOLE_AC_MAP,false];
 
 ctrlSetText [MCC_CONSOLE_UAVPIP, ""];
 _time = time + (1);
-while {_time > time && dialog} do {
+while {_time > time && (str (finddisplay mcc_playerConsole2_IDD) != "no display")} do {
 	_message = "";
 	_messageFinal = ["C","o","n","n","e","c","t","i","n","g"," ","D","R","O","N","E",".",".",".","."];
 	for "_i" from 0 to (count _messageFinal - 1) do {
@@ -55,16 +55,15 @@ while {_time > time && dialog} do {
 		sleep 0.05;
 	};
 };
-	
-if (dialog && (isnil "MCC_ConolseUAV") && MCC_Console2Open) exitWith {
-	ctrlSetText [MCC_CONSOLE_UAVPIP_BCKG, "No UAV signal found, connection failed"];
-	};
 
-if (dialog &&!alive MCC_ConolseUAV && MCC_Console2Open) exitWith {
-	ctrlSetText [MCC_CONSOLE_UAVPIP_BCKG, "UAV signal lost, connection failed"];
+if ((str (finddisplay mcc_playerConsole2_IDD) == "no display") || (isNull (missionNamespace getVariable ["MCC_ConolseUAV",objNull]))) exitWith {
+	if (missionNamespace getVariable ["MCC_Console2Open",false]) then {
+		ctrlSetText [MCC_CONSOLE_UAVPIP_BCKG, "No UAV signal found, connection failed"];
 	};
-	
-if (dialog && (alive MCC_ConolseUAV) && MCC_Console2Open) then {				//Create the UAV
+};
+
+//Create the UAV
+if ((str (finddisplay mcc_playerConsole2_IDD) != "no display") && (alive MCC_ConolseUAV) && MCC_Console2Open) then {
 	//Get rid of the connecting text
 	ctrlSetText [MCC_CONSOLE_UAVPIP_BCKG, ""];
 	_control = _mccdialog displayCtrl MCC_CONSOLE_UAVPIP;
@@ -75,36 +74,37 @@ if (dialog && (alive MCC_ConolseUAV) && MCC_Console2Open) then {				//Create the
 		MCC_fakeUAV 		= "Camera" camCreate [10,10,10];
 		if (!isnil "MCC_fakeUAVCenter") then {deletevehicle MCC_fakeUAVCenter};
 		MCC_fakeUAVCenter	= "Sign_Sphere10cm_F" createvehicle [((getpos MCC_ConolseUAV) select 0),(getpos MCC_ConolseUAV) select 1, 0];
-		hideobject MCC_fakeUAVCenter;
+		[[[netid MCC_fakeUAVCenter,MCC_fakeUAVCenter], "_this hideObjectGlobal true"], "MCC_fnc_setVehicleInit", false, false] spawn BIS_fnc_MP;
 		MCC_fakeUAV cameraEffect ["INTERNAL", "BACK", "rendertarget9"];
 		MCC_fakeUAVFOV = 0.6;
 		MCC_fakeUAV camsetTarget MCC_fakeUAVCenter;
 		MCC_fakeUAV camsetFOV MCC_fakeUAVFOV;
 		MCC_fakeUAV camCommit 0;
-	};
-	
+};
+
 	ctrlSetText [MCC_CONSOLE_ZOOM_TEXT, format ["ZOOM X %1",(10-(10*MCC_fakeUAVFOV))]];
 	ctrlSetText [MCC_CONSOLE_VISION_TEXT, MCC_ConsoleUAVvision];
-	
-	//Check Ammo 
+
+	//Check Ammo
 	MCC_ConsoleUAVmissiles = ["",0,""];
-	if ("6Rnd_LG_scalpel" in (MCC_ConolseUAV magazinesTurret [-1])) then {MCC_ConsoleUAVmissiles = ["AGM",(driver MCC_ConolseUAV) ammo "missiles_SCALPEL","missiles_SCALPEL","M_Scalpel_AT"]};
-	if ("2Rnd_GBU12_LGB" in (MCC_ConolseUAV magazinesTurret [-1])) then {MCC_ConsoleUAVmissiles = ["GBU",(driver MCC_ConolseUAV) ammo "GBU12BombLauncher","GBU12BombLauncher","Bo_GBU12_LGB"]};
+	if ("6Rnd_LG_scalpel" in (MCC_ConolseUAV magazinesTurret [0])) then {MCC_ConsoleUAVmissiles = ["AGM",(MCC_ConolseUAV) ammo "missiles_SCALPEL","missiles_SCALPEL","M_Scalpel_AT"]};
+	if ("2Rnd_GBU12_LGB" in (MCC_ConolseUAV magazinesTurret [0])) then {MCC_ConsoleUAVmissiles = ["GBU",(MCC_ConolseUAV) ammo "GBU12BombLauncher","GBU12BombLauncher","Bo_GBU12_LGB"]};
 	if ((MCC_ConsoleUAVmissiles select 0) != "") then {ctrlSetText [MCC_CONSOLE_UAV_MISSILE_COUNT, format ["%1 #: %2",MCC_ConsoleUAVmissiles select 0,MCC_ConsoleUAVmissiles select 1]]};
-	
-	switch (MCC_ConsoleUAVCameraMod) do {
+
+	switch (MCC_ConsoleUAVCameraMod) do
+	{
 		// Normal
 		case 0: {
-			_effectParams = [3, 1, 1, 1, 0.1, [0, 0.4, 1, 0.1], [0, 0.2, 1, 1], [0, 0, 0, 0]];
+			_effectParams = [3,1,1,0.4,0,[0,0,0,0],[1,1,1,0],[1,1,1,1]];
 			MCC_ConsoleUAVvision = "VIDEO";
 		};
-		
+
 		// Night vision
 		case 1: {
 			_effectParams = [1];
 			MCC_ConsoleUAVvision = "N/V";
 		};
-		
+
 		// Thermal imaging
 		case 2: {
 			_effectParams = [2];
@@ -119,39 +119,40 @@ if (dialog && (alive MCC_ConolseUAV) && MCC_Console2Open) then {				//Create the
 	ctrlShow [MCC_CONSOLE_COMPASS_W,true];
 	ctrlShow [MCC_CONSOLE_AC_MAP,true];
 	ctrlShow [MCC_CONSOLEUAVTAKECONTROL,true];
-	
-	if (MCC_ConolseUAV iskindof "AIR") then 				//Show flight hight slider
-		{
-			private ["_alt"];
-			ctrlShow [MCC_CONSOLEUAVFLIGHTHIGHT,true];
-			ctrlShow [MCC_CONSOLEUAVFLIGHTHIGHTTEXT,true];
-		
-			if (MCC_ConolseUAV iskindof "Plane") then 
-				{
-					sliderSetRange [MCC_CONSOLEUAVFLIGHTHIGHT, 300, 1500];
-					_alt = if (((getpos MCC_ConolseUAV) select 2) > 1500) then {1500} else {(getpos MCC_ConolseUAV) select 2};
-				};
-			if (MCC_ConolseUAV iskindof "Helicopter") then 
-				{
-					sliderSetRange [MCC_CONSOLEUAVFLIGHTHIGHT, 1, 500];
-					_alt = if (((getpos MCC_ConolseUAV) select 2) > 500) then {500} else {(getpos MCC_ConolseUAV) select 2};
-				};
-			sliderSetPosition [MCC_CONSOLEUAVFLIGHTHIGHT, _alt];
-			//(_mccdialog displayCtrl MCC_CONSOLEUAVFLIGHTHIGHT) ctrlSetTooltip format ["%1 Meters",sliderPosition MCC_CONSOLEUAVFLIGHTHIGHT];
-		};
+
+	//Show flight hight slider
+	if (MCC_ConolseUAV iskindof "AIR") then {
+		private ["_alt"];
+		ctrlShow [MCC_CONSOLEUAVFLIGHTHIGHT,true];
+		ctrlShow [MCC_CONSOLEUAVFLIGHTHIGHTTEXT,true];
+
+		if (MCC_ConolseUAV iskindof "Plane") then
+			{
+				sliderSetRange [MCC_CONSOLEUAVFLIGHTHIGHT, 300, 1500];
+				_alt = if (((getpos MCC_ConolseUAV) select 2) > 1500) then {1500} else {(getpos MCC_ConolseUAV) select 2};
+			};
+		if (MCC_ConolseUAV iskindof "Helicopter") then
+			{
+				sliderSetRange [MCC_CONSOLEUAVFLIGHTHIGHT, 1, 500];
+				_alt = if (((getpos MCC_ConolseUAV) select 2) > 500) then {500} else {(getpos MCC_ConolseUAV) select 2};
+			};
+		sliderSetPosition [MCC_CONSOLEUAVFLIGHTHIGHT, _alt];
+		//(_mccdialog displayCtrl MCC_CONSOLEUAVFLIGHTHIGHT) ctrlSetTooltip format ["%1 Meters",sliderPosition MCC_CONSOLEUAVFLIGHTHIGHT];
+	};
+
 	//Handle on screen data
 	[] spawn {
 		private ["_structured","_data","_mccdialog","_relPos"];
 		disableSerialization;
-		
-		while {MCC_Console2Open && dialog && alive MCC_ConolseUAV} do {
+
+		while {MCC_Console2Open && (str (finddisplay mcc_playerConsole2_IDD) != "no display") && alive MCC_ConolseUAV} do {
 			_relPos = if (MCC_ConolseUAV iskindof "AIR") then {-0.2} else {3};
 			MCC_fakeUAV camsetpos [(getpos MCC_ConolseUAV) select 0,(getpos MCC_ConolseUAV) select 1, ((getpos MCC_ConolseUAV) select 2)+_relPos];
 			MCC_fakeUAV camsetTarget MCC_fakeUAVCenter;
 			MCC_fakeUAV camcommit 0.01;
 			_mccdialog = findDisplay mcc_playerConsole2_IDD;
 			_structured = composeText [""];
-			_data = 
+			_data =
 				[
 				format ["Time:  %1:%2",[date select 3]call MCC_fnc_time2string,[date select 4]call MCC_fnc_time2string],
 				format ["Elapsed:  %1",[time]call MCC_fnc_time],
@@ -164,27 +165,29 @@ if (dialog && (alive MCC_ConolseUAV) && MCC_Console2Open) then {				//Create the
 			{_structured = composeText [_structured,_x,lineBreak]} forEach _data;
 			(_mccdialog displayctrl MCC_CONSOLE_TIME_TEXT) ctrlSetStructuredText _structured;
 			ctrlSetText [MCC_CONSOLE_DIR_TEXT, format ["Dir:%1",floor (getdir MCC_fakeUAV)]];
-			
+
 			//Compass
-			for [{_i = 0;_j = 0},{_i < 360;_j < 4},{_i = _i + 90;_j = _j + 1}] do 
+			for [{_i = 0;_j = 0},{_i < 360;_j < 4},{_i = _i + 90;_j = _j + 1}] do
 			{
 				_x = (0.476 + sin(_i - (getdir MCC_fakeUAV))*(SafeZoneW/8 - SafeZoneW/200));
 				_y = (0.42 - cos(_i - (getdir MCC_fakeUAV))*(SafeZoneH/8 - SafeZoneH/200));
-				
+
 				(_mccdialog displayCtrl 9116+_j) ctrlSetPosition [_x,_y];
 				(_mccdialog displayCtrl 9116+_j) ctrlCommit 0;
 
 			};
 			sleep 0.01;
 		};
-		if (!isnil "MCC_fakeUAV") then
-			{
-				MCC_fakeUAV cameraEffect ["TERMINATE", "BACK"];
-				camdestroy MCC_fakeUAV;
-				MCC_fakeUAV = nil; 
-			};
+
+		//Cleanup
+		if (!isnil "MCC_fakeUAV") then {
+			MCC_fakeUAV cameraEffect ["TERMINATE", "BACK"];
+			camdestroy MCC_fakeUAV;
+			MCC_fakeUAV = nil;
+			[(_mccdialog displayctrl MCC_CONSOLE_UAVPIP)] call MCC_fnc_pipOpen;
+			_null = [1] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf",MCC_path];
+		};
 	};
-	
+
 };
 
-		

@@ -1,55 +1,165 @@
-private ["_mccdialog","_comboBox","_displayname","_pic", "_index", "_array", "_class"];
+private ["_mccdialog","_comboBox","_displayname","_pic", "_index", "_array", "_class","_side","_html","_zone","_markerlabel"];
 // By: Shay_gman
 // Version: 1.1 (April 2012)
 #define groupGen_IDD 2994
 #define MCC_MINIMAP 9000
-
 #define MCC_FACTION 8008
-#define UNIT_TYPE 3010
-#define UNIT_CLASS 3011
-#define MCC_GroupGenCurrentGroup_IDD 9003
 
-#define MCC_GroupGenInfoText_IDC 9013
-#define MCC_GroupGenWPBckgr_IDC 9014
-#define MCC_GroupGenWPCombo_IDC 9015
-#define MCC_GroupGenWPformationCombo_IDC 9016
-#define MCC_GroupGenWPspeedCombo_IDC 9017
-#define MCC_GroupGenWPbehaviorCombo_IDC 9018
-#define MCC_GroupGenWPAdd_IDC 9019
-#define MCC_GroupGenWPReplace_IDC 9020
-#define MCC_GroupGenWPClear_IDC 9021
+#define MCCMISSIONMAKERNAME 1020
+#define MCCCLIENTFPS 1021
+#define MCCSERVERFPS 1022
+#define MCC_GroupGenInfo_IDC 530
 
+#define MCCSTOPCAPTURE 1014
+
+#define MCC_UM_LIST 3069
+#define MCC_UM_PIC 3070
+#define MCC_UM_KICK 3076
+#define MCC_UM_BAN 3077
 
 disableSerialization;
+MCC_mcc_screen = 2;	//Group gen for poping up the same menu again
 
-ctrlShow [MCC_GroupGenInfoText_IDC,false];
-ctrlShow [MCC_GroupGenWPBckgr_IDC,false];
-ctrlShow [MCC_GroupGenWPCombo_IDC,false];
-ctrlShow [MCC_GroupGenWPformationCombo_IDC,false];
-ctrlShow [MCC_GroupGenWPspeedCombo_IDC,false];
-ctrlShow [MCC_GroupGenWPbehaviorCombo_IDC,false];
-ctrlShow [MCC_GroupGenWPAdd_IDC,false];
-ctrlShow [MCC_GroupGenWPReplace_IDC,false];
-ctrlShow [MCC_GroupGenWPClear_IDC,false];
+//Clear old data
+missionNamespace setVariable ["MCC_selectedUnits",[]];
+missionNamespace setVariable ["MCC_GroupGenGroupSelected",[]];
+
+uiNamespace setVariable ["MCC_groupGen_Dialog", _this select 0];
+
+//Add delete button
+(findDisplay groupGen_IDD) displayAddEventHandler ["KeyUp",format ["if (_this select 1 == 211) then {MCC_UMUnit = 3; null = [12] execVM '%1mcc\general_scripts\unitManage\um.sqf'};",MCC_path]];
+
+//Assign as Curator on init
+if (player != getAssignedCuratorUnit MCC_curator) then {[compile format ["objectFromNetId '%1' assignCurator MCC_curator;", netid player],"BIS_fnc_spawn",false,false] spawn BIS_fnc_MP};
+
+//Track units if enabled
+if (MCC_trackMarker) then {
+	MCC_trackMarkerHandler = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 9000) ctrladdeventhandler ["draw","_this call MCC_fnc_trackUnits;"];
+};
+
+//Hide GroupWP
+ctrlShow [510,false];
+ctrlShow [MCC_GroupGenInfo_IDC,false];
+
+//Show zones
+{str _x setMarkerAlphaLocal 0.4;(format["LABEL_%1",_x]) setMarkerAlphaLocal 0.3;} foreach (missionNamespace getVariable ["MCC_zones_numbers",[]]);
+
+//Hide admin buttons for no-admins
+if !(serverCommandAvailable "#kick") then {
+	ctrlShow [MCC_UM_KICK,false];
+	ctrlShow [MCC_UM_BAN,false];
+};
+
+for "_i" from 500 to 518 step 1 do {
+	((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl _i) ctrlShow false;
+};
+
+if (missionNamespace getVariable ["CP_activated",false]) then {
+	ctrlsettext [520,"Disable Roles"];
+} else {
+	ctrlsettext [520,"Enable Roles"];
+};
+
+if (missionNamespace getVariable ["MCC_GAIA_AC",false]) then {
+	ctrlsettext [1015,"Ambient Warzone(on)"];
+} else {
+	ctrlsettext [1015,"Ambient Warzone(off)"];
+};
+
+//Capture
+if !(missionNamespace getVariable ["MCC_capture_state",false]) then { ctrlEnable [MCCSTOPCAPTURE,false];};
+
+//Respawn
+if !(missionNamespace getVariable ["MCC_enable_respawn",false]) then {((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 2) ctrlEnable false};
+
+//Mission Maker
+ctrlSetText [MCCMISSIONMAKERNAME, format["%1",mcc_missionmaker]];
 
 _mccdialog = findDisplay groupGen_IDD;
-MCC_groupGenCurrenGroupArray = []; 		//Reset the current group
+
 _comboBox = _mccdialog displayCtrl MCC_FACTION; //fill combobox CFG factions
 lbClear _comboBox;
-	{
-		_displayname = format ["%1(%2)",_x select 0,_x select 1];
-		_comboBox lbAdd _displayname;
-	} foreach U_FACTIONS;
+{
+	_displayname = format ["%1(%2)",_x select 0,_x select 1];
+	_comboBox lbAdd _displayname;
+} foreach U_FACTIONS;
 _comboBox lbSetCurSel MCC_faction_index;
 
-_comboBox = _mccdialog displayCtrl UNIT_TYPE;		//fill combobox CFG unit
+//-------------------------------------------- GAIA --------------------------------------------------------------------------------------------------
+_comboBox =((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 1);
 lbClear _comboBox;
 {
-	_displayname =  _x;
+	_displayname = format ["%1",_x select 0];
 	_index = _comboBox lbAdd _displayname;
-} foreach ["Infantry", "Vehicles", "Tracked", "Motorcycle", "Helicopter", "Fixed-wing", "Ship"];
-_comboBox lbSetCurSel MCC_class_index;
+} foreach MCC_GAIA_spawn_behaviors;
+_comboBox lbSetCurSel 0;
+
+//------------------------------------------- ZONES --------------------------------------------------------------------------------------------------
+_comboBox = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 1023); //fill combobox zone's numbers
+lbClear _comboBox;
+{
+	_displayname = format ["%1",_x];
+	_comboBox lbAdd _displayname;
+} foreach (missionNamespace getVariable ["MCC_zones_numbers",[]]);
+_comboBox lbSetCurSel MCC_zone_index;
+
+//------------------------------------------- Tooltip --------------------------------------------------------------------------------------------------
+_comboBox = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 303); //fill combobox zone's numbers
+
+_html = "<t color='#fefefe' size='1' shadow='1' align='center' underline='true'>HELP:</t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Scroll down this menu to get help. </t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Open 3D Editor: ALT + LMB on map. </t><br/><br/>";
+_html = _html + "<t color='#fefefe' size='1' shadow='1' align='center' underline='true'>GROUPS: </t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Assign Waypoint: Select a group and double Click on map. </t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Assign Quick Waypoint: Select groups hold Ctrl + double Click on map. </t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Groups' multi-select: Hold and drag on map. </t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Group Info:  Righ Click on Group's icon. </t><br/><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Delete Selected Groups: Press the Delete button </t><br/><br/>";
+_html = _html + "<t color='#fefefe' size='1' shadow='1' align='center' underline='true'>ZONES: </t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Select Zone: Left Click on Zone's icon.</t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Move Zone: Click on Zone's icon and drag.</t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Resize Zone: Shift + click on Zone's icon and drag.</t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Rotate Zone: Ctrl + click on Zone's icon and rotate. </t><br/><br/>";
+_html = _html + "<t color='#fefefe' size='1' shadow='1' align='center' underline='true'>IED: </t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Manual Detonate: Ctrl + Left mouse button on an IED icon.</t><br/>";
+_html = _html + "<t color='#fefefe' size='0.8' shadow='1' align='left' underline='false'>* Sync IEDs: Drag a line between two IEDs while holding Shift + Left mouse button.</t><br/>";
+
+_comboBox ctrlSetStructuredText parseText _html;
+
+//Is it first time we around? Let's respawn the zone markers if they are available
+if (isnil "MCCFirstOpenUI") then
+{
+	MCCFirstOpenUI = false;
+
+	sleep 1;
+	//Loose mission maker when DC move to after login
+	[] call MCC_fnc_createMCCZones;
+};
 
 //----------------------------------------------------------- GROUPs ----------------------------------------------------------------------------
-	
-[] call MCC_fnc_groupGenRefresh; 	
+
+[] spawn MCC_fnc_groupGenRefresh;
+
+//-------------------------------------------------FPS Loop  -----------------------------
+while {(str (finddisplay groupGen_IDD) != "no display")} do {
+	MCC_clientFPS  = round(diag_fps);
+	ctrlSetText [MCCCLIENTFPS, format["%1",MCC_clientFPS]];
+
+	if (isnil "mcc_fps_running") then {mcc_fps_running = false};
+	if !(mcc_fps_running) then {
+		[[1],"MCC_fnc_FPS",true,false] spawn BIS_fnc_MP;
+		sleep 0.5;
+	};
+
+	if !( MCC_isHC ) then {
+		ctrlSetText [MCCSERVERFPS, format["%1",MCC_serverFPS]];
+	} else {
+		ctrlSetText [MCCSERVERFPS, format[" %1 - HC FPS: %2", MCC_serverFPS, MCC_hcFPS]];
+	};
+	sleep 1;
+};
+
+//Hide zones
+{str _x setMarkerAlphaLocal 0;(format["LABEL_%1",_x]) setMarkerAlphaLocal 0;} foreach (missionNamespace getVariable ["MCC_zones_numbers",[]]);
+
+//------------------------------------------------------------------------------------------

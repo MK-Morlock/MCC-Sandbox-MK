@@ -1,13 +1,15 @@
-private ["_bool"];
+private ["_uav"];
 
 if (isnil "MCC_ConolseUAV") exitWith {};
-if (!alive MCC_ConolseUAV) exitWith {}; 
+if (!alive MCC_ConolseUAV) exitWith {};
 
-_bool = player connectTerminalToUav MCC_ConolseUAV;
+while {dialog} do {closeDialog 0};
 
-if (_bool) then {player action ["SwitchToUAVDriver", MCC_ConolseUAV]}; 
-while {dialog} do {closedialog  0}; 
+_uav = MCC_ConolseUAV;
+player action ["SwitchToUAVGunner",_uav];
 
-
-	
-	
+/*
+player remoteControl gunner _uav;
+gunner _uav switchCamera "Internal";
+player remoteControl gunner _uav;
+*/

@@ -1,5 +1,4 @@
-private ["_mccdialog","_comboBox","_displayname","_time", "_index","_message","_messageFinal","_type",
-		 "_insetionArray","_control","_data","_rad","_alt","_coords","_effectParams"];
+private ["_mccdialog","_comboBox","_displayname","_time", "_index","_message","_messageFinal","_type","_insetionArray","_control","_data","_rad","_alt","_coords","_effectParams","_leftDownPos","_uav","_ammoLeft"];
 // By: Shay_gman
 // Version: 1.1 (April 2013)
 #define mcc_playerConsole3_IDD 5010
@@ -22,6 +21,8 @@ private ["_mccdialog","_comboBox","_displayname","_time", "_index","_message","_
 #define MCC_MINIMAP 9120
 #define MCC_CONSOLE_AC_MAP 5022
 
+#define MCC_CONSOLEUAVFLIGHTHIGHT 9121
+
 disableSerialization;
 _mccdialog = findDisplay mcc_playerConsole3_IDD;
 MCC_Console1Open = false;
@@ -35,36 +36,45 @@ ctrlShow [MCC_CONSOLE_COMPASS_E,false];
 ctrlShow [MCC_CONSOLE_COMPASS_S,false];
 ctrlShow [MCC_CONSOLE_COMPASS_W,false];
 ctrlShow [MCC_MINIMAP,false];
+
 ctrlShow [MCC_CONSOLE_AC_MAP,false];
+ctrlShow [5055,false];
 
 ctrlSetText [MCC_CONSOLE_ACPIP, ""];
 _time = time + (2 + random 5);
-	while {_time > time && dialog && (isNil "MCC_fakeAC")} do {
-		_message = "";
-		_messageFinal = ["C","o","n","n","e","c","t","i","n","g"," ","A","C","-","1","3","0"," ","S","p","o","o","k","y",".",".","."];
-		for "_i" from 0 to (count _messageFinal - 1) do {
-			_message = _message + (_messageFinal select _i);
-			ctrlSetText [MCC_CONSOLE_AC_BCKG, _message];
-			sleep 0.05;
-		};
-	};
 
-if (dialog && !MCC_ACConsoleUp) then {
-		ctrlSetText [MCC_CONSOLE_AC_BCKG, "Error connecting to AC-130, connection failed"];
-		};
-		
-if (dialog && MCC_ACConsoleUp) then {				//Create the AC
+_uav = (missionNamespace getVariable ["MCC_ACConsoleUp",objNull]);
+
+while {_time > time && dialog && (isNil "MCC_fakeAC")} do {
+	_message = "";
+	_messageFinal = ["C","o","n","n","e","c","t","i","n","g"," ","A","C","-","1","3","0",".",".","."];
+	for "_i" from 0 to (count _messageFinal - 1) do {
+		_message = _message + (_messageFinal select _i);
+		ctrlSetText [MCC_CONSOLE_AC_BCKG, _message];
+		sleep 0.05;
+	};
+};
+
+if (dialog && (isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull]) || isNull _uav)) then {
+	ctrlSetText [MCC_CONSOLE_AC_BCKG, "Error connecting to AC-130, connection failed"];
+};
+
+//Create the AC
+if (dialog && !isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull])) then {
 		//Get rid of the connecting text
 		ctrlSetText [MCC_CONSOLE_AC_BCKG, ""];
 		_control = _mccdialog displayCtrl MCC_CONSOLE_ACPIP;
 		[_control] call MCC_fnc_pipOpen;
 		ctrlSetText [MCC_CONSOLE_ACPIP, "#(argb,512,512,1)r2t(rendertarget8,1.0);"];
+
 		// Create fake AC
 		if (isNil "MCC_fakeAC") then {
 			MCC_fakeAC 		= "Camera" camCreate [10,10,10];
 			if (!isnil "MCC_fakeACCenter") then {deletevehicle MCC_fakeACCenter};
-			MCC_fakeACCenter	= "Sign_Sphere10cm_F" createvehicle [MCC_consoleACpos select 0,MCC_consoleACpos select 1, 0];
-			hideobject MCC_fakeACCenter;
+			_leftDownPos = _uav modelToWorld [-400,2,-5];
+			_leftDownPos set [2,0];
+			MCC_fakeACCenter	= "Sign_Sphere10cm_F" createvehicle _leftDownPos;
+			MCC_fakeACCenter hideObjectGlobal true;
 			_rad	=	400;
 			_alt	=	300;
 			MCC_ACAng	= 	0;
@@ -76,27 +86,53 @@ if (dialog && MCC_ACConsoleUp) then {				//Create the AC
 			MCC_fakeAC camsetPos _coords;
 			MCC_fakeAC camsetFOV MCC_fakeACFOV;
 			MCC_fakeAC camCommit 0;
+
+			_uav dowatch MCC_fakeACCenter;
+			//MCC_fakeAC attachTo [_uav,[-6,2,-5]];
+			//MCC_fakeACCenter attachTo [_uav,[-400,2,-5]];
 		};
-		
+
 		ctrlSetText [MCC_CONSOLE_AC_ZOOM_TEXT, format ["ZOOM: %1x",(10-(10*MCC_fakeACFOV))]];
 		ctrlSetText [MCC_CONSOLE_AC_VISION_TEXT, MCC_ConsoleACvision];
-		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT, format ["25mm: %1",MCC_ConsoleACAmmo select 0]];
-		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT2, format ["40mm: %1",MCC_ConsoleACAmmo select 1]];
-		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT3, format ["105mm: %1",MCC_ConsoleACAmmo select 2]];
-		
+
+		if (typeOf _uav == "B_T_VTOL_01_armed_F") then {
+			//AmmosetVehicleAmmo
+			_ammoLeft = [
+						 ["20mm",_uav ammo "gatling_20mm_VTOL_01","gatling_20mm_VTOL_01","B_25mm"],
+						 ["40mm",((crew _uav) select 3) ammo "HE","HE","B_40mm_GPR_Tracer_Red"],
+						 ["105mm",_uav ammo "cannon_105mm_VTOL_01","cannon_105mm_VTOL_01","Sh_105mm_HEAT_MP"]
+						];
+
+		} else {
+			_ammoLeft = _uav getVariable ["MCC_ConsoleACAmmo",[
+								 ["20mm",4000,"gatling_20mm_VTOL_01","B_25mm"],
+								 ["40mm",400,"HE","B_40mm_GPR_Tracer_Red"],
+								 ["105mm",40,"cannon_105mm_VTOL_01","Sh_105mm_HEAT_MP"]
+								]];
+		};
+
+		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT, ("20mm: " + str ((_ammoLeft select 0) select 1))];
+		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT2, ("40mm: " + str ((_ammoLeft select 1) select 1))];
+		ctrlSetText [MCC_CONSOLE_AC_MISSILE_COUNT3, ("105mm: " + str ((_ammoLeft select 2) select 1))];
+
+		//Flight Height
+		sliderSetRange [MCC_CONSOLEUAVFLIGHTHIGHT, 300, 1500];
+		_alt = (((getpos _uav) select 2) min 1500) max 300;
+		sliderSetPosition [MCC_CONSOLEUAVFLIGHTHIGHT, _alt];
+
 		switch (MCC_ConsoleACCameraMod) do {
 			// Normal
 			case 0: {
-				_effectParams = [3, 1, 1, 1, 0.1, [0, 0.4, 1, 0.1], [0, 0.2, 1, 1], [0, 0, 0, 0]];
+				_effectParams = [3,1,1,0.4,0,[0,0,0,0],[1,1,1,0],[1,1,1,1]];
 				MCC_ConsoleACvision = "VIDEO";
 			};
-			
+
 			// Night vision
 			case 1: {
 				_effectParams = [1];
 				MCC_ConsoleACvision = "N/V";
 			};
-			
+
 			// Thermal imaging
 			case 2: {
 				_effectParams = [2];
@@ -104,89 +140,120 @@ if (dialog && MCC_ACConsoleUp) then {				//Create the AC
 			};
 		};
 		"rendertarget8" setPiPEffect _effectParams;
-		
+
 		switch (MCC_ConsoleACweaponSelected) do {
 			// 20mm
 			case 0: {
 				ctrlSetText [MCC_CONSOLE_AC_TARGET, MCC_path +"data\consuleTarget1.paa"];
 			};
-			
+
 			// 40mm
 			case 1: {
 				ctrlSetText [MCC_CONSOLE_AC_TARGET, MCC_path +"data\consuleTarget2.paa"];
 			};
-			
+
 			// 105mm
 			case 2: {
 				ctrlSetText [MCC_CONSOLE_AC_TARGET, MCC_path +"data\consuleTarget3.paa"];
 			};
 		};
-		
+
 		ctrlshow [MCC_CONSOLE_AC_TARGET,true];
 		ctrlShow [MCC_CONSOLE_COMPASS_N,true];
 		ctrlShow [MCC_CONSOLE_COMPASS_E,true];
 		ctrlShow [MCC_CONSOLE_COMPASS_S,true];
 		ctrlShow [MCC_CONSOLE_COMPASS_W,true];
 		ctrlShow [MCC_CONSOLE_AC_MAP,true];
-		
+		ctrlShow [5055,true];
+
 		//Handle on screen data
 		[] spawn {
-			private ["_structured","_data","_mccdialog"];
+			private ["_structured","_data","_mccdialog","_uavPos","_uav"];
 			disableSerialization;
-			
-			while {MCC_Console3Open && dialog} do {
+			_uav = missionNamespace getVariable ["MCC_ACConsoleUp",objNull];
+
+
+			while {MCC_Console3Open && dialog && alive _uav} do {
 				_mccdialog = findDisplay mcc_playerConsole3_IDD;
 				_structured = composeText [""];
-				_data = 
+				_uavPos = getpos MCC_fakeAC;
+				_data =
 					[
-					format ["Time: %1:%2",[date select 3]call MCC_fnc_time2string,[date select 4]call MCC_fnc_time2string],
-					format ["Elapsed: %1",[time]call MCC_fnc_time],
-					format ["X: %1 Y: %2",floor ((getpos MCC_fakeAC) select 0),floor ((getpos MCC_fakeAC) select 1)]
+						format ["Time: %1:%2",[date select 3]call MCC_fnc_time2string,[date select 4]call MCC_fnc_time2string],
+						format ["Remain: %1",[MCC_ConsoleACTime -(time - (missionNameSpace getVariable ["MCC_ConsoleACTimeStart",0]))] call MCC_fnc_time],
+						format ["X: %1 Y: %2",floor (_uavPos select 0),floor (_uavPos select 1)],
+						format ["Z %1",floor (_uavPos select 2)]
 					];
 				{_structured = composeText [_structured,_x,lineBreak]} forEach _data;
 				(_mccdialog displayctrl MCC_CONSOLE_AC_TIME_TEXT) ctrlSetStructuredText _structured;
 				ctrlSetText [MCC_CONSOLE_AC_DIR_TEXT, format ["Dir: %1",floor (getdir MCC_fakeAC)]];
-				
+
 				//Compass
-				for [{_i = 0;_j = 0},{_i < 360;_j < 4},{_i = _i + 90;_j = _j + 1}] do 
+				for [{_i = 0;_j = 0},{_i < 360;_j < 4},{_i = _i + 90;_j = _j + 1}] do
 				{
 					_x = (0.476 + sin(_i - (getdir MCC_fakeAC))*(SafeZoneW/8 - SafeZoneW/200));
 					_y = (0.42 - cos(_i - (getdir MCC_fakeAC))*(SafeZoneH/8 - SafeZoneH/200));
-					
+
 					(_mccdialog displayCtrl 9116+_j) ctrlSetPosition [_x,_y];
 					(_mccdialog displayCtrl 9116+_j) ctrlCommit 0;
 
 				};
+
+				//Set starting time
+				if ((missionNameSpace getVariable ["MCC_ConsoleACTimeStart",-1]) <=0) then {
+					missionNameSpace setVariable ["MCC_ConsoleACTimeStart",time];
+					publicVariable "MCC_ConsoleACTimeStart";
+				};
+
+				//No time remain close the AC-130
+				if (MCC_ConsoleACTime -(time - (missionNameSpace getVariable ["MCC_ConsoleACTimeStart",time])) <=0) exitWith {
+
+					[group driver _uav, driver _uav, _uav, [_uav, 1500, floor random 360] call BIS_fnc_relPos] call MCC_fnc_deletePlane;
+					missionNamespace setVariable ["MCC_ACConsoleUp",objNull];
+					publicVariable "MCC_ACConsoleUp";
+
+					[[2,compile format ['["MCCNotifications",["AC-130 Left the scene","%1data\AC130_icon.paa",""]] call bis_fnc_showNotification;',MCC_path]], "MCC_fnc_globalExecute", playerSide, false] spawn BIS_fnc_MP;
+				};
+
+				if (isNull(missionNamespace getVariable ["MCC_ACConsoleUp",objNull])) exitWith {
+					MCC_ConsoleACMouseButtonDown = false;
+					while {dialog} do {closeDialog 0};
+					MCC_ConsoleACMouseButtonDown = false;
+					[(_mccdialog displayctrl MCC_CONSOLE_ACPIP)] call MCC_fnc_pipOpen;
+					_null = [1] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf",MCC_path];
+
+					[[2,{["MCCNotifications",["AC-130 Left the scene",format ["%1data\AC130_icon.paa",MCC_path],""]] call bis_fnc_showNotification;}], "MCC_fnc_globalExecute", side player, false] spawn BIS_fnc_MP;
+				};
+
 				sleep 0.1;
 			};
-		};
-	
-		MCC_ACcenter = getpos MCC_fakeACCenter;
-		
-		if (MCC_uavConsoleACFirstTime) then {
-			MCC_uavConsoleACFirstTime = false; 
-					// Move camera in a circle
-				[getpos MCC_fakeACCenter, _alt, _rad] spawn {
-					private ["_pos", "_alt", "_rad", "_coords"];
-					disableSerialization;
-					
-					_pos = _this select 0;
-					_alt = _this select 1;
-					_rad = _this select 2;
-										
-					while {alive MCC_fakeAC} do {
-						MCC_ACAng = MCC_ACAng - 0.5;
-						_coords = [_pos, _rad, MCC_ACAng] call BIS_fnc_relPos;
-						_coords set [2, _alt];
-						
-						MCC_fakeAC camPreparePos _coords;
-						MCC_fakeACCenter setdir getdir (MCC_fakeAC);
-						MCC_fakeAC camCommitPrepared 0.3;
-						waitUntil {camCommitted MCC_fakeAC};
-					
-						MCC_fakeAC camPreparePos _coords;
-						MCC_fakeAC camCommitPrepared 0;
-					};
-				};
+
+			_cam = missionNamespace getVariable ["MCC_fakeAC",objNull];
+			_target = missionNamespace getVariable ["MCC_fakeACCenter",objNull];
+
+			if !(isNull _cam) then {
+				_cam cameraeffect ["terminate","back"];
+				camdestroy _cam;
+				MCC_fakeAC = nil;
+			};
+
+			if !(isNull _target) then {
+				deleteVehicle _target;
 			};
 		};
+
+		// Move camera in a circle
+		0 spawn	{
+			private ["_pos", "_alt", "_rad", "_coords","_uav","_cam","_target"];
+
+			_uav = missionNamespace getVariable ["MCC_ACConsoleUp",objNull];
+			_cam = missionNamespace getVariable ["MCC_fakeAC",objNull];
+			_target = missionNamespace getVariable ["MCC_fakeACCenter",objNull];
+
+			while {alive _cam && alive _uav && alive _target} do {
+				_cam camsetpos (_uav modelToWorld [-6,2,-5]);
+				_cam camsetTarget _target;
+				_cam camcommit 0.01;
+			};
+		};
+	};
