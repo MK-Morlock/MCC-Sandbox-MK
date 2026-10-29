@@ -20,7 +20,7 @@ if (MCC_isMode) then {
 };
 
 //-------------------- RPT diagnostics banner (search the RPT for "MCC [") --------------------
-["BUILD", "init.sqf", "MCC init started - build: MCC Sandbox MK 1.0 | game %1 | mission %2 on %3 | server=%4 dedicated=%5 interface=%6 | ACE=%7 CBA=%8 debug=%9", [productVersion select 2, missionName, worldName, isServer, isDedicated, hasInterface, MCC_isACE, MCC_isCBA, MCC_debug]] call MCC_fnc_log;
+["BUILD", "init.sqf", "MCC init started - build: MCC Sandbox MK 1.0.1 | game %1 | mission %2 on %3 | server=%4 dedicated=%5 interface=%6 | ACE=%7 CBA=%8 debug=%9", [productVersion select 2, missionName, worldName, isServer, isDedicated, hasInterface, MCC_isACE, MCC_isCBA, MCC_debug]] call MCC_fnc_log;
 if (missionNamespace getVariable ["MCC_debug", false]) then {MCC_targetWatchEH = addMissionEventHandler ["EntityCreated", {
 	params ["_e"];
 	if !(_e isKindOf "CAManBase") exitWith {};

@@ -128,6 +128,7 @@ _StartTimeIssueOrders = time;
 			_NumberOfForces	 = _NumberOfForces+ 1;
 
 
+			if ((count (_x getVariable ["GAIA_zone_intend", []]) > 1) || {(_x getVariable ["GAIA_Order", ""]) != ""}) then {
 			//Mortar group is firing on a CA that no longer exists
 			//We cancel it to simulate that the spotter has died
 			if 	(
@@ -230,6 +231,7 @@ _StartTimeIssueOrders = time;
 						((_x getVariable  ["GAIA_Order",""]) == "DoAttack")
 					)
 			then	{[_x] call GAIA_fnc_removeWaypoints;/*player globalchat "7";*/};
+			};
 	};
 }forEach AllGroups;
 
