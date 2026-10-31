@@ -125,6 +125,12 @@ for [{_i = 0}, {((_i<50) and (_best<_minimum))or (_i<10)}, {_i = _i + 1}] do
 			//This wont be good for land dudes, so ignore this one
 		//		{_found= -10000;};
 		//Since we basicly take "best chance" its good to check the most important one, water.
+		if (_goal != "WATER" && {_goal != "AIR"} && {_found > _best} && {
+			(((surfaceNormal _pos) select 2) < 0.87)
+			|| {!((nearestTerrainObjects [_pos, ["ROCK", "ROCKS"], 6, false, true]) isEqualTo [])}
+			|| {([0, 45, 90, 135, 180, 225, 270, 315] findIf {surfaceIsWater (_pos getPos [30, _x])}) >= 0}
+			|| {((_goal select [0, 4]) in ["VEH_", "ARM_"]) && {(((surfaceNormal _pos) select 2) < 0.966) || {private _h = getTerrainHeightASL _pos; ([0, 90, 180, 270] findIf {abs ((getTerrainHeightASL (_pos getPos [25, _x])) - _h) > 6.7}) >= 0}}}
+		}) then {_found = -10000};
 		if ( (surfaceiswater _pos) and _goal!="WATER" and _goal!="AIR") then
 			//This wont be good for land dudes, so ignore this one
 			{_found= -10000;};

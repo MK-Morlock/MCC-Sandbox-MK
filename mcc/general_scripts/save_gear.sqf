@@ -67,7 +67,7 @@ player enableStamina !(missionNamespace getVariable ["MCC_disableFatigue",false]
 //Delete dead body
 if (missionNameSpace getVariable ["MCC_deletePlayersBody",false]) then {deleteVehicle _unit};
 
-_null = [[], (compile format ["MCC_curator addCuratorEditableObjects [[objectFromNetId '%1'],false];",netid player])] remoteExec ["call", 2, false];
+_null = ["zeusAdd", [[player], false, false]] remoteExec ["MCC_fnc_secAction", 2, false];
 
 if (missionNamespace getvariable ["MCC_saveGear",false]) then {
 	[	_goggles,

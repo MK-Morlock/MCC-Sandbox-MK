@@ -49,7 +49,7 @@ if (_isCQB) then {
 		_spawnPos	= _building buildingPos (floor random _buildingPos);
 
 		//No other unit in the spawn position?
-		if (count (nearestObjects [_spawnPos, ["Man"], 1])<1) then {
+		if ((count (nearestObjects [_spawnPos, ["Man"], 1])<1) && {!surfaceIsWater _spawnPos}) then {
 			//Spawn the intel
 			_dummyObject = MCC_SMALL_IEDDEVICE_TABLE createvehicle _spawnPos;
 			_dummyObject setPos _spawnPos;

@@ -65,8 +65,10 @@ if (MCC_MWisGenerating) exitWith {systemchat "MCC is already generating a missio
 MCC_MWisGenerating = true;
 
 //Get params
-_playersNumber 		= (sliderPosition  MCC_MWPlayersIDC) + 1;
+_playersNumber 		= round ((sliderPosition  MCC_MWPlayersIDC) + 1);
 _civFaction			= (U_FACTIONSCIV select (lbCurSel CIVILIANFACTIONCOMBO)) select 2;
+private _contentMode = ((profileNamespace getVariable ["MCC_MWContentIndex", 1]) max 0) min 2;
+private _civContentMode = ((profileNamespace getVariable ["MCC_MWCivContentIndex", 1]) max 0) min 2;
 _playMusic			=  profileNamespace getVariable ["MCC_MWMusicIndex",0];
 _difficulty 		= ((profileNamespace getVariable ["MCC_MWDifficultyIndex",0])+1) * 2;		//each player == 3 enemy players multiply by difficulty
 _stealth 			= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profileNamespace getVariable ["MCC_MWStealthIndex",2]);
@@ -156,7 +158,13 @@ if (_enemyfaction == "") exitWith
 };
 
 //Build the faction's unitsArrays and send it to the server.
-_check = [_enemyfaction, _enemySide] call MCC_fnc_MWCreateUnitsArray;
+if (isNil "MCC_MWContentModes") then {MCC_MWContentModes = createHashMap};
+MCC_MWContentModes set [toLower _civFaction, _civContentMode];
+MCC_MWContentModes set [toLower _enemyfaction, _contentMode];
+publicVariableServer "MCC_MWContentModes";
+MCC_MWSpreadIndex = ((profileNamespace getVariable ["MCC_MWSpreadIndex", 1]) max 0) min 2;
+publicVariableServer "MCC_MWSpreadIndex";
+_check = [_enemyfaction, _enemySide, _contentMode] call MCC_fnc_MWCreateUnitsArray;
 waituntil {_check};
 
 //Send user custom groups to the server

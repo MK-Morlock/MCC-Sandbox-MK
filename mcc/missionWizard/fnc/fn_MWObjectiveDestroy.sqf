@@ -125,8 +125,18 @@ while {str _spawnPos == "[-500,-500,0]" || isOnRoad _spawnPos} do
 	//_spawnPos = _objPos findEmptyPosition [0,200,_typeSize];
 };
 
+private _fp = [switch (true) do {
+	case (_objType in ["tanks", "aa", "artillery"]): {"c_nestBig"};
+	case (_objType == "cache"): {"c_nestSmall"};
+	case (_objType == "air"): {"c_hanger"};
+	default {""};
+}] call MCC_fnc_compositionFootprint;
+private _flat = [_objPos, 250, _fp] call MCC_fnc_findFlatSpot;
+if (count _flat > 0) then {_spawnPos = [_flat select 0, _flat select 1, 0]};
+MCC_MWPlacedSpots = (missionNamespace getVariable ["MCC_MWPlacedSpots", []]) + [[_spawnPos, _fp]];
+
 //Clear area
-[_spawnPos,30,true] call MCC_fnc_hideTerrainObjectsArea;
+[_spawnPos, (_fp + 10) max 30, true, if ([_spawnPos, _fp] call MCC_fnc_structuresNear) then {[]} else {["TREE", "SMALL TREE", "BUSH", "ROCK", "ROCKS"]}] call MCC_fnc_hideTerrainObjectsArea;
 
 //Case we are dealing with a vehicle
 if (_objType in ["tanks","aa","artillery"]) then
@@ -185,8 +195,10 @@ if (_objType in ["artillery","aa"]) then {
 		};
 	} else {
 		_object = _type createvehicle _spawnPos;
+		_object allowDamage false;
 		_object setpos _spawnPos;
 		_object setdir _spawndir;
+		[_object] spawn {params ["_o"]; sleep 8; if (!isNull _o) then {_o allowDamage true}};
 	};
 };
 
@@ -194,7 +206,7 @@ if (_objType in ["artillery","aa"]) then {
 if (_objType in ["tanks","aa","artillery","air"]) then {
 		_init = '_this setVehicleLock "LOCKED";';
 	_init = '_this setVehicleLock "LOCKED";';
-	[[netID _object,_object], _init, false] remoteExec ["MCC_fnc_setVehicleInit", 2, false];
+	["MCC_fnc_setVehicleInit", [[netID _object,_object], _init, false], 2, false] call MCC_fnc_secRemote;
 
 	if (_objType isEqualTo "artillery") then {[0,_object] spawn MCC_fnc_amb_Art};
 	if (_objType isEqualTo "aa") then {[2,_object] spawn MCC_fnc_amb_Art};

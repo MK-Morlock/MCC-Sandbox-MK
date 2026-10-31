@@ -129,6 +129,13 @@ _StartTimeIssueOrders = time;
 
 
 			if ((count (_x getVariable ["GAIA_zone_intend", []]) > 1) || {(_x getVariable ["GAIA_Order", ""]) != ""}) then {
+			if (missionNamespace getVariable ["MCC_debug", false]) then {
+				private _sig = [_x getVariable ["GAIA_Order", ""], _x getVariable ["GAIA_OrderTime", 0]];
+				if !(_sig isEqualTo (_x getVariable ["MCC_gaiaLoggedOrder", []])) then {
+					_x setVariable ["MCC_gaiaLoggedOrder", _sig];
+					["DEBUG", "GAIA", "%1 order %2 at %3 | behaviour %4 | waypoints %5", [groupId _x, _sig select 0, mapGridPosition (_x getVariable ["GAIA_OrderPosition", getPos (leader _x)]), behaviour (leader _x), count (waypoints _x)]] call MCC_fnc_log;
+				};
+			};
 			//Mortar group is firing on a CA that no longer exists
 			//We cancel it to simulate that the spotter has died
 			if 	(
@@ -696,7 +703,7 @@ _StartTimeIssueOrders = time;
 		   	 			 //backward compatible fortify command
 
 
-		   	 			 if (count (waypoints _x ) == (currentWaypoint _x)) then
+		   	 			 if ((count (waypoints _x ) == (currentWaypoint _x)) && {(vehicle (leader _x)) == (leader _x) || {random 1 < 0.5}}) then
 		   	 			 	{
 
 		   	 			 			 				   switch (true) do

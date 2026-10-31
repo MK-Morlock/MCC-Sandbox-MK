@@ -31,26 +31,26 @@ private _versionRaw = "extDB3" callExtension "9:VERSION";
 private _extDB3Present = (_versionRaw isEqualType "") && {_versionRaw != ""} && {(_versionRaw select [0,1]) in ["0","1","2","3","4","5","6","7","8","9"]};
 
 if (!_extDB3Present) exitWith {
-	diag_log text format ["MCC_fnc_initExtDB3: extDB3 not detected (got: %1) - falling back to profileNamespace persistence.", _versionRaw];
+	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text format ["MCC_fnc_initExtDB3: extDB3 not detected (got: %1) - falling back to profileNamespace persistence.", _versionRaw]};
 	MCC_iniDBenabled = false;
 	publicVariable "MCC_iniDBenabled";
 	false
 };
 
-diag_log text format ["MCC_fnc_initExtDB3: extDB3 version %1 detected.", _versionRaw];
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text format ["MCC_fnc_initExtDB3: extDB3 version %1 detected.", _versionRaw]};
 
 // Connect to the database section defined in extdb3-conf.ini
 private _connectResult = "extDB3" callExtension format ["9:ADD_DATABASE:%1", _dbConfigSection];
-diag_log text format ["MCC_fnc_initExtDB3: ADD_DATABASE result: %1", _connectResult];
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text format ["MCC_fnc_initExtDB3: ADD_DATABASE result: %1", _connectResult]};
 
 // Register the SQL protocol under our session name (empty escape char = use extDB3's default escaping)
 private _protocolResult = "extDB3" callExtension format ["9:ADD_DATABASE_PROTOCOL:%1:SQL:%2:", _dbConfigSection, _sessionName];
-diag_log text format ["MCC_fnc_initExtDB3: ADD_DATABASE_PROTOCOL result: %1", _protocolResult];
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text format ["MCC_fnc_initExtDB3: ADD_DATABASE_PROTOCOL result: %1", _protocolResult]};
 
 // Make sure the table exists - safe to run every mission start, it's IF NOT EXISTS
 private _createTableSQL = "CREATE TABLE IF NOT EXISTS mcc_persistent (db_name VARCHAR(191) NOT NULL, section VARCHAR(191) NOT NULL, var_name VARCHAR(191) NOT NULL, value_data MEDIUMTEXT, PRIMARY KEY (db_name, section, var_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
 private _createResult = "extDB3" callExtension format ["1:%1:%2", _sessionName, _createTableSQL];
-diag_log text format ["MCC_fnc_initExtDB3: CREATE TABLE result: %1", _createResult];
+if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text format ["MCC_fnc_initExtDB3: CREATE TABLE result: %1", _createResult]};
 
 MCC_iniDBenabled = true;
 publicVariable "MCC_iniDBenabled";

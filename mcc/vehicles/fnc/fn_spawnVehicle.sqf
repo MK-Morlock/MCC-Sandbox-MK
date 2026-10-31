@@ -96,6 +96,16 @@ createvehiclecrew _veh;
 _crew = crew _veh;
 _crew joinsilent _grp;
 _grp addVehicle _veh;
+if !(toLower _sim in ["soldier", "airplanex", "helicopterrtd", "helicopterx"]) then {
+	_veh allowDamage false;
+	{_x allowDamage false} forEach _crew;
+	[_veh, _crew] spawn {
+		params ["_v", "_c"];
+		sleep 8;
+		if (!isNull _v) then {_v allowDamage true};
+		{if (!isNull _x) then {_x allowDamage true}} forEach _c;
+	};
+};
 
 //If this is a new group, select a leader.
 if (_newGrp) then

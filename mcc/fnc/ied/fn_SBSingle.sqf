@@ -20,13 +20,13 @@ params ["_pos", "_trapkind", "_trapvolume", "_IEDExplosionType", "_iedside"];
 _group = creategroup civilian;
 _sb	= _group createunit [_trapkind, _pos, [], 0, "NONE"];
 
-_init = FORMAT [";[_this,' %1','%2',%3] spawn MCC_fnc_manageSB;"
-				, _iedside
+_init = FORMAT [";[_this,%1,'%2',%3] spawn MCC_fnc_manageSB;"
+				, str ((if (_iedside isEqualType []) then {_iedside} else {[_iedside]}) apply {if (_x isEqualType "") then {_x} else {str _x}})
 				, _trapvolume
 				, _IEDExplosionType
 				];
 
-[[netid _sb,_sb], _init] remoteExec ["MCC_fnc_setVehicleInit", 2, false];
+["MCC_fnc_setVehicleInit", [[netid _sb,_sb], _init], 2, false] call MCC_fnc_secRemote;
 
 {_x addCuratorEditableObjects [[_sb],false]} forEach allCurators;
 

@@ -149,7 +149,7 @@ private _registryId = format ["FL_%1", ["MCC_generatedMissionCounter",1] call BI
 private _taskIds = [];
 
 //------------------------------------------------------------ GAIA zone over the whole defended area ------------------------------------------------------------
-private _zoneNumber = (count (missionNamespace getVariable ["MCC_zones_numbers",[]])) + 1;
+private _zoneNumber = call MCC_fnc_nextZoneNumber;
 [_zoneNumber, [_A, _len / 2, _depth / 2] call _at, [(_len / 2) + 50, _depth / 2, _lineDir - 90]] call MCC_fnc_MWUpdateZone;
 sleep 1;
 
@@ -161,6 +161,7 @@ private _t = _spacing / 2;
 while {_t < _len} do {
 	private _p = [[_t, 40 + random 40] call _at, 50] call _land;
 	if !(_p isEqualTo []) then {
+		[_p, 15, true] call MCC_fnc_hideTerrainObjectsArea;
 		[_p, _frontDir + 180, selectRandom ["c_nestSmall","c_nestSmall","c_nestBig"]] call MCC_fnc_objectMapper;	//the nest compositions face their back at the given direction, so +180 points them at the attack
 		private _grp = [_p, _defSide, _infGroups, _infUnits] call _spawnInf;
 		if (!isNull _grp) then {[_grp, _p] call BIS_fnc_taskDefend};
@@ -200,18 +201,18 @@ if (_fortify) then {
 		private _p = [_s, 30] call _at;
 		private _roads = _p nearRoads 20;
 		if (count _roads > 0 && {count _roadblocks < 4} && {_roadblocks findIf {_x distance2D _p < 300} < 0}) then {
-			private _road = _roads select 0;
-			private _rp = getPosATL _road;
-			private _con = roadsConnectedTo _road;
-			private _dir = _frontDir;
-			if (count _con > 0) then {
-				private _rd = _road getDir (_con select 0);
+			private _spot = [_roads select 0] call MCC_fnc_roadblockSpot;
+			if !(_spot isEqualTo []) then {
+				private _rp = _spot select 0;
+				private _rd = _spot select 1;
 				//use the road direction closest to the front
-				_dir = if (abs (((_rd - _frontDir) + 540) mod 360 - 180) <= 90) then {_rd} else {_rd + 180};
+				private _dir = if (abs (((_rd - _frontDir) + 540) mod 360 - 180) <= 90) then {_rd} else {_rd + 180};
+				if ((_roadblocks findIf {_x distance2D _rp < 300}) < 0) then {
+					[_rp, _dir, _faction, _defSide] call MCC_fnc_buildRoadblock;
+					_roadblocks pushBack _rp;
+					if (_fortMarkers == 1) then {[_rp, "mil_triangle", "Roadblock"] call _marker};
+				};
 			};
-			[_rp, _dir, _faction, _defSide] call MCC_fnc_buildRoadblock;
-			_roadblocks pushBack _rp;
-			if (_fortMarkers == 1) then {[_rp, "mil_triangle", "Roadblock"] call _marker};
 		};
 	};
 };
@@ -238,7 +239,8 @@ private _spawnVeh = {
 	for "_k" from 1 to _count do {
 		private _p = [[(_len * (_k - 0.5) / _count) + random 100 - 50, _mainDepth + random (_supportEnd - _mainDepth)] call _at, 80] call _land;
 		if !(_p isEqualTo []) then {
-			private _v = [_p, _frontDir, selectRandom _classes, _defSide] call MCC_fnc_spawnVehicle;
+			private _vc = selectRandom _classes;
+			private _v = [[_p, _vc] call MCC_fnc_safeSpawnPos, _frontDir, _vc, _defSide] call MCC_fnc_spawnVehicle;
 			private _grp = _v param [2, grpNull];
 			if (!isNull _grp) then {
 				[_grp] call _skill;
@@ -282,6 +284,7 @@ if (_depthIdx == 2) then {
 	while {_t2 < _len} do {
 		private _p = [[_t2, _depth * 0.6] call _at, 60] call _land;
 		if !(_p isEqualTo []) then {
+			[_p, 15, true] call MCC_fnc_hideTerrainObjectsArea;
 			[_p, _frontDir + 180, "c_nestSmall"] call MCC_fnc_objectMapper;
 			private _grp = [_p, _defSide, _infGroups, _infUnits] call _spawnInf;
 			if (!isNull _grp) then {[_grp, _p] call BIS_fnc_taskDefend};

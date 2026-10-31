@@ -33,7 +33,7 @@ _costRepair = floor (_cost * 0.5 * MCC_PRICESFACTOR);
 _costFuel = floor (_cost * 0.2 * MCC_PRICESFACTOR);
 _costValor = floor (_cost * 0.5 * MCC_PRICESFACTOR);
 
-_array = call compile format ["MCC_res%1",playerside];
+_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 
 _action =  param [0, 0, [0]];
 
@@ -134,7 +134,7 @@ switch (_action) do
             clearItemCargoGlobal _vehicle;
         };
 
-        [[_vehicle], {MCC_curator addCuratorEditableObjects [[_this select 0],false];}] remoteExec ["call", 2, false];
+        ["zeusAdd", [[_vehicle], false, false]] remoteExec ["MCC_fnc_secAction", 2, false];
         closeDialog 0;
     };
 };

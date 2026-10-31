@@ -22,9 +22,9 @@ while {alive _unit && !(_unit getVariable ["MCC_disarmed",false])} do
 {
 	sleep 0.1;
 	_t = _t + 0.1;
-	if (_t > _time || (getDammage _unit > _dammage) || (_unit getVariable ["MCC_disarmed",false])) exitWith {[[_unit,""], {(_this select 0) switchmove (_this select 1)}] remoteExec ["call", 0, false];};
+	if (_t > _time || (getDammage _unit > _dammage) || (_unit getVariable ["MCC_disarmed",false])) exitWith {["call", [[_unit,""], {(_this select 0) switchmove (_this select 1)}], 0, false] call MCC_fnc_secRemote;};
 };
 
-[[_unit,""], {(_this select 0) switchmove (_this select 1)}] remoteExec ["call", 0, false];
+["call", [[_unit,""], {(_this select 0) switchmove (_this select 1)}], 0, false] call MCC_fnc_secRemote;
 _unit enableAI "AUTOTARGET";
 _unit setVariable ["MCC_Stunned", false,true]; 

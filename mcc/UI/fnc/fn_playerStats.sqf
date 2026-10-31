@@ -11,7 +11,7 @@ private "_item";
 params ["_display"];
 
 _role = player getvariable ["CP_role",""];
-_oldLevel = call compile format  ["%1Level select 0",_role];
+_oldLevel = ((missionNamespace getVariable [format ["%1Level", _role], [0, 0]]) param [0, 0]);
 _html = "<t color='#818960' size='0.8' shadow='1' align='center' underline='false'>"+ _role+ " Level " + str _oldLevel + "</t>";
 (_display displayCtrl 102) ctrlSetStructuredText parseText _html;
 

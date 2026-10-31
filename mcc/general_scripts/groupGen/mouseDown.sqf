@@ -280,7 +280,7 @@ if (MCC_CASrequestMarker && _pressed==0) then
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the arrow
 	private _k0 = if (MCC_spawnkind isEqualType []) then {MCC_spawnkind param [0, ""]} else {MCC_spawnkind}; private _kind = if (_k0 isEqualType "") then {toLower _k0} else {""};
 	private _p0 = if (MCC_planeType isEqualType []) then {MCC_planeType param [0, ""]} else {MCC_planeType}; private _isDrop = (if (_p0 isEqualType "") then {toLower _p0} else {""}) in ["west","east","guer","civ","logic"];
-	private _w = if (_isDrop) then {8} else {[10, 5] select (_kind == "cruise missile")};
+	private _w = if (_isDrop) then {8} else {5};
 	private _lm = [["strike", "supply"] select _isDrop, MCC_pointA, MCC_pointA, [], _w] call MCCMK_fnc_supportLine;
 	MCCMK_lineCancel = false;
 	MCCMK_lineDrawing = true;
@@ -320,6 +320,7 @@ if (MCC_CASrequestMarker && _pressed==0) then
 	} else {
 		[MCC_spawnkind] call MCC_fnc_supportHint;
 		MCC_cruiseFromCommander = false;
+		MCC_cruiseFromMCC = true;
 		[_ammount, MCC_spawnkind , _markerPos, MCC_planeType, _spawn,_away,(missionNamespace getVariable ["MCC_airdropIsParachute",0])] spawn MCC_fnc_airDrop;
 	};
 
@@ -409,6 +410,7 @@ private _null = [];
 	_size = getMarkerSize _marker;
 	_pos = getMarkerPos  _marker;
 	deletemarkerlocal _marker;
+	if (((_size select 0) min (_size select 1)) < 5) exitWith {systemChat "Click and drag on the map to draw the zone"};
 	MCC_zone_drawing = false;
 	_null = [1,_pos,_size] execVM MCC_path + "mcc\pop_menu\zones.sqf";
 };

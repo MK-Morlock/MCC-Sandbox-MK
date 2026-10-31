@@ -156,11 +156,41 @@ for "_i" from 0 to ((count _types) - 1) do
 		//Is this a character or vehicle?
 		if (getNumber(configFile >> "CfgVehicles" >> _type >> "isMan") == 1) then
 		{
-			_unit = _grp createUnit [_type, _itemPos, [], 0, "FORM"];
+			_unit = _grp createUnit [_type, _itemPos, [], 0, "NONE"];
+			if ((((units _grp) - [_unit]) findIf {(_x distance2D _unit) < 1.5}) >= 0) then {
+				private _free = (getPosATL _unit) findEmptyPosition [1.5, 12, _type];
+				if (count _free > 0) then {_unit setPosATL _free};
+			};
+			if ((count ([getPosATL _unit, 0, 1, 2] call MCC_fnc_landSpot)) == 0) then {
+				private _good = [_pos, 30, 25, 2] call MCC_fnc_landSpot;
+				if (count _good > 0) then {
+					private _free = _good findEmptyPosition [0, 8, _type];
+					_unit setPosATL (if (count _free > 0) then {_free} else {_good});
+				};
+			};
 			_unit setDir _azimuth;
 		}
 		else
 		{
+			if (_type isKindOf "LandVehicle") then {
+				private _clear = [_itemPos, _type] call MCC_fnc_clearVehicleSpot;
+				if (_clear isEqualTo []) then {_clear = [_pos, _type, 80] call MCC_fnc_clearVehicleSpot};
+				if (_clear isEqualTo []) then {
+					private _road = [_pos, _type] call MCC_fnc_roadsideSpot;
+					if (count _road > 0) then {_itemPos = _road};
+					["DEBUG", "MCC_fnc_spawnGroup", "no clear spot for %1 near %2 - placed at %3", [_type, mapGridPosition _pos, mapGridPosition _itemPos]] call MCC_fnc_log;
+				} else {
+					_itemPos = _clear;
+					if !([_itemPos, _type] call MCC_fnc_vehicleCanDriveOut) then {
+						private _road = [_pos, _type] call MCC_fnc_roadsideSpot;
+						if (count _road > 0) then {
+							["DEBUG", "MCC_fnc_spawnGroup", "%1 could not drive out from %2 - moved to the roadside at %3", [_type, mapGridPosition _itemPos, mapGridPosition _road]] call MCC_fnc_log;
+							_itemPos = _road;
+						};
+					};
+				};
+			};
+			if (_itemPos isEqualTo []) then {continue};
 			_unit = ([_itemPos, _azimuth, _type, _grp] call MCC_fnc_spawnVehicle) select 0;
 			_vehicles set [count _vehicles, _unit];
 		};

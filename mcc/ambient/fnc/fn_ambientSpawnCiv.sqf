@@ -132,7 +132,7 @@ for "_i" from 1 to _counter do {
 			_civClass = _unitsArray call bis_fnc_selectRandom;
 
 			_civGroup = creategroup _side;
-			_unit = _civGroup createUnit [_civClass select 0,_pos,[],5,"NONE"];
+			_unit = _civGroup createUnit [_civClass select 0,(([_pos, 25, 12, 2] call MCC_fnc_landSpot) call {if (_this isEqualTo []) then {_pos} else {_this}}),[],5,"NONE"];
 
 			if (_side == civilian) then {
 				//Add coleteral damage EH
@@ -192,7 +192,7 @@ for "_i" from 1 to _counter do {
 
 			for "_i" from 1 to (random 3 + 2) step 1 do {
 			    	_civClass = _enemyArray call bis_fnc_selectRandom;
-					_unit = _civGroup createUnit [_civClass select 0,_pos,[],5,"NONE"];
+					_unit = _civGroup createUnit [_civClass select 0,(([_pos, 25, 12, 2] call MCC_fnc_landSpot) call {if (_this isEqualTo []) then {_pos} else {_this}}),[],5,"NONE"];
 					_unit forceAddUniform (_civUniforms call bis_fnc_selectRandom);
 					_unit addVest (_civVests call bis_fnc_selectRandom);
 					_unit addHeadgear (_civHead call bis_fnc_selectRandom);

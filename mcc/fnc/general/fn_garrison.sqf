@@ -55,8 +55,17 @@ _vehiclesArray	= [_faction,"carx","car"] call MCC_fnc_makeUnitsArray;		//Let's b
 if(count _vehiclesArray < 4) then {
 	_vehiclesArray = [_faction,"carx"] call MCC_fnc_makeUnitsArray;
 };
+_unitsArray = [_unitsArray, _faction] call MCC_fnc_contentFilterList;
+_vehiclesArray = ([_vehiclesArray, _faction] call MCC_fnc_contentFilterList) select {
+	private _c = configFile >> "CfgVehicles" >> (_x select 0);
+	private _m = toLower getText (_c >> "model");
+	(getNumber (_c >> "hasDriver") == 1) && {getNumber (_c >> "isUav") != 1}
+	&& {(["invisible", "pod_heli_transport_04", "radar_system", "sam_system"] findIf {(_m find _x) >= 0}) < 0}
+	&& {!((_x select 0) isKindOf "Slingload_base_F")}
+};
 
 _buildingsArray	= nearestObjects  [_center,["House","Ruins","Church","FuelStation","Strategic"],_radius];	//Let's find the buildings in the area
+_buildingsArray = _buildingsArray select {!(_x call MCC_fnc_isWaterStructure)};
 
 _unitsCount		= count _unitsArray;
 _vehiclesCount	= count _vehiclesArray;
@@ -164,14 +173,10 @@ if (_spawnVehicles) then	{
 				sleep 0.1;
 			};
 
-			_spawnPos = [];
-			_radius = 5;
-			//Make sure the vehicle is not in a wall on the road side
-			while {_spawnPos isEqualTo []} do {
-				_spawnPos = _roadPos findEmptyPosition [0.1,_radius, _type];
-				_radius = _radius +5;
-				sleep 0.1;
-			};
+			_spawnPos = [_roadPos, _type, 32] call MCC_fnc_clearVehicleSpot;
+			if (_spawnPos isEqualTo []) then {_spawnPos = [_roadPos, _type] call MCC_fnc_roadsideSpot};
+			if (_spawnPos isEqualTo []) then {_spawnPos = _roadPos findEmptyPosition [0.1, 40, _type]};
+			if (_spawnPos isEqualTo []) then {continue};
 
 			_vehicle= _type createVehicle _spawnPos;
 			waituntil {alive _vehicle};

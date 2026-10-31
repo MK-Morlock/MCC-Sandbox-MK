@@ -54,16 +54,22 @@ _comboBox = _mccdialog displayCtrl CIVILIANFACTIONCOMBO;		//fill combobox CFG fa
 		_displayname = format ["%1(%2)",_x select 0,_x select 1];
 		_comboBox lbAdd _displayname;
 	} foreach U_FACTIONSCIV;
-_comboBox lbSetCurSel ((U_FACTIONSCIV findIf {toLower (_x select 2) == toLower (missionNamespace getVariable ["MCC_MWStartCivFaction", ""])}) max 0);
+_comboBox lbSetCurSel ((U_FACTIONSCIV findIf {toLower (_x select 2) == toLower (missionNamespace getVariable ["MCC_MWStartCivFaction", "CIV_F"])}) max 0);
+
+{
+	_x params ["_idc", "_var"];
+	private _c = _mccdialog displayCtrl _idc;
+	lbClear _c;
+	{_c lbAdd _x} forEach ["Faction only", "Faction + Creator DLC", "All loaded mods"];
+	_c lbSetCurSel (((profileNamespace getVariable [_var, 1]) max 0) min 2);
+} forEach [[6027, "MCC_MWContentIndex"], [6028, "MCC_MWCivContentIndex"]];
+private _spreadCtrl = _mccdialog displayCtrl 6029;
+lbClear _spreadCtrl;
+{_spreadCtrl lbSetTooltip [_spreadCtrl lbAdd (_x select 0), _x select 1]} forEach [["Tight", "Most forces start near the zone centre"], ["Normal", "Original MCC: forces lean towards the centre"], ["Wide", "Forces start evenly spread over the whole zone"]];
+_spreadCtrl lbSetCurSel (((profileNamespace getVariable ["MCC_MWSpreadIndex", 1]) max 0) min 2);
 
 //------------------------------------------- ZONES --------------------------------------------------------------------------------------------------
-_comboBox = _mccdialog displayCtrl 1023; //fill combobox zone's numbers
-lbClear _comboBox;
-{
-	_displayname = format ["%1",_x];
-	_comboBox lbAdd _displayname;
-} foreach (missionNamespace getVariable ["MCC_zones_numbers",[]]);
-_comboBox lbSetCurSel MCC_zone_index;
+["fill"] call MCC_fnc_zoneList;
 
 //==========================       Mission Wizard ===============================================
 
@@ -71,8 +77,9 @@ _comboBox lbSetCurSel MCC_zone_index;
 _comboBox = _mccdialog displayCtrl MCC_MWPlayersIDC;
 _comboBox sliderSetRange [1, MCC_MWmaxPlayers];
 //A value from the (Settings) Mission Generator module, or one changed in this session, wins over the saved profile value
-_comboBox sliderSetPosition (missionNamespace getVariable ["MCC_MWPlayersSession", profileNamespace getVariable ["MCC_MWPlayersIndex",(floor MCC_MWmaxPlayers/2)]]);
+_comboBox sliderSetPosition (missionNamespace getVariable ["MCC_MWPlayersSession", profileNamespace getVariable ["MCC_MWPlayersIndex",20]]);
 _comboBox sliderSetSpeed [1, 1];
+_comboBox ctrlSetTooltip format ["%1 players: about %2 / %3 / %4 enemies (Easy / Medium / Hard)", floor (sliderPosition _comboBox), (floor (sliderPosition _comboBox)) * 2, (floor (sliderPosition _comboBox)) * 4, (floor (sliderPosition _comboBox)) * 6];
 
 //Stealth
 _comboBox = _mccdialog displayCtrl MCC_MWStealthIDC;

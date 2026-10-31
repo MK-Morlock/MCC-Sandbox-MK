@@ -63,7 +63,4 @@ _tooltip ctrlcommit 0;
 _tooltip ctrlShow true;
 _tooltip ctrlSetPosition [_infoPosX, _infoPosY,0.15 * safezoneW,_count * safezoneH];
 _tooltip ctrlCommit 0;
-
-sleep 1;
-_tooltip ctrlShow false;
 true

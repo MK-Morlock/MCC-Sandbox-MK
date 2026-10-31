@@ -55,16 +55,7 @@ if (_shout) then {
 	[2,getpos _target,[0,"NO CHANGE","NO CHANGE","UNCHANGED","UNCHANGED","", {},0],[(group _target)]] remoteExec ["MCC_fnc_manageWp", 2, false];
 
 	//Stop and look at the player
-	[[_target, _unit], {
-		_target = _this select 0;
-		_men = _this select 1;
-
-		(group _target) setFormDir ([_target,_men] call BIS_fnc_dirTo);
-		doStop _target;
-		_target disableAI "MOVE";
-		sleep 2;
-		_target enableAI "MOVE";
-	  }] remoteExec ["spawn", _target, false];
+	["haltAI", [_target, _unit]] remoteExec ["MCC_fnc_secAction", _target, false];
 };
 
 //If comply
@@ -112,4 +103,4 @@ if (random 100 >= _targetCorage || (_target getVariable ["MCC_Stunned", false]))
 	};
 };
 
-[[_target], {(_this select 0) enableAI "MOVE";}] remoteExec ["call", _target, false];
+["enableMove", [_target]] remoteExec ["MCC_fnc_secAction", _target, false];

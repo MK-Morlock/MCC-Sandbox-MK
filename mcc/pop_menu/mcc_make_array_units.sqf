@@ -35,9 +35,12 @@ for "_i" from 1 to (count _CfgVehicles - 1) do {
 
 	//Keep going when it is a public entry
 	private _mdl = toLower (getText (_CfgVehicle >> "model"));
-	private _invisible = ((["TargetSoldierBase", "TargetBase", "Target_Base_F", "InvisibleTarget_Base_F"] findIf {(configName _CfgVehicle) isKindOf _x}) >= 0) || {(_mdl find "empty") >= 0} || {(_mdl find "invisible") >= 0};
+	private _invisible = ((["TargetSoldierBase", "TargetBase", "Target_Base_F", "InvisibleTarget_Base_F"] findIf {(configName _CfgVehicle) isKindOf _x}) >= 0) || {_mdl in ["\a3\weapons_f\empty.p3d", "a3\weapons_f\empty.p3d", "\a3\weapons_f\empty", "a3\weapons_f\empty"]} || {(_mdl find "invisible") >= 0};
 	if (_invisible && {getNumber (_CfgVehicle >> "scope") == 2} && {missionNamespace getVariable ["MCC_debug", false]}) then {diag_log format ["MCC [DEBUG] spawn lists | invisible target left out: %1 (%2)", configName _CfgVehicle, getText (_CfgVehicle >> "displayName")]};
-	if ((getNumber(_CfgVehicle >> "scope") == 2) && {!_invisible}) then {
+	private _lcn = toLower (configName _CfgVehicle);
+	private _template = ((_lcn select [((count _lcn) - 5) max 0]) == "_base") || {(_lcn find "_base_") >= 0};
+	if (_template && {getNumber (_CfgVehicle >> "scope") == 2}) then {["DEBUG", "spawn lists", "template class left out: %1", [configName _CfgVehicle]] call MCC_fnc_log};
+	if ((getNumber(_CfgVehicle >> "scope") == 2) && {!_invisible} && {!_template}) then {
 
 		_vehicleDisplayName 	= getText(_CfgVehicle >> "displayname");
 		_cfgclass 			= (configName (_CfgVehicle));

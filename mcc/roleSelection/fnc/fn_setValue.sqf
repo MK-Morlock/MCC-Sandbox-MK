@@ -12,11 +12,7 @@
 
 params ["_varName", "_value", "_id"];
 
-if (getPlayerUID player == _id) then {
-	if (typeName _value == "STRING") then {
-		call compile format ["%1 = '%2';",_varName,_value];
-	} else {
-		call compile format ["%1=%2;",_varName,_value];
-	};
+if (getPlayerUID player == _id && {_varName isEqualType ""} && {_varName regexMatch "^[A-Za-z_][A-Za-z0-9_]*$"}) then {
+	missionNamespace setVariable [_varName, _value];
 };
 

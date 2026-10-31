@@ -199,3 +199,102 @@
     [0, 2, 0.5, 1],
     true
 ] call CBA_Settings_fnc_init;
+
+[
+    "MCC_MWVehicleSpawnMode",
+    "LIST",
+    ["Vehicle groups","How the Mission Generator uses each mission's vehicle budget (cars, armour, support).\nModified: mostly single vehicles. About 1 pick in 4 is a group of 1 or 2 vehicles, such as\nmotorised or mechanised infantry (a vehicle with its squad) or a pair of vehicles.\nGroups are charged per vehicle, so a mission gets the same number of vehicles.\nGroups of 3 or more vehicles are not used.\nOriginal: MCC's original calculation. Half the picks try a group of any size, but its cost\nrule means groups with infantry appear only now and then in large missions, and\nmechanised infantry practically never."],
+    "MCC Mission Generator",
+    [[0, 1], ["Original", "Modified"], 1],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_MWBoats",
+    "LIST",
+    ["Boats","Whether the Mission Generator adds enemy boat patrols to a mission.\nAuto: as the original MCC - when there is water within 2.5 times the mission radius.\nBoats patrol water at least 2 m deep and 15 m from the shore, up to 1 km from the area:\nalong and out from a coast, or up and down a river or lake. Small ponds get no boats.\nOff: never."],
+    "MCC Mission Generator",
+    [[0, 1], ["Auto", "Off"], 0],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_cleanupMissions",
+    "CHECKBOX",
+    ["Cleanup: Finished Missions","Removes a finished generated or campaign mission (compositions, remaining enemies, markers) once no player is near or can see it.\nHidden map objects are put back. Anything players built, and vehicles they have used, are never removed."],
+    "MCC Mission Generator",
+    true,
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_cleanupDistance",
+    "SLIDER",
+    ["Cleanup: Distance (m)","A finished mission is removed once no player is within this distance or can see it."],
+    "MCC Mission Generator",
+    [200, 3000, 1000, 0],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_cleanupWait",
+    "SLIDER",
+    ["Cleanup: Wait (minutes)","How long a finished mission must stay out of every player's range and sight before it is removed."],
+    "MCC Mission Generator",
+    [1, 30, 5, 0],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_cleanupBackstop",
+    "SLIDER",
+    ["Cleanup: Backstop (minutes)","If players stay near a finished mission (for example holding it as a base), its leftovers are removed after this long, piece by piece, whenever nobody is within 50 m or looking at them.\n0 = off."],
+    "MCC Mission Generator",
+    [0, 240, 60, 0],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_cleanupBodies",
+    "SLIDER",
+    ["Cleanup: Bodies (minutes)","Enemy bodies from generated and campaign missions are removed this long after death, once nobody is within 50 m or looking at them.\n0 = never."],
+    "MCC Mission Generator",
+    [0, 120, 20, 0],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_cleanupWrecks",
+    "SLIDER",
+    ["Cleanup: Wrecks (minutes)","Destroyed or empty enemy vehicles from generated and campaign missions are removed this long after, once nobody is within 50 m or looking at them. Vehicles players have used are kept.\n0 = never."],
+    "MCC Mission Generator",
+    [0, 240, 60, 0],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_MWmaxPlayers",
+    "SLIDER",
+    ["Max Players","Highest value on the Mission Generator's players slider.\nEnemies are about 2, 4 or 6 per player (Easy/Medium/Hard): 100 players on Medium is about 400 enemies."],
+    "MCC Mission Generator",
+    [10, 100, 100, 0],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_MWAirDefenceChance",
+    "SLIDER",
+    ["Air Defence: Site Chance (%)","Chance that a generated mission gets an air-defence site (a SAM launcher with a radar).\nRolled separately for each mission: 0 = never, 100 = always."],
+    "MCC Mission Generator",
+    [0, 100, 25, 0],
+    true
+] call CBA_Settings_fnc_init;
+
+[
+    "MCC_MWAirDefenceFallback",
+    "CHECKBOX",
+    ["Air Defence: Standard SAM And Radar","Air-defence sites use the enemy faction's own SAM launcher and radar.\nWhen the faction has none, the standard Arma 3 ones for its side are used instead.\nUntick to place no air-defence site for factions without them."],
+    "MCC Mission Generator",
+    true,
+    true
+] call CBA_Settings_fnc_init;

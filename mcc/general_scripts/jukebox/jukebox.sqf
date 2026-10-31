@@ -54,17 +54,17 @@ switch (_type) do {
 		};
 
 		if (_jukeBoxMusic) then {
-			[2,compile format ["playMusic '%1'",_track]] remoteExec ["MCC_fnc_globalExecute", 0, false];
+			["MCC_fnc_globalExecute", [2,compile format ["playMusic '%1'",_track]], 0, false] call MCC_fnc_secRemote;
 		};
 	};
 
 	//Play
     case 1:	{
 		if (_jukeBoxMusic) then	{
-			[2,compile format ["playMusic '%1'",_track]] remoteExec ["MCC_fnc_globalExecute", 0, false];
+			["MCC_fnc_globalExecute", [2,compile format ["playMusic '%1'",_track]], 0, false] call MCC_fnc_secRemote;
 		} else {
 			if (isClass(configFile >> "CfgSounds" >> _track) || isClass(missionconfigFile >> "CfgSounds" >> _track)) then {
-				[2,compile format ["playSound '%1'",_track]] remoteExec ["MCC_fnc_globalExecute", 0, false];
+				["MCC_fnc_globalExecute", [2,compile format ["playSound '%1'",_track]], 0, false] call MCC_fnc_secRemote;
 			};
 		};
 	};
@@ -78,20 +78,20 @@ switch (_type) do {
 		};
 
 		if (_jukeBoxMusic) then {
-			[2,compile format ["playMusic '%1'",_track]] remoteExec ["MCC_fnc_globalExecute", 0, false];
+			["MCC_fnc_globalExecute", [2,compile format ["playMusic '%1'",_track]], 0, false] call MCC_fnc_secRemote;
 		};
 	};
 
 	//Stop
    	case 3:	{
-		[2,compile "playMusic ''"] remoteExec ["MCC_fnc_globalExecute", 0, false];
+		["MCC_fnc_globalExecute", [2,compile "playMusic ''"], 0, false] call MCC_fnc_secRemote;
 	};
 
 	//Volume slider
    	case 4:	{
 		//Left = silent, right = full volume, for everyone (the jukebox plays for everyone). Kept within 0..1.
 		private _vol = ((sliderPosition MCC_JUKEBOX_VOLUME) max 0) min 1;
-		[2, compile format [["0 fadeSound %1", "0 fadeMusic %1"] select _jukeBoxMusic, _vol]] remoteExec ["MCC_fnc_globalExecute", 0, false];	//as Play / Stop do
+		["MCC_fnc_globalExecute", [2, compile format [["0 fadeSound %1", "0 fadeMusic %1"] select _jukeBoxMusic, _vol]], 0, false] call MCC_fnc_secRemote;	//as Play / Stop do
 	};
 
 	//Link to zone

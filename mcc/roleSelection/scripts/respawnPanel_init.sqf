@@ -202,11 +202,11 @@ if (missionNamespace getvariable ["CP_activated",false]) then {
 	_role = player getvariable "CP_role";
 	if (isnil "_role") exitWith {};
 
-	_exp 	 = call compile format  ["%1Level select 1",_role];
+	_exp 	 = ((missionNamespace getVariable [format ["%1Level", _role], [0, 0]]) param [1, 0]);
 	if (isnil "_exp") exitWith {};
 
 	if (_exp < 0) then {_exp = 0};
-	_oldLevel = call compile format  ["%1Level select 0",_role];
+	_oldLevel = ((missionNamespace getVariable [format ["%1Level", _role], [0]]) param [0, 0]);
 	_html = "<t color='#818960' size='0.8' shadow='1' align='center' underline='false'>"+ _role+ " Level " + str _oldLevel + "</t>";
 	messeges ctrlSetStructuredText parseText _html;
 
@@ -301,7 +301,7 @@ if (missionNamespace getvariable ["CP_activated",false]) then {
 		missionNamespace setVariable ["MCCActiveSpawnPosArray",[player] call MCC_fnc_respawnObjects];
 
 		//Load available resources
-		_array = call compile format ["MCC_res%1",playerside];
+		_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 		{_disp displayCtrl _x ctrlSetText ([(_array select _forEachIndex)] call MCC_fnc_formatNumber)} foreach [81,82,83,84,85];
 
 		//Load available valor

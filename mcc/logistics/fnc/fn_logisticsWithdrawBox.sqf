@@ -40,7 +40,7 @@ _cratesType = missionNamespace getVariable ["MCC_logisticsCrates_TypesWest",[]];
 if (count _cratesType <=0) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC Logistics: Error MCC_logisticsCrates_TypesWest not defined"}};
 
 //Get side resources
-_res = call compile format ["MCC_res%1",_side];
+_res = (missionNamespace getVariable format ["MCC_res%1",_side]);
 _str = "";
 
 switch (tolower _boxType) do

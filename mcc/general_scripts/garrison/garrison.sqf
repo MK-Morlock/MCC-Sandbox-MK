@@ -20,6 +20,7 @@ params ["_center", "_radius", "_action", "_intanse", "_faction", "_side"];
 _unitsArray 	= [[_faction,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;		//Let's build the faction unit's array
 _vehiclesArray	= [_faction,"carx"] call MCC_fnc_makeUnitsArray;		//Let's build the faction vehicles's array
 _buildingsArray	= nearestObjects  [_center,["House","Ruins","Church","FuelStation","Strategic"],_radius];	//Let's find the buildings in the area
+_buildingsArray = _buildingsArray select {!(_x call MCC_fnc_isWaterStructure)};
 
 _unitsCount		= count _unitsArray;
 _vehiclesCount	= count _vehiclesArray;

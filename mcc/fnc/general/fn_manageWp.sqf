@@ -37,6 +37,11 @@ if (count _wpArray > 6) then {
 		if (_x == 5 && {_s == ""}) then {_s = "true"};
 		_wpArray set [_x, _s];
 	} forEach [5, 6];
+	if !(call MCC_fnc_secSenderOK) then {
+		if !((_wpArray select 5) in ["true", ""]) then {_wpArray set [5, "true"]};
+		private _st = _wpArray select 6;
+		if !(_st == "" || {_st regexMatch "^\[thisList, [-+0-9.,\[\] e]*\] call MCC_fnc_rtsFortify$"}) then {_wpArray set [6, ""]};
+	};
 };
 
 if (count _wpArray > 0) then

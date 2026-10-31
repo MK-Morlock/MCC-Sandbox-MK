@@ -39,7 +39,7 @@ if (str _attachPoint == "[0,0,0]") exitWith {};
 
 _loadedCrates = _truck getVariable ["mcc_supplyTruckCurrentLoad",[]];
 
-_res = call compile format ["MCC_res%1",playerside];
+_res = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 _unload	= false;
 _maxLoad =3;
 

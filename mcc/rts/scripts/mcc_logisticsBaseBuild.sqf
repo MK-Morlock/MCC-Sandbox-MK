@@ -151,7 +151,7 @@ _handler = (_disp displayCtrl 9120) ctrladdeventhandler ["draw","_this call MCC_
 	_disp = uiNamespace getVariable "MCC_LOGISTICS_BASE_BUILD";
 
 	//Load available resources
-	_array = call compile format ["MCC_res%1",playerside];
+	_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 	while {(str (_disp displayCtrl 2) != "No control")} do {
 
 		//get number of storage
@@ -1224,18 +1224,7 @@ MCC_CONST_CAM_Handler =
 								_buildingPos = [(nearestBuilding _wpPos), count units _x] call BIS_fnc_buildingPositions;
 								_x setVariable ["MCC_rtsIsFortified",true,true];
 
-								_string = format ["{
-								                      _unit = (thislist select  _forEachIndex);
-								                      _unit domove _x;
-								                      _unit setSpeedMode 'FULL';
-								                      _unit spawn {
-								                      	sleep 5;
-								                      	waituntil {unitready _this};
-								                      	_this disableai 'move';
-								                      	while {(unitready leader _this)} do {sleep 1};
-								                      	_this enableai 'move';
-								                       };
-								                  } forEach %1;",_buildingPos];
+								_string = format ["[thisList, %1] call MCC_fnc_rtsFortify", _buildingPos];
 							} else {
 								//Board empty vehicles
 								if ({count crew _x ==0} count _list > 0) then {

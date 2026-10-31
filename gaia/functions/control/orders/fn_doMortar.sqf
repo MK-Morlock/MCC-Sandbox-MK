@@ -24,6 +24,11 @@ if (_MortarRound>0) then {_pos = _group getVariable ["GAIA_MortarTarget",[0,0,0]
 
 //If this is the second round, we dont check for all sorts of stuff. Finish what you started
 _isInRange 				= (_pos inRangeOfArtillery [[(leader _group)],_ammo  ]) or (_MortarRound>0) ;
+if (_isInRange && {!([_group, _pos] call MCC_fnc_gaiaFireSafe)}) exitWith {
+	_group setVariable ["GAIA_MortarRound", 0, false];
+	_group setVariable ["GAIA_MortarTarget", [0,0,0], false];
+	false
+};
 
 
 // First Shot

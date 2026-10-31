@@ -114,7 +114,7 @@ else
 
 						if (isMultiplayer) then
 						{
-							 [[], compile format ["unassignVehicle objectFromNetID '%1'; objectFromNetID '%1' action ['eject', vehicle objectFromNetID '%1']", netID _unit]] remoteExec ["call", _unit, false];
+							 ["eject", [_unit]] remoteExec ["MCC_fnc_secAction", _unit, false];
 						}
 						else
 						{
@@ -279,7 +279,7 @@ else
 						{
 							_unit action ["GETOUT", vehicle _unit];
 							unassignVehicle _unit;
-							[[], compile format ["objectFromNetID '%1' switchmove 'crew_tank01_out'", netID _unit]] remoteExec ["call", 0, false];
+							["switchMove", [_unit, "crew_tank01_out"]] remoteExec ["MCC_fnc_secAction", 0, false];
 						}
 						else
 						{
@@ -304,11 +304,11 @@ else
 						detach _unit;
 						if (isMultiplayer) then
 						{
-							 [[], compile format ["objectFromNetID '%1' switchmove '';", netID _unit]] remoteExec ["call", 0, false];
+							 ["switchMove", [_unit, ""]] remoteExec ["MCC_fnc_secAction", 0, false];
 						}
 						else
 						{
-							[[], compile format ["objectFromNetID '%1' switchmove ''", netID _unit]] remoteExec ["call", 0, false];
+							["switchMove", [_unit, ""]] remoteExec ["MCC_fnc_secAction", 0, false];
 						};
 					};
 

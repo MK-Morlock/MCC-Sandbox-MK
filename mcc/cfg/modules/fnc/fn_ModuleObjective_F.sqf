@@ -62,7 +62,11 @@ switch (tolower _state) do
 
 		sleep 5;
 
-		_module setVariable ["updated",false,true];
+		if ((_module getVariable ["RscAttributeTaskState","created"]) isEqualTo _taskState) then {
+			_module setVariable ["updated",false,true];
+		} else {
+			_module setVariable ["updated",true,true];
+		};
 
 		//Pending
 		waitUntil {(isNull _module) || (_module getvariable ["updated",false])};

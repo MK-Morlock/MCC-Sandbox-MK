@@ -15,7 +15,7 @@ if (MCC_isACE) then {
 	removeallweapons _hostage;
 	_hostage setcaptive true;
 	_init = "_this switchmove 'Acts_ExecutionVictim_Loop';";
-	[[netID _hostage,_hostage], _init, false] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+	["MCC_fnc_setVehicleInit", [[netID _hostage,_hostage], _init, false], 0, true] call MCC_fnc_secRemote;
 	/*[_hostage, "Hold %1 to interact"] remoteExec ["MCC_fnc_createHelper", 2, false];*/
 };
 

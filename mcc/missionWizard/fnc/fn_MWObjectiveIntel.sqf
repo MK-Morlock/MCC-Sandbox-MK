@@ -40,7 +40,6 @@ _objType = if (_isDownloadIntel) then {"Land_DataTerminal_01_F"} else {
 if !(_isCQB) then {
 
 	//Clear area
-	[_objPos,50,true] call MCC_fnc_hideTerrainObjectsArea;
 
 	_objPos = [_objPos] call MCC_fnc_buildRandomComposition;
 };
@@ -48,6 +47,7 @@ if !(_isCQB) then {
 //Lets spawn some body guards
 _range = if (_isCQB) then {30} else {60};
 [_objPos,_range,0,4,_faction, _side] remoteExec ["MCC_fnc_garrison",2];
+[_objPos, 30, 4, _faction, _side] remoteExec ["MCC_fnc_MWcampGuards", 2];
 
 //Lets find out if we have a building close by
 _selectedBuilding = ([_objPos, 100] call MCC_fnc_MWFindbuildingPos) call BIS_fnc_selectRandom;
@@ -111,7 +111,7 @@ missionNamespace setVariable ["MCC_MWObjectiveItems", ((missionNamespace getVari
 
 //Pick Item
 _init = '_this call MCC_fnc_pickItem';
-[[netID _object,_object], _init] remoteExec ["MCC_fnc_setVehicleInit",0,_object];
+["MCC_fnc_setVehicleInit", [[netID _object,_object], _init], 0, _object] call MCC_fnc_secRemote;
 
 {_x addCuratorEditableObjects [[_object],false]} forEach allCurators;
 

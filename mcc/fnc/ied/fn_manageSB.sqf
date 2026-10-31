@@ -28,18 +28,22 @@ _iedside			= param [1,west];
 _trapvolume			= param [2,"medium"];
 _IEDExplosionType	= param [3,1];
 
-if (typeName _iedside == "STRING") then {
-	_iedside = switch (tolower _iedside) do
-				{
-				   case "west":	{[west]};
-				   case "east":	{[east]};
-				   case "guer":	{[resistance]};
-				   case "civ":	{[civilian]};
-				   default {[west]};
-				};
+if !(_iedside isEqualType []) then {_iedside = [_iedside]};
+_iedside = _iedside apply {
+	if (_x isEqualType "") then {
+		switch (toLower ((_x splitString " []") joinString "")) do {
+			case "west": {west};
+			case "east": {east};
+			case "guer": {resistance};
+			case "resistance": {resistance};
+			case "independent": {resistance};
+			case "civ": {civilian};
+			case "civilian": {civilian};
+			default {west};
+		}
+	} else {_x}
 };
-
-if (typeName _iedside == typeName sideLogic) then {_iedside = [_iedside]};
+if (_iedside isEqualTo []) then {_iedside = [west]};
 
 
 _sound		=1; //choose 0 for no sounds
@@ -50,7 +54,7 @@ removeallweapons _sb;
 
 _dummy = MCC_dummy createVehicle (getpos _sb);
 _init = '_this hideobject true;';
-[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+["MCC_fnc_setVehicleInit", [[netid _dummy,_dummy], _init], 0, true] call MCC_fnc_secRemote;
 
 _dummy attachto [_sb,[0,0,0]];
 

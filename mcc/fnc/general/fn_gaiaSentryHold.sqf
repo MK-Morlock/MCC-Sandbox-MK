@@ -1,0 +1,13 @@
+params [["_group", grpNull, [grpNull]], ["_wp", [], [[]]]];
+if (isNull _group || {count _wp < 2}) exitWith {};
+if (((units _group) findIf {isPlayer _x}) >= 0) exitWith {};
+private _idx = _wp select 1;
+private _wpPos = waypointPosition _wp;
+private _same = {(count (waypoints _group) > _idx) && {(waypointPosition [_group, _idx]) isEqualTo _wpPos} && {(waypointType [_group, _idx]) == "SENTRY"}};
+waitUntil {sleep 3; isNull _group || {!(call _same)} || {((currentWaypoint _group) == _idx) && {((leader _group) distance2D _wpPos) < 40}}};
+if (isNull _group || {!(call _same)}) exitWith {};
+private _held = (units _group) select {alive _x && {!isPlayer _x} && {(vehicle _x) == _x}};
+if (count _held == 0) exitWith {};
+{doStop _x} forEach _held;
+waitUntil {sleep 3; isNull _group || {!(call _same)} || {(currentWaypoint _group) != _idx}};
+if (!isNull _group) then {{if (alive _x && {!isPlayer _x}) then {_x doFollow (leader _group)}} forEach _held};

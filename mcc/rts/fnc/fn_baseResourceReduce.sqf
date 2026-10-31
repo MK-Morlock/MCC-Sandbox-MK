@@ -10,7 +10,7 @@ private "_level";
 //removes resources
 
 params ["_res"];
-_resToCheck = call compile format ["MCC_res%1",playerSide];
+_resToCheck = (missionNamespace getVariable format ["MCC_res%1",playerSide]);
 {
 	_var   = _x select 0;
 	_level = _x select 1;

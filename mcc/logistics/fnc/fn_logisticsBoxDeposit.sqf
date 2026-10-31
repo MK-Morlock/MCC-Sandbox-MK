@@ -47,7 +47,7 @@ if (_cratesType == -1) then {
 if (_cratesType == -1) exitWith {};
 
 //Get side resources
-_res = call compile format ["MCC_res%1",_side];
+_res = (missionNamespace getVariable format ["MCC_res%1",_side]);
 _str = "";
 
 //If it is a big create

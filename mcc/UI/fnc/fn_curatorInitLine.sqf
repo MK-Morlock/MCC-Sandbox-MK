@@ -361,7 +361,7 @@ if (MCC_unitName != "") then
 
 if (MCC_unitInit != "" && (MCC_unitInit != (_target getVariable ["vehicleInit",""]))) then
 {
-	[[netid _target,_target], MCC_unitInit] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+	["MCC_fnc_setVehicleInit", [[netid _target,_target], MCC_unitInit], 0, true] call MCC_fnc_secRemote;
 };
 
 /*

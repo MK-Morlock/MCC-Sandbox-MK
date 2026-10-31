@@ -167,13 +167,13 @@ switch (true) do {
 				if (count _extractionObjects > 0) then {["addObjects", [_logic, _extractionObjects]] call MCC_fnc_generatedMissions};
 				["WARN", "MCC_fnc_customTasks", "rescue task: no start location or respawn position for %1 - extraction point at %2, %3 m from the hostage", [_owners, mapGridPosition _extraction, round (_extraction distance2D _attachedUnit)]] call MCC_fnc_log;
 				_extractionMarker = format ["MCC_extraction_%1", ["MCC_extractionCounter",1] call BIS_fnc_counter];
-				[[_extractionMarker, _extraction, [_owners select 0, true] call BIS_fnc_sideColor], {
+				["call", [[_extractionMarker, _extraction, [_owners select 0, true] call BIS_fnc_sideColor], {
 					params ["_mk", "_p", "_c"];
 					private _m = createMarkerLocal [_mk, _p];
 					_m setMarkerTypeLocal "mil_pickup";
 					_m setMarkerColorLocal _c;
 					_m setMarkerTextLocal "Extraction";
-				}] remoteExec ["call", _owners select 0, _extractionMarker];
+				}], _owners select 0, _extractionMarker] call MCC_fnc_secRemote;
 				_desc = format ["Get %1 to the extraction point alive.<br/><br/>Your side has no base on this map (no start location or respawn point), so an extraction point is marked on the map. Get %1 within 100 m of it.", name _attachedUnit];
 				_logic setvariable ["showMarker", _extraction, true];
 			};

@@ -94,7 +94,7 @@ for "_i" from 1 to (_houseConuter min _counter) do {
 				 };
 
 			//Make sure the vehicle is not in a wall on the road side
-			_spawnPos = [];
+			_spawnPos = [_roadPos, _vehicleClass, 32] call MCC_fnc_clearVehicleSpot;
 			_radius = 5;
 
 			while {_spawnPos isEqualTo []} do {

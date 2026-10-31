@@ -122,7 +122,7 @@ _haloList sort true;
     "CHECKBOX",
     ["Ambient Fire","Explosions may start fires that spread with the wind. Unticking puts\nout all fires and stops new ones."],
     ["MCC General", "Ambient Fire"],
-    true,
+    false,
     true,
     {
         params ["_value"];

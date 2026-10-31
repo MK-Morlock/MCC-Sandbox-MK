@@ -1,4 +1,5 @@
 params ["_pos", "_cfg", ["_loc", 0], "_side", ["_dir", 0, [0]], ["_height", 0, [0]], ["_beh", "hold", [""]], ["_cmd", false, [false]]];
+if !(call MCC_fnc_secSenderOK) exitWith {};
 if (!isServer) exitWith {};
 private _grp = [_pos, _cfg, _loc, _side, false, false, "-"] call MCC_fnc_groupSpawn;
 if (isNil "_grp" || {!(_grp isEqualType grpNull)} || {isNull _grp}) exitWith {};

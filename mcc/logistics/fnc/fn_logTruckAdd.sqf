@@ -59,7 +59,7 @@ _loadedCrates = if (_isHeli) then {
 					_truck getVariable ["mcc_supplyTruckCurrentLoad",[]];
 				};
 
-_array = call compile format ["MCC_res%1",playerside];
+_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 
 if (_add) then {
 	if (count _loadedCrates <_maxLoad) then {

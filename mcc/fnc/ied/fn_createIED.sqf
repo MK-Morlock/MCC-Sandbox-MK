@@ -123,7 +123,7 @@ _fnc_iedHandle = {
 	//delete IED marker
 	_dummyMarker = _dummy getvariable "iedMarkerName";
 	if (!isnil "_dummyMarker") then {
-		[2,compile format ["deletemarkerlocal '%1';",_dummyMarker]] remoteExec ["MCC_fnc_globalExecute",0];
+		["MCC_fnc_globalExecute", [2,compile format ["deletemarkerlocal '%1';",_dummyMarker]], 0, false] call MCC_fnc_secRemote;
 	};
 
 	_armed 		= _dummy getvariable ["armed",false];

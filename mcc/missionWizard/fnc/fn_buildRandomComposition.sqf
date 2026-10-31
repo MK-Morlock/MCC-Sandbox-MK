@@ -44,6 +44,11 @@ _compTypeName = switch (tolower _compType) do
 _compostion = (missionNamespace getVariable [_compTypeName,[[]]]) call BIS_fnc_selectRandom;
 
 if (count _pos == 2) then {_pos set [2,0]};
+private _fp = [_compostion] call MCC_fnc_compositionFootprint;
+private _flat = [_pos, 250, _fp] call MCC_fnc_findFlatSpot;
+if (count _flat > 0) then {_pos = [_flat select 0, _flat select 1, 0]};
+MCC_MWPlacedSpots = (missionNamespace getVariable ["MCC_MWPlacedSpots", []]) + [[_pos, _fp]];
+[_pos, (_fp + 10) max 30, true, if ([_pos, _fp] call MCC_fnc_structuresNear) then {[]} else {["TREE", "SMALL TREE", "BUSH", "ROCK", "ROCKS"]}] call MCC_fnc_hideTerrainObjectsArea;
 _null = [_pos, random 360, _compostion] call MCC_fnc_compositionsPlace;
 
 _pos;

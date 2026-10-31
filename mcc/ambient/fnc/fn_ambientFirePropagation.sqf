@@ -25,7 +25,7 @@ params [
 if (_fireDistance <=0) exitWith {};
 
 // Stop if ambient fire is switched off, or fires were extinguished after this spread step was scheduled
-if !(missionNamespace getVariable ["MCC_ambientFireSettingIndex", true]) exitWith {};
+if !(missionNamespace getVariable ["MCC_ambientFireSettingIndex", false]) exitWith {};
 private _fireEpoch = missionNamespace getVariable ["MCC_ambientFireEpoch", 0];
 
 private ["_pos","_fire","_fireSpread","_posTree","_dummy","_effect","_object"];

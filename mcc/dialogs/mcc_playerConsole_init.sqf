@@ -519,7 +519,7 @@ MCC_fnc_mapDrawWPConsole =
 		} foreach allgroups;
 
 		//Load available resources
-		_array = call compile format ["MCC_res%1",playerside];
+		_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 		{_mccdialog displayCtrl _x ctrlSetText str floor (_array select _forEachIndex)} foreach [81,82,83,84,85];
 
 		sleep 0.5;

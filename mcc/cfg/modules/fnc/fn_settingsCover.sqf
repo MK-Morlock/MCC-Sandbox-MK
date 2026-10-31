@@ -126,6 +126,6 @@ publicvariable "MCC_surviveModAllowSearch";
           ];
 
 //Fatigue
-{player enableStamina !(missionNamespace getVariable ["MCC_disableFatigue",false])} remoteExec ["bis_fnc_call", 0];
+["bis_fnc_call", {player enableStamina !(missionNamespace getVariable ["MCC_disableFatigue",false])}, 0, false] call MCC_fnc_secRemote;
 
 deleteVehicle _module;

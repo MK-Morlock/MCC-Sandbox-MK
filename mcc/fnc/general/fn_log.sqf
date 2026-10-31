@@ -6,7 +6,7 @@ params [
 ];
 
 _level = toUpper _level;
-if (!(missionNamespace getVariable ["MCC_debug", false]) && {!(_level in ["ERROR", "BUILD"])}) exitWith {};
+if (!(missionNamespace getVariable ["MCC_debug", false]) && {!(_level in ["BUILD", "CAMPAIGN"])}) exitWith {};
 
 private _text = if (count _args > 0) then {format ([_message] + _args)} else {_message};
 

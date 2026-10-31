@@ -677,6 +677,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 			case "Bombing-run":	//Bombing run
 			{
 				[_plane1, [_pos select 0, _pos select 1, 0]] call MCC_fnc_casReleaseWait;
+				[_plane1, [_pos select 0, _pos select 1, 0], 15, 4 + (_ammount * 0.5)] call MCC_fnc_casGuideArm;
 				[_plane1, "bomb", [], _ammount * 2, 0.25] call MCC_fnc_casRealFire;
 			};
 

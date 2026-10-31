@@ -38,4 +38,4 @@ _statment = {
 	_mine spawn {sleep 30; _this setDamage 1};
 };
 
-[[_pos, _leader], _statment] remoteExec ["spawn", _leader, false];
+["placeSatchel", [_pos, _leader]] remoteExec ["MCC_fnc_secAction", _leader, false];

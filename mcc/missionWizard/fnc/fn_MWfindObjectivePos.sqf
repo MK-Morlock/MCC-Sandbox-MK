@@ -56,7 +56,7 @@ while {(count _availablePos) == 0 && (_range < (_maxObjectivesDistance*3))} do {
 };
 
 if (missionNamespace getVariable ["MCC_debug",false]) then {
-	systemChat format ["found position: %1, have time: %2, farenough: %3",(count _availablePos) > 0, time < _time,_farEnough];
+	if (missionNamespace getVariable ["MCC_debug", false]) then {systemChat format ["found position: %1, have time: %2, farenough: %3",(count _availablePos) > 0, time < _time,_farEnough]};
 	if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["found position: %1, have time: %2, farenough: %3",(count _availablePos) > 0, time < _time,_farEnough]};
 };
 

@@ -31,7 +31,7 @@ if (typeName _objPos == typeName objNull) then {
 while {count _foundBuildings == 0} do
 {
 	_buildingsArray	= nearestObjects  [_objPos,["House","Ruins","Church","FuelStation","Strategic"],_radius];	//Let's find the buildings in the area
-	_buildingsArray = _buildingsArray select {!isObjectHidden _x};
+	_buildingsArray = _buildingsArray select {!isObjectHidden _x && {!(_x call MCC_fnc_isWaterStructure)}};
 	_radius = _radius + 50; 	//increase by 50 meters in nothing is found.
 
 

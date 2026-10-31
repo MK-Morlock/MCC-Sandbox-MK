@@ -113,6 +113,7 @@ _arrayAssets params [
 //Record what this mission creates so it can be deleted again (MCC_fnc_generatedMissions / "Delete Missions")
 private _registryId = format ["MW_%1", ["MCC_generatedMissionCounter",1] call BIS_fnc_counter];
 ["start", [_registryId]] call MCC_fnc_generatedMissions;
+MCC_MWPlacedSpots = [];
 missionNamespace setVariable ["MCC_MWCurrentMissionId", _registryId];
 ["genStart", [_registryId]] call MCC_fnc_perfLog;	//performance diagnostics (CBA: MCC General > Performance log)
 
@@ -261,7 +262,7 @@ if (typeName _wholeMap == typeName true ) then {
 								};
 
 		//Find mission center
-		_center = [getpos MWMissionArea,_radius,_isCQB,MCC_MWBasedLocations] call MCC_fnc_MWFindMissionCenter;
+		_center = [getpos MWMissionArea,_radius,_isCQB,MCC_MWBasedLocations,true] call MCC_fnc_MWFindMissionCenter;
 
 		//If we stray too far from the center cancel the mission
 		_missionCenter = (_center select 0);
@@ -289,7 +290,8 @@ if (isNil "_missionCenter") exitWith {};
 
 ["genStage", ["find mission location"]] call MCC_fnc_perfLog;
 //Init the MW groups configs
-[_enemyfaction] call MCC_fnc_createConfigs;
+MCC_MWSpreadActive = if (_campaignMission) then {missionNamespace getVariable ["MCC_campaignSpreadIndex", 1]} else {missionNamespace getVariable ["MCC_MWSpreadIndex", 1]};
+[_enemyfaction, (missionNamespace getVariable ["MCC_MWContentModes", createHashMap]) getOrDefault [toLower _enemyfaction, 2]] call MCC_fnc_createConfigs;
 
 _missionCenterTrigger = createtrigger ["emptydetector",_missionCenter];
 _missionCenterTrigger settriggerarea [_maxObjectivesDistance*2.5,_maxObjectivesDistance*2.5,0,false];
@@ -526,7 +528,7 @@ _objectives = [];
 								[[_markerName]] call MCC_MWCleanup;
 							};
 
-							_supplyTruck = _supplyTruckClass createVehicle _startPos;
+							_supplyTruck = _supplyTruckClass createVehicle ([_startPos, _supplyTruckClass] call MCC_fnc_safeSpawnPos);
 
 							//Add to curator
 							{_x addCuratorEditableObjects [[_supplyTruck],true]} forEach allCurators;
@@ -546,7 +548,7 @@ _objectives = [];
 							};
 
 							//Spawn one group in defend
-							_unitsArray = [[_enemyfaction ,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry;
+							_unitsArray = [[[_enemyfaction ,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry, _enemyfaction] call MCC_fnc_contentFilterList;
 
 							if (count _unitsArray > 0) then {
 								if (count _unitsArray > 6) then {_unitsArray resize 6};
@@ -624,7 +626,7 @@ _objectives = [];
 			_objPos = MCC_MWObjectivesNames select 0;
 
 			//Lets create a zone
-			_zoneNumber = (count (missionNamespace getVariable ["MCC_zones_numbers",[]])) + 1;
+			_zoneNumber = call MCC_fnc_nextZoneNumber;
 			_script_handler = [_zoneNumber,_objPos,_maxObjectivesDistance*(if (_campaignMission) then {1} else {2})] call MCC_fnc_MWUpdateZone;
 			waituntil {_script_handler};
 
@@ -649,19 +651,19 @@ _objectives = [];
 			private _objectType = "";
 			private _unitsArray = [];
 			private _pos = [];
-			_unitsArray 	= [_civFaction, "soldier"] call MCC_fnc_makeUnitsArray;		//Let's build the faction unit's array
+			_unitsArray 	= [[_civFaction, "soldier"] call MCC_fnc_makeUnitsArray, _civFaction] call MCC_fnc_contentFilterList;		//Let's build the faction unit's array
 
 			if (_isSB && (count _unitsArray > 0)) then {
 				for [{_i = 0},{_i <=(_totalEnemyUnits/30)},{_i = _i+1}] do {
 					if (random 1 >0.5) then {
 						//Name the bomber.
 						_objectType = (_unitsArray call BIS_fnc_selectRandom) select 0;
-						_pos = [[[_objPos,(_maxObjectivesDistance*0.7)]],["water"],{true}] call BIS_fnc_randomPos;
+						_pos = [_objPos, (_maxObjectivesDistance*0.7)] call MCC_fnc_landSpot;
 
-						[_pos,_objectType,"large",floor (random 2),_sidePlayer] remoteExec ["MCC_fnc_SBSingle", 2,false];
+						if !(_pos isEqualTo []) then {[_pos,_objectType,"large",floor (random 2),_sidePlayer] remoteExec ["MCC_fnc_SBSingle", 2,false];};
 
 						//Debug
-						if (MCC_debug) then {
+						if (MCC_debug && {!(_pos isEqualTo [])}) then {
 							private _marker = "";
 							private _name = "";
 							_name = FORMAT ["SBMarker_%1", ["SBMarker",1] call bis_fnc_counter];
@@ -681,12 +683,12 @@ _objectives = [];
 					if (random 1 >0.5) then {
 						//Name the AC.
 						_objectType = (_unitsArray call BIS_fnc_selectRandom) select 0;
-						_pos = [[[_objPos,(_maxObjectivesDistance*0.7)]],["water"],{true}] call BIS_fnc_randomPos;
+						_pos = [_objPos, (_maxObjectivesDistance*0.7)] call MCC_fnc_landSpot;
 
-						[_pos,_objectType,_sidePlayer,"Armed Civilian",random 360] remoteExec ["MCC_fnc_ACSingle", 2];
+						if !(_pos isEqualTo []) then {[_pos,_objectType,_sidePlayer,"Armed Civilian",random 360] remoteExec ["MCC_fnc_ACSingle", 2];};
 
 						//Debug
-						if (MCC_debug) then {
+						if (MCC_debug && {!(_pos isEqualTo [])}) then {
 							private _marker = "";
 							private _name = "";
 							_name = FORMAT ["ACMarker_%1", ["ACMarker_",1] call bis_fnc_counter];
@@ -846,12 +848,12 @@ _sounds set [count _sounds, _tempText select 1];
 //_isCQB
 if (_isCQB) then {
     _tempText = [
-	              [" and they have taken up defensive positions inside buildings.",["isCQB1",3.49]],
-				  [" and they are using civilian buildings to fortify themselves.",["isCQB2",3.69]]
+	              ["They have taken up defensive positions inside buildings.",["isCQB1",3.49]],
+				  ["They are using civilian buildings to fortify themselves.",["isCQB2",3.69]]
 				] call BIS_fnc_selectRandom;
-    _html = _html + format ["<t size='0.8' color='#E2EEE0'> %1.</t>",_tempText select 0];
-	_html2 = _html2 + format ["%1",_tempText select 0];
-	_missionText =  _missionText + format ["%1 <br/>",_tempText select 0];
+    _html = _html + format ["<t size='0.8' color='#E2EEE0'>%1 </t>",_tempText select 0];
+	_html2 = _html2 + format [" %1",_tempText select 0];
+	_missionText =  _missionText + format [" %1<br/>",_tempText select 0];
 	//_plainText pushback [_tempText select 0,"<t size='0.7' color='#E2EEE0' font='PuristaMedium'>%1</t>",0];
 	_sounds set [count _sounds, _tempText select 1];
 };

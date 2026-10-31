@@ -63,7 +63,7 @@ if !mcc_isloading then
 							case "civ" : {MCC_server setVariable ["Arti_CIV_shellsleft",HW_arti_number_shells_per_hour,true]};
 						};	
 							
-						[2,compile format ['["MCCNotifications",["%2 %1 shells added","%3data\ammo_icon.paa",""]] call bis_fnc_showNotification;',nshell,_shellName,MCC_path]] remoteExec ["MCC_fnc_globalExecute", 0, false];
+						["MCC_fnc_globalExecute", [2,compile format ['["MCCNotifications",["%2 %1 shells added","%3data\ammo_icon.paa",""]] call bis_fnc_showNotification;',nshell,_shellName,MCC_path]], 0, false] call MCC_fnc_secRemote;
 						//["MCCNotifications",[format ["%2 %1 shells added",nshell,_shellName],format ["%1data\ammo_icon.paa",MCC_path],""]] call bis_fnc_showNotification;
 				};
 				hint format ["%1 Artillery enabled. \nAdded %2 artillery rounds",_shellName,nshell];

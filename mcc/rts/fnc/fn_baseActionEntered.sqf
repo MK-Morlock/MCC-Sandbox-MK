@@ -100,7 +100,7 @@ for [{_i= 121},{_i <= 127},{_i = _i + 2}] do
 };
 
 private _short = [];
-private _have = call compile format ["MCC_res%1", playerSide];
+private _have = (missionNamespace getVariable format ["MCC_res%1",playerSide]);
 {
 	_x params [["_rn", "", [""]], ["_amt", 0, [0]]];
 	private _ri = ["ammo", "repair", "fuel", "food", "med"] find (toLower _rn);

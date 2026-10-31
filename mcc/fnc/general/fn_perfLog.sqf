@@ -1,6 +1,6 @@
 params [["_mode", "", [""]], ["_args", []]];
 if (!isServer) exitWith {};
-if !(missionNamespace getVariable ["MCC_perfLog", false]) exitWith {};
+if !((missionNamespace getVariable ["MCC_perfLog", false]) && {missionNamespace getVariable ["MCC_debug", false]}) exitWith {};
 
 if (isNil "MCC_perfWrite") then {
 	MCC_perfWrite = {

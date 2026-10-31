@@ -131,7 +131,7 @@ if (_constType != "hq") then {
 
 										{detach _x; deleteVehicle _x} foreach attachedObjects _obj;
 										deleteVehicle _obj;
-										[[_side], {player addRating (if (playerside != (_this select 0)) then {500} else {-1000})}] remoteExec ["call", _source, false];
+										["buildRating", [_side]] remoteExec ["MCC_fnc_secAction", _source, false];
 
 										[_text,true] remoteExec ["MCC_fnc_globalHint", _side, false];
 

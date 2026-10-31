@@ -15,7 +15,7 @@ deletevehicle _anchor;
 
 if (_deleteModule) then {
 	//Delete Marker
-	[[], compile format ['deleteMarker "%1";',(_module getVariable ["mcc_markerName",""])]] remoteExec ["call", _side, false];
+	["deleteMarker", [_module getVariable ["mcc_markerName", ""]]] remoteExec ["MCC_fnc_secAction", _side, false];
 
 	//Delete module
 	deletevehicle _module;

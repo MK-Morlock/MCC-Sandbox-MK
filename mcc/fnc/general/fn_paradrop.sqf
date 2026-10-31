@@ -89,7 +89,7 @@ if (_halo) then {
 		_unit addHeadgear "H_CrewHelmetHeli_B";
 		_unit forceAddUniform  "U_B_HeliPilotCoveralls";
 
-		if ( isPlayer _unit ) then
+		call
 		{
 			if (_backpack != "") then
 			{
@@ -203,6 +203,7 @@ if (_halo) then {
 		else
 		{
 			//AI: own uniform and its items back (they went to the player before), and the backpack back on with its load
+			{if (typeOf _x == "GroundWeaponHolder") then {detach _x; deleteVehicle _x}} forEach attachedObjects _unit;
 			if (_headgear != "") then { removeHeadgear _unit; _unit addHeadgear _headgear };
 			if (_uniform != "") then { removeUniform _unit; _unit forceAddUniform  _uniform };
 

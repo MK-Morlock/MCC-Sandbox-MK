@@ -55,7 +55,7 @@ if (_object isKindOf "mcc_sandbox_modulevehicleSpawner" || _object isKindOf "MCC
 
         waitUntil {!isNil "MCC_curator"};
         {
-            [[_x], {MCC_curator addCuratorEditableObjects [[_this select 0],false];}] remoteExec ["call", 2, false];
+            ["zeusAdd", [[_x], false, false]] remoteExec ["MCC_fnc_secAction", 2, false];
         } forEach [_billboard,_helipad];
 
         [_billboard,[_type,_helipad],"init"] remoteExec ["MCC_fnc_vehicleSpawnerInit",0,_billboard];

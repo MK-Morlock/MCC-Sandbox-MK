@@ -10,4 +10,7 @@ private _unitname = _this select 1;
 
 _unit setVehicleVarName _unitname;
 _unit setVariable ["text",_unitname,true];
-_unit call compile format ["%1=_This; PublicVariable ""%1""",_unitname];
+if (_unitname isEqualType "" && {_unitname regexMatch "^[A-Za-z_][A-Za-z0-9_]*$"}) then {
+	missionNamespace setVariable [_unitname, _unit];
+	publicVariable _unitname;
+};

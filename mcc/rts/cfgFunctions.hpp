@@ -58,6 +58,7 @@ class rts
 	class rtsBuildUIContainerBack {description = "back from UI container";};
 	class rtsbuyVehicle {description = "open vehicle spawner dialog for the commander";};
 	class rtsOrderStop {description = "Stop WP";};
+	class rtsFortify {description = "(MK) fortify order: units move to building positions and hold";};
 	class rtsOrderGetout {description = "Disembark units from vehicle";};
 	class rtsOrderLand {description = "Order land";};
 	class rtsTradeforFood {description = "Trade resources for food";};

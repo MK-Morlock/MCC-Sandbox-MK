@@ -402,17 +402,10 @@ MCC_fnc_MWMapOpen_draw = {
 	};
 
 	//--- Tooltip
-	if (count _selected > 0 && !MCC_MWMap_mouseClickDisable) then {
-		switch (count _selected) do {
-
-			//--- Mission
-			case 10;
-			case 9:
-			{
-				//[_selected,_display,MC_MWMap_mousePos] execVM MCC_path + "mcc\missionWizard\fnc\fn_MWMapTooltip.sqf";
-				[_selected,_display,MC_MWMap_mousePos] spawn MCC_fnc_MWMapTooltip;
-			};
-		};
+	if (count _selected > 0 && {!MCC_MWMap_mouseClickDisable} && {(count _selected) in [9, 10]}) then {
+		[_selected,_display,MC_MWMap_mousePos] call MCC_fnc_MWMapTooltip;
+	} else {
+		(_display displayctrl 9511) ctrlShow false;
 	};
 	MCC_MWMap_selected = _selected;
 };

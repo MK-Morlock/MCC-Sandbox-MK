@@ -83,7 +83,7 @@ if ((str (finddisplay mcc_playerConsole2_IDD) != "no display") && (alive MCC_Con
 		MCC_fakeUAV 		= "Camera" camCreate [10,10,10];
 		if (!isnil "MCC_fakeUAVCenter") then {deletevehicle MCC_fakeUAVCenter};
 		MCC_fakeUAVCenter	= "Sign_Sphere10cm_F" createvehicle [((getpos MCC_ConolseUAV) select 0),(getpos MCC_ConolseUAV) select 1, 0];
-		[[netid MCC_fakeUAVCenter,MCC_fakeUAVCenter], "_this hideObjectGlobal true"] remoteExec ["MCC_fnc_setVehicleInit", 2, false];
+		["hideGlobal", [MCC_fakeUAVCenter]] remoteExec ["MCC_fnc_secAction", 2, false];
 		MCC_fakeUAV cameraEffect ["INTERNAL", "BACK", "rendertarget9"];
 		MCC_fakeUAVFOV = 0.6;
 		MCC_fakeUAV camsetTarget MCC_fakeUAVCenter;
@@ -284,9 +284,17 @@ if ((str (finddisplay mcc_playerConsole2_IDD) != "no display") && (alive MCC_Con
 			MCC_fakeUAV = nil;
 			_mccdialog = findDisplay mcc_playerConsole2_IDD;
 			if (_cruiseEnd) then {
-				//Cruise missile feed: Escape closes the console (it used to go back to the console's main page); after
-				//the impact the console closes a moment later
-				if (!isNull _mccdialog && {!(missionNamespace getVariable ["MCC_cruiseFromCommander", false])}) then {closeDialog 0};
+				//Cruise missile feed: after the impact the console it was launched from comes back (the commander console's main page, or the MCC console).
+				if (missionNamespace getVariable ["MCC_cruiseFromCommander", false]) then {
+					MCC_cruiseFromCommander = false;
+					if (!isNull _mccdialog) then {_null = [1] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf",MCC_path]};
+				} else {
+					if (!isNull _mccdialog) then {closeDialog 0};
+					if (missionNamespace getVariable ["MCC_cruiseFromMCC", false]) then {
+						MCC_cruiseFromMCC = false;
+						[] spawn {waitUntil {!dialog}; [nil,nil,nil,nil,0] execVM format ["%1mcc\dialogs\mcc_PopupMenu.sqf",MCC_path]};
+					};
+				};
 			} else {
 				if (!isNull _mccdialog) then {[(_mccdialog displayctrl MCC_CONSOLE_UAVPIP)] call MCC_fnc_pipOpen};
 				_null = [1] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf",MCC_path];

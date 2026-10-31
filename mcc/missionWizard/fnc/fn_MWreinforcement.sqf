@@ -42,7 +42,7 @@ if !(isServer || isDedicated) exitWith {};
 if (isnil "mcc_mwunitsarraycar") then
 {
 	//Build the faction's unitsArrays and send it to the server.
-	_check = [_faction, _side] call MCC_fnc_MWCreateUnitsArray;
+	_check = [_faction, _side, (missionNamespace getVariable ["MCC_MWContentModes", createHashMap]) getOrDefault [toLower _faction, 2]] call MCC_fnc_MWCreateUnitsArray;
 	waituntil {_check};
 };
 
@@ -134,7 +134,7 @@ for "_i" from 0 to (count _cond) step 1 do
 				_dir 	= [_missionCenterTriggerPos, _newPos] call BIS_fnc_dirTo;
 				_strDir = "HQ: Enemy aerial QRF is moving in from the " + ([_dir] call MCC_fnc_dirToString);	//small, near the top, as on the squad screen (MCC_fnc_rsMessage)
 				_command = format ['["%1",6] spawn MCC_fnc_rsMessage;',_strDir];
-				[2,compile _command] remoteExec ["MCC_fnc_globalExecute", 0, false];
+				["MCC_fnc_globalExecute", [2,compile _command], 0, false] call MCC_fnc_secRemote;
 			};
 		};
 
@@ -147,7 +147,7 @@ for "_i" from 0 to (count _cond) step 1 do
 				_dir 	= [_missionCenterTriggerPos, _newPos] call BIS_fnc_dirTo;
 				_strDir = "HQ: Enemy motorized QRF is moving in from the " + ([_dir] call MCC_fnc_dirToString);	//small, near the top, as on the squad screen (MCC_fnc_rsMessage)
 				_command = format ['["%1",6] spawn MCC_fnc_rsMessage;',_strDir];
-				[2,compile _command] remoteExec ["MCC_fnc_globalExecute", 0, false];
+				["MCC_fnc_globalExecute", [2,compile _command], 0, false] call MCC_fnc_secRemote;
 			};
 
 		};
@@ -184,6 +184,7 @@ for "_i" from 0 to (count _cond) step 1 do
 				, false
 				];
 
+	MCC_MWReinforcePending = (missionNamespace getVariable ["MCC_MWReinforcePending", []]) + [[str _zoneNumber, time]];
 	_ar remoteExec ["mcc_setup", 2, false];
 };
 

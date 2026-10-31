@@ -141,7 +141,7 @@ switch (_type) do {
 					{
 						if (isMultiplayer) then
 						{
-							[2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group Player), netID player]] remoteExec ["MCC_fnc_globalExecute", 0, false];
+							["MCC_fnc_globalExecute", [2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group Player), netID player]], 0, false] call MCC_fnc_secRemote;
 						}
 						else
 						{

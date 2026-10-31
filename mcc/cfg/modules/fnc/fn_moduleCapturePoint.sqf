@@ -402,7 +402,7 @@ switch _mode do {
 				private _array = [];
 				private _res = 0;
 				private _resources = [];
-				_array = call compile format ["MCC_res%1",_owner];
+				_array = (missionNamespace getVariable format ["MCC_res%1",_owner]);
 
 				//get number of storage
 				_resources = ["resources",_owner] call MCC_fnc_rtsCalculateResourceTreshold;

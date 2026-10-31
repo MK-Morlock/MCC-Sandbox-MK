@@ -20,16 +20,19 @@ if (MCC_isMode) then {
 };
 
 //-------------------- RPT diagnostics banner (search the RPT for "MCC [") --------------------
-["BUILD", "init.sqf", "MCC init started - build: MCC Sandbox MK 1.0.1 | game %1 | mission %2 on %3 | server=%4 dedicated=%5 interface=%6 | ACE=%7 CBA=%8 debug=%9", [productVersion select 2, missionName, worldName, isServer, isDedicated, hasInterface, MCC_isACE, MCC_isCBA, MCC_debug]] call MCC_fnc_log;
+["BUILD", "init.sqf", "MCC init started - build: MCC Sandbox MK 1.0.2 | game %1 | mission %2 on %3 | server=%4 dedicated=%5 interface=%6 | ACE=%7 CBA=%8 debug=%9", [productVersion select 2, missionName, worldName, isServer, isDedicated, hasInterface, MCC_isACE, MCC_isCBA, MCC_debug]] call MCC_fnc_log;
 if (missionNamespace getVariable ["MCC_debug", false]) then {MCC_targetWatchEH = addMissionEventHandler ["EntityCreated", {
 	params ["_e"];
-	if !(_e isKindOf "CAManBase") exitWith {};
+	if !(_e isKindOf "AllVehicles") exitWith {};
 	private _cls = toLower typeOf _e;
-	private _dn = toLower getText (configFile >> "CfgVehicles" >> typeOf _e >> "displayName");
-	if (["target", "invisible", "dummy", "virtual"] findIf {_cls find _x >= 0 || {_dn find _x >= 0}} < 0) exitWith {};
+	if ((getText (configFile >> "CfgVehicles" >> typeOf _e >> "simulation")) == "UAVPilot") exitWith {};
+	private _dnRaw = getText (configFile >> "CfgVehicles" >> typeOf _e >> "displayName");
+	private _dn = toLower (if ((_dnRaw select [0, 1]) == "$") then {localize (_dnRaw select [1])} else {_dnRaw});
+	private _mdl = toLower getText (configFile >> "CfgVehicles" >> typeOf _e >> "model");
+	if (((["target", "invisible", "dummy", "virtual"] findIf {_cls find _x >= 0 || {_dn find _x >= 0}}) < 0) && {(_mdl find "invisible") < 0}) exitWith {};
 	private _st = "";
 	isNil {_st = str (call compile "diag_stacktrace")};
-	["WARN", "targetWatch", "invisible target-type soldier created: %1 (%2) side %3 group %4 at %5 | created by: %6", [typeOf _e, getText (configFile >> "CfgVehicles" >> typeOf _e >> "displayName"), side group _e, groupId group _e, (getPosATL _e) apply {round _x}, _st select [0, 1500]]] call MCC_fnc_log;
+	["ERROR", "targetWatch", "invisible target-type unit created: %1 (%2) side %3 group %4 at %5 | created by: %6", [typeOf _e, getText (configFile >> "CfgVehicles" >> typeOf _e >> "displayName"), side group _e, groupId group _e, (getPosATL _e) apply {round _x}, _st select [0, 1500]]] call MCC_fnc_log;
 }];};
 if (isNil "MCC_logEndedEH") then {
 	MCC_logEndedEH = addMissionEventHandler ["Ended", {[] call MCC_fnc_logSummary}];
@@ -492,7 +495,7 @@ MCC_currentSide = 0; //0- west 1 - east 2- resistance 3 - civilian
 //MCC Save
 MCC_saveIndex = 0;
 //================================================== Mission Wizard params ========================================================================//
-if (isNil "MCC_MWmaxPlayers") then {MCC_MWmaxPlayers = 40};
+if (isNil "MCC_MWmaxPlayers") then {MCC_MWmaxPlayers = 100};
 
 //HVT Array 0-BLUEFOR 1-OPFOR 2-INDEPENDENT 3 - CIVILIAN
 if (isNil "MCC_MWHVT") then {MCC_MWHVT = ["B_officer_F","O_officer_F","I_officer_F","C_Nikos"]};
@@ -795,7 +798,7 @@ if ( isServer ) then {
 		{
 			_str = "<t size='1' font = 'puristaLight' color='#FFFFFF'>" + format ["%1 is no longer the commander",_name] + "</t>";
 			_command = format ['["MCC_woosh",true] spawn BIS_fnc_playSound; ["%1",0,0.2,5,1,0.0] spawn bis_fnc_dynamictext;',_str];
-			[2,compile _command] remoteExec ["MCC_fnc_globalExecute", 0, false];
+			["announce", [_str, 1]] remoteExec ["MCC_fnc_secAction", 0, false];
 
 			MCC_server setVariable [format ["CP_commander%1",(player getVariable ["CP_side",  playerside])],"", true];
 		};
@@ -1041,7 +1044,7 @@ if (hasInterface) then {
 
 			//Curator
 			if(isMultiplayer) then {
-				[[], compile format ["MCC_curator addCuratorEditableObjects [[objectFromNetID '%1'],true]", netID player]] remoteExec ["call", 2, false];
+				["zeusAdd", [[player], true, false]] remoteExec ["MCC_fnc_secAction", 2, false];
 			};
 		};
 

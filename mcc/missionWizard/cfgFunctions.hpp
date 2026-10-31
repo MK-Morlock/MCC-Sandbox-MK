@@ -28,10 +28,16 @@ class missionWizard
 	class MWSpawnInfantry		{description = "Spawn infantry groups in the zone.";};
 	class MWSpawnVehicles		{description = "Spawn vehicles in the zone.";};
 	class buildRoadblock		{description = "Create a road block in the given position and direction.";};
+	class roadblockSpot		{description = "(MK) a roadblock position and direction on a road, clear of junctions and bridges";};
+	class fallbackSpot		{description = "(MK) a never-fail land spot: good spot, wider, relaxed, roadside, then the centre";};
 	class MWopenBriefing		{description = "Create The breifings.";};
 	class MWMapTooltip			{description = "Create The tooltips on breifings.";};
 	class MWreinforcement		{description = "Create a reinforcment type.";};
 	class MWSpawnStatic			{description = "Spawn static weapons in the zone.";};
+	class MWSpawnAirDefence		{description = "(MK) Spawn a SAM launcher with a radar in the zone.";};
+	class MWcampGuards			{description = "(MK) guards for an objective camp with few or no building positions";};
+	class MWAutoCleanup			{description = "(MK) Removes finished missions, enemy bodies and wrecks when no player is near or watching";};
+	class MWSpawnBoats			{description = "(MK) Mission Generator boats: open coastal water near the zone, own coastal patrol";};
 	class customTasks			{description = "Manage custom tasks.";};
 	class MWspawnAnimals		{description = "spawn animals in the area.";};
 	class MWinitMission			{description = "Init generated mission.";};

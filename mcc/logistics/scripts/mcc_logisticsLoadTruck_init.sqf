@@ -95,7 +95,7 @@ if (_startLoad) then {
 
 //Load available resources
 while {dialog} do {
-	_array = call compile format ["MCC_res%1",playerside];
+	_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 	MCC_loadTruckSupplies ctrlSetText str floor (_array select 1);
 	MCC_loadTruckRepair ctrlSetText str floor (_array select 0);
 	MCC_loadTruckFuel ctrlSetText str floor (_array select 2);

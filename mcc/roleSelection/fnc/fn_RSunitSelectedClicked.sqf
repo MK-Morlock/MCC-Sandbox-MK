@@ -29,7 +29,7 @@ switch (toLower _data) do {
 
     case "commander": {
     	if (player == leader _unit && _unit != player) then {
-    		[[_unit], {(group (_this select 0)) selectLeader (_this select 0);}] remoteExec ["call", group _unit, false];
+    		["selectLeader", [_unit]] remoteExec ["MCC_fnc_secAction", group _unit, false];
     	};
     };
 

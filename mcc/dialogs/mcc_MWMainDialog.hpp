@@ -6,6 +6,7 @@ class MCCDLG_NAME
 	idd = MCCMWDialog_IDD;
 	movingEnable = true;
 	onLoad = __EVAL("_this execVM '"+MCCPATH+"mcc\dialogs\mcc_mw_init.sqf'");
+	onUnload = "if (isNull (findDisplay 2994)) then {{str _x setMarkerAlphaLocal 0; (format ['LABEL_%1', _x]) setMarkerAlphaLocal 0} forEach (missionNamespace getVariable ['MCC_zones_numbers', []])}";
 
 	controlsBackground[] =
 	{

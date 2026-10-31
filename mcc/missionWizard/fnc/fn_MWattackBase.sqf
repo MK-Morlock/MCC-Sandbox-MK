@@ -81,9 +81,12 @@ for "_i" from 0 to _strength step 5 do {
 		//Spawn units
 		if (_simu == "soldier") then {
 			_units = [_unitsArray, 4 + floor random 7] call MCCMK_fnc_buildSquad;
-			_grp = [_spawnPos, _enemySide, _units] call BIS_fnc_spawnGroup;
+			_spawnPos = [_spawnPos] call MCC_fnc_safeSpawnPos;
+			_grp = [_spawnPos, _enemySide, _units] call MCC_fnc_spawnGroup;
 		} else {
-			([_spawnPos, 200, ([[_unitsArray, "patrol"] call MCCMK_fnc_pickVehicle] apply {if (_x == "") then {(_unitsArray call BIS_fnc_selectRandom) select 0} else {_x}}) select 0, _enemySide] call MCC_fnc_spawnVehicle) params [
+			private _cls = ([[_unitsArray, "patrol"] call MCCMK_fnc_pickVehicle] apply {if (_x == "") then {(_unitsArray call BIS_fnc_selectRandom) select 0} else {_x}}) select 0;
+			_spawnPos = [_spawnPos, _cls] call MCC_fnc_safeSpawnPos;
+			([_spawnPos, 200, _cls, _enemySide] call MCC_fnc_spawnVehicle) params [
 					["_vehicle",objNull,[objNull]],
 					["_units",[],[[]]],
 					["_grp",grpNull,[grpNull]]

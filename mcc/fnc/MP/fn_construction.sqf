@@ -16,7 +16,7 @@ private _availableCrates = 0;
 private "_cratesArray";
 
 params ["_conType", "_pos", "_side"];
-_dir	 	=call compile (_this select 3);
+_dir	 	= parseNumber (_this select 3);
 
 #define REQUIRE_MEMBERS 0
 #define ANCHOR_ITEM "Land_TreeBin_F"
@@ -170,7 +170,7 @@ if (_conType in ["bunker","wall"]) then {
 				_newObjects set [count _newObjects, _prop];
 
 				//Update marker
-				[[], compile format ['deleteMarker "%1";',_markerName]] remoteExec ["call", _side, false];
+				["deleteMarker", [_markerName]] remoteExec ["MCC_fnc_secAction", _side, false];
 				sleep 1;
 				[[_markerName], _pos, "colorBlue", "loc_Tourism", format ["Building %1: %2/%3 crates",_text, _availableCrates, _reqCrates],false] remoteExec ["BIS_fnc_markerCreate", _side, false];
 			};
@@ -183,7 +183,7 @@ if (_conType in ["bunker","wall"]) then {
 
 	sleep 2;
 	//Update marker
-	[[], compile format ['deleteMarker %1;',str _markerName]] remoteExec ["call", _side, false];
+	["deleteMarker", [_markerName]] remoteExec ["MCC_fnc_secAction", _side, false];
 
 	//Clear stuff
 	{
@@ -215,7 +215,7 @@ if (_conType in ["bunker","wall"]) then {
 													private _mark = _obj getVariable ["mcc_const_name",""];
 													private _side = _obj getVariable ["side",civilian];
 
-													[[], compile format ['deleteMarker "%1";',_mark]] remoteExec ["call", _side, false];
+													["deleteMarker", [_mark]] remoteExec ["MCC_fnc_secAction", _side, false];
 												}];
 		} else {
 			[_pos, _dir, _side ,"FOB",true,false] remoteExec ["MCC_fnc_buildSpawnPoint", 2, false];

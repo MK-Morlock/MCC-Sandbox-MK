@@ -23,6 +23,7 @@ private _waterSpawn = 0;
 private _cache = nil;
 
 params ["_pos", "_unitsArray", "_loc"];
+if !(call MCC_fnc_secSenderOK) exitWith {};
 _side		= if (typeName (_this select 3) == "STRING") then
 				{
 					switch (tolower (_this select 3)) do

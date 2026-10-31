@@ -1,4 +1,5 @@
 if !(missionNamespace getVariable ["MCC_debug", false]) exitWith {};
+if !(missionNamespace getVariable ["MCC_debug", false]) exitWith {};
 private _counts = missionNamespace getVariable ["MCC_logCounts", createHashMap];
 private _parts = [];
 {

@@ -14,7 +14,9 @@ if ((_sim == "soldier" || {_sim == "soldierx"}) && {
 }) exitWith {""};
 
 private _lcClass = toLower _class;
-if (((toLower getText (_cfg >> "displayName")) find "invisible") >= 0
+private _dnRaw = getText (_cfg >> "displayName");
+private _dnLoc = toLower (if ((_dnRaw select [0, 1]) == "$") then {localize (_dnRaw select [1])} else {_dnRaw});
+if ((_dnLoc find "invisible") >= 0 || {((toLower getText (_cfg >> "model")) find "invisible") >= 0} || {(_lcClass find "invisibletarget") >= 0}
 	|| {(_lcClass find "targetsoldier") >= 0} || {(_lcClass find "target_vehicle") >= 0} || {(_lcClass find "targetvehicle") >= 0}
 	|| {getText (_cfg >> "model") in ["", "\A3\Weapons_f\empty", "\A3\Weapons_F\empty.p3d"]}
 ) exitWith {""};

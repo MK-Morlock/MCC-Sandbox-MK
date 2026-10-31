@@ -258,7 +258,7 @@ switch (_mode) do
 												_mark = _obj getVariable ["mcc_fob_name",""];
 												_side = _obj getVariable ["side",civilian];
 
-												[[], compile format ['deleteMarker "%1";',_mark]] remoteExec ["call", _side, false];
+												["deleteMarker", [_mark]] remoteExec ["MCC_fnc_secAction", _side, false];
 
 												_flag = _obj getVariable ["mcc_flag",objnull];
 												if (!isnil "_flag") then

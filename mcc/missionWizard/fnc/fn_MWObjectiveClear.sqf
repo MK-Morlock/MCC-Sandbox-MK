@@ -31,7 +31,6 @@ if (_isCQB) then {
 	if (!_campaignMission || (random 1 > 0.7)) then {
 
 		//Clear area
-		[_objPos,50,true] call MCC_fnc_hideTerrainObjectsArea;
 
 		_objPos = [_objPos,"military"] call MCC_fnc_buildRandomComposition;
 	};
@@ -39,6 +38,7 @@ if (_isCQB) then {
 
 //Lets populate it
 [_objPos,_range, 0, (if (_campaignMission) then {0.5} else {2}),_faction, _side] call MCC_fnc_garrison;
+[_objPos, 30, (if (_campaignMission) then {0.5} else {2}), _faction, _side] remoteExec ["MCC_fnc_MWcampGuards", 2];
 
 sleep 2;
 

@@ -42,7 +42,7 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					{
 						[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 					};
-					[[netid _dummy,_dummy], _init, false] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+					["MCC_fnc_setVehicleInit", [[netid _dummy,_dummy], _init, false], 0, true] call MCC_fnc_secRemote;
 
 					//Curator
 					{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -70,7 +70,7 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					{
 						[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 					};
-					[[netid _dummy,_dummy], _init, false] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+					["MCC_fnc_setVehicleInit", [[netid _dummy,_dummy], _init, false], 0, true] call MCC_fnc_secRemote;
 
 					//Curator
 					{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -124,7 +124,7 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 						(_dummy select 0) setVariable ["vehicleinit", _tempInit, true];
 
 
-						[[netid (_dummy select 0),(_dummy select 0)], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+						["MCC_fnc_setVehicleInit", [[netid (_dummy select 0),(_dummy select 0)], _init], 0, true] call MCC_fnc_secRemote;
 
 						//Curator
 						{_x addCuratorEditableObjects [[(_dummy select 0)],true]} forEach allCurators;
@@ -150,7 +150,7 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 						{
 							[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 						};
-						[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+						["MCC_fnc_setVehicleInit", [[netid _dummy,_dummy], _init], 0, true] call MCC_fnc_secRemote;
 
 						//Curator
 						{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -178,7 +178,7 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					{
 						[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 					};
-					[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+					["MCC_fnc_setVehicleInit", [[netid _dummy,_dummy], _init], 0, true] call MCC_fnc_secRemote;
 
 					//Curator
 					{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
@@ -194,7 +194,7 @@ if ( ( (isServer) && ( (_loc == 0) || !(MCC_isHC) ) ) || ( (MCC_isLocalHC) && (_
 					{
 						[[netid _dummy,_dummy], _name] remoteExec ["MCC_fnc_setVehicleName", 0, true];
 					};
-					[[netid _dummy,_dummy], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+					["MCC_fnc_setVehicleInit", [[netid _dummy,_dummy], _init], 0, true] call MCC_fnc_secRemote;
 
 					//Curator
 					{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;

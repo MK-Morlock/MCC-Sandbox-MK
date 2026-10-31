@@ -17,7 +17,7 @@ if (mcc_missionmaker == (name player)) then {
 
 	   case 1:	//Global
 		{
-			[2,compile _string] remoteExec ["MCC_fnc_globalExecute", 0, false];
+			["MCC_fnc_globalExecute", [2,compile _string], 0, false] call MCC_fnc_secRemote;
 		};
 
 		case 2: // mcc load
@@ -29,14 +29,14 @@ if (mcc_missionmaker == (name player)) then {
 		case 3: // BroadCast text - small
 		{
 			_command = format ['titleText ["%1","PLAIN DOWN"]; titleFadeOut 60;',_string];
-			[2,compile _command] remoteExec ["MCC_fnc_globalExecute", 0, false];
+			["MCC_fnc_globalExecute", [2,compile _command], 0, false] call MCC_fnc_secRemote;
 		};
 
 		case 4: // BroadCast text - Big
 		{
 			_str = "<t size='1' font='PuristaLight' color='#FFFFFF'>" + _string + "</t>";
 			_command = format ['["%1",0,0.2,5,1,0.0] spawn bis_fnc_dynamictext;',_str];
-			[2,compile _command] remoteExec ["MCC_fnc_globalExecute", 0, false];
+			["MCC_fnc_globalExecute", [2,compile _command], 0, false] call MCC_fnc_secRemote;
 		};
 	};
 } else {player globalchat "Access Denied"};

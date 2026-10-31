@@ -10,6 +10,7 @@ _group 			= _this select 0;
 
 //Clear what ever orders we had before.
 [_group] call GAIA_fnc_removeWaypoints;
+if !(_group getVariable ["GAIA_supportLoop", false]) then {_group setVariable ["GAIA_supportLoop", true]; [_group] spawn GAIA_fnc_supportLoop};
 
 //Get the zone
 _zone	 = (((_group) getVariable ["GAIA_zone_intend",[]])select 0);
@@ -17,7 +18,8 @@ _zone	 = (((_group) getVariable ["GAIA_zone_intend",[]])select 0);
 if !(isnil("_Zone")) then
 {
 	//Go somewhere
-	_pos= [_group,_zone,"ROAD"] call GAIA_fnc_generateWaypoints;
+	_pos = [_group, _zone] call GAIA_fnc_supportSpot;
+	if (count _pos == 0) then {_pos= [_group,_zone,"ROAD"] call GAIA_fnc_generateWaypoints};
 
 	if (count(_pos)>0) then
 		{

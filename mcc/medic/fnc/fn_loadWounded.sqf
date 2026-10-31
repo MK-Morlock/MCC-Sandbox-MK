@@ -10,7 +10,7 @@ if (_load) then
 {
 	if (_suspect getVariable ["MCC_medicUnconscious",false] && alive _suspect) then
 	{
-		_number = call compile ([_ctrlData, "0123456789"] call BIS_fnc_filterString);
+		_number = parseNumber ([_ctrlData, "0123456789"] call BIS_fnc_filterString);
 		_nearVehicles = [];
 		if (_suspect getVariable ["MCC_medicUnconscious",false]) then
 		{

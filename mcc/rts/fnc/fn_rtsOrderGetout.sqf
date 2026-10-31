@@ -30,7 +30,7 @@ player globalRadio "CuratorWaypointPlaced";
 		} forEach assignedCargo _vehicle;
 
 		{
-			[[_x,_vehicle], {(_this select 0) leaveVehicle (_this select 1);}] remoteExec ["call", leader _x, false];
+			["leaveVehicle", [_x, _vehicle]] remoteExec ["MCC_fnc_secAction", leader _x, false];
 		} forEach _groups;
 	};
 } forEach _vehicles;

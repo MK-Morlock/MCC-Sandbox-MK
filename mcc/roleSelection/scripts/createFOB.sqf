@@ -8,7 +8,7 @@ _pos 	= getpos _item;
 _dir 	= getdir _item;
 _side	= str (side _caller);
 {
-	 [[], compile format ["unassignVehicle objectFromNetID '%1'; objectFromNetID '%1' action ['eject', vehicle objectFromNetID '%1'];", netID _x]] remoteExec ["call", _x, false];
+	 ["eject", [_x]] remoteExec ["MCC_fnc_secAction", _x, false];
 	 sleep 0.1;
 } foreach crew _item;
 

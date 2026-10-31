@@ -121,10 +121,10 @@ if (_tickets > 0) then {
 //Asset preset of the campaign enemy faction (console Assets page; applied where the preset is saved)
 ["apply", [_factionEnemy]] remoteExec ["MCC_fnc_assetsData", 0];	//performance log: campaign start-up stages
 //Build the faction's unitsArrays and send it to the server.
-_check = [_factionEnemy, _sideEnemy] call MCC_fnc_MWCreateUnitsArray;
+_check = [_factionEnemy, _sideEnemy, (missionNamespace getVariable ["MCC_MWContentModes", createHashMap]) getOrDefault [toLower _factionEnemy, 2]] call MCC_fnc_MWCreateUnitsArray;
 waituntil {_check};
 
-[_factionEnemy] call MCC_fnc_createConfigs;
+[_factionEnemy, (missionNamespace getVariable ["MCC_MWContentModes", createHashMap]) getOrDefault [toLower _factionEnemy, 2]] call MCC_fnc_createConfigs;
 
 ["genStage", ["enemy unit lists and group configs"]] call MCC_fnc_perfLog;
 //Search the map for locations
@@ -154,6 +154,7 @@ _locations = [];
 	};
 } forEach allMapMarkers;
 
+private _locFrom = if (count _locations > 0) then {"AO markers"} else {"map"};
 //If no user defined locations lets find map locations.
 if (count _locations == 0) then {
 	_pos = getpos MCC_worldArea;
@@ -173,12 +174,14 @@ if (count _locations == 0) then {
 
 //Still no location go bruth force
 if (count _locations == 0) then {
+	_locFrom = "random positions";
 	for "_i" from 1 to 100  do {
 		_temploc = [[getpos MCC_worldArea, MCC_worldArea], "ground", ["water"],{}] call BIS_fnc_randomPos;
 		_locations pushBack [_temploc, ""];
 	};
 };
 
+["CAMPAIGN", "MCC_fnc_campaignInit", "campaign locations: %1 from %2%3", [count _locations, _locFrom, if (_locFrom == "AO markers") then {format [" (Empty-type markers with ao in the name: %1)", (allMapMarkers select {markerType _x == "Empty" && {["ao", _x] call bis_fnc_inString}})]} else {""}]] call MCC_fnc_log;
 ["genStage", ["find locations"]] call MCC_fnc_perfLog;
 //init map markers
 [_sideEnemy,_tileSize,0.2,_locations,400,0.4,_loadDb] call MCC_fnc_campaignInitMap;
@@ -230,9 +233,11 @@ _basePos = switch (_sidePlayer) do
 				default	{[0,0,0]};
 			};
 _locations = [_locations,[_basePos],{_input0 distance (_x select 0)},"ASCEND"] call BIS_fnc_sortBy;
+private _locCountStart = count _locations;
 
 //Start the campaign missions?
 if (_missionMax == 0) exitWith {
+	["CAMPAIGN", "MCC_fnc_campaignInit", "campaign ending: Number of Missions is 0", []] call MCC_fnc_log;
 	["sidetickets"] call  BIS_fnc_endMissionServer;
 };
 
@@ -264,6 +269,7 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 		_areaMissions = 0;
 	};
 
+	private _rejected = [];
 	while {count _locations > 0 && !_goodLocation} do {
 		//_index = floor random count _locations;
 		_index = if (_reconMission) then {floor random count _locations} else {0} ;
@@ -273,7 +279,9 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 		_locations set [_index,-1];
 		_locations = _locations - [-1];
 
-		_goodLocation = ([_AOlocationPos] call MCC_fnc_campaignGetNearestTile) select 1 == _sideEnemy;
+		private _tileInfo = [_AOlocationPos] call MCC_fnc_campaignGetNearestTile;
+		_goodLocation = (_tileInfo select 1) == _sideEnemy;
+		if (!_goodLocation && {count _rejected < 10}) then {_rejected pushBack [mapGridPosition _AOlocationPos, _tileInfo select 0, markerColor (_tileInfo select 0), _tileInfo select 1]};
 
 		sleep 0.5;
 	};
@@ -282,6 +290,9 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 
 	//No locations? mission won
 	if (count _locations == 0 && !_goodLocation) exitWith {
+		private _gridTiles = if (isNil "MCCMK_tileCells") then {[]} else {values MCCMK_tileCells};
+		private _enemyColor = switch (_sideEnemy) do {case west: {"ColorWEST"}; case resistance: {"ColorGUER"}; default {"ColorEAST"}};
+		["CAMPAIGN", "MCC_fnc_campaignInit", "campaign ending: no location on an enemy-held tile | missions done %1 of %2 | enemy side %3 | locations at start %4 | tiles %5, readable %6, enemy colour %7 | first rejected (grid, tile, colour, side): %8", [_missionDone, _missionMax, _sideEnemy, _locCountStart, count _gridTiles, {markerColor _x != ""} count _gridTiles, {markerColor _x == _enemyColor} count _gridTiles, _rejected]] call MCC_fnc_log;
 		//Mission won outro
 		["everyonewon"] remoteExec ["BIS_fnc_endMissionServer", 2, false]
 	};
@@ -478,4 +489,5 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 };
 
 //Mission won outro
+["CAMPAIGN", "MCC_fnc_campaignInit", "campaign ending: mission loop finished | missions done %1 of %2 | locations left %3", [_missionDone, _missionMax, count _locations]] call MCC_fnc_log;
 ["sidetickets"] call  BIS_fnc_endMissionServer;

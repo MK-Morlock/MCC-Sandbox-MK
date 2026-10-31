@@ -79,8 +79,7 @@ while {_counter <=_limit} do
 
 	if (_fitTransport || {(getNumber (configfile >> "CfgVehicles" >> _vehicleClass >> "transportSoldier") > 2) || (count (configfile >> "CfgVehicles" >> _vehicleClass >> "Turrets") >0)}) then
 	{
-		_isFlat = _startPosDir findEmptyPosition [10, 100];
-		if (count _isFlat == 0) then {_isFlat = _startPosDir};
+		_isFlat = [_startPosDir, _vehicleClass] call MCC_fnc_safeSpawnPos;
 		_vehicle = [_isFlat , ([_isFlat, _endPos] call BIS_fnc_dirTo), _vehicleClass, _groupVehicles] call MCC_fnc_spawnVehicle;
 		_vehiclesArray set [count _vehiclesArray, (_vehicle select 0)];
 		_counter = _counter + 1;

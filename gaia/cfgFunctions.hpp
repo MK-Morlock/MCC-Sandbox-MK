@@ -103,6 +103,7 @@ class GAIA
         class issueOrders {};
         class occupy {};
         class removeWaypoints {};
+        class trafficJam {};
 
     };
 
@@ -130,6 +131,8 @@ class GAIA
         class doClearRecon {};
         class doFortify {};
         class doHide {};
+        class supportSpot {};
+        class supportLoop {};
         class doMortar {};
         class doOrganizeTransportation {};
         class doPark {};

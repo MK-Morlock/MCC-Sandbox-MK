@@ -148,7 +148,7 @@ _blur spawn {
 	while {(str (_mccdialog displayCtrl 0) != "No control")} do {
 
 		//Load available resources
-		_array = call compile format ["MCC_res%1",playerside];
+		_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 		{_mccdialog displayCtrl _x ctrlSetText ([(_array select _forEachIndex)] call MCC_fnc_formatNumber)} foreach [81,82,83,84,85];
 	};
 

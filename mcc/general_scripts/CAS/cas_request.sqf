@@ -66,7 +66,7 @@ switch (_type) do
 			{
 				MCC_capture_var = MCC_capture_var + FORMAT ['%5 set [count %5,[%1, %2]];
 					publicVariable "%5";
-					[2,{["MCCNotifications",["%4 CAS available","%3data\ammo_icon.paa",""]] call bis_fnc_showNotification;}] remoteExec ["MCC_fnc_globalExecute", 0, false];
+					["MCC_fnc_globalExecute", [2,{["MCCNotifications",["%4 CAS available","%3data\ammo_icon.paa",""]] call bis_fnc_showNotification;}], 0, false] call MCC_fnc_secRemote;
 					'
 					,MCC_spawnkind
 					,MCC_planeType
@@ -89,7 +89,7 @@ switch (_type) do
 					missionNameSpace setVariable [_arrayName,_array];
 					publicvariable _arrayName;
 
-					[2,compile format ['["MCCNotifications",["%1 CAS available","%2data\ammo_icon.paa",""]] call bis_fnc_showNotification;',MCC_spawnkind select 0,MCC_path]] remoteExec ["MCC_fnc_globalExecute", _side, false];
+					["MCC_fnc_globalExecute", [2,compile format ['["MCCNotifications",["%1 CAS available","%2data\ammo_icon.paa",""]] call bis_fnc_showNotification;',MCC_spawnkind select 0,MCC_path]], _side, false] call MCC_fnc_secRemote;
 			};
 		};
 

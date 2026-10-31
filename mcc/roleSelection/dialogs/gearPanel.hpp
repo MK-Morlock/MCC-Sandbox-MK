@@ -92,7 +92,7 @@ class MCCDLG_NAME {
 					action =  "0 spawn MCC_fnc_RSTakeCommander";
 
 					x = 0.144375 * safezoneW;
-					y = 0.0385 * safezoneH;
+					y = 0.0165 * safezoneH;
 					w = 0.05 * safezoneW;
 					h = 0.0329871 * safezoneH;
 				};

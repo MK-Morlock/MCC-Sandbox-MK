@@ -81,6 +81,14 @@ for "_i" from 0 to ((count _configName) - 1) do
 		_newObj = _type createVehicle _newPos;
 		_newObj setDir (_azi + _azimuth);
 		_newObj setPos _newPos;
+		if (_z < 0.3 && {!(_newObj isKindOf "AllVehicles") || {_newObj isKindOf "StaticWeapon"}}) then {
+			private _bb = boundingBoxReal _newObj;
+			private _n = surfaceNormal _newPos;
+			if (((((_bb select 1) select 2) - ((_bb select 0) select 2)) < 5) && {(_n select 2) < 0.995}) then {
+				_newObj setVectorUp _n;
+				_newObj setPos _newPos;
+			};
+		};
 		if (!isNil "_fuel") then {_newObj setFuel _fuel};
 		if (!isNil "_damage") then {_newObj setDamage _damage};
 		if (!isNil "_vehicleinit" && {_vehicleinit != ""}) then {

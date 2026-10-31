@@ -71,6 +71,7 @@ if (_steerToImpact) then {
 		if (isNull _m || {!alive _m} || {isNull _tg}) exitWith {};
 		private _mp = getPosASL _m;
 		private _tp = getPosASL _tg;
+		if (((_mp select 2) - ((getTerrainHeightASL _mp) max 0)) < 0.3) exitWith {triggerAmmo _m};
 		private _d2 = _mp distance2D _tp;
 		private _hDir = vectorNormalized [(_tp select 0) - (_mp select 0), (_tp select 1) - (_mp select 1), 0];
 		private _toT = vectorNormalized ((_tp vectorAdd [0, 0, -3]) vectorDiff _mp);

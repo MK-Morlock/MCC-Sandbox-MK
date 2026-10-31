@@ -21,7 +21,7 @@ private _uc = UAVControl _veh;
 for "_i" from 0 to (count _uc - 1) step 2 do {
 	private _c = _uc select _i;
 	if (!isNull _c && {isPlayer _c}) then {
-		[2, {player action ["BackFromUAV", player]; player connectTerminalToUAV objNull; player switchCamera "INTERNAL"}] remoteExec ["MCC_fnc_globalExecute", _c];
+		["leaveUAV", []] remoteExec ["MCC_fnc_secAction", _c, false];
 	};
 };
 _veh call _onEnd;

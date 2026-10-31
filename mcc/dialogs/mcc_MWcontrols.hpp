@@ -25,6 +25,9 @@
 #define MCC_MWAnimalsIDC 6023
 #define MCC_MWBattleGroundIDC 6024
 #define MCC_MCC_MWMusicIDC 6024
+#define MCC_MWContentIDC 6027
+#define MCC_MWCivContentIDC 6028
+#define MCC_MWSpreadIDC 6029
 
 class MCC_MWControls: MCC_RscControlsGroup
 {
@@ -60,6 +63,78 @@ class MCC_MWControls: MCC_RscControlsGroup
 		};
 
 		//Faction
+		class MCC_MWContentTittle: MCC_RscText
+		{
+			colorText[] = {0.62,0.65,0.68,1};
+			idc = -1;
+			text = "Rival Content";
+			x = 0.00572965 * safezoneW;
+			y = 0.0494784 * safezoneH;
+			w = 0.06875 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
+		};
+		class MCC_MWContentCombo: MCC_RscCombo
+		{
+			idc = MCC_MWContentIDC;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			onLBSelChanged = "if ((_this select 1) >= 0) then {profileNamespace setVariable ['MCC_MWContentIndex', _this select 1]}";
+			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Rival units: own faction, plus Creator DLC, or all mods'";
+			tooltip = "Rival units: own faction, plus Creator DLC, or all mods";
+			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
+			x = 0.0802087 * safezoneW;
+			y = 0.0494784 * safezoneH;
+			w = 0.0859375 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCC_MWCivContentTittle: MCC_RscText
+		{
+			colorText[] = {0.62,0.65,0.68,1};
+			idc = -1;
+			text = "Civilian Content";
+			x = 0.00572965 * safezoneW;
+			y = 0.1484397 * safezoneH;
+			w = 0.06875 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
+		};
+		class MCC_MWCivContentCombo: MCC_RscCombo
+		{
+			idc = MCC_MWCivContentIDC;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			onLBSelChanged = "if ((_this select 1) >= 0) then {profileNamespace setVariable ['MCC_MWCivContentIndex', _this select 1]}";
+			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Civilian units: own faction, plus Creator DLC, or all mods'";
+			tooltip = "Civilian units: own faction, plus Creator DLC, or all mods";
+			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
+			x = 0.0802087 * safezoneW;
+			y = 0.1484397 * safezoneH;
+			w = 0.0859375 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCC_MWSpreadTittle: MCC_RscText
+		{
+			colorText[] = {0.62,0.65,0.68,1};
+			idc = -1;
+			text = "Force Spread";
+			x = 0.00572965 * safezoneW;
+			y = 0.0824655 * safezoneH;
+			w = 0.06875 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
+		};
+		class MCC_MWSpreadCombo: MCC_RscCombo
+		{
+			idc = MCC_MWSpreadIDC;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			tooltip = "Where enemy forces start: Tight = near the centre, Normal = original MCC, Wide = evenly over the zone";
+			onLBSelChanged = "if ((_this select 1) >= 0) then {profileNamespace setVariable ['MCC_MWSpreadIndex', _this select 1]}";
+			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Where enemy forces start: Tight = near the centre, Normal = original MCC, Wide = evenly over the zone'";
+			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
+			x = 0.0802087 * safezoneW;
+			y = 0.0824655 * safezoneH;
+			w = 0.0859375 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
 		class MCC_MWRivalFactionTittle: MCC_RscText
 		{
 			colorText[] = {0.62,0.65,0.68,1};
@@ -67,7 +142,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Rival Faction"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
-			y = 0.0549788 * safezoneH;
+			y = 0.0164913 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -82,7 +157,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.0802087 * safezoneW;
-			y = 0.0549788 * safezoneH;
+			y = 0.0164913 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 		};
@@ -95,7 +170,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Civilians Faction"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
-			y = 0.0879658 * safezoneH;
+			y = 0.1154526 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -109,7 +184,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.0802087 * safezoneW;
-			y = 0.0879658 * safezoneH;
+			y = 0.1154526 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 		};
@@ -122,7 +197,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "# Players"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
-			y = 0.120953 * safezoneH;
+			y = 0.1814268 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -146,13 +221,14 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 		class MCC_MWPlayersCombo: MCC_RscSlider
 		{
+			tooltip = "About 2, 4 or 6 enemies per player (Easy/Medium/Hard): 40 players on Medium is about 160 enemies";
 			idc = MCC_MWPlayersIDC;
-			onSliderPosChanged = "(_this select 0) ctrlSetTooltip str floor (_this select 1);(profileNamespace setVariable ['MCC_MWPlayersIndex',(_this select 1)]);MCC_MWPlayersSession = _this select 1;((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText format ['Players: %1 (more players = more enemies and a larger mission area)', floor (_this select 1)];";
+			onSliderPosChanged = "(_this select 0) ctrlSetTooltip format ['%1 players: about %2 / %3 / %4 enemies (Easy / Medium / Hard)', floor (_this select 1), (floor (_this select 1)) * 2, (floor (_this select 1)) * 4, (floor (_this select 1)) * 6];(profileNamespace setVariable ['MCC_MWPlayersIndex',(_this select 1)]);MCC_MWPlayersSession = _this select 1;((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText format ['Players: %1 (more players = more enemies and a larger mission area)', floor (_this select 1)];";
 			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'More players = more enemies and larger mission area';";
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.0802087 * safezoneW;
-			y = 0.120953 * safezoneH;
+			y = 0.1814268 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -166,7 +242,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Difficulty"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
-			y = 0.15394 * safezoneH;
+			y = 0.2144139 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -185,7 +261,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Easy","Medium","Hard"};
 
 			x = 0.0802087 * safezoneW;
-			y = 0.15394 * safezoneH;
+			y = 0.2144139 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -199,7 +275,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "CQB"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
-			y = 0.186927 * safezoneH;
+			y = 0.2474010 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -213,7 +289,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.0802087 * safezoneW;
-			y = 0.186927 * safezoneH;
+			y = 0.2474010 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -227,7 +303,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Stealth"; //--- ToDo: Localize;
 			x = 0.00572965 * safezoneW;
-			y = 0.219914 * safezoneH;
+			y = 0.2803881 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -246,7 +322,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Disabled","Enabled","Random"};
 
 			x = 0.0802087 * safezoneW;
-			y = 0.219914 * safezoneH;
+			y = 0.2803881 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -260,8 +336,8 @@ class MCC_MWControls: MCC_RscControlsGroup
 			idc = -1;
 
 			text = "Objectives Markers"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.252902 * safezoneH;
+			x = 0.372396 * safezoneW;
+			y = 0.0164913 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -279,8 +355,8 @@ class MCC_MWControls: MCC_RscControlsGroup
 			strings[] = {"Precise","Area"};
 			checked_strings[] = {"Precise","Area"};
 
-			x = 0.0802087 * safezoneW;
-			y = 0.252902 * safezoneH;
+			x = 0.446875 * safezoneW;
+			y = 0.0164913 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -293,8 +369,8 @@ class MCC_MWControls: MCC_RscControlsGroup
 			idc = -1;
 
 			text = "General Markers"; //--- ToDo: Localize;
-			x = 0.00572965 * safezoneW;
-			y = 0.28589 * safezoneH;
+			x = 0.372396 * safezoneW;
+			y = 0.0494784 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -311,8 +387,8 @@ class MCC_MWControls: MCC_RscControlsGroup
 			strings[] = {"Disabled","Enabled"};
 			checked_strings[] = {"Disabled","Enabled"};
 
-			x = 0.0802087 * safezoneW;
-			y = 0.28589 * safezoneH;
+			x = 0.446875 * safezoneW;
+			y = 0.0494784 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -328,7 +404,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Objective 1"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
-			y = 0.0549788 * safezoneH;
+			y = 0.0494784 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -342,7 +418,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.263542 * safezoneW;
-			y = 0.0549788 * safezoneH;
+			y = 0.0494784 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -357,7 +433,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Objective 2"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
-			y = 0.0879658 * safezoneH;
+			y = 0.0824655 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -371,7 +447,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.263542 * safezoneW;
-			y = 0.0879658 * safezoneH;
+			y = 0.0824655 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -386,7 +462,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Objective 3"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
-			y = 0.120953 * safezoneH;
+			y = 0.1154526 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -400,7 +476,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.263542 * safezoneW;
-			y = 0.120953 * safezoneH;
+			y = 0.1154526 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -414,7 +490,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Vehicles"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
-			y = 0.15394 * safezoneH;
+			y = 0.1484397 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -434,7 +510,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 
 			x = 0.263542 * safezoneW;
-			y = 0.15394 * safezoneH;
+			y = 0.1484397 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -449,7 +525,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Armor"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
-			y = 0.186927 * safezoneH;
+			y = 0.1814268 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -468,7 +544,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Disabled","Enabled","Random"};
 
 			x = 0.263542 * safezoneW;
-			y = 0.186927 * safezoneH;
+			y = 0.1814268 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -484,7 +560,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Reinforcement"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
-			y = 0.219914 * safezoneH;
+			y = 0.2144139 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -497,7 +573,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.263542 * safezoneW;
-			y = 0.219914 * safezoneH;
+			y = 0.2144139 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -513,7 +589,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Artillery"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
-			y = 0.252902 * safezoneH;
+			y = 0.2474010 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -527,7 +603,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.263542 * safezoneW;
-			y = 0.252902 * safezoneH;
+			y = 0.2474010 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -541,7 +617,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Intro"; //--- ToDo: Localize;
 			x = 0.189063 * safezoneW;
-			y = 0.28589 * safezoneH;
+			y = 0.2803881 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -559,7 +635,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Cinematic","Pop-Up","None"};
 
 			x = 0.263542 * safezoneW;
-			y = 0.28589 * safezoneH;
+			y = 0.2803881 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -574,7 +650,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "IEDs"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
-			y = 0.0549788 * safezoneH;
+			y = 0.0824655 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -593,7 +669,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Disabled","Enabled","Random"};
 
 			x = 0.446875 * safezoneW;
-			y = 0.0549788 * safezoneH;
+			y = 0.0824655 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -608,7 +684,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Suicide Bombers"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
-			y = 0.0879658 * safezoneH;
+			y = 0.1154526 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -627,7 +703,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Disabled","Enabled","Random"};
 
 			x = 0.446875 * safezoneW;
-			y = 0.0879658 * safezoneH;
+			y = 0.1154526 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -641,7 +717,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Armed Civilians"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
-			y = 0.120953 * safezoneH;
+			y = 0.1484397 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -660,7 +736,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Disabled","Enabled","Random"};
 
 			x = 0.446875 * safezoneW;
-			y = 0.120953 * safezoneH;
+			y = 0.1484397 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -674,7 +750,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Roadblocks"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
-			y = 0.15394 * safezoneH;
+			y = 0.1814268 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -693,7 +769,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Disabled","Enabled","Random"};
 
 			x = 0.446875 * safezoneW;
-			y = 0.15394 * safezoneH;
+			y = 0.1814268 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -707,7 +783,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Animals"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
-			y = 0.186927 * safezoneH;
+			y = 0.2144139 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -726,7 +802,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] = {"Disabled","Enabled","Random"};
 
 			x = 0.446875 * safezoneW;
-			y = 0.186927 * safezoneH;
+			y = 0.2144139 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -740,7 +816,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Time/Weather"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
-			y = 0.219914 * safezoneH;
+			y = 0.2474010 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -753,7 +829,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 
 			x = 0.446875 * safezoneW;
-			y = 0.219914 * safezoneH;
+			y = 0.2474010 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
@@ -767,7 +843,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 			text = "Area"; //--- ToDo: Localize;
 			x = 0.372396 * safezoneW;
-			y = 0.252902 * safezoneH;
+			y = 0.2803881 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
@@ -785,7 +861,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 			checked_strings[] =  {"Whole map","Current zone"};
 
 			x = 0.446875 * safezoneW;
-			y = 0.252902 * safezoneH;
+			y = 0.2803881 * safezoneH;
 			w = 0.0859375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";

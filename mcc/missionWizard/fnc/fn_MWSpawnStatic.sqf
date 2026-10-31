@@ -30,6 +30,7 @@ _unitPlaced = 0;
 
 //We have an artillery piece
 if (_artillery != 999) then	{
+	private _facMortars = ((_arrayUnits select {_x isEqualType [] && {count _x > 1}}) apply {_x select 1}) select {_x isKindOf "StaticMortar"};
 	switch (_side) do  {
 		case west: {_arrayUnits = ["B_Mortar_01_F","B_MBT_01_arty_F"]};
 		case east: {_arrayUnits = ["O_Mortar_01_F","O_MBT_02_arty_F"]};
@@ -38,29 +39,43 @@ if (_artillery != 999) then	{
 	};
 
 	_vehicleClass = if (_artillery != 3) then {_arrayUnits select (_artillery-1)} else {_arrayUnits call BIS_fnc_selectRandom};
+	if ((_vehicleClass isKindOf "StaticMortar") && {count _facMortars > 0}) then {_vehicleClass = selectRandom _facMortars};
 	_perSpawn = 2;
 } else {
-	_vehicleClass = (_arrayUnits call BIS_fnc_selectRandom) select 1;
+	_arrayUnits = _arrayUnits select {
+		private _c = _x select 1;
+		(getNumber (configFile >> "CfgVehicles" >> _c >> "artilleryScanner") == 0)
+		&& {(["StaticMGWeapon", "StaticGrenadeLauncher", "StaticATWeapon", "StaticAAWeapon"] findIf {_c isKindOf _x}) >= 0}
+		&& {(["SAM_System_01_base_F", "SAM_System_02_base_F", "SAM_System_03_base_F", "SAM_System_04_base_F", "Radar_System_01_base_F", "Radar_System_02_base_F"] findIf {_c isKindOf _x}) < 0}
+		&& {((toLower getText (configFile >> "CfgVehicles" >> _c >> "displayName")) find "radar") < 0}
+		&& {(["sam_system", "radar_system"] findIf {((toLower getText (configFile >> "CfgVehicles" >> _c >> "model")) find _x) >= 0}) < 0}
+	};
+	_vehicleClass = if (count _arrayUnits > 0) then {(selectRandom _arrayUnits) select 1} else {""};
 	_perSpawn = 1;
 };
 
-_availablePos = selectBestPlaces [_missionCenter, _radius, "meadow * (2*hills)", 10, 5];
+_availablePos = (selectBestPlaces [_missionCenter, _radius, "meadow * (2*hills)", 10, 40]) call BIS_fnc_arrayShuffle;
+if (isNil "MCC_MWStaticUsed") then {MCC_MWStaticUsed = []};
 
 if (count _arrayUnits > 0) then {
 
-	_time = time + 3;
+	_time = time + 15;
 
 	while {(_unitPlaced < (_totalEnemyUnits)) && (count _availablePos > 0) && (time < _time)} do {
 
 		_pos = [((_availablePos select 0) select 0) select 0, ((_availablePos select 0) select 0) select 1,0];
 		_availablePos set [0, -1];
 		_availablePos = _availablePos - [-1];
+		MCC_MWStaticUsed = MCC_MWStaticUsed select {(_x isEqualType []) && {!isNull (_x select 1)} && {alive (_x select 1)}};
+		if ((MCC_MWStaticUsed findIf {((_x select 0) distance2D _pos) < 35}) >= 0) then {continue};
+		if (_artillery == 999) then {_vehicleClass = (selectRandom _arrayUnits) select 1};
 		_group = createGroup _side;
 
 		//Spawn the static pieces
 		for "_x" from 1 to _perSpawn step 1 do {
 			_radius = 40;
-			_spawnPos = _pos findEmptyPosition [20,_radius,_vehicleClass];
+			_spawnPos = [_pos, _vehicleClass, 60] call MCC_fnc_clearVehicleSpot;
+			if (count _spawnPos == 0) then {_spawnPos = _pos findEmptyPosition [20,_radius,_vehicleClass]};
 
 			while {count _spawnPos == 0} do {
 				_radius = _radius +40;
@@ -69,6 +84,7 @@ if (count _arrayUnits > 0) then {
 			};
 
 			_vehicle = [_spawnPos, (random 360), _vehicleClass, _group] call MCC_fnc_spawnVehicle;
+			MCC_MWStaticUsed pushBack [_spawnPos, _vehicle select 0];
 			{_x addCuratorEditableObjects [[_vehicle select 0],true]} forEach allCurators;
 			(_vehicle select 2) setVariable ["GAIA_ZONE_INTEND",[str _zone,"NOFOLLOW"], true];
 		};

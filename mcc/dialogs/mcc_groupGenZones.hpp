@@ -26,7 +26,7 @@ class MCC_zoneControls: MCC_RscControlsGroup
 
 			x = 0.000000 * safezoneW;
 			y = 0.002000 * safezoneH;
-			w = 0.025000 * safezoneW;
+			w = 0.033000 * safezoneW;
 			h = 0.022000 * safezoneH;
 		};
 
@@ -50,9 +50,9 @@ class MCC_zoneControls: MCC_RscControlsGroup
 			idc = 1;
 			onLBSelChanged = "MCC_behavior_index = (lbcurSel (_this select 0))";
 
-			x = 0.028000 * safezoneW;
+			x = 0.036000 * safezoneW;
 			y = 0.002000 * safezoneH;
-			w = 0.060000 * safezoneW;
+			w = 0.052000 * safezoneW;
 			h = 0.022000 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};

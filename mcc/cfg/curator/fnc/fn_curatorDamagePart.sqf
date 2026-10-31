@@ -66,7 +66,7 @@ if (_resualt select (_resualtCount - 1)) then {
 //Set Damage
 {
 	if (_x) then {
-		[[_object, _selectionsNames select _foreachIndex], {(_this select 0) setHit [(_this select 1), 1];}] remoteExec ["call", _object, false];
+		["call", [[_object, _selectionsNames select _foreachIndex], {(_this select 0) setHit [(_this select 1), 1];}], _object, false] call MCC_fnc_secRemote;
 	}
 } forEach _resualt;
 

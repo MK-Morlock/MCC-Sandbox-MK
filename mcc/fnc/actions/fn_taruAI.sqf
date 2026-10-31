@@ -126,7 +126,7 @@ switch (_mode) do {
 				_hh enableCollisionWith _p;
 				private _t = time + 15;
 				waitUntil {sleep 0.5; !alive _p || {(getPos _p select 2) < 1 && {vectorMagnitude (velocity _p) < 1}} || {time > _t}};
-				{[_x, {params ["_u"]; if (missionNamespace getVariable ["MCC_debug", false]) then {["DEBUG", "getout", "MOVEOUT by pods (taruAI) | %1 from %2 at %3 m", [name _u, typeOf (vehicle _u), round ((getPosATL _u) select 2)]] call MCC_fnc_log}; unassignVehicle _u; moveOut _u}] remoteExec ["call", _x]} forEach (crew _p);
+				{["podMoveOut", [_x, "taruAI"]] remoteExec ["MCC_fnc_secAction", _x, false]} forEach (crew _p);
 			};
 		};
 		_h setVariable ["MCC_taruHold", nil];

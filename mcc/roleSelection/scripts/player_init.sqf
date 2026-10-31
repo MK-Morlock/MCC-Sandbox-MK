@@ -112,7 +112,7 @@
 	if ( (tolower _role == "officer" ) && (player != leader player)) then {group player selectLeader player};
 
 	//Set Rank
-	_level 	 = call compile format  ["%1Level select 0",_role];
+	_level 	 = ((missionNamespace getVariable [format ["%1Level", _role], [0, 0]]) param [0, 0]);
 
 	if (MCCplayerRank == "N/A") then {
 		MCCplayerRank = [(floor (_level/10)) min 6,"classname"] call BIS_fnc_rankParams;

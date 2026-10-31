@@ -41,6 +41,7 @@ _waypoint = _group addWaypoint 				[_position, 0];
 _waypoint setWaypointType 						_WPType;
 _waypoint setWaypointCompletionRadius _Radius;
 _waypoint	setWaypointTimeout [20, 30, 25];
+if (_WPType == "SENTRY") then {[_group, _waypoint] spawn MCC_fnc_gaiaSentryHold};
 
 _waypoint;
 

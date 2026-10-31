@@ -15,7 +15,7 @@ private _vehicles = (missionNamespace getVariable ["MCC_convoyVehicles", []]) se
 if (_vehicles isEqualTo []) exitWith {hint "No convoy to remove.\nPress Spawn to place one."};
 
 //On the server (the convoy is made there)
-[1, {
+["MCC_fnc_globalExecute", [1, {
 	private _groups = [];
 	{
 		private _veh = _x;
@@ -24,6 +24,6 @@ if (_vehicles isEqualTo []) exitWith {hint "No convoy to remove.\nPress Spawn to
 	} forEach ((missionNamespace getVariable ["MCC_convoyVehicles", []]) select {!isNull _x});
 	{if (!isNull _x) then {{deleteVehicle _x} forEach (units _x); deleteGroup _x}} forEach _groups;
 	missionNamespace setVariable ["MCC_convoyVehicles", [], true];
-}] remoteExec ["MCC_fnc_globalExecute", 2, false];
+}], 2, false] call MCC_fnc_secRemote;
 
 hint format ["Convoy removed (%1 vehicles).\nPress Spawn to place a new convoy.", count _vehicles];

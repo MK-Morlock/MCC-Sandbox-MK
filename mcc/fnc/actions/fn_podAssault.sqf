@@ -37,7 +37,7 @@ if (!alive _h || {!alive _p} || {count (ropes _h) == 0}) exitWith {["WARN", "pod
 
 private _n = count (crew _p);
 {
-	[_x, {params ["_u"]; if (missionNamespace getVariable ["MCC_debug", false]) then {["DEBUG", "getout", "MOVEOUT by pods (podAssault) | %1 from %2 at %3 m", [name _u, typeOf (vehicle _u), round ((getPosATL _u) select 2)]] call MCC_fnc_log}; unassignVehicle _u; moveOut _u}] remoteExec ["call", _x];
+	["podMoveOut", [_x, "podAssault"]] remoteExec ["MCC_fnc_secAction", _x, false];
 	sleep 0.15;
 } forEach (crew _p);
 private _tl = time + 20;

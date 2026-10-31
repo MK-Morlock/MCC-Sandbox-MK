@@ -72,6 +72,7 @@ if (_addGunners) then {
 	};
 };
 
+[_object, _gunnersGroup] call MCC_fnc_evacGunners;
 _object setVariable ["MCC_evacStartPos", getposATL _object, true];
 _object setVariable ["MCC_evacSide", _side, true];
 

@@ -50,6 +50,7 @@ params [
 	["_store",true,[true]],
 	["_rearm",true,[true]]
 ];
+if !(call MCC_fnc_secSenderOK) exitWith {};
 
 if (!isServer) exitWith {};
 

@@ -164,7 +164,7 @@ my_pv_handler =
 				{
 					if (MCC_Chat) then
 					{
-						[[netId _p_mcc_player,_p_mcc_player], format["MCC ID %1-> %2 Logged out as Mission Maker",_p_mcc_request,mcc_missionMaker], false] remoteExec ["MCC_fnc_groupchat", 0, false];
+						[[netId _p_mcc_player,_p_mcc_player], format["MCC ID %1-> %2 Logged out as Mission Maker",_p_mcc_request,mcc_missionMaker], true] remoteExec ["MCC_fnc_groupchat", 0, false];
 					};
 					mcc_missionmaker="";
 					publicVariable "mcc_missionmaker";
@@ -203,6 +203,18 @@ my_pv_handler =
 
 					if (_p_mcc_spawntype == "Reinforcement") then
 					{
+						private _pendIdx = (missionNamespace getVariable ["MCC_MWReinforcePending", []]) findIf {((_x select 0) == _p_mcc_zone_markername) && {(time - (_x select 1)) < 30}};
+						if (_pendIdx >= 0) then {
+							(missionNamespace getVariable ["MCC_MWReinforcePending", []]) deleteAt _pendIdx;
+							[allGroups, _p_mcc_zone_markername] spawn {
+								params ["_before", "_zone"];
+								private _end = time + 90;
+								while {time < _end} do {
+									sleep 5;
+									{_x setVariable ["MCC_MWReinforcement", true]} forEach ((allGroups - _before) select {(((_x getVariable ["GAIA_ZONE_INTEND", []]) param [0, ""]) == _zone) && {((units _x) findIf {isPlayer _x}) < 0}});
+								};
+							};
+						};
 						if (_p_mcc_spawnname in ["0","1","2","3","4","5","6","7","8"] || _p_mcc_spawnname in [0,1,2,3,4,5,6,7,8]) then
 						{
 							[[(_p_safepos select 0),(_p_safepos select 1),0],_p_mcc_grouptype,_p_mcc_spawnname,_p_mcc_zone_markername,_p_mcc_zone_behavior,_p_mcc_awareness,_p_mcc_spawnfaction,_p_mcc_spawn_dir] spawn MCC_fnc_paratroops;

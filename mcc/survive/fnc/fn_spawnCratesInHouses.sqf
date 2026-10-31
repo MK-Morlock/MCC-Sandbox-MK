@@ -23,7 +23,7 @@ params [
 
 if (_pos isEqualTo [0,0,0]) exitWith {};
 
-_buildings = _pos nearObjects ["House",_radius];
+_buildings = (_pos nearObjects ["House",_radius]) select {!(_x call MCC_fnc_isWaterStructure)};
 _index = missionNamespace getVariable ["MCC_itemMarker_index",0];
 
 _path = if (isClass (missionconfigFile >> "CfgMCCspawnItems")) then {(missionconfigFile >> "CfgMCCspawnItems")} else {(configFile >> "CfgMCCspawnItems")};
@@ -148,7 +148,7 @@ if (_debug) then {
 {
 	_temploc = [_mapCenter,5000,_x] call MCC_fnc_MWbuildLocations;
 	{
-		_buildings = (getpos (_x select 0)) nearObjects ["House",500];
+		_buildings = ((getpos (_x select 0)) nearObjects ["House",500]) select {!(_x call MCC_fnc_isWaterStructure)};
 
 	    {
 	    	_availablePos = [];

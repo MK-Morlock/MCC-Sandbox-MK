@@ -30,7 +30,7 @@ if (typeName _pos == typeName objNull) then {
 if (_pos isEqualTo [0,0,0]) exitWith {};
 
 // Stop if ambient fire is switched off, or fires were extinguished after this spread step was scheduled
-if !(missionNamespace getVariable ["MCC_ambientFireSettingIndex", true]) exitWith {};
+if !(missionNamespace getVariable ["MCC_ambientFireSettingIndex", false]) exitWith {};
 private _fireEpoch = missionNamespace getVariable ["MCC_ambientFireEpoch", 0];
 
 //Find fire direction and distance

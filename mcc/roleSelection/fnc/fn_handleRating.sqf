@@ -35,7 +35,7 @@ player setVariable ["MCC_valorPoints",(player getVariable ["MCC_valorPoints",50]
 _role = player getvariable ["CP_role",""];
 if (_role =="") exitWith {};
 
-_exp = call compile format  ["%1Level select 1",_role];
+_exp = ((missionNamespace getVariable [format ["%1Level", _role], [0, 0]]) param [1, 0]);
 
 
 if (isnil "_exp") exitWith {};
@@ -43,7 +43,7 @@ if (isnil "_exp") exitWith {};
 if (_exp < 0) then {_exp = 0};
 if (MCC_debug) then {systemchat format ["rating: %1", _exp]};
 
-_oldLevel = call compile format  ["%1Level select 0",_role];
+_oldLevel = ((missionNamespace getVariable [format ["%1Level", _role], [0, 0]]) param [0, 0]);
 
 _exp = (_exp + _rating);
 _level =[floor(_exp/CP_XPperLevel)+1 ,_exp];

@@ -15,7 +15,7 @@ _pos = _this param [0, [], [[]]];
 _civSpawnDistance = _this param [1, 250, [250]];
 
 //Find nearest houses
-_nearHouses = nearestObjects [_pos,["House","Church","FuelStation"],_civSpawnDistance];
+_nearHouses = (nearestObjects [_pos,["House","Church","FuelStation"],_civSpawnDistance]) select {!(_x call MCC_fnc_isWaterStructure)};
 
 // Only real buildings: power lines, wires, pylons, walls and fences are also "House" objects (and some sit in the air),
 // so ambient civilians used to spawn on power-line wires and fall. A usable building has at least one building position.

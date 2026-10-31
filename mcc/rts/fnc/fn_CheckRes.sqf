@@ -19,7 +19,7 @@ _res = param [1,missionnamespace,[[]]];
 _available = false;
 
 //Do we have the needed resources
-_resToCheck = call compile format ["MCC_res%1",_side];
+_resToCheck = (missionNamespace getVariable format ["MCC_res%1",_side]);
 
 _var   = _res select 0;
 _level = _res select 1;

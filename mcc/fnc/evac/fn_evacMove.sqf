@@ -140,7 +140,7 @@ else
 
 						if (isMultiplayer) then
 						{
-							 [[], compile format ["unassignVehicle objectFromNetID '%1'; objectFromNetID '%1' action ['eject', vehicle objectFromNetID '%1']", netID _unit]] remoteExec ["call", _unit, false];
+							 ["eject", [_unit]] remoteExec ["MCC_fnc_secAction", _unit, false];
 						}
 						else
 						{

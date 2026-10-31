@@ -18,6 +18,33 @@ class MCC_Module_campaignInit : Module_F
 			property = "MCC_Module_campaignInit_factionPlayer";
 		};
 
+		class playerContent : Combo
+		{
+			displayName = "Players Content";
+			description = "Which units and vehicles the players' faction may use: its own, plus Creator DLC, or every loaded mod";
+			typeName = "NUMBER";
+			property = "MCC_Module_campaignInit_playerContent";
+			class values
+			{
+				class own
+				{
+					name = "Faction only";
+					value = 0;
+				};
+				class creatorDLC
+				{
+					name = "Faction + Creator DLC";
+					value = 1;
+					default = 1;
+				};
+				class allMods
+				{
+					name = "All loaded mods";
+					value = 2;
+				};
+			};
+		};
+
 		class factionRivalPlayer : Combo
 		{
 			displayName = "Rival Players Side";
@@ -66,6 +93,33 @@ class MCC_Module_campaignInit : Module_F
 			property = "MCC_Module_campaignInit_factionEnemy";
 		};
 
+		class enemyContent : Combo
+		{
+			displayName = "Enemy Content";
+			description = "Which units and vehicles the enemy faction may use: its own, plus Creator DLC, or every loaded mod";
+			typeName = "NUMBER";
+			property = "MCC_Module_campaignInit_enemyContent";
+			class values
+			{
+				class own
+				{
+					name = "Faction only";
+					value = 0;
+				};
+				class creatorDLC
+				{
+					name = "Faction + Creator DLC";
+					value = 1;
+					default = 1;
+				};
+				class allMods
+				{
+					name = "All loaded mods";
+					value = 2;
+				};
+			};
+		};
+
 		class factionCiv : Edit
 		{
 			control = "MCC_AttributeFaction";	//drop-down of all loaded factions (mod factions included)
@@ -74,6 +128,60 @@ class MCC_Module_campaignInit : Module_F
 			description = "Config name";
 			defaultValue = """CIV_F""";
 			property = "MCC_Module_campaignInit_factionCiv";
+		};
+
+		class civContent : Combo
+		{
+			displayName = "Civilian Content";
+			description = "Which units and vehicles the civilian faction may use: its own, plus Creator DLC, or every loaded mod";
+			typeName = "NUMBER";
+			property = "MCC_Module_campaignInit_civContent";
+			class values
+			{
+				class own
+				{
+					name = "Faction only";
+					value = 0;
+				};
+				class creatorDLC
+				{
+					name = "Faction + Creator DLC";
+					value = 1;
+					default = 1;
+				};
+				class allMods
+				{
+					name = "All loaded mods";
+					value = 2;
+				};
+			};
+		};
+
+		class forceSpread : Combo
+		{
+			displayName = "Force Spread";
+			description = "Where enemy forces start: Tight = near the centre, Normal = original MCC, Wide = evenly over the zone";
+			typeName = "NUMBER";
+			property = "MCC_Module_campaignInit_forceSpread";
+			class values
+			{
+				class tight
+				{
+					name = "Tight";
+					value = 0;
+				};
+				class normal
+				{
+					name = "Normal";
+					value = 1;
+					default = 1;
+				};
+				class wide
+				{
+					name = "Wide";
+					value = 2;
+				};
+			};
 		};
 
 		class missionMax : Combo
@@ -111,6 +219,7 @@ class MCC_Module_campaignInit : Module_F
 		class difficulty : Combo
 		{
 			displayName = "Difficulty";
+			description = "Easy, Medium and Hard give about 5, 10 or 20 enemies per player, and rise 10% after each mission. Higher difficulty also means more vehicles, armour, artillery and objectives.";
 			typeName = "NUMBER";
 			property = "MCC_Module_campaignInit_difficulty";
 
@@ -173,7 +282,7 @@ class MCC_Module_campaignInit : Module_F
 		class playersCount : Edit
 		{
 			displayName = "Players (enemy scaling)";
-			description = "Enemy numbers are sized for at least this many players. 0 = count the real players (with few players a mission still has at least 20 enemies).";
+			description = "Enemy numbers are sized for at least this many players (0 = count the real players). Enemies per mission: about 5, 10 or 20 per player (Easy / Medium / Hard), rising 10% after each mission.";
 			typeName = "NUMBER";
 			defaultValue = 0;
 			property = "MCC_Module_campaignInit_playersCount";
@@ -214,7 +323,7 @@ class MCC_Module_campaignInit : Module_F
 			tooltip = "Area: task markers are placed up to ~400 m from the objective and must be searched for (classic MCC campaign). Precise: markers sit on the objective with a 3D icon.";
 			typeName = "NUMBER";
 			property = "MCC_Module_campaignInit_objectiveMarkers";
-			defaultValue = "0";
+			defaultValue = "1";
 
 			class values
 			{
@@ -222,12 +331,12 @@ class MCC_Module_campaignInit : Module_F
 				{
 					name = "Area (search)";
 					value = 0;
-					default = 1;
 				};
 				class precise
 				{
 					name = "Precise";
 					value = 1;
+					default = 1;
 				};
 			};
 		};

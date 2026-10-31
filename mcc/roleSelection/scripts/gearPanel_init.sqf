@@ -112,11 +112,11 @@ if (count _roleLevel <= 0) then {
 	};
 };
 
-_exp  = call compile format  ["%1Level select 1",_role];
+_exp  = ((missionNamespace getVariable [format ["%1Level", _role], [0, 0]]) param [1, 0]);
 if (isnil "_exp") exitWith {};
 
 if (_exp < 0) then {_exp = 0};
-_oldLevel = call compile format  ["%1Level select 0",_role];
+_oldLevel = ((missionNamespace getVariable [format ["%1Level", _role], [0]]) param [0, 0]);
 _html = "<t color='#818960' size='0.8' shadow='1' align='center' underline='false'>"+ _role+ " Level " + str _oldLevel + "</t>";
 messeges ctrlSetStructuredText parseText _html;
 
@@ -250,7 +250,7 @@ for "_i" from 0 to (count _cfg -1) do {
 		missionNamespace setVariable ["MCCActiveSpawnPosArray",[player] call MCC_fnc_respawnObjects];
 
 		//Load available resources
-		_array = call compile format ["MCC_res%1",playerside];
+		_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 		{_disp displayCtrl _x ctrlSetText str floor (_array select _forEachIndex)} foreach [81,82,83,84,85];
 
 		//Load available valor
@@ -305,7 +305,7 @@ for "_i" from 0 to (count _cfg -1) do {
 			_idc = _i+ 500;
 
 			//Update levels
-			(_disp displayCtrl (_idc + 400)) ctrlSetStructuredText parseText format ["<t color='#ffffff' size='0.8' shadow='1' align='cent'>Level: %1</t><br/><br/>", call compile format ["%1Level select 0",toLower _cfgName]];
+			(_disp displayCtrl (_idc + 400)) ctrlSetStructuredText parseText format ["<t color='#ffffff' size='0.8' shadow='1' align='cent'>Level: %1</t><br/><br/>", ((missionNamespace getVariable [format ["%1Level", toLower _cfgName], [0, 0]]) param [0, 0])];
 
 			_countRole = {(_x getvariable "CP_role") == _cfgName} count units player;
 			_countRoleSide = {(_x getvariable "CP_role") == _cfgName && side _x ==  (player getVariable ["CP_side",  playerside])} count allplayers;

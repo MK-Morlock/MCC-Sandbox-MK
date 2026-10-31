@@ -79,7 +79,7 @@ if (MCC_CASrequestMarker && _pressed==0) exitWith {
 	MCCMK_callSource = "Call button";
 	private _k0 = if (MCC_spawnkind isEqualType []) then {MCC_spawnkind param [0, ""]} else {MCC_spawnkind}; private _kind = if (_k0 isEqualType "") then {toLower _k0} else {""};
 	private _p0 = if (MCC_planeType isEqualType []) then {MCC_planeType param [0, ""]} else {MCC_planeType}; private _isDrop = (if (_p0 isEqualType "") then {toLower _p0} else {""}) in ["west","east","guer","civ","logic"];
-	private _w = if (_isDrop) then {8} else {[10, 5] select (_kind == "cruise missile")};
+	private _w = if (_isDrop) then {8} else {5};
 	private _lm = [["strike", "supply"] select _isDrop, MCC_pointA, MCC_pointA, [], _w] call MCCMK_fnc_supportLine;
 	MCCMK_lineCancel = false;
 	MCCMK_lineDrawing = true;
@@ -119,6 +119,7 @@ if (MCC_CASrequestMarker && _pressed==0) exitWith {
 
 	[MCC_spawnkind] call MCC_fnc_supportHint;
 	MCC_cruiseFromCommander = true;
+	MCC_cruiseFromMCC = false;
 
 	private _pend = missionNamespace getVariable ["MCCMK_consolePending", []];
 	if (count _pend > 0) then {

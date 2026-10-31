@@ -19,6 +19,7 @@ Author:
 private ["_group", "_buildings ","_max","_i","_wp","_pos"];
 _group 		 = _this select 0;
 _pos			 = _this select 1;
+if (isNil "_pos" || {!(_pos isEqualType [])} || {count _pos < 2}) exitWith {0};
 
 
 //Then actualy go there.

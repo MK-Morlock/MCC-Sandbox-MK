@@ -39,7 +39,7 @@ if (!alive _player) exitWith {};
 ["INFO", "haloFormation", "ROS player formation on %1 with %2 AI at %3 m", [name _player, count _ai, round ((getPosATL _player) select 2)]] call MCC_fnc_log;
 private _v0 = velocity _player;
 if ((vectorMagnitude [_v0 select 0, _v0 select 1, 0]) > 5) then {
-	[[((_v0 select 0) atan2 (_v0 select 1) + 360) mod 360, _v0], {params ["_d", "_v"]; player setDir _d; player setVelocity _v}] remoteExec ["call", _player];
+	["haloAlign", [((_v0 select 0) atan2 (_v0 select 1) + 360) mod 360, _v0]] remoteExec ["MCC_fnc_secAction", _player, false];
 };
 
 if (((_player getVariable ["MCC_paraOpen", [0, 0]]) select 0) != 1) then {[_player] spawn {

@@ -58,7 +58,8 @@ for "_i" from 0 to (count _CfgVehicles - 1) do
 		//hit or destroyed, so they never go into a spawn list. Nothing in MCC needs them from these lists.
 		private _invisibleTarget = ((toLower (_vehicleDisplayName select 0)) find "invisible") >= 0
 			|| {((toLower _cfgclass) find "targetsoldier") >= 0} || {((toLower _cfgclass) find "target_vehicle") >= 0}
-			|| {((toLower _cfgclass) find "targetvehicle") >= 0};
+			|| {((toLower _cfgclass) find "targetvehicle") >= 0}
+			|| {((toLower _cfgclass) select [((count _cfgclass) - 5) max 0]) == "_base"} || {((toLower _cfgclass) find "_base_") >= 0};
 		if (_faction in [_cfgFaction,"all"] && !(_dlc in ["kart"]) && !_invisibleTarget) then
 		{
 			_vehicleClass = [_CfgVehicle] call MCC_fnc_unitCategory;	//mod vehicleClass names mapped to MCCs (GitHub #48)

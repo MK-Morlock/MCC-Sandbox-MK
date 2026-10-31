@@ -8,7 +8,11 @@ if (!isNil "mcc_zone_pos" && {count mcc_zone_pos > _zn}) then {mcc_zone_pos set 
 if (!isNil "mcc_zone_size" && {count mcc_zone_size > _zn}) then {mcc_zone_size set [_zn, [1,1]]};
 publicVariable "mcc_zone_pos"; publicVariable "mcc_zone_size";
 deleteMarker str _zn; deleteMarker format ["LABEL_%1", _zn];
-[[str _zn], {params ["_m"]; deleteMarkerLocal _m; deleteMarkerLocal format ["LABEL_%1", _m]}] remoteExec ["call", 0];
+{_x setVariable ["GAIA_ZONE_INTEND", nil, true]} forEach (allGroups select {((_x getVariable ["GAIA_ZONE_INTEND", []]) param [0, ""]) isEqualTo (str _zn)});
+MCC_zones_numbers = (missionNamespace getVariable ["MCC_zones_numbers", []]) - [_zn];
+publicVariable "MCC_zones_numbers";
+["call", [[str _zn], {params ["_z"]; {_y set ["zones", (_y getOrDefault ["zones", []]) - [_z]]} forEach (missionNamespace getVariable ["MCC_generatedMissions", createHashMap])}], 2, false] call MCC_fnc_secRemote;
+["call", [[str _zn], {params ["_m"]; deleteMarkerLocal _m; deleteMarkerLocal format ["LABEL_%1", _m]}], 0, false] call MCC_fnc_secRemote;
 ["INFO", "deleteZone", "zone %1 deleted (%2 GAIA groups used it)", [_zn, _gaia]] call MCC_fnc_log;
 ["fill"] call MCC_fnc_zoneList;
 hint format ["Zone %1 deleted", _zn];

@@ -21,6 +21,25 @@ class general
 	class mobileRespawn	{description = "will move the respawn marker to the current position of the unit while the unit is alive, if the unit dead will move the marker to the prvious location.";};
 	class buildingPosCount	{description = "return the ammount of indexed positions in a building.";};
 	class posOnBuilding	{description = "(MK) is a spawn spot on, in or under a building";};
+	class gaiaFireSafe	{description = "(MK) GAIA artillery: is it safe to fire at this spot";};
+	class roadsideSpot	{description = "(MK) a clear roadside spot for a vehicle, on the nearest roads to a point";};
+	class vehicleCanDriveOut	{description = "(MK) can a vehicle drive from a spot to the nearest road (or the zone centre), by the AI pathfinder";};
+	class nextZoneNumber	{description = "(MK) lowest zone number not in use";};
+	class secAction	{description = "(MK) fixed named actions that players can request on other machines";};
+	class secSenderOK	{description = "(MK) server side: was this remote call sent by the server, an admin, the mission maker, a Zeus or a headless client";};
+	class secRemote	{description = "(MK) remote call routed through the server, which checks the sender";};
+	class secRelay	{description = "(MK) server side of secRemote: only the mission maker, admins, Zeus and headless clients are relayed";};
+	class isWaterStructure	{description = "(MK) is a building a pier, jetty, bridge or other structure over water";};
+	class isUtilityVehicle	{description = "(MK) an unarmed, single-seat, non-supply vehicle such as an aircraft tug";};
+	class landSpot	{description = "(MK) a land spot for people: no water, rocks, steep ground or buildings close by";};
+	class structuresNear	{description = "(MK) is there a building, wall, fence or other structure within a radius";};
+	class compositionFootprint	{description = "(MK) radius a composition covers, from its pieces";};
+	class contentAllowed	{description = "(MK) does a class pass the Mission Generator content filter for a faction";};
+	class contentFilterList	{description = "(MK) a unit list with the Mission Generator content filter applied";};
+	class gaiaSentryHold	{description = "(MK) GAIA sentry teams hold their spot instead of re-forming";};
+	class findFlatSpot	{description = "(MK) the flattest open spot near a position, inside its zone";};
+	class safeSpawnPos	{description = "(MK) a safe spawn spot for a group or vehicle near a position";};
+	class clearVehicleSpot	{description = "(MK) a clear spot for a vehicle near a position";};
 	class openSpotNear	{description = "(MK) Nearest open ground around a spawn spot that was on a building";};
 	class paraOffRoof	{description = "(MK) AI parachutist landed: chute removed, off a roof when nobody is near or watching";};
 	class makeUnitsArray	{description = "returns a unit array consist of all the units from the given function and simulation in format [_cfgclass,_vehicleDisplayName].";};
@@ -287,6 +306,7 @@ class evac
 	class evacSpawn {description = "Spawn a vehicle with crew and gunners, mark it as an evac vehicle";};
 	class repairEvac {description = "Repair evac helicopter";};
 	class setEvac {description = "Sets an empty ot AI vehicle into an ecav for a specific side";};
+	class evacGunners {description = "(MK) AI already in an evac's gun seats join its gunners group so they engage";};
 	class fastRopeLocal {description = "handles fast rope on clients";};
 };
 

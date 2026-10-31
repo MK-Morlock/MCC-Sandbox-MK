@@ -26,7 +26,7 @@ for "_x" from 0 to _toPlace step 1 do
 	if (count _places == 0) exitWith {};
 
 	//Select animal type
-	_animalType = ["ModuleAnimalsGoats_F","ModuleAnimalsPoultry_F","ModuleAnimalsSheep_F"] call BIS_fnc_selectRandom;
+	_animalType = selectRandom [["Goat_random_F"], ["Hen_random_F", "Cock_random_F"], ["Sheep_random_F"]];
 
 	//Select pos
 	_index = floor random (count _places);
@@ -34,9 +34,10 @@ for "_x" from 0 to _toPlace step 1 do
 
 	_pos = [(_pos select 0) select 0, (_pos select 0) select 1,0];
 
-	_group = createGroup sidelogic;
-	_animal = _group createUnit [_animalType, _pos, [], 0, "none"];
-	{_x addCuratorEditableObjects [[_animal],false]} forEach allCurators;
+	for "_k" from 1 to (3 + floor random 5) do {
+		private _animal = createAgent [selectRandom _animalType, (([_pos, 15, 8, 2] call MCC_fnc_landSpot) call {if (_this isEqualTo []) then {_pos getPos [random 8, random 360]} else {_this}}), [], 0, "NONE"];
+		{_x addCuratorEditableObjects [[_animal],false]} forEach allCurators;
+	};
 
 	//resize the possible positon array
 	_places set [_index, -1];

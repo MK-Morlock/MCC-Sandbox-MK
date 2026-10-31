@@ -6,6 +6,7 @@
 // Returns:
 //     <Nothing>
 //==============================================================================================================================================================================
+if !(call MCC_fnc_secSenderOK) exitWith {};
  private "_arrayGroups";
  private "_arrayVehicles";
  private "_objectData";
@@ -83,7 +84,7 @@ if (count _arrayGroups > 0) then
 			if (_objectData select 7 != "") then
 			{
 				_vehicle setVariable ["vehicleinit",(_objectData select 7),true];
-				[[netID _vehicle,_vehicle], _objectData select 7] remoteExec ["MCC_fnc_setVehicleInit",0];
+				["MCC_fnc_setVehicleInit", [[netID _vehicle,_vehicle], _objectData select 7], 0, false] call MCC_fnc_secRemote;
 			};
 
 			if (_objectData select 8) then
@@ -171,7 +172,7 @@ if ((count _arrayVehicles) > 0) then
 		if (_objectData select 4 != "") then
 		{
 			_vehicle setVariable ["vehicleinit",(_objectData select 4),true];
-			[[netID _vehicle,_vehicle], (_objectData select 4)] remoteExec ["MCC_fnc_setVehicleInit", 0, false];
+			["MCC_fnc_setVehicleInit", [[netID _vehicle,_vehicle], (_objectData select 4)], 0, false] call MCC_fnc_secRemote;
 		};
 
 		clearWeaponCargoGlobal _vehicle;

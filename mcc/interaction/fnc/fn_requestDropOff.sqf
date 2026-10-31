@@ -21,7 +21,7 @@ openMap false;
 cutText ["", "PLAIN DOWN",1,true];
 
 _command = compile format ['titleText ["%1 Request Drop-off at X-ray: %2 Yankee: %3","PLAIN DOWN"]; titleFadeOut 60;',name player, floor (MCC_mapClick select 0), floor (MCC_mapClick select 1)];
-[[], _command] remoteExec ["call", driver _vehicPlayer, false];
+["dropOffMsg", [name player, floor (MCC_mapClick select 0), floor (MCC_mapClick select 1)]] remoteExec ["MCC_fnc_secAction", driver _vehicPlayer, false];
 
 [1,MCC_mapClick,[9,"NO CHANGE","NO CHANGE","FULL","UNCHANGED","", {},0],[group driver _vehicPlayer]] remoteExec ["MCC_fnc_manageWp", driver _vehicPlayer, false];
 

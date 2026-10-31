@@ -109,7 +109,7 @@ if (MCC_Prev_HijackedGroupIsLeader) then
 {
 	if (isMultiplayer) then
 	{
-		[2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group _preUnit), netID _preUnit]] remoteExec ["MCC_fnc_globalExecute", _preUnit, false];
+		["MCC_fnc_globalExecute", [2, compile format ["(groupFromNetID '%1') selectLeader objectFromNetId '%2'",netID (group _preUnit), netID _preUnit]], _preUnit, false] call MCC_fnc_secRemote;
 	}
 	else
 	{

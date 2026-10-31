@@ -9,9 +9,10 @@ disableSerialization;
 params ["_type", "_pos", "_size"];
 
 //Creating a zone
+if (_type in [1, 2] && {((_size select 0) min (_size select 1)) < 5}) exitWith {};
 if (_type == 1) exitWith
 {
-	mcc_zone_number = (count (missionNamespace getVariable ["MCC_zones_numbers",[]])) + 1;
+	mcc_zone_number = call MCC_fnc_nextZoneNumber;
 	MCC_zones_numbers = (missionNamespace getVariable ["MCC_zones_numbers",[]]);
 	MCC_zones_numbers set [count MCC_zones_numbers, mcc_zone_number];
 	mcc_zone_markposition = _pos;

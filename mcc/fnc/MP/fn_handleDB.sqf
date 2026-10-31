@@ -95,7 +95,7 @@ if (_read == "read") then {
 	try {
 		_decoded = call compile _storedString;
 	} catch {
-		diag_log text format ["MCC_fnc_handleDB: failed to decode stored value for %1/%2/%3 - returning default", _dbName, _section, _var];
+		if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log text format ["MCC_fnc_handleDB: failed to decode stored value for %1/%2/%3 - returning default", _dbName, _section, _var]};
 		_decoded = _value;
 	};
 

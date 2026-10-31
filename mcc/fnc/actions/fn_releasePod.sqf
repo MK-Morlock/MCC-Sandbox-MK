@@ -94,7 +94,7 @@ private _relH = (ASLToATL (getPosWorld _vehicle)) select 2;
 	sleep 1;
 	private _nOut = count crew _pod;
 	{
-		[_x, {params ["_u"]; if (missionNamespace getVariable ["MCC_debug", false]) then {["DEBUG", "getout", "MOVEOUT by pods (releasePod) | %1 from %2 at %3 m", [name _u, typeOf (vehicle _u), round ((getPosATL _u) select 2)]] call MCC_fnc_log}; unassignVehicle _u; moveOut _u}] remoteExec ["call", _x];
+		["podMoveOut", [_x, "releasePod"]] remoteExec ["MCC_fnc_secAction", _x, false];
 	} forEach (crew _pod);
 	["INFO", "paradrop", "drop pod landed at %1 - %2 passengers out%3", [mapGridPosition _pod, _nOut, if (count _tgt > 1) then {format [" - %1 m from the middle of the line", round (_pod distance2D _tgt)]} else {""}]] call MCC_fnc_log;
 };

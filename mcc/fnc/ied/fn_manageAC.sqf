@@ -91,7 +91,8 @@ while {alive _suspect && _check} do {
 	_check = _suspect getvariable ["armed",true];
 	_close = (getPos _suspect) nearObjects _rad;
 
-	if(({side _x in _side} count _close > 0) || {isPlayer _x} count _close > 0) then {
+	private _home = _suspect getVariable ["MCC_homeSide", sideUnknown];
+	if(({(side _x in _side) && {(side _x) != _home}} count _close > 0) || {isPlayer _x} count _close > 0) then {
 		_t=600;
 
 		while {(alive _suspect) && (_check) && (_t > 0)} do {
@@ -99,7 +100,7 @@ while {alive _suspect && _check} do {
 			_check = _suspect getvariable ["armed",true];
 			_closeunit = [];
 			{
-				if (side _x in _side || isPlayer _x) then {_closeunit = _closeunit + [_x]}
+				if (((side _x in _side) && {(side _x) != _home}) || isPlayer _x) then {_closeunit = _closeunit + [_x]}
 			} forEach _close;
 
 			_count=count _closeunit;
@@ -130,6 +131,7 @@ while {alive _suspect && _check} do {
 
 									if (!(_suspect hasweapon _weapon)) then {
 
+										if (_home != sideUnknown && {_home != civilian} && {_home != (side _enemy)}) then {_grp = createGroup _home} else {
 										switch (side _enemy) do {
 											case west: {_grp = createGroup east};
 											case east: {_grp = createGroup west};
@@ -137,6 +139,7 @@ while {alive _suspect && _check} do {
 											{if ((west getFriend resistance)>0.5)then {_grp = createGroup east} else {_grp = createGroup west}};
 											case civilian: {if ((west getFriend civilian)>0.5) then {_grp = createGroup east} else {_grp = createGroup west}};
 											default {_grp = createGroup east};
+										};
 										};
 
 										[_suspect] joinSilent grpNull;

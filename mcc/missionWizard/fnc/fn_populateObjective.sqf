@@ -55,7 +55,7 @@ _missionCenter	= getpos _missionCenterTrigger;
 
 _missionRadius 	= (((triggerArea _missionCenterTrigger) select 0)+ ((triggerArea _missionCenterTrigger) select 1))/2;
 //Let'screate the main zone and placing units
-_zoneNumber = (count (missionNamespace getVariable ["MCC_zones_numbers",[]])) + 1;
+_zoneNumber = call MCC_fnc_nextZoneNumber;
 
 _debug = missionNamespace getVariable ["MCC_debug",false];
 
@@ -126,11 +126,16 @@ if (random 1 > 0.3) then
 	if (_debug) then {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "Enemy's Static Weapons Spawned in main zone"}};
 };
 
-//Ship
-_safepos =[_missionCenter ,1,(_missionRadius*2.5),2,2,10,0,[],[[-500,-500,0],[-500,-500,0]]] call BIS_fnc_findSafePos; //Check if they are water
-if (str _safepos != "[-500,-500,0]") then
+if (random 100 < (missionNamespace getVariable ["MCC_MWAirDefenceChance", 25])) then
 {
-	_unitPlaced = [(_totalEnemyUnits*0.2),_zoneNumber,MCC_MWGroupArrayShip,MCC_MWunitsArrayShip,5,15,"WATER",_enemySide] call MCC_fnc_MWSpawnVehicles;
+	[_missionCenter,_missionRadius,MCC_MWunitsArrayStatic,_enemySide,_zoneNumber] remoteExec ["MCC_fnc_MWSpawnAirDefence", 2, false];
+};
+
+//Ship
+private _boatWater = [_missionCenter ,1,(_missionRadius*2.5),2,2,10,0,[],[[-500,-500,0],[-500,-500,0]]] call BIS_fnc_findSafePos;
+if (str _boatWater != "[-500,-500,0]") then
+{
+	_unitPlaced = [(_totalEnemyUnits*0.2),_zoneNumber,MCC_MWGroupArrayShip,MCC_MWunitsArrayShip,_enemySide,_missionCenter,_missionRadius] call MCC_fnc_MWSpawnBoats;
 	if (_debug) then {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log format ["Total enemy ships spawned in main zone: %1", _unitPlaced]}};
 };
 
@@ -146,12 +151,11 @@ if (_isRoadblocks) then
 		{
 			if (random 1 > 0.5) then
 			{
-				_roadConnectedTo 	= roadsConnectedTo _x;
-				_connectedRoad 		= _roadConnectedTo select 0;
-				if (!isnil "_connectedRoad") then
+				private _spot = [_x, _missionCenter] call MCC_fnc_roadblockSpot;
+				if !(_spot isEqualTo []) then
 				{
-					_dir			 	= [_x, _connectedRoad] call BIS_fnc_DirTo;
-					_pos				= getpos _x;
+					_dir			 	= _spot select 1;
+					_pos				= _spot select 0;
 
 					if (isnil "_dir") then {_dir = 0};
 
@@ -178,7 +182,7 @@ if (_isIED) then
 	_roadPositions = [_missionCenter,(_missionRadius*0.9)] call MCC_fnc_findRoadsLeadingZone;
 	if (count _roadPositions >0) then
 	{
-		_unitsArray 	= [_civFaction,"carx"] call MCC_fnc_makeUnitsArray;
+		_unitsArray 	= [[_civFaction,"carx"] call MCC_fnc_makeUnitsArray, _civFaction] call MCC_fnc_contentFilterList;
 		if (count _unitsArray > 0) then {
 			{
 				if (random 1 > 0.3) then
@@ -264,13 +268,14 @@ if (_reinforcement in [1,2,3]) then
 
 //all sides but the enemy
 private _playersSides = [west,east,resistance] - [_enemySide];
+if (({[_x, _enemySide] call BIS_fnc_sideIsEnemy} count _playersSides) > 0) then {_playersSides = _playersSides select {[_x, _enemySide] call BIS_fnc_sideIsEnemy}};
 
 //Suicide Bombers
 private _name = "";
 private _objectType = "";
 private _unitsArray = [];
 private _pos = [];
-_unitsArray 	= [_civFaction, "soldier"] call MCC_fnc_makeUnitsArray;		//Let's build the faction unit's array
+_unitsArray 	= [[_civFaction, "soldier"] call MCC_fnc_makeUnitsArray, _civFaction] call MCC_fnc_contentFilterList;		//Let's build the faction unit's array
 
 if (_isSB) then {
 
@@ -279,12 +284,12 @@ if (_isSB) then {
 		if (random 1 >0.5) then	{
 			//Name the bomber.
 			_objectType = (_unitsArray call BIS_fnc_selectRandom) select 0;
-			_pos = [[[_missionCenter,(_missionRadius*0.4)]],["water"],{true}] call BIS_fnc_randomPos;
+			_pos = [_missionCenter, _missionRadius, "suicide bomber"] call MCC_fnc_fallbackSpot;
 
-			[_pos,_objectType,"large",floor (random 2),_playersSides] remoteExec ["MCC_fnc_SBSingle", 2,false];
+			if !(_pos isEqualTo []) then {[_pos,_objectType,"large",floor (random 2),_playersSides] remoteExec ["MCC_fnc_SBSingle", 2,false];};
 
 			//Debug
-			if (_debug) then
+			if (_debug && {!(_pos isEqualTo [])}) then
 				{
 					private _marker = "";
 					private _name = "";
@@ -308,12 +313,12 @@ if (_isAS) then {
 
 			//Name the AC.
 			_objectType = (_unitsArray call BIS_fnc_selectRandom) select 0;
-			_pos = [[[_missionCenter,(_missionRadius*0.4)]],["water"],{true}] call BIS_fnc_randomPos;
+			_pos = [_missionCenter, _missionRadius, "armed civilian"] call MCC_fnc_fallbackSpot;
 
-			[_pos,_objectType,_playersSides,"Armed Civilian",random 360] remoteExec ["MCC_fnc_ACSingle", 2,false];
+			if !(_pos isEqualTo []) then {[_pos,_objectType,_playersSides,"Armed Civilian",random 360] remoteExec ["MCC_fnc_ACSingle", 2,false];};
 
 			//Debug
-			if (_debug) then
+			if (_debug && {!(_pos isEqualTo [])}) then
 				{
 					private _marker = "";
 					private _name = "";

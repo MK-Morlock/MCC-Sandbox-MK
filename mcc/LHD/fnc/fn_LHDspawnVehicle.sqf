@@ -172,7 +172,7 @@ switch (_function) do
 		_ctrl ctrlSetText ((_vehiclesArray select (lbCurSel (_display displayCtrl 1502)) select 1) select 1);
 
 		//Get costs
-		_array = call compile format ["MCC_res%1",playerside];
+		_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 		_selectedVehicle = _vehiclesArray select (lbCurSel (_display displayCtrl 1502));
 		_cfgclass = _selectedVehicle select 0;
 		_cost = _selectedVehicle select 2;
@@ -261,7 +261,7 @@ switch (_function) do
 		_vehiclesArray = missionNamespace getVariable ["MCC_fnc_LHDspawnMenuInitArray", []];
 		if (count _vehiclesArray <= 0) exitWith {};
 
-		_array = call compile format ["MCC_res%1",playerside];
+		_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 		_selectedVehicle = _vehiclesArray select (lbCurSel (_display displayCtrl 1502));
 		_cfgclass = _selectedVehicle select 0;
 		_cost = _selectedVehicle select 2;
@@ -330,7 +330,7 @@ switch (_function) do
 
 			//Lets see if we need to pay for this spawn
 			if (_operator > 0) then {
-				_array = call compile format ["MCC_res%1",playerside];
+				_array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 
 				//Reduce resources
 				if (_operator == 1) then {
@@ -390,7 +390,7 @@ switch (_function) do
 
 			while {!(isnull attachedTo _cargo)} do {detach _cargo; sleep .1};
 			_cargo setDir _direction;
-			[netId _cargo,{{_x addCuratorEditableObjects [[objectFromNetId (_this)],true]} forEach allCurators}] remoteExec ["BIS_fnc_spawn",2];
+			["zeusAdd", [[_cargo], true, true]] remoteExec ["MCC_fnc_secAction", 2, false];
 
 			waitUntil {isTouchingGround _cargo};
 			sleep 5;

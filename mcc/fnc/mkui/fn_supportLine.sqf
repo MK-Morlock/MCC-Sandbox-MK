@@ -43,7 +43,7 @@ private _fnc_dot = {
 	_out pushBack _m;
 };
 switch (_mode) do {
-	case "strike": {[_a, _end, _extra, "ColorRed"] call _fnc_seg};
+	case "strike": {[_a, _end, _extra, "ColorRed"] call _fnc_seg; call _fnc_arrow};
 	case "para": {
 		[_a, _end, 8, "ColorRed"] call _fnc_seg;
 		call _fnc_arrow;

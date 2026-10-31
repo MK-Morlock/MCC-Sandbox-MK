@@ -42,7 +42,8 @@ private _simMap = createHashMapFromArray [
 private _factionLower = toLower _enemyFaction;
 private _cfgAll = configFile >> "CfgVehicles";
 private _scanned = 0;
-private _cacheKey = "MCC_campaignPatrolLists2_" + _factionLower;
+private _contentMode = (missionNamespace getVariable ["MCC_MWContentModes", createHashMap]) getOrDefault [_factionLower, 2];
+private _cacheKey = format ["MCC_campaignPatrolLists3_%1_%2", _factionLower, _contentMode];
 private _cached = uiNamespace getVariable [_cacheKey, []];
 if (count _cached > 0) then {
 	//Built earlier in this game session (the config cannot change while the game runs)
@@ -54,21 +55,40 @@ if (count _cached > 0) then {
 		format ["getNumber (_x >> 'scope') == 2 && {toLower getText (_x >> 'faction') == '%1'}", _factionLower]
 	};
 	private _classes = _cond configClasses _cfgAll;
+	private _listsAll = createHashMapFromArray ((keys _lists) apply {[_x, []]});
 	_scanned = count _classes;
 	{
 		private _cfg = _x;
 		private _type = _simMap getOrDefault [toLower getText (_cfg >> "simulation"), ""];
 		private _lc = toLower configName _cfg;
-		private _invisibleTarget = ((toLower getText (_cfg >> "displayName")) find "invisible") >= 0
-			|| {(_lc find "targetsoldier") >= 0} || {(_lc find "target_vehicle") >= 0} || {(_lc find "targetvehicle") >= 0}
-			|| {getText (_cfg >> "model") in ["", "\A3\Weapons_f\empty", "\A3\Weapons_F\empty.p3d"]};
+		private _mdl = toLower getText (_cfg >> "model");
+		private _dnr = getText (_cfg >> "displayName");
+		private _dnl = toLower (if ((_dnr select [0, 1]) == "$") then {localize (_dnr select [1])} else {_dnr});
+		private _invisibleTarget = ((_dnl find "invisible") >= 0) || {(_mdl find "invisible") >= 0}
+			|| {(["invisibletarget", "targetsoldier", "target_vehicle", "targetvehicle"] findIf {(_lc find _x) >= 0}) >= 0}
+			|| {_mdl in ["", "\a3\weapons_f\empty", "\a3\weapons_f\empty.p3d"]}
+			|| {((_lc select [((count _lc) - 5) max 0]) == "_base") || {(_lc find "_base_") >= 0}}
+			|| {(_mdl find "pod_heli_transport_04") >= 0} || {(configName _cfg) isKindOf "Slingload_base_F"}
+			|| {(["radar_system", "sam_system"] findIf {(_mdl find _x) >= 0}) >= 0}
+			|| {_type != "soldier" && {getNumber (_cfg >> "hasDriver") == 0} && {getNumber (_cfg >> "isUav") != 1}}
+			|| {_type != "soldier" && {(configName _cfg) isKindOf "Car"} && {[configName _cfg] call MCC_fnc_isUtilityVehicle}}
+			|| {_type == "soldier" && {(["virtual", "uav_ai", "uavai", "dummy"] findIf {((_lc find _x) >= 0) || {(_dnl find _x) >= 0}}) >= 0}};
 		if (_type != "" && {!_invisibleTarget} && {!(toLower getText (_cfg >> "DLC") in ["kart"])}) then {
 			private _cat = toLower ([_cfg] call MCC_fnc_unitCategory);
 			if (!("vr" in _cat) && {_type != "soldier" || {_cat == "men"}}) then {
-				(_lists get _type) pushBack [configName _cfg, [getText (_cfg >> "displayName"), getText (_cfg >> "picture")]];
+				(_listsAll get _type) pushBack [configName _cfg, [getText (_cfg >> "displayName"), getText (_cfg >> "picture")]];
+				if ([_cfg, _enemyFaction, _contentMode] call MCC_fnc_contentAllowed) then {
+					(_lists get _type) pushBack [configName _cfg, [getText (_cfg >> "displayName"), getText (_cfg >> "picture")]];
+				};
 			};
 		};
 	} forEach _classes;
+	{
+		if (((_lists get _x) isEqualTo []) && {!((_listsAll get _x) isEqualTo [])}) then {
+			_lists set [_x, _listsAll get _x];
+			["INFO", "fn_campaignSpawnAIInit", "%1: no %2 patrols left with the content filter - using all content", [_enemyFaction, _x]] call MCC_fnc_log;
+		};
+	} forEach (keys _lists);
 	uiNamespace setVariable [_cacheKey, (keys _lists) apply {[_x, +(_lists get _x)]}];
 };
 {
@@ -155,10 +175,12 @@ while {true} do {
 				//Spawn units
 				if (_simu == "soldier") then {
 					_units = [_unitsArray, 4 + floor random 7] call MCCMK_fnc_buildSquad;
-					_grp = [_spawnPos, _enemySide, _units] call BIS_fnc_spawnGroup;
+					_spawnPos = [_spawnPos] call MCC_fnc_safeSpawnPos;
+					_grp = [_spawnPos, _enemySide, _units] call MCC_fnc_spawnGroup;
 				} else {
 					private _cls = [_unitsArray, "patrol"] call MCCMK_fnc_pickVehicle;
 					if (_cls == "") then {_cls = (_unitsArray call BIS_fnc_selectRandom) select 0};
+					_spawnPos = [_spawnPos, _cls] call MCC_fnc_safeSpawnPos;
 					_grp = ([_spawnPos, 200, _cls, _enemySide] call MCC_fnc_spawnVehicle) select 2;
 					private _c = configFile >> "CfgVehicles" >> _cls;
 					private _odd = ((toLower getText (_c >> "displayName")) find "invisible") >= 0 || {((toLower _cls) find "target") >= 0} || {getText (_c >> "model") in ["", "\A3\Weapons_f\empty", "\A3\Weapons_F\empty.p3d"]};

@@ -16,7 +16,7 @@ private _groupName = "";
 private _groupDisplayname = "";
 private _CfgGroup = configNull;
 private _cfgentry = "";
-params [["_faction", "OPF_F", [""]]];
+params [["_faction", "OPF_F", [""]], ["_mode", 2, [0]]];
 
 //Create the groups type array
 #define CONFIG (configFile >> "CfgGroups" )
@@ -70,6 +70,7 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 									_groupDisplayname = getText (_CfgGroup >> "name");
 									_cfgentry = format ["configFile >> ""CfgGroups"" >>""%1"">>""%2"">>""%3"">>""%4""",(configname (_Cfgside)),(configname (_Cfgfaction)),(configname (_Cfgtype)),(configname (_CfgGroup))];
 
+									if (_mode < 2 && {(("isClass _x" configClasses _CfgGroup) findIf {!([getText (_x >> "vehicle"), _faction, _mode] call MCC_fnc_contentAllowed)}) >= 0}) then {continue};
 									private _man = 0;
 									private _diver = 0;
 									private _recon = 0;
@@ -242,4 +243,13 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 			};
 		};
 	};
+};
+if (_mode < 2) then {
+	private _names = ["MCC_MWGroupArrayMen", "MCC_MWGroupArrayMenDiver", "MCC_MWGroupArrayMenRecon", "MCC_MWGroupArrayMenSniper", "MCC_MWGroupArrayMenSupport", "MCC_MWGroupArrayMenStory", "MCC_MWGroupArrayCar", "MCC_MWGroupArrayArmored", "MCC_MWGroupArrayAir", "MCC_MWGroupArrayAutonomous", "MCC_MWGroupArraySupport", "MCC_MWGroupArrayShip", "MCC_MWGroupArraySubmarine", "MCC_MWGroupArrayStatic"];
+	private _kept = _names apply {+(missionNamespace getVariable [_x, []])};
+	[_faction, 2] call MCC_fnc_createConfigs;
+	{
+		private _f = _kept select _forEachIndex;
+		if (count _f > 0 || {count (missionNamespace getVariable [_x, []]) == 0}) then {missionNamespace setVariable [_x, _f]} else {["INFO", "MCC_fnc_createConfigs", "%1: nothing left in %2 with the content filter - using all content", [_faction, _x]] call MCC_fnc_log};
+	} forEach _names;
 };

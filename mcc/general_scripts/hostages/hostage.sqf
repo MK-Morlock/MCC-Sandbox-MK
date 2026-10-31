@@ -22,7 +22,7 @@ if (_action == 0) then
 	sleep 1;
 	[_hostage] join _caller;
 	_nul = _caller addaction [format ["Disband %1", name _hostage],MCC_path + "mcc\general_scripts\hostages\hostage.sqf",[1,_hostage],6,false,true,"","_target == _this"];
-	[[netID _hostage,_hostage], _init] remoteExec ["MCC_fnc_setVehicleInit", 0, true];
+	["hostageFreed", [_hostage]] remoteExec ["MCC_fnc_secAction", 0, true];
 	[_hostage] spawn MCC_fnc_deleteHelper;
 };
 
@@ -43,7 +43,7 @@ if (_action == 2) then
  {
 	_hostage setVariable ["MCC_orgSide", side _hostage, true];
 	(units group _hostage) join _caller;
-	[[_hostage], {(_this select 0) setUnitPos "AUTO"}] remoteExec ["call", _hostage, false];
+	["setUnitPos", [_hostage, "AUTO"]] remoteExec ["MCC_fnc_secAction", _hostage, false];
 	_nul = _caller addaction [format ["Disband %1", name _hostage],MCC_path + "mcc\general_scripts\hostages\hostage.sqf",[1,_hostage],6,false,true,"","_target == _this"];
 	[_hostage] spawn MCC_fnc_deleteHelper;
 };

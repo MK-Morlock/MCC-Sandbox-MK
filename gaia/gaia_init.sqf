@@ -105,6 +105,7 @@ MCC_GAIA_TARGETS_CIV			= []; for "_i" from 0 to 90 do  { MCC_GAIA_TARGETS_INDEP 
 
 
 [] spawn GAIA_fnc_startGaiaCache;
+[] spawn GAIA_fnc_trafficJam;
 
 [] spawn GAIA_FNC_ambientCombat;
 

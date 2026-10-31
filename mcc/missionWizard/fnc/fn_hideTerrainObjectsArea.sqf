@@ -14,7 +14,8 @@ private _found = objNull;
 params [
 	["_pos",[0,0,0],[[],objNull]],
 	["_radius",50,[0]],
-	["_hide",true,[true]]
+	["_hide",true,[true]],
+	["_types",[],[[]]]
 ];
 
 _hidingCode = if (_hide) then {
@@ -23,7 +24,7 @@ _hidingCode = if (_hide) then {
 		{_x hideObjectGlobal false;_x allowDamage true;}
 	};
 
-_found = nearestTerrainObjects [_pos,[],_radius,false,true];
+_found = nearestTerrainObjects [_pos,_types,_radius,false,true];
 
 if (_hide) then {
 	private _items = (missionNamespace getVariable ["MCC_MWObjectiveItems", []]) select {!isNull _x && {(_x distance2D _pos) < (_radius + 60)}};
@@ -40,4 +41,10 @@ if (_hide) then {
 	};
 };
 
-_hidingCode forEach (_found inAreaArray [_pos, _radius, _radius, 0, false]);
+private _act = _found inAreaArray [_pos, _radius, _radius, 0, false];
+if (_hide) then {
+	_act = _act select {!isObjectHidden _x};
+	if (isNil "MCC_MWHiddenTerrain") then {MCC_MWHiddenTerrain = []};
+	MCC_MWHiddenTerrain append _act;
+};
+_hidingCode forEach _act;

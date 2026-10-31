@@ -27,7 +27,7 @@ private _vehicleClass = "";
 private _simulation = "";
 private _simTypesUnits = [];
 
-params [["_faction", "", [""]], ["_side", sideUnknown, [sideUnknown, ""]]];
+params [["_faction", "", [""]], ["_side", sideUnknown, [sideUnknown, ""]], ["_mode", 2, [0]]];
 
 // _side is polymorphic across callers - some pass a real Side (e.g. fn_campaignInit.sqf's
 // `param [2, east]`), others pass mcc_sidename, which is a STRING ("WEST"/"EAST"/"GUER"/"CIV",
@@ -96,11 +96,25 @@ for "_i" from 0 to (count _CfgVehicles - 1) do
 			_vehicleDisplayName		= [_vehicleDisplayName, gettext(_CfgVehicle >> "picture")];
 			_vehicleclass			= "";
 
-			if (_simulation in _simTypesUnits) then
+			private _mdl = toLower getText (_CfgVehicle >> "model");
+			private _dnr = getText (_CfgVehicle >> "displayName");
+			private _dnl = toLower (if ((_dnr select [0, 1]) == "$") then {localize (_dnr select [1])} else {_dnr});
+			private _lcc = toLower _cfgclass;
+			private _isMan = toLower _simulation in ["soldier", "soldierx"];
+			private _isTemplate = ((_lcc select [((count _lcc) - 5) max 0]) == "_base") || {(_lcc find "_base_") >= 0};
+			if (_isTemplate) then {["DEBUG", "spawn lists", "template class left out: %1", [_cfgclass]] call MCC_fnc_log};
+			private _junk = _isTemplate || {!_isMan && {_cfgclass isKindOf "Car"} && {[_cfgclass] call MCC_fnc_isUtilityVehicle}} || {(_mdl find "invisible") >= 0} || {(_dnl find "invisible") >= 0}
+				|| {(["invisibletarget", "targetvehicle", "target_vehicle", "targetsoldier"] findIf {(_lcc find _x) >= 0}) >= 0}
+				|| {_mdl in ["", "\a3\weapons_f\empty", "\a3\weapons_f\empty.p3d"]}
+				|| {(_mdl find "pod_heli_transport_04") >= 0} || {_cfgclass isKindOf "Pod_Heli_Transport_04_base_F"} || {_cfgclass isKindOf "Slingload_base_F"}
+				|| {_isMan && {(["virtual", "uav_ai", "uavai", "dummy"] findIf {((_lcc find _x) >= 0) || {(_dnl find _x) >= 0}}) >= 0}}
+				|| {!_isMan && {getNumber (_CfgVehicle >> "hasDriver") == 0} && {getNumber (_CfgVehicle >> "isUav") != 1} && {!(_cfgclass isKindOf "StaticWeapon")}};
+			if ((_simulation in _simTypesUnits) && {!_junk} && {[_CfgVehicle, _faction, _mode] call MCC_fnc_contentAllowed}) then
 			{
 				if (toUpper(_cfgFaction) == toUpper _faction) then
 				{
 					_vehicleclass = [_CfgVehicle] call MCC_fnc_unitCategory;	//mod vehicleClass names mapped to MCCs (GitHub #48)
+					if ((_vehicleclass in ["Car","Armored","Support","Air","Ship","Submarine"]) && {(getNumber (_CfgVehicle >> "hasDriver") == 0 && {getNumber (_CfgVehicle >> "isUav") != 1}) || {_cfgclass isKindOf "Pod_Heli_Transport_04_base_F"} || {_cfgclass isKindOf "Slingload_base_F"} || {((toLower getText (_CfgVehicle >> "model")) find "pod_heli_transport_04") >= 0}}) then {_vehicleclass = ""};
 					if (_vehicleclass in ["Men","MenDiver","MenRecon","MenSniper","MenSupport","MenStory","Car","Armored","Air","Autonomous","Support","Ship","Submarine","Static"]) then
 					{
 						switch (toLower(_vehicleclass)) do
@@ -262,6 +276,20 @@ for "_i" from 0 to (count _CfgVehicles - 1) do
 	};
 };
 
+if (_mode < 2) then {
+	private _names = ["MCC_MWunitsArrayMen", "MCC_MWunitsArrayMenDiver", "MCC_MWunitsArrayMenRecon", "MCC_MWunitsArrayMenSniper", "MCC_MWunitsArrayMenSupport", "MCC_MWunitsArrayMenStory", "MCC_MWunitsArrayCar", "MCC_MWunitsArrayArmored", "MCC_MWunitsArrayAir", "MCC_MWunitsArrayHeli", "MCC_MWunitsArrayAutonomous", "MCC_MWunitsArraySupport", "MCC_MWunitsArrayShip", "MCC_MWunitsArraySubmarine", "MCC_MWunitsArrayStatic"];
+	private _kept = _names apply {+(missionNamespace getVariable [_x, []])};
+	[_faction, _side, 2] call MCC_fnc_MWCreateUnitsArray;
+	{
+		private _f = _kept select _forEachIndex;
+		if (count _f > 0 || {count (missionNamespace getVariable [_x, []]) == 0}) then {
+			missionNamespace setVariable [_x, _f];
+		} else {
+			["INFO", "MCC_fnc_MWCreateUnitsArray", "%1: nothing left in %2 with the content filter - using all content", [_faction, _x]] call MCC_fnc_log;
+		};
+	} forEach _names;
+};
+
 publicvariableserver "MCC_MWunitsArrayMen";
 publicvariableserver "MCC_MWunitsArrayMenDiver";
 publicvariableserver "MCC_MWunitsArrayMenRecon";
@@ -274,6 +302,7 @@ publicvariableserver "MCC_MWunitsArraySupport";
 publicvariableserver "MCC_MWunitsArrayShip";
 publicvariableserver "MCC_MWunitsArraySubmarine";
 publicvariableserver "MCC_MWunitsArrayStatic";
+publicvariableserver "MCC_MWunitsArrayAutonomous";
 
 true
 

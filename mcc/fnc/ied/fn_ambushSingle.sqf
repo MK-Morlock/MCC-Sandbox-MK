@@ -24,6 +24,7 @@ private _targetSide = sideUnknown;
 disableSerialization;
 
 params ["_pos", "_spawnName", "_side"];
+if !(call MCC_fnc_secSenderOK) exitWith {};
 _iedMarkerName 	= _this select 3 select 0;
 _groupDir 		= _this select 4;
 _pointB 		= _this select 5;
@@ -101,7 +102,7 @@ if (_isSpotter > 0) then
 		};
 	};
 
-	_spotter = _group createUnit [_spotterClass , _pos, [], 0, "NONE"];
+	_spotter = _group createUnit [_spotterClass , (([_pos, 20, 15, 2] call MCC_fnc_landSpot) call {if (_this isEqualTo []) then {_pos} else {_this}}), [], 0, "NONE"];
 	_spotter AddWeapon "Binocular";
 	{_x addCuratorEditableObjects [[_spotter],false]} forEach allCurators;
 }
@@ -119,5 +120,5 @@ _init = format [";_this setVariable ['isIED',true,true];[_this,'%1',%2,%3,%4,'%5
 				 ,_targetSide
 				 ];
 
-[[netid (leader _group), leader _group], _init] remoteExec ["MCC_fnc_setVehicleInit", 2, false];
+["MCC_fnc_setVehicleInit", [[netid (leader _group), leader _group], _init], 2, false] call MCC_fnc_secRemote;
 (leader _group)
