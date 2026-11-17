@@ -13,6 +13,14 @@ class Cfg3DEN
 			onTerrainNew = "[] spawn (uiNamespace getVariable ['MCC_fnc_edenStartLocPreview', {}])";
 			onMissionPreview = "uiNamespace setVariable ['MCC_slPrevToken', (uiNamespace getVariable ['MCC_slPrevToken', 0]) + 1]";
 		};
+		class MCCMK_shipPreview
+		{
+			onMissionLoad = "[] spawn (uiNamespace getVariable ['MCCMK_fnc_shipEdenInit', {}])";
+			onMissionNew = "[] spawn (uiNamespace getVariable ['MCCMK_fnc_shipEdenInit', {}])";
+			onMissionPreviewEnd = "[] spawn (uiNamespace getVariable ['MCCMK_fnc_shipEdenInit', {}])";
+			onTerrainNew = "[] spawn (uiNamespace getVariable ['MCCMK_fnc_shipEdenInit', {}])";
+			onMissionPreview = "uiNamespace setVariable ['MCCMK_shipPrevToken', (uiNamespace getVariable ['MCCMK_shipPrevToken', 0]) + 1]";
+		};
 	};
 	class Attributes
 	{

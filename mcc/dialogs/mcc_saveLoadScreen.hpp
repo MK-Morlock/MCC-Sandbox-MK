@@ -110,7 +110,7 @@ class MCCDLG_NAME
 			y = 0.467 * safezoneH + safezoneY;
 			w = 0.108854 * safezoneW;
 			h = 0.032987 * safezoneH;
-			tooltip = "Paste the MCC mission configuration code from the clipboard (Ctrl+V) into the text box first";
+			tooltip = "Paste the MCC mission configuration code from the clipboard\n(Ctrl+V) into the text box first";
 			onButtonClick = __EVAL("[0] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
 		};
 
@@ -184,7 +184,7 @@ class MCCDLG_NAME
 			idc = -1;
 			onButtonClick = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
 			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
-			tooltip = "Save a mission to the profile namespace - choose a slot from the list above first";
+			tooltip = "Save a mission to the profile namespace - choose a slot from\nthe list above first";
 			text = "Save To Profile"; //--- ToDo: Localize;
 			x = 0.5 * safezoneW + safezoneX;
 			y = 0.675931 * safezoneH + safezoneY;
@@ -197,7 +197,7 @@ class MCCDLG_NAME
 			idc = -1;
 			onButtonClick = __EVAL("[4] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
 			sizeEx ="(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
-			tooltip = "Load a mission from the profile namespace - choose a slot from the list above first";
+			tooltip = "Load a mission from the profile namespace - choose a slot from\nthe list above first";
 			text = "Load From Profile"; //--- ToDo: Localize;
 			x = 0.620312 * safezoneW + safezoneX;
 			y = 0.675931 * safezoneH + safezoneY;
@@ -209,7 +209,7 @@ class MCCDLG_NAME
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[5] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
-			tooltip = "Save all of the mission's objects in SQM format and copy them to the clipboard."; //--- ToDo: Localize;
+			tooltip = "Save all of the mission's objects in SQM format and copy them\nto the clipboard."; //--- ToDo: Localize;
 			text = "Save All (SQM)"; //--- ToDo: Localize;
 			x = 0.507100 * safezoneW + safezoneX;
 			y = 0.719914 * safezoneH + safezoneY;
@@ -221,7 +221,7 @@ class MCCDLG_NAME
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[7] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
-			tooltip = "Save only the MCC/Zeus objects in SQM format and copy them to the clipboard."; //--- ToDo: Localize;
+			tooltip = "Save only the MCC/Zeus objects in SQM format and copy them to\nthe clipboard."; //--- ToDo: Localize;
 			text = "Save MCC (SQM)"; //--- ToDo: Localize;
 			x = 0.614200 * safezoneW + safezoneX;
 			y = 0.719914 * safezoneH + safezoneY;
@@ -233,7 +233,7 @@ class MCCDLG_NAME
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[6] execVM '"+MCCPATH+"mcc\general_scripts\commandLine\mcc_loadConfig.sqf'");
-			tooltip = "Save MCC's 3D editor placements in composition format to the clipboard and the RPT file"; //--- ToDo: Localize;
+			tooltip = "Save MCC's 3D editor placements in composition format to the\nclipboard and the RPT file"; //--- ToDo: Localize;
 			text = "Save Comp"; //--- ToDo: Localize;
 			x = 0.614200 * safezoneW + safezoneX;
 			y = 0.719914 * safezoneH + safezoneY;

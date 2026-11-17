@@ -39,8 +39,8 @@ if ((typeName (_this select 0)) == "OBJECT") then {
 	private _fnc_bool = {params ["_v", "_d"]; if (_v isEqualType "") then {_v = (toLower _v) in ["true", "1"]}; if (_v isEqualType 0) then {_v = _v != 0}; if !(_v isEqualType true) then {_v = _d}; _v};
 
 	_side 			= ([_logic getvariable ["side",1], 1] call _fnc_num) call bis_fnc_sideType;	//default BLUFOR, like the module
-	_size 			= _logic getvariable ["size","FOB"];
-	if !(_size isEqualType "") then {_size = "FOB"};
+	_size 			= _logic getvariable ["size","MAIN"];
+	if !(_size isEqualType "") then {_size = "MAIN"};
 	_size 			= toUpper _size;
 	_destructable	= [_logic getvariable ["distractable",true], true] call _fnc_bool;
 	_animate		= false;
@@ -195,7 +195,7 @@ switch (_mode) do
 		};
 
 		if (_construct) then {
-			_null = [_pos, _dir , "MCC_rts_hq1", 0, _side] spawn MCC_fnc_construct_base;
+			_null = [[_pos, _dir , "MCC_rts_hq1", 0, _side, _size == "FOB"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_construct_base};
 		};
 
 		_building = if (_size == "FOB") then {MCC_FOB_BaseItem} else {MCC_HQ_BaseItem};
@@ -273,8 +273,9 @@ switch (_mode) do
 			_name = format ["FOB_%1",["MCC_fob_counter",1] call bis_fnc_counter];
 			_dummy setvariable ["mcc_fob_name",_name, true];
 
-			//Create marker
-			[[_name], _pos, "colorGreen", "loc_Bunker",_name,false] remoteExec ["BIS_fnc_markerCreate", _side, false];
+			//Create marker: "HQ FOB_1" when this F.O.B. is also the side's HQ (no Main start location before it)
+			private _fobHQ = isNil {missionNamespace getVariable format ["MCC_START_%1", _side]};
+			[[_name], _pos, "colorGreen", "loc_Bunker", [_name, format ["HQ %1", _name]] select _fobHQ, false] remoteExec ["BIS_fnc_markerCreate", _side, false];
 		} else {
 			//Not destroyable
 			_dummy addEventHandler ["handledamage",{0}];
@@ -288,6 +289,13 @@ switch (_mode) do
 		// so a mission with just one F.O.B-type Start Location module (the module's default Type) still works.
 		private _startVar = format ["MCC_START_%1",_side];
 		if (_side in [west, east, resistance] && {_size != "FOB" || {isNil {missionNamespace getVariable _startVar}}}) then {
+			// a Main start location takes over as HQ: an F.O.B. that was named "HQ FOB_1" goes back to "FOB_1"
+			if (_size != "FOB") then {
+				{
+					private _fn = _x getVariable ["mcc_fob_name", ""];
+					if (_fn != "" && {(markerText _fn) == format ["HQ %1", _fn]}) then {_fn setMarkerText _fn};
+				} forEach ((missionNamespace getVariable ["MCCMK_spawnPointList", []]) select {!isNull _x});
+			};
 			missionNameSpace setVariable [_startVar,_pos];
 			publicVariable _startVar;
 			["INFO", "fn_buildSpawnPoint", "%1 start position set from %2 start location at %3", [_side, _size, _pos]] call MCC_fnc_log;
@@ -306,5 +314,9 @@ switch (_mode) do
 		};
 
 		[_side, _dummy] call BIS_fnc_addRespawnPosition;
+		MCCMK_spawnPointList = ((missionNamespace getVariable ["MCCMK_spawnPointList", []]) select {!isNull _x}) + [_dummy];
+		publicVariable "MCCMK_spawnPointList";
+		[_dummy, 10] remoteExec ["MCCMK_fnc_hqActionLocal", 0, _dummy];
+		[_dummy] call MCCMK_fnc_campaignProtect;
 	};
 };

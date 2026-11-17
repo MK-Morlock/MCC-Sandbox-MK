@@ -39,7 +39,39 @@ _ctrl = _display displayCtrl 2300;
 _ctrlPos = ctrlPosition _ctrl;
 
 //If close open it
+private _opened = false;
 if ((_ctrlPos select 2)<=0) then {
+	_opened = true;
+	uiNamespace setVariable ["MCCMK_lhdCur", [_deck, _selection, _operator]];
+	if (isNull (_display displayCtrl 7780)) then {
+		private _grp = _display displayCtrl 2300;
+		private _mkc = {
+			params ["_cls", "_idc", "_pos"];
+			private _c = _display ctrlCreate [_cls, _idc, _grp];
+			_c ctrlSetPosition [(_pos select 0) * safezoneW, (_pos select 1) * safezoneH, (_pos select 2) * safezoneW, (_pos select 3) * safezoneH];
+			_c ctrlCommit 0;
+			_c
+		};
+		private _refresh = "(uiNamespace getVariable ['MCCMK_lhdCur', [0, '', 0]]) params ['_d', '_s', '_o']; ['updateVehicleType', _d, _s, _o] spawn MCC_fnc_LHDspawnVehicle;";
+		private _l1 = ["RscText", 7784, [0.14, 0.099, 0.05, 0.033]] call _mkc;
+		_l1 ctrlSetText "Faction";
+		private _c1 = ["RscCheckBox", 7780, [0.185, 0.104, 0.011, 0.022]] call _mkc;
+		_c1 cbSetChecked (uiNamespace getVariable ["MCCMK_lhdFactionOnly", true]);
+		_c1 ctrlSetTooltip "Ticked: your faction's vehicles only. Unticked: your whole\nside's vehicles.";
+		_c1 ctrlAddEventHandler ["CheckedChanged", "uiNamespace setVariable ['MCCMK_lhdFactionOnly', (_this select 1) == 1]; " + _refresh];
+		private _l2 = ["RscText", 7785, [0.205, 0.099, 0.065, 0.033]] call _mkc;
+		_l2 ctrlSetText "Sort by price";
+		private _c2 = ["RscCheckBox", 7781, [0.27, 0.104, 0.011, 0.022]] call _mkc;
+		_c2 cbSetChecked (uiNamespace getVariable ["MCCMK_lhdSortPrice", false]);
+		_c2 ctrlSetTooltip "Cheapest first";
+		_c2 ctrlAddEventHandler ["CheckedChanged", "uiNamespace setVariable ['MCCMK_lhdSortPrice', (_this select 1) == 1]; " + _refresh];
+		private _ed = ["RscEdit", 7782, [0.14, 0.138, 0.105, 0.032]] call _mkc;
+		_ed ctrlSetTooltip "Search by name";
+		_ed ctrlAddEventHandler ["KeyUp", _refresh];
+		private _cl = [["MCC_RscButtonRoundSmall", "MCC_RscButtonRoundSmall3D"] select (profileNamespace getVariable ["MCC_consoleButtons", false]), 7783, [0.248, 0.138, 0.036, 0.032]] call _mkc;
+		_cl ctrlSetText "Clear";
+		_cl ctrlAddEventHandler ["ButtonClick", "ctrlSetText [7782, '']; " + _refresh];
+	};
 
 	//Hide ctel depends on the player status
 	_hideCtrls = switch (_operator) do
@@ -63,6 +95,12 @@ if ((_ctrlPos select 2)<=0) then {
 					};
 				};
 	{ctrlShow [_x,false]} forEach _hideCtrls;
+	private _px = 0.05 * safezoneW + safezoneX;
+	private _py = 0.5 * safezoneH + safezoneY;
+	{
+		(ctrlPosition _x) params ["_bx", "_by", "_bw", "_bh"];
+		if ((_bx + _bw) > _px && {_bx < (_px + 0.5 * safezoneW)} && {(_by + _bh) > _py} && {_by < (_py + 0.4 * safezoneH)}) then {_x ctrlShow false};
+	} forEach (uiNamespace getVariable ["MCCMK_lhdSlotBtns", []]);
 
     //Disable purchase button
     if (_operator != 0)  then {ctrlEnable [2400,false]};
@@ -90,24 +128,97 @@ if ((_ctrlPos select 2)<=0) then {
 	//Type
 	_ctrl = _display displayCtrl 1501;
 	lbClear _ctrl;
+	private _slot = if ((_selection select [0, 1]) == "[") then {parseSimpleArray _selection} else {_selection};
+	private _water = (_slot isEqualType []) && {(_slot param [2, 5]) <= 1};
+	private _stype = _ship getVariable ["MCC_ShipType", 0];
+	private _allowed = switch (true) do {
+		case (_water || {_stype == 2}): {["ship"]};
+		case (_stype == 0): {["heli", "vehicle", "tank"]};
+		case (_stype == 3 && {_deck == 4}): {["ship", "vehicle", "tank"]};
+		default {["vehicle", "tank", "heli", "jet"]};
+	};
+	private _what = switch (true) do {
+		case (_water || {_stype == 2}): {"Boat slot: boats only"};
+		case (_stype == 0): {"Helipad: helicopters, and vehicles to sling-load"};
+		case (_stype == 3 && {_deck == 4}): {"Well deck: boats and amphibious vehicles"};
+		default {"Deck: aircraft and vehicles"};
+	};
+	private _wl = _display displayCtrl 7778;
+	if (isNull _wl) then {_wl = _display ctrlCreate ["RscStructuredText", 7778, _display displayCtrl 2300]};
+	_wl ctrlSetPosition [0.01 * safezoneW, 0.004 * safezoneH, 0.38 * safezoneW, 0.03 * safezoneH];
+	_wl ctrlSetStructuredText parseText format ["<t size='0.95' color='#ffd966'>%1</t>", _what];
+	_wl ctrlCommit 0;
+	private _types = ([["Vehicles", "vehicle"], ["Tracked/Static", "tank"], ["Helicopter", "heli"], ["Fixed-wing", "jet"], ["Ship", "ship"]] select {(_x select 1) in _allowed}) select {count ([_x select 1, _side, "", true] call MCC_fnc_vehicleSpawnerBuildCostTable) > 0};
+	uiNamespace setVariable ["MCCMK_lhdTypes", _types apply {_x select 1}];
 	{
-		_ctrl lbAdd _x;
-	} foreach ["Vehicles", "Tracked/Static", "Helicopter", "Fixed-wing", "Ship"];
+		_ctrl lbAdd (_x select 0);
+	} foreach _types;
+	if (_types isEqualTo []) then {_ctrl lbAdd "Nothing available here"};
 	_ctrl lbSetCurSel 0;
 
 	//Change faction or vehicle type
 	{
 		_ctrl = _display displayCtrl _x;
+		_ctrl ctrlRemoveAllEventHandlers "LBSelChanged";
 		_ctrl ctrlAddEventHandler ["LBSelChanged",format ["['updateVehicleType',%1,'%2', %3] spawn MCC_fnc_LHDspawnVehicle;",_deck, _selection, _operator]];
 		_ctrl ctrlCommit 0;
 	} forEach [8008,1501];
 
 	//Change class
 	_ctrl = _display displayCtrl 1502;
+	_ctrl ctrlRemoveAllEventHandlers "LBSelChanged";
 	_ctrl ctrlAddEventHandler ["LBSelChanged",format ["['updateVehicleClass',%1,'%2', %3] spawn MCC_fnc_LHDspawnVehicle;",_deck, _selection, _operator]];
 	_ctrl ctrlCommit 0;
 
 	//Update
+	["updateVehicleType",_deck, _selection, _operator] spawn MCC_fnc_LHDspawnVehicle;
+};
+
+if (_function == "updateSpawn" && {!_opened}) then {
+	uiNamespace setVariable ["MCCMK_lhdCur", [_deck, _selection, _operator]];
+	_ctrl = _display displayCtrl 1501;
+	lbClear _ctrl;
+	private _slot = if ((_selection select [0, 1]) == "[") then {parseSimpleArray _selection} else {_selection};
+	private _water = (_slot isEqualType []) && {(_slot param [2, 5]) <= 1};
+	private _stype = _ship getVariable ["MCC_ShipType", 0];
+	private _allowed = switch (true) do {
+		case (_water || {_stype == 2}): {["ship"]};
+		case (_stype == 0): {["heli", "vehicle", "tank"]};
+		case (_stype == 3 && {_deck == 4}): {["ship", "vehicle", "tank"]};
+		default {["vehicle", "tank", "heli", "jet"]};
+	};
+	private _what = switch (true) do {
+		case (_water || {_stype == 2}): {"Boat slot: boats only"};
+		case (_stype == 0): {"Helipad: helicopters, and vehicles to sling-load"};
+		case (_stype == 3 && {_deck == 4}): {"Well deck: boats and amphibious vehicles"};
+		default {"Deck: aircraft and vehicles"};
+	};
+	private _wl = _display displayCtrl 7778;
+	if (isNull _wl) then {_wl = _display ctrlCreate ["RscStructuredText", 7778, _display displayCtrl 2300]};
+	_wl ctrlSetPosition [0.01 * safezoneW, 0.004 * safezoneH, 0.38 * safezoneW, 0.03 * safezoneH];
+	_wl ctrlSetStructuredText parseText format ["<t size='0.95' color='#ffd966'>%1</t>", _what];
+	_wl ctrlCommit 0;
+	private _types = ([["Vehicles", "vehicle"], ["Tracked/Static", "tank"], ["Helicopter", "heli"], ["Fixed-wing", "jet"], ["Ship", "ship"]] select {(_x select 1) in _allowed}) select {count ([_x select 1, _side, "", true] call MCC_fnc_vehicleSpawnerBuildCostTable) > 0};
+	uiNamespace setVariable ["MCCMK_lhdTypes", _types apply {_x select 1}];
+	{
+		_ctrl lbAdd (_x select 0);
+	} foreach _types;
+	if (_types isEqualTo []) then {_ctrl lbAdd "Nothing available here"};
+	_ctrl lbSetCurSel 0;
+	//Change faction or vehicle type
+	{
+		_ctrl = _display displayCtrl _x;
+		_ctrl ctrlRemoveAllEventHandlers "LBSelChanged";
+		_ctrl ctrlAddEventHandler ["LBSelChanged",format ["['updateVehicleType',%1,'%2', %3] spawn MCC_fnc_LHDspawnVehicle;",_deck, _selection, _operator]];
+		_ctrl ctrlCommit 0;
+	} forEach [8008,1501];
+
+	//Change class
+	_ctrl = _display displayCtrl 1502;
+	_ctrl ctrlRemoveAllEventHandlers "LBSelChanged";
+		_ctrl ctrlAddEventHandler ["LBSelChanged",format ["['updateVehicleClass',%1,'%2', %3] spawn MCC_fnc_LHDspawnVehicle;",_deck, _selection, _operator]];
+	_ctrl ctrlCommit 0;
+
 	["updateVehicleType",_deck, _selection, _operator] spawn MCC_fnc_LHDspawnVehicle;
 };
 
@@ -120,7 +231,7 @@ switch (_function) do
 		_index = lbCurSel (_display displayCtrl 8008);
 		if ((missionNamespace getVariable ["MCC_faction_index",-1]) != _index) then	{
 			mcc_sidename = (U_FACTIONS select _index) select 1;
-			mcc_faction = (U_FACTIONS select _index) select 2;
+			mcc_faction = (U_FACTIONS select _index) select 2; player setVariable ["MCCMK_faction", mcc_faction, true];
 			MCC_faction_index = _index;
 			0 = [false] call mcc_fnc_faction_choice;
 		};
@@ -128,16 +239,13 @@ switch (_function) do
 
 		//class
 		_index = lbCurSel (_display displayCtrl 1501);
-		_vehicleType = switch (_index) do
-							{
-								case 0:	{"vehicle"};
-								case 1:	{"tank"};
-								case 2:	{"heli"};
-								case 3:	{"jet"};
-								default	{"ship"};
-							};
+		_vehicleType = (uiNamespace getVariable ["MCCMK_lhdTypes", ["vehicle", "tank", "heli", "jet", "ship"]]) param [_index, ""];
 
-		_vehiclesArray = [_vehicleType, _side, "", true] call MCC_fnc_vehicleSpawnerBuildCostTable;
+		private _facOnly = uiNamespace getVariable ["MCCMK_lhdFactionOnly", true];
+		_vehiclesArray = [_vehicleType, _side, faction player, !_facOnly] call MCC_fnc_vehicleSpawnerBuildCostTable;
+		private _find = toLower (ctrlText (_display displayCtrl 7782));
+		if (_find != "") then {_vehiclesArray = _vehiclesArray select {((toLower ((_x select 1) select 0)) find _find) >= 0}};
+		if (uiNamespace getVariable ["MCCMK_lhdSortPrice", false]) then {_vehiclesArray = [_vehiclesArray, [], {_x select 2}, "ASCEND"] call BIS_fnc_sortBy};
 		missionNamespace setVariable ["MCC_fnc_LHDspawnMenuInitArray", _vehiclesArray];
 		_ctrl = _display displayCtrl 1502;
 		lbClear _ctrl;
@@ -199,7 +307,7 @@ switch (_function) do
 
 		    	//Do we have enough side resources
 		        {
-		            ctrlSetText [_ctrl, [_x] call MCC_fnc_formatNumber];
+		            ctrlSetText [_ctrl, [_x, true] call MCC_fnc_formatNumber];
 		            if (_x <= (_array select _foreachindex)) then {
 		                (_display displayctrl _ctrl) ctrlSetTextColor [1,1,1,1];
 		            } else {
@@ -255,6 +363,8 @@ switch (_function) do
 		private "_cfgclass";
 
 		if (_selection isEqualTo "" || _selection isEqualTo []) exitWith {};
+		if ((_ship getVariable ["MCCMK_crippled", false]) || {_ship getVariable ["MCCMK_disabled", false]} || {_ship getVariable ["MCCMK_sinking", false]}) exitWith {["The ship is too badly damaged - repair the hull first."] call MCCMK_fnc_lhdStatus};
+		if (((_ship getVariable ["MCCMK_repositionUntil", 0]) - serverTime) > 0) exitWith {["Repositioning: available in " + ([((_ship getVariable ["MCCMK_repositionUntil", 0]) - serverTime), "MM:SS"] call BIS_fnc_secondsToString) + "."] call MCCMK_fnc_lhdStatus};
 
 		//Get costs
 
@@ -317,9 +427,13 @@ switch (_function) do
 		_boundingBox = (_cargo call BIS_fnc_boundingBoxDimensions) ;
 		_maxDistance = _boundingBox select _boundingBoxIndecator;
 
-		if (count (nearestObjects [getPosASL _dummy, ["Land","Air","Ship"], _maxDistance]) > 0 || (_selection isEqualTo "")) then {
-			_str = "<t size='0.8' font='PuristaLight' color='#FFFFFF'>" + "Not enough space" + "</t>";
-			_null = [_str,0,1.1,2,0.1,0.0] spawn bis_fnc_dynamictext;
+		private _blocker = [getPosASL _dummy, _direction, boundingBoxReal _cargo, [_cargo, _dummy, _ship]] call MCCMK_fnc_bayBlocked;
+		if (!isNull _blocker || (_selection isEqualTo "")) then {
+			if (!isNull _blocker) then {["INFO", "LHDSpawn", "bay %1 blocked by %2 (%3 m away)", [_selection, typeOf _blocker, round (_blocker distance _dummy)]] call MCC_fnc_log};
+			if (isNil "MCCMK_fnc_lhdStatus") then {
+				_str = "<t size='0.8' font='PuristaLight' color='#FFFFFF'>" + "Bay is blocked" + "</t>";
+				_null = [_str,0,1.1,2,0.1,0.0] spawn bis_fnc_dynamictext;
+			} else {["Bay is blocked"] call MCCMK_fnc_lhdStatus};
 
 			deleteVehicle _cargo;
 			detach _dummy;
@@ -390,7 +504,13 @@ switch (_function) do
 
 			while {!(isnull attachedTo _cargo)} do {detach _cargo; sleep .1};
 			_cargo setDir _direction;
+			[_cargo] call MCCMK_fnc_spawnAnchor;
 			["zeusAdd", [[_cargo], true, true]] remoteExec ["MCC_fnc_secAction", 2, false];
+			private _paid = switch (_operator) do {case 1: {["res", [_costAmmo, _costRepair, _costFuel]]}; case 2: {["cr", _costValor]}; default {["free", 0]}};
+			if ((_paid select 0) != "free") then {_cargo setVariable ["MCCMK_bought", [_paid select 0, _paid select 1, getPlayerUID player, playerSide, name player], true]};
+			private _pl = uiNamespace getVariable ["MCCMK_lhdPurchases", []];
+			_pl pushBack [_cargo, _paid select 0, _paid select 1, getPosASL _cargo];
+			uiNamespace setVariable ["MCCMK_lhdPurchases", _pl];
 
 			waitUntil {isTouchingGround _cargo};
 			sleep 5;
@@ -412,6 +532,7 @@ switch (_function) do
 
 	case "close":
 	{
+		{_x ctrlShow true} forEach (uiNamespace getVariable ["MCCMK_lhdSlotBtns", []]);
 		_ctrlPos set [2,0];
 		_ctrlPos set [3,0];
 		_ctrl ctrlSetPosition _ctrlPos;

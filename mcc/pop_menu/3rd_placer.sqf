@@ -190,6 +190,7 @@ MCC_3D_panel = {
 	_t = _t + format ["<t color='#A9BCCB'>Behaviour: </t>%1    <t color='#A9BCCB'>Commandable: </t>%2<br/>",
 		["Hold position", "None (Arma default)", "BIS Defence", "BIS Patrol"] param [(["hold", "bis", "bisd", "bisp"] find (missionNamespace getVariable ["MCC_3D_beh", "hold"])) max 0, "Hold position"],
 		["No", "Yes"] select (missionNamespace getVariable ["MCC_3D_cmd", false])];
+	_t = _t + format ["<t color='#A9BCCB'>Start (aircraft): </t>%1<br/>", ["Flying", "Landed", "On water"] param [missionNamespace getVariable ["MCC_3D_start", [0, 1] select (missionNamespace getVariable ["MCC_3D_landed", true])], "Landed"]];
 	if ([] call MCC_3D_cargoApplies) then {_t = _t + format ["<t color='#A9BCCB'>Cargo: </t>custom (%1 items)<br/>", [] call MCC_3D_cargoCount]};
 	_t = _t + "<br/>";
 	{_t = _t + (_x call _key)} forEach [

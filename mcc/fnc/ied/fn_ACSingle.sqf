@@ -23,8 +23,8 @@ if (count _this > 5) then {_static	=  true};
 if (MCC_debug) then {systemchat str _iedside};
 
 _rank = ["SERGEANT","LIEUTENANT","CAPTAIN"] select (floor random 3);
-_group = creategroup civilian;
-_sb = _group createunit [_trapkind, _pos, [], 0, "NONE"];
+_group = creategroup civilian; [_group] call MCCMK_fnc_genTag;
+_sb = _group createunit [_trapkind, _pos, [], 0, "NONE"]; [_sb] call MCCMK_fnc_genTag;
 _sb setVariable ["static",_static,true];
 _sb setVariable ["MCC_IEDtype","ac",true];
 

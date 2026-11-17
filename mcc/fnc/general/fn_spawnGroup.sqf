@@ -116,7 +116,39 @@ if (_charsType == (typeName configFile)) then
 	};
 };
 
-private _grp = createGroup _side;
+//(MK) A soldier whose class belongs to another side than the group (a faction's ready-made group listing another side's
+// soldiers - FIA EAST's listed FIA Independent ones, I_G_...): the same soldier on the group's side by Arma's naming
+// (I_G_Soldier_TL_F -> O_G_Soldier_TL_F), used only if it exists and is on the group's side; none: kept, and logged.
+// Mixed-side groups showed the wrong colour on the console - and Independent is friendly to WEST by default.
+private _sidePfx = switch (_side) do {case west: {"b_"}; case east: {"o_"}; case resistance: {"i_"}; default {""}};
+private _sideNum = [east, west, resistance, civilian] find _side;
+if (_sidePfx != "") then {
+	if (isNil "MCCMK_sideSwapLogged") then {MCCMK_sideSwapLogged = createHashMap};
+	_types = _types apply {
+		private _t = _x;
+		private _cfgT = configFile >> "CfgVehicles" >> _t;
+		if (_t isKindOf "CAManBase" && {getNumber (_cfgT >> "side") != _sideNum} && {getNumber (_cfgT >> "side") in [0, 1, 2]}) then {
+			private _l = toLower _t;
+			private _swap = "";
+			if ((_l select [0, 2]) in ["b_", "o_", "i_"]) then {
+				private _c = _sidePfx + (_t select [2]);
+				if (isClass (configFile >> "CfgVehicles" >> _c) && {getNumber (configFile >> "CfgVehicles" >> _c >> "side") == _sideNum}) then {_swap = configName (configFile >> "CfgVehicles" >> _c)};
+			};
+			if !(_l in MCCMK_sideSwapLogged) then {
+				MCCMK_sideSwapLogged set [_l, true];
+				if (_swap != "") then {
+					["INFO", "fn_spawnGroup", "%1 group: %2 is another side's soldier - %3 instead", [_side, _t, _swap]] call MCC_fnc_log;
+				} else {
+					["WARN", "fn_spawnGroup", "%1 group: %2 is another side's soldier, with no %1 equivalent - kept", [_side, _t]] call MCC_fnc_log;
+				};
+			};
+			if (_swap != "") then {_t = _swap};
+		};
+		_t
+	};
+};
+
+private _grp = createGroup _side; [_grp] call MCCMK_fnc_genTag;
 
 //Create the units according to the selected types.
 for "_i" from 0 to ((count _types) - 1) do
@@ -156,7 +188,7 @@ for "_i" from 0 to ((count _types) - 1) do
 		//Is this a character or vehicle?
 		if (getNumber(configFile >> "CfgVehicles" >> _type >> "isMan") == 1) then
 		{
-			_unit = _grp createUnit [_type, _itemPos, [], 0, "NONE"];
+			_unit = _grp createUnit [_type, _itemPos, [], 0, "NONE"]; [_unit] call MCCMK_fnc_genTag;
 			if ((((units _grp) - [_unit]) findIf {(_x distance2D _unit) < 1.5}) >= 0) then {
 				private _free = (getPosATL _unit) findEmptyPosition [1.5, 12, _type];
 				if (count _free > 0) then {_unit setPosATL _free};

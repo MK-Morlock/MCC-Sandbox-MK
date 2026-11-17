@@ -158,7 +158,7 @@ class mcc_consoleF6: MCC_RscButtonConsoleKey	//invisible key over the tablet pic
 	h = 0.0329871 * safezoneH;
 	text = "F6";
 	tooltip = "Fleet Management";
-	onButtonClick ="while {dialog} do {closeDialog 0}; [0,0,0] spawn MCC_fnc_LHDspawnMenuInit";
+	onButtonClick ="while {dialog} do {closeDialog 0}; [0,0,[2,1] select (((missionNamespace getVariable ['MCC_server',objNull]) getVariable [format ['CP_commander%1',playerSide],'']) == getPlayerUID player)] spawn MCC_fnc_LHDspawnMenuInit";
 };
 class MCC_ConsoleExitButton: MCC_RscButtonConsoleKey
 {
@@ -182,7 +182,7 @@ class MCC_ConsoleExitButton: MCC_RscButtonConsoleKey
 	class MCC_ConsoleUAVFeed: MCC_RscPicture
 	{
 		idc = MCC_CONSOLE_UAVPIP;
-		text = "";	//set by the script once the camera exists: asked for before a camera was bound to it, the first view stayed black
+		text = "";	//set by the script once the camera exists (asked for before a camera is bound to it, the view stays black)
 		x = 0.219271 * safezoneW + safezoneX;
 		y = 0.225107 * safezoneH + safezoneY;
 		w = 0.561458 * safezoneW;
@@ -231,7 +231,7 @@ class MCC_ConsoleExitButton: MCC_RscButtonConsoleKey
 		onMouseZChanged = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\console\UAVmousez.sqf'");
 		onMouseMoving = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\console\UAVmouseMoving.sqf'");
 	};
-	//(was a switch bar; now rounded buttons like the MCC console)
+	//rounded buttons, like the MCC console
 	class MCC_ConsoleUAVCamBtn0: MCCBTN_R
 	{
 		idc = 9170;

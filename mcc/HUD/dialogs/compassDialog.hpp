@@ -20,15 +20,6 @@ class MCC_hud {
 
 			class Controls
 			{
-				class CompassStripe : MCC_RscPicture
-				{
-					idc = 13;
-					x = -1.02;
-					y = 0;
-					w = 2.5;
-					h = 2.5/(2048/64)*(4/3);
-					text = __EVAL(MCCPATH +"mcc\HUD\data\compass.paa");
-				};
 				class ObjectiveMarker : MCC_RscPicture
 				{
 					idc = 14;
@@ -37,16 +28,6 @@ class MCC_hud {
 					w = 0.023;
 					h = 0.03 * (4/3);
 					text = __EVAL(MCCPATH +"mcc\HUD\data\needleGreen.paa");
-					colorText[] = {1,1,1,1};
-				};
-				class Needle : MCC_RscPicture
-				{
-					idc = -1;
-					x = 0.21;
-					y =  0.04;
-					w = 0.023;
-					h = 0.03 * (4/3);
-					text = __EVAL(MCCPATH +"mcc\HUD\data\needle.paa");
 					colorText[] = {1,1,1,1};
 				};
 			};

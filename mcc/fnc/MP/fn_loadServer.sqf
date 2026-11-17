@@ -95,7 +95,7 @@ if (!isServer) exitWith {};
 	if (_loadStartLoc) then {
 		_tempVar = [format ["%1_%2_%3",_fileName, worldname,missionName], "SPAWN_POINTS", str _x, "read",[],true] call MCC_fnc_handleDB;
 
-		{_x spawn MCC_fnc_buildSpawnPoint} forEach _tempVar;
+		{[_x, (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_buildSpawnPoint}} forEach _tempVar;
 	};
 
 } forEach [east,west,resistance];
@@ -112,7 +112,7 @@ if (_loadRTSBuildngs) then {
 
 		//Now load the new one
 		{
-			_x spawn MCC_fnc_construct_base
+			[_x, (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_construct_base}
 		} forEach _tempVar;
 	};
 };

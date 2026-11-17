@@ -18,10 +18,12 @@ _posY = _params select 3;
 _shift = _params select 4;
 _ctrlKey = _params select 5;
 _alt = _params select 6;
+if ((missionNamespace getVariable ["MCC_evacParaDrag", false]) && {_pressed == 0}) exitWith {["up", _ctrl, _posX, _posY] call MCC_fnc_evacParaLine};
 
 MCC_ConsoleMouseButtonDown = false;	//Mouse state
 MCC_ConsoleMouseButtonUp = true;
 _groupSelected = missionNamespace getVariable ["MCC_ConsoleGroupSelected",[]];
+if (_pressed == 1 && {["active"] call MCCMK_fnc_wpChain} && {abs (_posX - ((missionNamespace getVariable ["MCCConsoleDispPosXYScreen",[0,0]]) select 0)) < 0.005}) exitWith {["end"] call MCCMK_fnc_wpChain};
 
 //Quick WP
 if (_pressed == 1  && (count _groupSelected > 0) && abs (_posX - ((missionNamespace getVariable ["MCCConsoleDispPosXYScreen",[0,0]]) select 0))<0.005) then {

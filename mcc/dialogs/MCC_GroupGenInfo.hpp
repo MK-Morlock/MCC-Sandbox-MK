@@ -66,14 +66,14 @@ class MCC_GroupGenInfo:MCC_RscControlsGroup
 
 			w = 0.0572917 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			tooltip = "Give the selected groups to GAIA control with the selected zone and behavior"; //--- ToDo: Localize;
+			tooltip = "Give the selected groups to GAIA control with the selected\nzone and behavior"; //--- ToDo: Localize;
 		};
 
 		class MCC_GroupGenInfo_gaiaRespawnCombo: MCC_RscCombo
 		{
 			idc = MCC_GroupGenInfo_gaiaRespawnCombo_IDC;
 			onLBSelChanged = "if (missionNamespace getVariable ['MCC_GAIARespawnFilling', false]) exitWith {}; MCC_GAIARespawnNumberIndex = if ((lbcurSel (_this select 0))>10) then {999} else {(lbcurSel (_this select 0))}; if (!isnil 'MCC_GroupGenGroupSelected') then {{[_x,MCC_GAIARespawnNumberIndex] spawn GAIA_fnc_respawnSet} foreach MCC_GroupGenGroupSelected};";
-			tooltip = "Respawns: a group with respawn over 0 will keep on respawning if defeated";
+			tooltip = "Respawns: a group with respawn over 0 will keep on respawning\nif defeated";
 
 			w = 0.0458333 * safezoneW;
 			h = 0.0219914 * safezoneH;
@@ -88,7 +88,7 @@ class MCC_GroupGenInfo:MCC_RscControlsGroup
 			text = "Player"; //--- ToDo: Localize;
 			w = 0.0572917 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			tooltip = "Give the selected groups to the player's control via the M-Tac MCC handheld console"; //--- ToDo: Localize;
+			tooltip = "Give the selected groups to the player's control via the M-Tac\nMCC handheld console"; //--- ToDo: Localize;
 		};
 
 		class MCC_GroupGenInfo_cacheButton: MCCBTN_S

@@ -21,5 +21,4 @@ if (count _done == 0) then {
 	} forEach _pick;
 };
 _v setVariable ["MCCMK_rampParts", _parts];
-["INFO", "aircraftRamp", "%1: %2", [typeOf _v, if (count _done == 0) then {"no ramp found"} else {format ["ramp %1 (%2)", ["closing", "opening"] select _open, _done joinString ", "]}]] call MCC_fnc_log;
 count _done > 0

@@ -1,6 +1,6 @@
 /*================================================================== MCC_fnc_toggleRespawn ==================================================================
 	Console button Disable Respawn / Enable Respawn (idc 9140 of the MCC console). Switches player respawn off or on for everyone.
-	Off: as before (players who die go to spectator mode). On again: players respawn at their start location, and players
+	Off: players who die go to spectator mode. On again: players respawn at their start location, and players
 	who are in spectator mode because respawn was off are brought back to their start location (MCC_fnc_respawnRestore).
 	Respawn on = MCC_TRAINING true (the variable the Respawn event handler in init.sqf reads).
 ==============================================================================================================================================================*/

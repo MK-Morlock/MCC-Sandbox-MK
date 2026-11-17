@@ -30,6 +30,7 @@ MCC_UMUnit = [0, 1] select _isGroup;
 
 MCC_UMFocus = false;
 [] call MCC_fnc_groupGenUMRefresh;
+MCC_UMListSig = [-1, [], [], +_new];
 private _list = _d displayCtrl MCC_UM_LIST;
 if (lbSize _list == 0) exitWith {};
 private _rows = if (_isGroup) then {[0]} else {[0 max 0] + ((lbSize _list) call {private _r = []; for "_i" from 1 to (_this - 1) do {_r pushBack _i}; _r})};

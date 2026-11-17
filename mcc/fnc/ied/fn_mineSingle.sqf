@@ -94,11 +94,11 @@ for [{_i=0},{_i<=(_zoneX*2)},{_i=_i+30}] do
 		_minePos = [((_startingPos select 0) + (_i - 2) + random 4),((_startingPos select 1) + (_x - 2) + random 4)];
 		if (_visable && (random 5 <0.7)) then
 		{
-			_fakeIed = "Land_Sign_Mines_F" createvehicle[((_startingPos select 0) + (_i - 2) + random 4),((_startingPos select 1) + (_x - 2) + random 4),(_startingPos select 2) - 0.06];
+			_fakeIed = "Land_Sign_Mines_F" createvehicle[((_startingPos select 0) + (_i - 2) + random 4),((_startingPos select 1) + (_x - 2) + random 4),(_startingPos select 2) - 0.06]; [_fakeIed] call MCCMK_fnc_genTag;
 		}
 		else
 		{
-			_fakeIed = createvehicle [_mineClass ,_minePos,[],0,"none"];
+			_fakeIed = createvehicle [_mineClass ,_minePos,[],0,"none"]; [_fakeIed] call MCCMK_fnc_genTag;
 		};
 
 		{_x addCuratorEditableObjects [[_fakeIed],false]} forEach allCurators;

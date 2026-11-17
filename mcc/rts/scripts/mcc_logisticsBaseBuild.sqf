@@ -196,7 +196,14 @@ _handler = (_disp displayCtrl 9120) ctrladdeventhandler ["draw","_this call MCC_
 		_fog = true;
 		{
 			if (side _x == playerSide) exitWith {_fog = false}
-		} forEach (_camPos nearEntities [["Man", "Air", "Car", "Motorcycle", "Tank"], 150 max (_camHeight * 1.5)]);
+		} forEach (_camPos nearEntities [["Man", "Air", "Car", "Motorcycle", "Tank", "Ship", "StaticWeapon"], 150 max (_camHeight * 1.5)]);
+		//(MK) your own ships count as friendly presence too (over or near the hull)
+		if (_fog) then {
+			{
+				private _half = (([_x getVariable ["MCC_ShipType", 0]] call MCCMK_fnc_shipCfg) select 3);
+				if (!isNull _x && {(_x getVariable ["MCC_side", sideUnknown]) isEqualTo playerSide} && {(_x distance2D _camPos) < ((_half select 1) + (150 max (_camHeight * 1.5)))}) exitWith {_fog = false};
+			} forEach (missionNamespace getVariable ["MCC_staticShips", []]);
+		};
 
 		//Switch the view distance only when the wanted value has held for 2 s: switching it while the camera moved made
 		//the camera jerk (every change reloads what is drawn)
@@ -337,6 +344,7 @@ _handler = (_disp displayCtrl 9120) ctrladdeventhandler ["draw","_this call MCC_
 								_hiddenUnits pushBack vehicle _unit;
 							} else {
 								_unit hideObject false;
+								(vehicle _unit) hideObject false;	//(MK) and the vehicle it is in
 								_unit setVariable ["MCC_knowsAbout",playerside knowsAbout _unit];
 							};
 						} forEach units _group;
@@ -770,6 +778,8 @@ _createBorderScope = [_startPos,_size] call MCC_fnc_baseBuildBorders;
 
 		if (isNil "_inFOV") then {_inFOV = false};
 
+		//(MK) ship weapons: their icon only while selected (they're listed under their ship in the groups panel)
+		if (_inFOV && {_group getVariable ["MCCMK_shipWpn", false]} && {!(_group in (missionNamespace getVariable ["MCC_ConsoleGroupSelected", []]))} && {!(_group getVariable ["MCC_rtsHighlightedGroup", false])}) then {_inFOV = false};
 		if (_inFOV && group (vehicle _leader) == _group ) then {
 			if !(ctrlshown _ctrl) then {_ctrl ctrlShow true};
 			_ctrlPos = ctrlPosition _ctrl;
@@ -812,35 +822,8 @@ _createBorderScope = [_startPos,_size] call MCC_fnc_baseBuildBorders;
 				};
 			};
 		} else {
-			//Show Groups that not in the FOV on the side bar
-			_ctrl ctrlSetPosition [0.02*safezoneW+safezoneX + (floor (_sideBarCounter/8)*0.08*safezoneW), 0.6*safezoneH+safezoneY - ((_sideBarCounter mod 8)*0.08*safezoneH),0.1*safezoneW,0.05*safezoneH];
-			_sideBarCounter = _sideBarCounter + 1;
-			_ctrl ctrlCommit 0;
-
-			_disp = (ctrlParent _ctrl);
-			_ctrlIdc = ctrlIDC _ctrl;
-
-			//Show fuel and health
-			_value = 0;
-			{
-				_value = _value + getDammage vehicle _x;
-			} forEach (units _group);
-			_value = _value/((count units _group) max 1);
-
-			_ctrl = _disp displayCtrl (_ctrlIdc + 2);
-			_ctrl progressSetPosition (1-_value);
-			_ctrl ctrlShow true;
-			_ctrl ctrlCommit 0;
-
-			//fuel
-			_ctrl =  _disp displayCtrl (_ctrlIdc + 3);
-			if (vehicle _leader != _leader) then {
-				_ctrl progressSetPosition (fuel vehicle _leader);
-				_ctrl ctrlShow true;
-			} else {
-				_ctrl ctrlShow false;
-			};
-			_ctrl ctrlCommit 0;
+			//(MK) Groups not in view: listed in the groups panel (MCCMK_fnc_rtsGroupPanel), not stacked down the side
+			if (ctrlShown _ctrl) then {_ctrl ctrlShow false};
 		};
 
 		//draw WP
@@ -849,6 +832,9 @@ _createBorderScope = [_startPos,_size] call MCC_fnc_baseBuildBorders;
 		};
 	} forEach ( missionNamespace getVariable ["MCC_rtsUIGroupsIcons", []]);
 },[_startPos,_size]] call BIS_fnc_addStackedEventHandler;
+
+//(MK) the groups panel: every group, in sections by type, with filter tabs - folds to its tab bar
+[] spawn MCCMK_fnc_rtsGroupPanel;
 
 //Smooth camera movement with W / A / S / D held (speed by height, Shift x3); the keys only set MCC_rtsHeld
 MCC_rtsHeld = [false, false, false, false];
@@ -1098,6 +1084,7 @@ MCC_CONST_CAM_Handler =
 					_dummy setposATL _dummyPos;
 					_dummy setdir _dummyDir;
 					_dummy setVariable ["MCC_rtsObject",true,true];
+					if (MCC_CONST_PLACEHOLDER getVariable ["MCCMK_padLights", false]) then {["build", _dummy, playerSide] remoteExec ["MCCMK_fnc_helipadLights", 2]};	//(MK) lit helipad
 					playsound "click";
 				} else {
 					playSound "MCC_consturctionInitialized";

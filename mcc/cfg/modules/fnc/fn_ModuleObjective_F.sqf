@@ -20,7 +20,7 @@ switch (tolower _state) do
 		_module setVariable ["MCC_objInitStarted", true];
 		waitUntil {_module getVariable ["updated",false] && time > 0};
 		_module setvariable ["bis_fnc_curatorAttachObject_object",(_module getVariable ["AttachObject_object",_module])];
-		[_module,"update"] spawn MCC_fnc_ModuleObjective_F;
+		[[_module,"update"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_ModuleObjective_F};
 	};
 
 	case "update":
@@ -41,11 +41,11 @@ switch (tolower _state) do
 			_module setVariable ["MCCcustomTaskInit",false];
 
 
-			[_module] spawn MCC_fnc_customTasks;
+			[[_module], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_customTasks};
 
 			//Capture point fnc
     		if (_taskType in ["attack","deffend"]) then {
-    			[_module] spawn MCC_fnc_moduleCapturePoint;
+    			[[_module], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_moduleCapturePoint};
     		};
 		};
 
@@ -73,7 +73,7 @@ switch (tolower _state) do
 
 		//Update Task
 		if (_module getvariable ["updated",false]) exitWith {
-			[_module,"update"] spawn MCC_fnc_ModuleObjective_F;
+			[[_module,"update"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_ModuleObjective_F};
 		};
 
 		//Delete Task

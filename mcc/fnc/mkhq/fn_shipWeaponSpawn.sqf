@@ -1,0 +1,21 @@
+params [["_ship", objNull, [objNull]], ["_side", west, [west]], ["_spec", [], [[]]], ["_index", -1, [0]]];
+if (isNull _ship || {_spec isEqualTo []}) exitWith {objNull};
+_spec params ["_cls", "_off", "_rel", ["_code", ""]];
+private _w = ([[0, 0, 0], 0, _cls, _side] call BIS_fnc_spawnVehicle) select 0;
+_w allowDamage false;
+_w setDir ((getDir _ship) + _rel);
+_w attachTo [_ship, _off];
+detach _w;
+_w setDir ((getDir _ship) + _rel);
+_w spawn {sleep 20; _this allowDamage true};
+if (_code != "") then {_w spawn compile _code};
+_w setVariable ["MCCMK_shipWeapon", true, true];
+_w setVariable ["MCCMK_weaponShip", _ship, true];
+_w addEventHandler ["Fired", {(_this select 0) setVariable ["MCCMK_lastBusy", time]}];
+_w addEventHandler ["Hit", {(_this select 0) setVariable ["MCCMK_lastBusy", time]}];
+_ship setVariable ["MCCMK_shipObjects", ((_ship getVariable ["MCCMK_shipObjects", []]) select {!isNull _x}) + [_w]];
+private _ws = +(_ship getVariable ["MCCMK_weapons", []]);
+if (_index >= 0) then {_ws set [_index, _w]} else {_ws pushBack _w};
+_ship setVariable ["MCCMK_weapons", _ws, true];
+[_w, _ship getVariable ["MCCMK_radarOn", true]] call MCCMK_fnc_shipRadarLocal;
+_w

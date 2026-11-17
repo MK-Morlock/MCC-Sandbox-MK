@@ -7,6 +7,7 @@ params ["_params"];
 _ctrl = _params select 0;
 
 MCCGroupGenDispPosXY = _ctrl ctrlmapscreentoworld [_params select 1,_params select 2];
+if (missionNamespace getVariable ["MCC_evacParaDrag", false]) exitWith {["move", _ctrl, _params select 1, _params select 2] call MCC_fnc_evacParaLine};
 
 
 

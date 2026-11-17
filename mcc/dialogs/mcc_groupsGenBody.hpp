@@ -89,17 +89,6 @@ class MCCDLG_NAME
 		};
 
 
-		//Faction
-		class mcc_groupGen_factionTittle: MCC_RscStructuredText
-		{
-			idc = -1;
-			text = "<t align='center' font='RobotoCondensedBold' color='#8FBF6B' size='1.25'>MCC</t><t align='center' font='RobotoCondensed' color='#E3E5E8' size='0.95'> SANDBOX MK</t>";
-			x = 0.105 * safezoneW + safezoneX;
-			y = 0.024 * safezoneH + safezoneY;
-			w = 0.0802083 * safezoneW;
-			h = 0.034 * safezoneH;
-			colorBackground[] = {0,0,0,0};
-		};
 
 		class mcc_groupGen_factionComboBox: MCC_RscCombo
 		{
@@ -114,33 +103,138 @@ class MCCDLG_NAME
 			h = 0.0219914 * safezoneH;
 		};
 
-		//Console colour squares: rounded, a little smaller and centred under the sliders (the white frame on the chosen one
-		//touched the slider above). Tinted with their colour by MCC_fnc_consoleTheme.
-		class MCC_assetsButton: MCCBTN_S
+		class MCCMK_spawnScope: MCC_RscCombo
 		{
-			idc = -1;
-			text = "Assets";
-			tooltip = "Choose the units, vehicles and objects MCC uses for tasks and support, per enemy faction";
-			onButtonClick = "createDialog ('MCC_AssetsDialog' + (['', 'Buttons'] select (profileNamespace getVariable ['MCC_consoleButtons', false])))";
+			idc = 3094;
+			tooltip = "Which factions the lists draw from: the faction, its DLC\nrelatives, mods' additions, the whole side or all sides";
+			onLBSelChanged = "[_this select 1] call MCCMK_fnc_spawnScopeSet";
 
 			x = 0.195 * safezoneW + safezoneX;
 			y = 0.0601715 * safezoneH + safezoneY;
 			w = 0.114583 * safezoneW;
 			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+		};
+		class MCC_assetsButton: MCCBTN_S
+		{
+			idc = -1;
+			text = "Assets";
+			tooltip = "Choose the units, vehicles and objects MCC uses for tasks and\nsupport, per enemy faction";
+			onButtonClick = "createDialog ('MCC_AssetsDialog' + (['', 'Buttons'] select (profileNamespace getVariable ['MCC_consoleButtons', false])))";
+
+			x = 0.753146 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.058937 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 
 
-		//Map
+		//(MK) Faction search (beside the faction list, level with it) and side buttons : narrow the faction list
+		// (MCCMK_fnc_factionFilter). The side choice is remembered; the search starts empty.
+		class MCCMK_factionSearch: MCC_RscText
+		{
+			idc = 9240;
+			type = 2;
+			tooltip = "Type to find a faction";
+			onKeyUp = "['text', ctrlText (_this select 0), 2994] call MCCMK_fnc_factionFilter";
+			x = 0.313583 * safezoneW + safezoneX;
+			y = 0.0281887 * safezoneH + safezoneY;	//(MK) level with the faction drop-down (it swapped places with the title)
+			w = 0.059 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCCMK_factionSideBg0: MCC_RscText
+		{
+			idc = 9241;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
+			colorText[] = {1,1,1,1};
+			x = 0.313583 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionSideLabel0: MCC_RscText
+		{
+			idc = 9251;
+			style = 2;
+			text = "All";
+			shadow = 0;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			colorText[] = {0.88,0.89,0.9,1};
+			x = 0.313583 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionSideButton0: MCCBTN_R
+		{
+			idc = 9261;
+			text = "";
+			tooltip = "Cycle the faction list: All, West, East, Ind, Civ";
+			animTextureNormal = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureDisabled = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureFocused = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureDefault = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
+			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
+			onButtonClick = "['cycle', '', 2994] call MCCMK_fnc_factionFilter";
+			x = 0.313583 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionResetBg: MCC_RscText
+		{
+			idc = 9311;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
+			colorText[] = {1,1,1,1};
+			x = 0.344583 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionResetLabel: MCC_RscText
+		{
+			idc = 9312;
+			style = 2;
+			text = "Clear";
+			shadow = 0;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			colorText[] = {0.88,0.89,0.9,1};
+			x = 0.344583 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionResetButton: MCCBTN_R
+		{
+			idc = 9313;
+			text = "";
+			tooltip = "Clear text box";
+			animTextureNormal = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureDisabled = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureFocused = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureDefault = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
+			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
+			onButtonClick = "((ctrlParent (_this select 0)) displayCtrl 9240) ctrlSetText ''; ['text', '', 2994] call MCCMK_fnc_factionFilter";
+			x = 0.344583 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
 		class mcc_groupGen_AllFilterBg: MCC_RscText
 		{
 			idc = 9201;
 			style = 48;
 			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
 			colorText[] = {1,1,1,1};
-			x = 0.224600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.658792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_AllFilterLabel: MCC_RscText
 		{
@@ -148,12 +242,12 @@ class MCCDLG_NAME
 			style = 2;
 			text = "All";
 			shadow = 0;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.75)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			colorText[] = {0.88,0.89,0.90,1};
-			x = 0.224600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.658792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_AllButton: MCCBTN_R
 		{
@@ -167,10 +261,10 @@ class MCCDLG_NAME
 			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
 			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
 			onButtonClick = "['toggle', 'all'] call MCC_fnc_consoleFilter";
-			x = 0.224600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.658792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_PlayersFilterBg: MCC_RscText
 		{
@@ -178,10 +272,10 @@ class MCCDLG_NAME
 			style = 48;
 			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
 			colorText[] = {1,1,1,1};
-			x = 0.269600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.441792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_PlayersFilterLabel: MCC_RscText
 		{
@@ -189,12 +283,12 @@ class MCCDLG_NAME
 			style = 2;
 			text = "Players";
 			shadow = 0;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.75)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			colorText[] = {0.88,0.89,0.90,1};
-			x = 0.269600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.441792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_PlayersButton: MCCBTN_R
 		{
@@ -208,10 +302,10 @@ class MCCDLG_NAME
 			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
 			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
 			onButtonClick = "['toggle', 'players'] call MCC_fnc_consoleFilter";
-			x = 0.269600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.441792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_WestFilterBg: MCC_RscText
 		{
@@ -219,10 +313,10 @@ class MCCDLG_NAME
 			style = 48;
 			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
 			colorText[] = {1,1,1,1};
-			x = 0.314600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.472792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_WestFilterLabel: MCC_RscText
 		{
@@ -230,12 +324,12 @@ class MCCDLG_NAME
 			style = 2;
 			text = "West";
 			shadow = 0;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.75)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			colorText[] = {0.44,0.63,0.85,1};
-			x = 0.314600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.472792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_WestButton: MCCBTN_R
 		{
@@ -249,10 +343,10 @@ class MCCDLG_NAME
 			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
 			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
 			onButtonClick = "['toggle', 'west'] call MCC_fnc_consoleFilter";
-			x = 0.314600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.472792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_EastFilterBg: MCC_RscText
 		{
@@ -260,10 +354,10 @@ class MCCDLG_NAME
 			style = 48;
 			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
 			colorText[] = {1,1,1,1};
-			x = 0.359600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.503792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_EastFilterLabel: MCC_RscText
 		{
@@ -271,12 +365,12 @@ class MCCDLG_NAME
 			style = 2;
 			text = "East";
 			shadow = 0;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.75)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			colorText[] = {0.82,0.42,0.37,1};
-			x = 0.359600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.503792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_EastButton: MCCBTN_R
 		{
@@ -290,10 +384,10 @@ class MCCDLG_NAME
 			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
 			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
 			onButtonClick = "['toggle', 'east'] call MCC_fnc_consoleFilter";
-			x = 0.359600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.503792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_IndFilterBg: MCC_RscText
 		{
@@ -301,10 +395,10 @@ class MCCDLG_NAME
 			style = 48;
 			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
 			colorText[] = {1,1,1,1};
-			x = 0.404600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.534792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_IndFilterLabel: MCC_RscText
 		{
@@ -312,12 +406,12 @@ class MCCDLG_NAME
 			style = 2;
 			text = "Ind";
 			shadow = 0;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.75)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			colorText[] = {0.56,0.75,0.42,1};
-			x = 0.404600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.534792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_IndButton: MCCBTN_R
 		{
@@ -331,10 +425,10 @@ class MCCDLG_NAME
 			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
 			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
 			onButtonClick = "['toggle', 'ind'] call MCC_fnc_consoleFilter";
-			x = 0.404600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.534792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_CivFilterBg: MCC_RscText
 		{
@@ -342,10 +436,10 @@ class MCCDLG_NAME
 			style = 48;
 			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
 			colorText[] = {1,1,1,1};
-			x = 0.449600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.565792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_CivFilterLabel: MCC_RscText
 		{
@@ -353,12 +447,12 @@ class MCCDLG_NAME
 			style = 2;
 			text = "Civ";
 			shadow = 0;
-			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.75)";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			colorText[] = {0.66,0.55,0.82,1};
-			x = 0.449600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.565792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class mcc_groupGen_CivButton: MCCBTN_R
 		{
@@ -372,10 +466,94 @@ class MCCDLG_NAME
 			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
 			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
 			onButtonClick = "['toggle', 'civ'] call MCC_fnc_consoleFilter";
-			x = 0.449600 * safezoneW + safezoneX;
-			y = 0.098500 * safezoneH + safezoneY;
-			w = 0.042000 * safezoneW;
-			h = 0.026000 * safezoneH;
+			x = 0.565792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		//(MK) Orders: every group's waypoint markers and the lines to them shown or hidden (MCC_fnc_consoleFilter "orders")
+		class MCCMK_OrdersFilterBg: MCC_RscText
+		{
+			idc = 9286;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
+			colorText[] = {1,1,1,1};
+			x = 0.596792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_OrdersFilterLabel: MCC_RscText
+		{
+			idc = 9287;
+			style = 2;
+			text = "Orders";
+			shadow = 0;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			colorText[] = {0.47,0.53,0.88,1};
+			x = 0.596792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_OrdersFilterButton: MCCBTN_R
+		{
+			idc = 9288;
+			text = "";
+			tooltip = "Waypoint markers and their lines on / off (the orders still\nstand)";
+			animTextureNormal = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureDisabled = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureFocused = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureDefault = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
+			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
+			onButtonClick = "['toggle', 'orders'] call MCC_fnc_consoleFilter";
+			x = 0.596792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		//(MK) IEDs: IED and ambush markers on the map shown or hidden (MCC_fnc_consoleFilter "ieds")
+		class MCCMK_IEDFilterBg: MCC_RscText
+		{
+			idc = 9283;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_n_ca.paa";
+			colorText[] = {1,1,1,1};
+			x = 0.627792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_IEDFilterLabel: MCC_RscText
+		{
+			idc = 9284;
+			style = 2;
+			text = "IEDs";
+			shadow = 0;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			colorText[] = {0.76,0.30,0.36,1};
+			x = 0.627792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_IEDFilterButton: MCCBTN_R
+		{
+			idc = 9285;
+			text = "";
+			tooltip = "IED and ambush markers on / off";
+			animTextureNormal = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureDisabled = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureFocused = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureDefault = "#(argb,8,8,3)color(0,0,0,0)";
+			animTextureOver = "\mcc_sandbox_mod\data\mk_hover_ca.paa";
+			animTexturePressed = "\mcc_sandbox_mod\data\mk_press_ca.paa";
+			onButtonClick = "['toggle', 'ieds'] call MCC_fnc_consoleFilter";
+			x = 0.627792 * safezoneW + safezoneX;
+			y = 0.0601715 * safezoneH + safezoneY;
+			w = 0.028000 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 
 
@@ -386,12 +564,12 @@ class MCCDLG_NAME
 	//---------------------------------------- BENCHMARK ----------------------------------------
 		class MCC_MissionMakerTittle: MCC_RscText
 		{
-			idc = -1;
+			idc = 9307;
 			text = "Mission Maker:";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 
-			x = 0.366771 * safezoneW + safezoneX;
-			y = 0.016857 * safezoneH + safezoneY;
+			x = 0.254781 * safezoneW + safezoneX;
+			y = 0.813500 * safezoneH + safezoneY;
 			w = 0.056 * safezoneW;
 			h = 0.0219914 * safezoneH;
 		};
@@ -401,32 +579,32 @@ class MCCDLG_NAME
 			idc = MCCMISSIONMAKERNAME;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 
-			x = 0.424063 * safezoneW + safezoneX;
-			y = 0.016857 * safezoneH + safezoneY;
+			x = 0.312073 * safezoneW + safezoneX;
+			y = 0.813500 * safezoneH + safezoneY;
 			w = 0.0572917 * safezoneW;
 			h = 0.0219914 * safezoneH;
 		};
 
 		class MCC_clientFPSTittle: MCC_RscText
 		{
-			idc = -1;
+			idc = 9308;
 			text = "Client FPS:";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 
-			x = 0.492813 * safezoneW + safezoneX;
-			y = 0.016857 * safezoneH + safezoneY;
+			x = 0.380822 * safezoneW + safezoneX;
+			y = 0.813500 * safezoneH + safezoneY;
 			w = 0.0515625 * safezoneW;
 			h = 0.0219914 * safezoneH;
 		};
 
 		class MCC_ServerFPSTittle: MCC_RscText
 		{
-			idc = -1;
+			idc = 9309;
 			text = "Server FPS:";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 
-			x = 0.590209 * safezoneW + safezoneX;
-			y = 0.016857 * safezoneH + safezoneY;
+			x = 0.478218 * safezoneW + safezoneX;
+			y = 0.813500 * safezoneH + safezoneY;
 			w = 0.0515625 * safezoneW;
 			h = 0.0219914 * safezoneH;
 		};
@@ -436,8 +614,8 @@ class MCCDLG_NAME
 			idc = MCCCLIENTFPS;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 
-			x = 0.544375 * safezoneW + safezoneX;
-			y = 0.016857 * safezoneH + safezoneY;
+			x = 0.432385 * safezoneW + safezoneX;
+			y = 0.813500 * safezoneH + safezoneY;
 			w = 0.034375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 		};
@@ -447,8 +625,8 @@ class MCCDLG_NAME
 			idc = MCCSERVERFPS;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 
-			x = 0.641771 * safezoneW + safezoneX;
-			y = 0.016857 * safezoneH + safezoneY;
+			x = 0.529780 * safezoneW + safezoneX;
+			y = 0.813500 * safezoneH + safezoneY;
 			w = 0.034375 * safezoneW;
 			h = 0.0219914 * safezoneH;
 		};
@@ -458,10 +636,10 @@ class MCCDLG_NAME
 		{
 			idc = MCCSTOPCAPTURE;
 			text = "Stop Capturing";
-			tooltip = "Once a trigger has been generated, MCC's actions won't be executed but will be saved to the trigger until this button is pressed";
+			tooltip = "Once a trigger has been generated, MCC's actions won't be\nexecuted but will be saved to the trigger until this button is\npressed";
 			onButtonClick = "ctrlEnable [1014,false];MCC_capture_state=false;";
 
-			x = 0.879020 * safezoneW + safezoneX;	//under Ambient Warzone (it sat over the help text column)
+			x = 0.879020 * safezoneW + safezoneX;	//under Ambient Warzone
 			y = 0.060172 * safezoneH + safezoneY;
 			w = 0.058937 * safezoneW;
 			h = 0.0219914 * safezoneH;
@@ -470,12 +648,12 @@ class MCCDLG_NAME
 
 		class MCC_occupyButton: MCCBTN_S
 		{
-			idc = -1;
+			idc = 9304;
 			onButtonClick = "if (str (getmarkerpos str mcc_active_zone) != str [0,0,0]) then {[str mcc_active_zone] spawn GAIA_fnc_occupy} else {systemchat 'Create a zone first'}";
-			tooltip = "Occupy the currently selected zone with the selected faction's units";
+			tooltip = "Occupy the currently selected zone with the selected faction's\nunits";
 			text = "Occupy Zone"; //--- ToDo: Localize;
 
-			x = 0.353000 * safezoneW + safezoneX;
+			x = 0.366812 * safezoneW + safezoneX;
 			y = 0.603076 * safezoneH + safezoneY;
 			w = 0.058000 * safezoneW;
 			h = 0.026000 * safezoneH;
@@ -483,13 +661,13 @@ class MCCDLG_NAME
 		class MCC_deleteZoneButton: MCCBTN_S
 		{
 
-			idc = -1;
+			idc = 9305;
 
 			onButtonClick = "[] spawn MCC_fnc_deleteZone";
 			tooltip = "Delete the zone chosen in the Zone drop-down";
 			text = "Delete Zone";
 
-			x = 0.414000 * safezoneW + safezoneX;
+			x = 0.427812 * safezoneW + safezoneX;
 			y = 0.603076 * safezoneH + safezoneY;
 			w = 0.058000 * safezoneW;
 			h = 0.026000 * safezoneH;
@@ -523,7 +701,7 @@ class MCCDLG_NAME
 		{
 			idc = 1015;
 			text = "";
-			tooltip = "Ambient Warzone: random ambient battlefield around the player - press to switch on / off";
+			tooltip = "Ambient Warzone: random ambient battlefield around the player\n- press to switch on / off";
 			animTextureNormal = "#(argb,8,8,3)color(0,0,0,0)";
 			animTextureDisabled = "#(argb,8,8,3)color(0,0,0,0)";
 			animTextureFocused = "#(argb,8,8,3)color(0,0,0,0)";
@@ -542,44 +720,48 @@ class MCCDLG_NAME
 
 		class MCC_ghostMode: MCCBTN_R
 		{
+			class TextPos {left = 0; top = "((0.026 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//(MK) text centred in the 0.026-tall button
 			idc = -1;
 			text = "Ghost Mode";
 			tooltip = "Make the mission maker invisible to enemies";
 			onButtonClick = "if (mcc_missionmaker == (name player)) then {if (captive player) then {player setcaptive false;if (MCC_Chat) then {['Mission maker is no longer cheating'] remoteExec ['MCC_fnc_globalHint',0,false];};} else {player setcaptive true; if (MCC_Chat) then {['Mission maker is cheating'] remoteExec ['MCC_fnc_globalHint',0,false];}};} else {player globalchat 'Access Denied'};";
-			x = 0.425958 * safezoneW + safezoneX;
-			y = 0.0491758 * safezoneH + safezoneY;
-			w = 0.06 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			x = 0.481792 * safezoneW + safezoneX;
+			y = 0.0262 * safezoneH + safezoneY;
+			w = 0.053 * safezoneW;
+			h = 0.026 * safezoneH;
 		};
 
 		class MCC_spectator: MCCBTN_R
 		{
+			class TextPos {left = 0; top = "((0.026 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//(MK) text centred in the 0.026-tall button
 			idc = -1;
 			text = "Spectator";
 			tooltip = "Open Spectator Mode";
 			onButtonClick = __EVAL("[4] execVM '"+MCCPATH+"mcc\Pop_menu\mission_settings.sqf'");
 
-			x = 0.491458 * safezoneW + safezoneX;
-			y = 0.0491758 * safezoneH + safezoneY;
-			w = 0.06 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			x = 0.537792 * safezoneW + safezoneX;
+			y = 0.0262 * safezoneH + safezoneY;
+			w = 0.053 * safezoneW;
+			h = 0.026 * safezoneH;
 		};
 
 		class MCC_Teleport: MCCBTN_R
 		{
+			class TextPos {left = 0; top = "((0.026 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//(MK) text centred in the 0.026-tall button
 			idc = -1;
 			text = "Teleport";
-			tooltip = "Teleport the mission maker and any vehicle he is in to a new location";
+			tooltip = "Teleport the mission maker and any vehicle he is in to a new\nlocation";
 			onButtonClick = "if (mcc_missionmaker == (name player)) then {hint 'Click on the map';onMapSingleClick 'vehicle player setPos _pos;onMapSingleClick '''';true;'} else {player globalchat 'Access Denied'};";
 
-			x = 0.556958 * safezoneW + safezoneX;
-			y = 0.0491758 * safezoneH + safezoneY;
-			w = 0.06 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			x = 0.593792 * safezoneW + safezoneX;
+			y = 0.0262 * safezoneH + safezoneY;
+			w = 0.053 * safezoneW;
+			h = 0.026 * safezoneH;
 		};
 
 		class MCC_MissionWIn: MCCBTN_R
 		{
+			class TextPos {left = 0; top = "((0.026 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//(MK) text centred in the 0.026-tall button
 			color2[] = {0.56,0.75,0.42,1};
 			colorFocused[] = {0.56,0.75,0.42,1};
 			color[] = {0.56,0.75,0.42,1};
@@ -589,14 +771,15 @@ class MCCDLG_NAME
 			colorText[] = {0.56,0.75,0.42,1};
 			tooltip = "End mission with - Mission Accomplished"; //--- ToDo: Localize;
 
-			x = 0.323062 * safezoneW + safezoneX;
-			y = 0.0491758 * safezoneH + safezoneY;
-			w = 0.097396 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			x = 0.393792 * safezoneW + safezoneX;
+			y = 0.0262 * safezoneH + safezoneY;
+			w = 0.085 * safezoneW;
+			h = 0.026 * safezoneH;
 		};
 
 		class MCC_MissionLost: MCCBTN_R
 		{
+			class TextPos {left = 0; top = "((0.026 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};	//(MK) text centred in the 0.026-tall button
 			color2[] = {0.82,0.42,0.37,1};
 			colorFocused[] = {0.82,0.42,0.37,1};
 			color[] = {0.82,0.42,0.37,1};
@@ -606,10 +789,10 @@ class MCCDLG_NAME
 			colorText[] = {0.82,0.42,0.37,1};
 			tooltip = "End mission with - Mission Failed"; //--- ToDo: Localize;
 
-			x = 0.622458 * safezoneW + safezoneX;
-			y = 0.0491758 * safezoneH + safezoneY;
-			w = 0.097396 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			x = 0.649792 * safezoneW + safezoneX;
+			y = 0.0262 * safezoneH + safezoneY;
+			w = 0.085 * safezoneW;
+			h = 0.026 * safezoneH;
 		};
 
 
@@ -641,6 +824,227 @@ class MCCDLG_NAME
 		#include "mcc_groupGenCS.hpp"
 
 		#include "mcc_groupGenUM.hpp"
+		//(MK) The factions on the map (MCCMK_fnc_factionBox): a panel built like the Units / Groups box - background, rows, and
+		// the same frame on top, in one group. The rows (flag, relation, side, faction - long names wrapped) scroll with the
+		// mouse wheel; a thin scroll bar shows only when they go past the bottom. Click a row: its faction becomes the console's.
+		//(MK) What the faction panel shows: Factions / Forces / Missions - the same switch as Regular / Night Vision / Thermal,
+		// with the same rounded boxes under its three entries (flat or 3D with the console's theme)
+		//(MK) On / Off for the whole faction box (MCCMK_fnc_factionBox "power"): green On, white Off - as the video feed's
+		class MCCMK_factionPowerBg: MCC_RscText
+		{
+			idc = 9296;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_half_n_ca.paa";	// the 3D theme swaps it (MCC_fnc_consoleApply3D)
+			colorText[] = {1,1,1,1};
+			x = 0.255381 * safezoneW + safezoneX;
+			y = 0.648576 * safezoneH + safezoneY;
+			w = 0.022800 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionPower: MCC_RscButton
+		{
+			idc = 9297;
+			text = "On";
+			style = 2;
+			colorText[] = {0.56,0.75,0.42,1};
+			colorBackground[] = {0,0,0,0};
+			colorBackgroundActive[] = {0,0,0,0};
+			colorFocused[] = {0,0,0,0};
+			colorBackgroundFocused[] = {0,0,0,0};
+			offsetPressedX = 0;
+			offsetPressedY = 0;
+			onButtonClick = "['power'] call MCCMK_fnc_factionBox";
+			x = 0.254781 * safezoneW + safezoneX;
+			y = 0.648576 * safezoneH + safezoneY;
+			w = 0.024 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCCMK_factionTabBg0: MCC_RscText
+		{
+			idc = -1;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";	// the 3D theme swaps it (MCC_fnc_consoleApply3D)
+			colorText[] = {1,1,1,1};
+			x = 0.281381 * safezoneW + safezoneX;
+			y = 0.648576 * safezoneH + safezoneY;
+			w = 0.043606 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionTabBg1: MCC_RscText
+		{
+			idc = -1;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";	// the 3D theme swaps it (MCC_fnc_consoleApply3D)
+			colorText[] = {1,1,1,1};
+			x = 0.326187 * safezoneW + safezoneX;
+			y = 0.648576 * safezoneH + safezoneY;
+			w = 0.043606 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionTabBg2: MCC_RscText
+		{
+			idc = -1;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";	// the 3D theme swaps it (MCC_fnc_consoleApply3D)
+			colorText[] = {1,1,1,1};
+			x = 0.370992 * safezoneW + safezoneX;
+			y = 0.648576 * safezoneH + safezoneY;
+			w = 0.043606 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
+		class MCCMK_factionTabs: MCC_RscToolbox
+		{
+			colorText[] = {0.88,0.89,0.90,1};
+			colorTextSelect[] = {0.56,0.75,0.42,1};
+			idc = 9294;
+			strings[] = {"Factions","Forces","Missions"};
+			rows = 1;
+			columns = 3;
+			values[] = {0,1,2};
+			style = 2;
+			colorSelectedBg[] = {0,0,0,0};
+			onToolBoxSelChanged = "['tab', _this select 1] call MCCMK_fnc_factionBox";
+			x = 0.280781 * safezoneW + safezoneX;
+			y = 0.648576 * safezoneH + safezoneY;
+			w = 0.134417 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCCMK_factionPanel: MCC_RscControlsGroup
+		{
+			idc = 9293;
+			x = 0.254781 * safezoneW + safezoneX;
+			y = 0.676567 * safezoneH + safezoneY;
+			w = 0.160417 * safezoneW;
+			h = 0.133957 * safezoneH;
+			class Controls
+			{
+				class MCCMK_factionPanelBg: MCC_RscText
+				{
+					idc = -1;
+					text = "";
+					colorBackground[] = {0.07,0.08,0.09,0.95};
+					x = 0;
+					y = 0;
+					w = 0.160417 * safezoneW;
+					h = 0.133957 * safezoneH;
+				};
+				class MCCMK_factionRows: MCC_RscControlsGroup
+				{
+					idc = 9292;
+					x = 0;
+					y = 0.004 * safezoneH;
+					w = 0.160417 * safezoneW;
+					h = 0.127957 * safezoneH;
+					class VScrollbar: VScrollbar
+					{
+						width = 0.0022 * safezoneW;
+						autoScrollEnabled = 0;
+					};
+					class Controls {};
+				};
+				//(MK) the Units / Groups box's edge, drawn exactly (measured from it): along the top and bottom a grey line over a
+				// darker one - the soft bevel - 1 px of white on the left, 2 px on the right
+				class MCCMK_factionEdgeTop1: MCC_RscText
+				{
+					idc = -1;
+					text = "";
+					colorBackground[] = {0.486,0.486,0.49,1};
+					x = 0;
+					y = 0;
+					w = 0.160417 * safezoneW;
+					h = pixelH;
+				};
+				class MCCMK_factionEdgeTop2: MCC_RscText
+				{
+					idc = -1;
+					text = "";
+					colorBackground[] = {0.314,0.314,0.322,1};
+					x = 0;
+					y = pixelH;
+					w = 0.160417 * safezoneW;
+					h = pixelH;
+				};
+				class MCCMK_factionEdgeBottom1: MCC_RscText
+				{
+					idc = -1;
+					text = "";
+					colorBackground[] = {0.486,0.486,0.49,1};
+					x = 0;
+					y = 0.133957 * safezoneH - 2 * pixelH;
+					w = 0.160417 * safezoneW;
+					h = pixelH;
+				};
+				class MCCMK_factionEdgeBottom2: MCC_RscText
+				{
+					idc = -1;
+					text = "";
+					colorBackground[] = {0.314,0.314,0.322,1};
+					x = 0;
+					y = 0.133957 * safezoneH - pixelH;
+					w = 0.160417 * safezoneW;
+					h = pixelH;
+				};
+				class MCCMK_factionEdgeLeft: MCC_RscText
+				{
+					idc = -1;
+					text = "";
+					colorBackground[] = {1,1,1,1};
+					x = 0;
+					y = 0;
+					w = pixelW;
+					h = 0.133957 * safezoneH;
+				};
+				class MCCMK_factionEdgeRight: MCC_RscText
+				{
+					idc = -1;
+					text = "";
+					colorBackground[] = {1,1,1,1};
+					x = 0.160417 * safezoneW - 2 * pixelW;
+					y = 0;
+					w = 2 * pixelW;
+					h = 0.133957 * safezoneH;
+				};
+			};
+		};
+
+		//(MK) The unit feed's view distance (MCCMK_fnc_feedDist): a slim slider under the feed, the distance beside it
+		class MCCMK_feedDistSlider: MCC_RscXSliderH
+		{
+			idc = 9298;
+			tooltip = "Video feed view distance";
+			onLoad = "['load', _this select 0] call MCCMK_fnc_feedDist";
+			onSliderPosChanged = "['set', _this select 1] call MCCMK_fnc_feedDist";
+			x = 0.713386 * safezoneW + safezoneX;
+			y = 0.8240 * safezoneH + safezoneY;	// the feed's full width, about 5 pixels tall
+			w = 0.160417 * safezoneW;
+			h = 0.0035 * safezoneH;
+		};
+		class MCCMK_feedDistText: MCC_RscText
+		{
+			idc = 9299;
+			style = 0;	// just after the slider's right end
+			text = "";
+			colorText[] = {0.62,0.64,0.66,1};
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.5)";
+			x = 0.874803 * safezoneW + safezoneX;
+			y = 0.8188 * safezoneH + safezoneY;
+			w = 0.032000 * safezoneW;
+			h = 0.014000 * safezoneH;
+		};
+
+		//(MK) The title - drawn last, on top of everything
+		class mcc_groupGen_factionTittle: MCC_RscStructuredText
+		{
+			idc = -1;
+			text = "<t align='center' font='RobotoCondensedBold' color='#8FBF6B' size='1.25'>MCC</t><t align='center' font='RobotoCondensed' color='#E3E5E8' size='0.95'> SANDBOX MK</t>";
+			x = 0.105 * safezoneW + safezoneX;
+			y = 0.0222 * safezoneH + safezoneY;	//(MK) a small gap under it
+			w = 0.0802083 * safezoneW;
+			h = 0.034 * safezoneH;
+			colorBackground[] = {0,0,0,0};
+		};
 		class MCC_displaySettingsRound: MCC_RscText
 		{
 			idc = -1;
@@ -648,7 +1052,7 @@ class MCCDLG_NAME
 			text = "\mcc_sandbox_mod\data\btn_round_sq_n_ca.paa";
 			colorText[] = {1,1,1,1};
 			colorBackground[] = {0,0,0,0};
-			x = 0.924260 * safezoneW + safezoneX;
+			x = 0.916421 * safezoneW + safezoneX;
 			y = 0.024000 * safezoneH + safezoneY;
 			w = 0.013700 * safezoneW;
 			h = 0.022000 * safezoneH;
@@ -660,7 +1064,7 @@ class MCCDLG_NAME
 			text = "\mcc_sandbox_mod\data\mk_settings_ca.paa";
 			colorText[] = {0.88,0.89,0.90,1};
 			colorBackground[] = {0,0,0,0};
-			x = 0.926260 * safezoneW + safezoneX;
+			x = 0.918421 * safezoneW + safezoneX;
 			y = 0.027000 * safezoneH + safezoneY;
 			w = 0.009700 * safezoneW;
 			h = 0.016000 * safezoneH;
@@ -668,9 +1072,8 @@ class MCCDLG_NAME
 		class MCC_displaySettingsBtn: MCC_RscButtonConsoleKey
 		{
 			idc = 9171;
-			tooltip = "Display settings: console colour, window and map transparency, button style";
 			onButtonClick = "private _g = (ctrlParent (_this select 0)) displayCtrl 9170; _g ctrlShow !(ctrlShown _g);";
-			x = 0.924260 * safezoneW + safezoneX;
+			x = 0.916421 * safezoneW + safezoneX;
 			y = 0.024000 * safezoneH + safezoneY;
 			w = 0.013700 * safezoneW;
 			h = 0.022000 * safezoneH;
@@ -681,7 +1084,7 @@ class MCCDLG_NAME
 			x = 0.767960 * safezoneW + safezoneX;
 			y = 0.040200 * safezoneH + safezoneY;
 			w = 0.170000 * safezoneW;
-			h = 0.128000 * safezoneH;
+			h = 0.158000 * safezoneH;
 			class Controls
 			{
 				class MCC_displaySettingsFrame: MCC_RscText
@@ -694,7 +1097,7 @@ class MCCDLG_NAME
 					x = 0;
 					y = 0;
 					w = 0.170000 * safezoneW;
-					h = 0.128000 * safezoneH;
+					h = 0.158000 * safezoneH;
 				};
 				class MCC_displaySettingsSolid: MCC_RscText
 				{
@@ -703,7 +1106,7 @@ class MCCDLG_NAME
 					x = 0.004 * safezoneW;
 					y = 0.006 * safezoneH;
 					w = 0.162000 * safezoneW;
-					h = 0.116000 * safezoneH;
+					h = 0.146000 * safezoneH;
 				};
 				class MCC_dsColourLabel: MCC_RscText
 				{
@@ -811,6 +1214,26 @@ class MCCDLG_NAME
 					w = 0.015 * safezoneW;
 					h = 0.015 * safezoneH;
 				};
+				class MCCMK_consoleTipsBox: MCC_RscCheckbox
+				{
+					idc = 9172;
+					tooltip = "Tooltips on / off";
+					onCheckedChanged = "['toggle', _this select 1] call MCCMK_fnc_consoleTips";
+					x = 0.152500 * safezoneW;
+					y = 0.021700 * safezoneH;
+					w = 0.011000 * safezoneW;
+					h = 0.019600 * safezoneH;
+				};
+				class MCCMK_consoleInfoBox: MCC_RscCheckbox
+				{
+					idc = 9173;
+					tooltip = "Mission maker text";
+					onCheckedChanged = "['toggle', _this select 1] call MCCMK_fnc_infoToggle";
+					x = 0.007500 * safezoneW;
+					y = 0.021700 * safezoneH;
+					w = 0.011000 * safezoneW;
+					h = 0.019600 * safezoneH;
+				};
 				class MCC_consoleThemeFrame: MCC_RscText
 				{
 					idc = 9160;	//rounded white ring round the chosen colour (placed by MCC_fnc_consoleTheme)
@@ -843,6 +1266,28 @@ class MCCDLG_NAME
 					w = 0.094000 * safezoneW;
 					h = 0.012000 * safezoneH;
 				};
+				class MCC_dsZonesLabel: MCC_RscText
+				{
+					idc = -1;
+					text = "Map zones";
+					tooltip = "How strongly the campaign territory squares are drawn on the\nmap - for everyone (mission maker). Each player can also fade\nthem for himself in Addon Options (MCCMK General).";
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+					colorText[] = {0.62,0.65,0.68,1};
+					x = 0.006 * safezoneW;
+					y = 0.098000 * safezoneH;
+					w = 0.06 * safezoneW;
+					h = 0.02 * safezoneH;
+				};
+				class MCC_consoleZonesSlider: MCC_RscXSliderH
+				{
+					idc = 9122;
+					tooltip = "Campaign map zones: right = full, left = hidden (for everyone)";
+					onSliderPosChanged = "[_this select 1] call MCCMK_fnc_zonesOpacity";
+					x = 0.070000 * safezoneW;
+					y = 0.101800 * safezoneH;
+					w = 0.094000 * safezoneW;
+					h = 0.012000 * safezoneH;
+				};
 				class MCC_dsFlatConsole: MCCBTN_S
 				{
 					idc = 9174;
@@ -850,7 +1295,7 @@ class MCCDLG_NAME
 					tooltip = "Flat buttons";
 					onButtonClick = "if (profileNamespace getVariable ['MCC_consoleButtons', false]) then {profileNamespace setVariable ['MCC_consoleButtons', false]; saveProfileNamespace; closeDialog 0; [] spawn {waitUntil {isNull (findDisplay 2994)}; createDialog 'mcc_groupGen'}};";
 					x = 0.006 * safezoneW;
-					y = 0.098000 * safezoneH;
+					y = 0.128000 * safezoneH;
 					w = 0.077000 * safezoneW;
 					h = 0.0219914 * safezoneH;
 				};
@@ -861,7 +1306,7 @@ class MCCDLG_NAME
 					tooltip = "3D buttons";
 					onButtonClick = "if !(profileNamespace getVariable ['MCC_consoleButtons', false]) then {profileNamespace setVariable ['MCC_consoleButtons', true]; saveProfileNamespace; closeDialog 0; [] spawn {waitUntil {isNull (findDisplay 2994)}; createDialog 'mcc_groupGenButtons'}};";
 					x = 0.087000 * safezoneW;
-					y = 0.098000 * safezoneH;
+					y = 0.128000 * safezoneH;
 					w = 0.077000 * safezoneW;
 					h = 0.0219914 * safezoneH;
 				};
@@ -908,9 +1353,9 @@ class MCCDLG_NAME
 			onButtonClick = __EVAL("[15] execVM '"+MCCPATH+"mcc\general_scripts\unitManage\um.sqf'");
 
 			text = "Kick"; //--- ToDo: Localize;
-			x = 0.866638 * safezoneW + safezoneX;
+			x = 0.879803 * safezoneW + safezoneX;
 			y = 0.704559 * safezoneH + safezoneY;
-			w = 0.033375 * safezoneW;
+			w = 0.026750 * safezoneW;
 			h = 0.021991 * safezoneH;
 			tooltip = "Kick selected player from the server"; //--- ToDo: Localize;
 		};
@@ -920,9 +1365,9 @@ class MCCDLG_NAME
 			onButtonClick = __EVAL("[16] execVM '"+MCCPATH+"mcc\general_scripts\unitManage\um.sqf'");
 
 			text = "Ban"; //--- ToDo: Localize;
-			x = 0.902013 * safezoneW + safezoneX;
+			x = 0.908553 * safezoneW + safezoneX;
 			y = 0.704559 * safezoneH + safezoneY;
-			w = 0.033375 * safezoneW;
+			w = 0.026750 * safezoneW;
 			h = 0.021991 * safezoneH;
 			tooltip = "Ban selected player from the server"; //--- ToDo: Localize;
 		};
@@ -930,9 +1375,9 @@ class MCCDLG_NAME
 		{
 			idc = -1;
 			text = "Logout";
-			x = 0.866638 * safezoneW + safezoneX;
+			x = 0.879803 * safezoneW + safezoneX;
 			y = 0.732550 * safezoneH + safezoneY;
-			w = 0.068750 * safezoneW;
+			w = 0.055500 * safezoneW;
 			h = 0.021991 * safezoneH;
 			tooltip = "Login or logout as the mission maker";
 			onButtonClick = "_null = [] spawn MCC_fnc_loginDialog";
@@ -941,9 +1386,9 @@ class MCCDLG_NAME
 		{
 			idc = -1;
 			text = "Save/Load";
-			x = 0.866638 * safezoneW + safezoneX;
+			x = 0.879803 * safezoneW + safezoneX;
 			y = 0.760542 * safezoneH + safezoneY;
-			w = 0.068750 * safezoneW;
+			w = 0.055500 * safezoneW;
 			h = 0.021991 * safezoneH;
 			onButtonClick = "if (mcc_missionmaker == (name player)) then {createDialog ('MCC_SaveLoadScreen' + (['', 'Buttons'] select (profileNamespace getVariable ['MCC_consoleButtons', false])));} else {player globalchat 'Access Denied'};";
 		};
@@ -954,9 +1399,9 @@ class MCCDLG_NAME
 			text = "Close";
 			action = "closeDialog 0;";
 
-			x = 0.866638 * safezoneW + safezoneX;
+			x = 0.879803 * safezoneW + safezoneX;
 			y = 0.788533 * safezoneH + safezoneY;
-			w = 0.068750 * safezoneW;
+			w = 0.055500 * safezoneW;
 			h = 0.021991 * safezoneH;
 		};
 		#include "mcc_groupGenWaypoints.hpp"

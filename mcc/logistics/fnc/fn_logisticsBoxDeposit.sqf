@@ -52,6 +52,14 @@ _str = "";
 
 //If it is a big create
 _cost = if (_cratesType > 2) then {CRATE_COST*2} else {CRATE_COST};
+//(MK) only what the crate still holds: less after Resupply has been used, or for a repacked crate
+private _fr = _object getVariable ["MCCMK_crateFrac", 1];
+if ((_cratesType mod 3) == 0) then {
+	private _full = getNumber (configFile >> "CfgVehicles" >> typeOf _object >> "ammo");
+	if (_full <= 0) then {_full = 200};
+	_fr = _fr min ((_object getVariable ["ammoLeft", _full]) / _full);
+};
+_cost = round (_cost * ((_fr min 1) max 0));
 
 switch (_cratesType mod 3) do
 {

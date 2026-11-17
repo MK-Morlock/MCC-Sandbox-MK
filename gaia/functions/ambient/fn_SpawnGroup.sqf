@@ -73,7 +73,7 @@ if (_simu == "soldier") then
 			_dude = _unitarray select (floor random (count _unitarray));
 			_GrpUnit = _GrpUnit + [ (_dude  select 0)];
 		};
-		_grp = [_spawnPos, _side, _GrpUnit] call BIS_fnc_spawnGroup;
+		_grp = [_spawnPos, _side, _GrpUnit] call BIS_fnc_spawnGroup; [_grp] call MCCMK_fnc_genTag;
 		( _grp) setVariable ["GAIA_ZONE_INTEND",[_ActiveZone, (["MOVE","NOFOLLOW","FORTIFY"]call BIS_fnc_selectRandom)], true];
 	};
 

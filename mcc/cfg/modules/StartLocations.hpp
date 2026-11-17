@@ -48,12 +48,12 @@ class mcc_sandbox_moduleStartLocations : Module_F
 				{
 					name = "F.O.B";
 					value = "FOB";
-					default = 1;
 				};
 				class Disabled
 				{
 					name = "Main";
 					value = "MAIN";
+					default = 1;
 				};
 			};
 		};

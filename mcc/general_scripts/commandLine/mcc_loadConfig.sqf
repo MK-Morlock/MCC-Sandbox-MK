@@ -104,7 +104,7 @@ switch (_type) do {
 	case 2: //Save MCC Mission config code to uinamespace
 	{
 		_string = ctrlText MCC_SAVE_NAME;
-		if (_string == "" ) exitWith {hint "Mission save failed! Please type a name for your saved mission"};
+		if (_string == "" ) exitWith {["Mission save failed! Please type a name for your saved mission"] call MCCMK_fnc_hint};
 
 		//Give the mission a new name
 		missionnamespace setvariable ["bis_fnc_moduleMissionName_name",_string];
@@ -122,7 +122,7 @@ switch (_type) do {
 		profileNamespace setVariable ["MCC_save", MCC_saveNames];
 		profileNamespace setVariable ["MCC_saveFiles", MCC_saveFiles];
 		saveProfileNamespace;
-		hint "Saved MCC Mission configuration.";
+		["Saved MCC Mission configuration."] call MCCMK_fnc_hint;
 
 		_comboBox = _mccdialog displayCtrl MCC_SAVE_LIST;
 		lbClear _comboBox;
@@ -166,7 +166,7 @@ switch (_type) do {
 			[] spawn compile _command;
 
 		} else {
-			hint "Mission load failed: no MCC mission configuration pasted from the namespace";
+			["Mission load failed: no MCC mission configuration pasted from the namespace"] call MCCMK_fnc_hint;
 		};
 	};
 

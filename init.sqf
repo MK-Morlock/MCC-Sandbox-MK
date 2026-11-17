@@ -20,7 +20,7 @@ if (MCC_isMode) then {
 };
 
 //-------------------- RPT diagnostics banner (search the RPT for "MCC [") --------------------
-["BUILD", "init.sqf", "MCC init started - build: MCC Sandbox MK 1.0.2 | game %1 | mission %2 on %3 | server=%4 dedicated=%5 interface=%6 | ACE=%7 CBA=%8 debug=%9", [productVersion select 2, missionName, worldName, isServer, isDedicated, hasInterface, MCC_isACE, MCC_isCBA, MCC_debug]] call MCC_fnc_log;
+["BUILD", "init.sqf", "MCC init started - build: MCC Sandbox MK 1.0.3 | game %1 | mission %2 on %3 | server=%4 dedicated=%5 interface=%6 | ACE=%7 CBA=%8 debug=%9", [productVersion select 2, missionName, worldName, isServer, isDedicated, hasInterface, MCC_isACE, MCC_isCBA, MCC_debug]] call MCC_fnc_log;
 if (missionNamespace getVariable ["MCC_debug", false]) then {MCC_targetWatchEH = addMissionEventHandler ["EntityCreated", {
 	params ["_e"];
 	if !(_e isKindOf "AllVehicles") exitWith {};
@@ -507,7 +507,7 @@ if (isNil "MCC_MWRadio") then {MCC_MWRadio = ["Land_TTowerBig_2_F"]};
 if (isNil "MCC_MWFuelTanks") then {MCC_MWFuelTanks = ["Land_dp_smallTank_F","Land_ReservoirTank_V1_F","Land_dp_bigTank_F"]};
 
 //Armored tanks for destroy armor mission
-if (isNil "MCC_MWTanks") then {MCC_MWTanks = ["B_MBT_01_cannon_F","O_MBT_02_cannon_F"]};
+if (isNil "MCC_MWTanks") then {MCC_MWTanks = ["B_MBT_01_cannon_F","O_MBT_02_cannon_F","I_MBT_03_cannon_F"]};
 
 //Air vehicles for destroy armor mission
 if (isNil "MCC_MWAir") then {MCC_MWAir = ["O_Heli_Attack_02_F","O_Heli_Attack_02_black_F","O_UAV_02_F","O_UAV_02_CAS_F","B_Heli_Attack_01_F","I_Plane_Fighter_03_CAS_F","I_Plane_Fighter_03_AA_F"]};
@@ -703,6 +703,8 @@ if ( isServer ) then {
 	_SideHQ_East   = createCenter east;
 	_SideHQ_Resist = createCenter resistance;
 	_SideHQ_west   = createCenter west;
+
+	[] spawn MCC_fnc_aiDrones;
 
 	//create logics
 	MCC_dummyLogicGroup = creategroup sideLogic;
@@ -1104,7 +1106,7 @@ if (hasInterface) then {
 //===============Delete Groups (server and HC client only)====================
 if (isServer || MCC_isLocalHC) then {
 	[] spawn {
-		//Let the mission load first (was 120 s - groups killed in the first two minutes never respawned)
+		//Let the mission load first
 		waitUntil {sleep 1; time > 15};
 
 		_gaia_respawn = [];

@@ -88,7 +88,7 @@ if (!isServer) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) 
 	if (count _sides > 0 && {!(_sidePlayer in _sides)}) then {
 		private _msg = format ["MCC Campaign: it is set up for %1 players (faction %2), but the players are %3. Tasks and task markers are given to %1. Set Players Faction in the Campaign module to your faction.", _sidePlayer, _factionPlayer, _sides arrayIntersect _sides];
 		["WARN", "MCC_fnc_campaignInit", _msg] call MCC_fnc_log;
-		_msg remoteExec ["hint", 0];
+		_msg remoteExec ["MCCMK_fnc_hint", 0];
 	};
 };
 
@@ -100,6 +100,7 @@ publicVariable "MCC_isCampaignRuning";
 waitUntil {time > 3};
 
 missionNamespace setVariable ["MCC_campaignEnemyFaction",_factionEnemy];
+missionNamespace setVariable ["MCC_campaignEnemySide", _sideEnemy, true];
 publicVariable "MCC_campaignEnemyFaction";
 
 //Time Multuplier
@@ -109,6 +110,18 @@ if (timeMultiplier < 12) then {setTimeMultiplier 12};
 if (_loadDb) then {
 	["MCC_campaign",true,true,true,true,true,true,true,true,true] call MCC_fnc_loadServer;
 };
+
+//(MK) The campaign's ID - Valor is kept per campaign. "Load from DB": the saved campaign's ID (and its Valor); a new
+// campaign, or a saved one from before IDs: a new ID, so everyone starts fresh.
+private _cdb = format ["MCC_campaign_%1_%2", worldName, missionName];
+private _cid = if (_loadDb) then {[_cdb, "CAMPAIGN", "ID", "read", "", true] call MCC_fnc_handleDB} else {""};
+if (!(_cid isEqualType "") || {_cid == ""}) then {
+	_cid = format ["c%1%2", (systemTime apply {str _x}) joinString "", floor random 1000];
+	[_cdb, "CAMPAIGN", "ID", "write", _cid, true] call MCC_fnc_handleDB;
+};
+MCCMK_campaignID = _cid;
+[format ["%1_%2_%3", worldName, missionName, _cid]] call MCCMK_fnc_creditKeySet;
+["CAMPAIGN", "MCC_fnc_campaignInit", "campaign ID %1 (%2)", [_cid, ["new campaign", "loaded from the save"] select _loadDb]] call MCC_fnc_log;
 
 //Add tickets to the sides
 if (_tickets > 0) then {
@@ -135,7 +148,7 @@ private _mapCenter = [];
 if (isnil "MCC_worldArea") then {
 	_worldPath = configfile >> "cfgworlds" >> worldname;
 	_mapSize = getnumber (_worldPath >> "mapSize");
-	if (_mapSize == 0) then {_mapSize = worldSize};	// modded terrains often lack mapSize (was a fixed 10 km guess)
+	if (_mapSize == 0) then {_mapSize = worldSize};	// modded terrains often lack mapSize
 
 	_mapSize = _mapSize / 2;
 	_mapCenter = [_mapSize,_mapSize];
@@ -163,7 +176,8 @@ if (count _locations == 0) then {
 		{
 			if (((missionNamespace getVariable ["MCC_START_WEST",[0,0,0]]) distance (getpos (_x select 0)) >700) &&
 				((missionNamespace getVariable ["MCC_START_EAST",[0,0,0]]) distance (getpos (_x select 0)) >700) &&
-				((missionNamespace getVariable ["MCC_START_GUER",[0,0,0]]) distance (getpos (_x select 0)) >700)) then {
+				((missionNamespace getVariable ["MCC_START_GUER",[0,0,0]]) distance (getpos (_x select 0)) >700) &&
+				{private _lp = getpos (_x select 0); (([] call MCCMK_fnc_spawnPoints) findIf {(_x distance2D _lp) < 700}) < 0}) then {
 
 				_locations pushBack [getpos (_x select 0), _x select 1];
 			};
@@ -200,10 +214,13 @@ if (count _locations == 0) then {
 		[_basePos,1000,_x,0.2] call MCC_fnc_campaignPaintMarkers;
 	};
 } forEach [_sidePlayer,_sidePlayer2];
+{
+	if !([_x] call MCCMK_fnc_isHQ) then {[_x, true] call MCCMK_fnc_campaignProtect};
+} forEach (([_sidePlayer] call MCCMK_fnc_spawnPoints) + ([_sidePlayer2] call MCCMK_fnc_spawnPoints));
 
 ["genStage", ["paint start bases"]] call MCC_fnc_perfLog;
 //Spawn enemy ambient patrols
-[500,18,_factionEnemy] spawn MCC_fnc_campaignSpawnAIInit;
+[[500,18,_factionEnemy], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_campaignSpawnAIInit};
 
 
 //Pick first location
@@ -218,6 +235,7 @@ _missionDone = 0;
 */
 
 ["genEnd", ["campaign setup finished (hot spots are painted in the background)", false]] call MCC_fnc_perfLog; missionNamespace setVariable ["MCCMK_campaignSetupDone", true]; [_factionEnemy] spawn MCCMK_fnc_preloadFaction;
+[] call MCCMK_fnc_resFreeLoop;	//(MK) the campaign's resources mode applies (Free: keep the stock topped up)
 //main mission loop
 private "_AOlocationPos";
 private "_AOlocationName";
@@ -232,8 +250,20 @@ _basePos = switch (_sidePlayer) do
 				case resistance: {missionNamespace getVariable ["MCC_START_GUER",[0,0,0]]};
 				default	{[0,0,0]};
 			};
+if (!(_basePos isEqualType []) || {count _basePos < 2} || {(_basePos select [0, 2]) isEqualTo [0, 0]}) then {
+	private _sp = ([_sidePlayer] call MCCMK_fnc_spawnPoints) select {!isNull _x};
+	private _pl = (allUnits select {(side group _x) isEqualTo _sidePlayer && {isPlayer _x || {_x in playableUnits} || {_x in switchableUnits}}});
+	if (_pl isEqualTo []) then {_pl = allUnits select {(side group _x) isEqualTo _sidePlayer}};
+	_basePos = switch (true) do {
+		case (count _sp > 0): {getPos (_sp select 0)};
+		case (count _pl > 0): {getPos (_pl select 0)};
+		default {[worldSize / 2, worldSize / 2, 0]};
+	};
+	["CAMPAIGN", "MCC_fnc_campaignInit", "no HQ position for %1 - choosing the first missions near %2 (grid %3) instead", [_sidePlayer, ["a spawn point", "the players"] select (count _sp == 0), mapGridPosition _basePos]] call MCC_fnc_log;
+};
 _locations = [_locations,[_basePos],{_input0 distance (_x select 0)},"ASCEND"] call BIS_fnc_sortBy;
 private _locCountStart = count _locations;
+["DEBUG", "MCC_fnc_campaignInit", "AO choice inputs | player side %1 (and %2), enemy %3 | start WEST %4, EAST %5, GUER %6 | sorted from %7 | nearest 5 locations: %8", [_sidePlayer, _sidePlayer2, _sideEnemy, missionNamespace getVariable ["MCC_START_WEST", [0,0,0]], missionNamespace getVariable ["MCC_START_EAST", [0,0,0]], missionNamespace getVariable ["MCC_START_GUER", [0,0,0]], _basePos, (_locations select [0, 5]) apply {[_x select 1, mapGridPosition (_x select 0), round ((_x select 0) distance2D _basePos), ([_x select 0] call MCC_fnc_campaignGetNearestTile) apply {if (_x isEqualType "") then {format ["%1 %2", _x, markerColor _x]} else {_x}}]}]] call MCC_fnc_log;
 
 //Start the campaign missions?
 if (_missionMax == 0) exitWith {
@@ -245,7 +275,7 @@ if (_missionMax == 0) exitWith {
 ["MCC_campaign",1200,true] spawn MCC_fnc_saveServer;
 
 
-//Missions Rotation: how many missions are played in one area before the campaign moves on (it was read but never used)
+//Missions Rotation: how many missions are played in one area before the campaign moves on
 _missionRotation = (round _missionRotation) max 1;
 private _areaMissions = 0;		//missions played so far in the current area
 _AOlocation = [];
@@ -281,9 +311,17 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 
 		private _tileInfo = [_AOlocationPos] call MCC_fnc_campaignGetNearestTile;
 		_goodLocation = (_tileInfo select 1) == _sideEnemy;
+		if (_goodLocation && {(([] call MCCMK_fnc_spawnPoints) findIf {(_x distance2D _AOlocationPos) < 700}) >= 0}) then {
+			_goodLocation = false;
+			if (count _rejected < 10) then {_rejected pushBack [mapGridPosition _AOlocationPos, "spawn point within 700 m"]};
+		};
 		if (!_goodLocation && {count _rejected < 10}) then {_rejected pushBack [mapGridPosition _AOlocationPos, _tileInfo select 0, markerColor (_tileInfo select 0), _tileInfo select 1]};
 
 		sleep 0.5;
+	};
+	if (_goodLocation) then {
+		private _ti = [_AOlocationPos] call MCC_fnc_campaignGetNearestTile;
+		["DEBUG", "MCC_fnc_campaignInit", "AO chosen: %1 at %2 (grid %3) | %4 m from start %5 | tile %6 colour %7 side %8 | %9 | rejected before it: %10 | locations left %11", [_AOlocationName, _AOlocationPos apply {round _x}, mapGridPosition _AOlocationPos, round (_AOlocationPos distance2D _basePos), _basePos apply {round _x}, _ti select 0, markerColor (_ti select 0), _ti select 1, if (_reconMission) then {"recon (random location)"} else {"nearest enemy-held location"}, _rejected, count _locations]] call MCC_fnc_log;
 	};
 
 
@@ -315,9 +353,10 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 	private _weatherChange = 0;
 	private _preciseMarkers = _campaignPreciseMarkers;
 	_aoPos = getMarkerpos _AOlocationName;
+	_totalPlayers = (([_sidePlayer] call MCC_fnc_forceCount) + 1) max _playersOverride;
 	_totalEnemyUnits = (_totalPlayers/2)*_difficulty;	//original MCC formula
 	_isCQB =  (count (nearestObjects  [_aoPos,["House","Ruins","Church","FuelStation","Strategic"],200])) > 2;
-	_isCiv = false;
+	_isCiv = missionNamespace getVariable ["MCCMK_campaignCivilians", false];	//(MK) addon option: civilians as the Mission Generator adds them
 	_animals = random 1 > 0.5;
 	_vehicles = (random 100 < (_difficulty)*2) && (_missionDone >= 3); //No vehicles in the first 3 missions
 	_armor = (random 100 < (_difficulty)) && (_missionDone >= 4); //No armor in the first 4 missions;
@@ -336,24 +375,31 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 	_preciseMarkers = _campaignPreciseMarkers;
 
 	sleep 1;
-	[
+	[[
 		[_AOlocation, _totalEnemyUnits,  100, _AOSize, _weatherChange, _preciseMarkers, _playMusic],
 		[_sideEnemy, _factionEnemy, _sidePlayer, _factionPlayer, _factionCiv],
 		[_obj1, _obj2, _obj3],
 		[_isCQB, _isCiv, _armor, _vehicles, _reconMission, _isIED, _isAS, _isSB, _isRoadblocks, _animals],
 		[_reinforcement, _artillery]
-	] spawn MCC_fnc_MWinitMission;
+	], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_MWinitMission};
 
 
 	//Wait untill mission wizard mission is runing
-	waitUntil {missionNamespace getVariable ["MCC_MWMissionRuning",false]};
+	waitUntil {(missionNamespace getVariable ["MCC_MWMissionRuning",false]) || {missionNamespace getVariable ["MCC_MWMissionCancelled", false]}};
+	private _cancelled = missionNamespace getVariable ["MCC_MWMissionCancelled", false];
+	if (_cancelled) then {
+		missionNamespace setVariable ["MCC_MWMissionCancelled", false];
+		["CAMPAIGN", "MCC_fnc_campaignInit", "mission at %1 cancelled (no room for objectives) - choosing the next location", [_AOlocationName]] call MCC_fnc_log;
+		_areaMissions = 0;
+		_AOlocation = [];
+	};
 
 	//CAS
-	if (_obj2 == "Destroy Radar/Radio") then {
+	if (!_cancelled && {_obj2 == "Destroy Radar/Radio"}) then {
 		private _tower = _AOlocationPos nearObjects [(missionNamespace getVariable ["MCC_MWRadio",["Land_TTowerBig_2_F"]]) select 0, (_AOSize*2.5)];
 		if (count _tower > 0) then {
 			_tower = _tower select 0;
-			[_tower,_sideEnemy, _factionEnemy, _sidePlayer]spawn {
+			[[_tower,_sideEnemy, _factionEnemy, _sidePlayer], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; _this = _this select 0; 
 				params ["_tower","_sideEnemy","_factionEnemy","_sidePlayer"];
 
 				sleep (60 + (random 120));
@@ -399,7 +445,7 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 	_ticketsStart = [_sidePlayer] call BIS_fnc_respawnTickets;
 
 	//Wait untill mission is complete
-	waitUntil {!(missionNamespace getVariable ["MCC_MWMissionRuning",true])};
+	waitUntil {_cancelled || {!(missionNamespace getVariable ["MCC_MWMissionRuning",true])}};
 
 	//Get the objectives
 	private _objectives = (allMissionObjects "MCC_ModuleObjective_FCurator") select {(_x getvariable ["MCC_customTask",false])};
@@ -414,11 +460,11 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 	_ticketsEnd = [_sidePlayer] call BIS_fnc_respawnTickets;
 	_sumTickets = _ticketsStart - _ticketsEnd;
 
-	if (_sidePlayer != sideLogic) then {
+	if (!_cancelled && {_sidePlayer != sideLogic}) then {
 		["Main",count _activeObjectivesSide1,count _failedObjectivesSide1,_sidePlayer,_totalPlayers,_difficulty,60,[0.2,0.4,0.2,0.15,0.05],_sumTickets] spawn MCC_fnc_missionDone;
 	};
 
-	if (_sidePlayer2 != sideLogic) then {
+	if (!_cancelled && {_sidePlayer2 != sideLogic}) then {
 		["Main",count  _activeObjectivesSide2,count _failedObjectivesSide2,_sidePlayer2,_totalPlayers,_difficulty,60,[0.2,0.4,0.2,0.15,0.05]] spawn MCC_fnc_missionDone;
 	};
 
@@ -433,7 +479,7 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 	*/
 
 	//clean up
-	[_AOlocationPos,_AOSize*2] spawn {
+	[[_AOlocationPos,_AOSize*2], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; _this = _this select 0; 
 		params [["_AOlocationPos",[0,0,0],[[],objNull]],
 				["_AOSize",200,[0]]
 			   ];
@@ -463,6 +509,7 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 	};
 	*/
 
+	if (!_cancelled) then {
 	_areaMissions = _areaMissions + 1;
 
 	//Expand the borders only when the area's set of missions is done
@@ -484,6 +531,7 @@ while {(count _locations > 0 || {_areaMissions > 0}) &&	_missionDone <= _mission
 
 	_missionDone = _missionDone + 1;
 	_difficulty = (_difficulty * 1.1) min 60;
+	};
 
 	sleep 5;
 };

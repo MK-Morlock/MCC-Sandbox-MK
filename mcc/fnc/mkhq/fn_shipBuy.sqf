@@ -1,0 +1,36 @@
+params [["_t", 0, [0]], ["_pos", [0, 0], [[]]], ["_dir", 0, [0]], ["_u", objNull, [objNull]], ["_free", false, [true]]];
+if (!isServer || {isNull _u}) exitWith {};
+private _side = side group _u;
+if (_free && {!([_u] call MCCMK_fnc_isMissionMaker)}) then {_free = false};
+if (!_free && {!([_u, _side] call MCCMK_fnc_shipCanCommand)}) exitWith {["Only the commander can buy ships."] remoteExec ["MCCMK_fnc_hint", _u]};
+([_pos, _dir, _t, _side, objNull] call MCCMK_fnc_shipPosCheck) params ["_ok", "_why"];
+if (!_ok) exitWith {[format ["The ship can't arrive there: %1.", _why]] remoteExec ["MCCMK_fnc_hint", _u]};
+([_t] call MCCMK_fnc_shipCfg) params ["_nm", "_price"];
+if (!_free) then {
+	private _var = format ["MCC_res%1", _side];
+	private _r = +(missionNamespace getVariable [_var, [0, 0, 0, 0, 0]]);
+	_price params ["_s", "_a", "_f"];
+	if ((_r select 0) < _a || {(_r select 1) < _s} || {(_r select 2) < _f}) exitWith {_free = -1};
+	_r set [0, (_r select 0) - _a];
+	_r set [1, (_r select 1) - _s];
+	_r set [2, (_r select 2) - _f];
+	missionNamespace setVariable [_var, _r];
+	publicVariable _var;
+};
+if (_free isEqualTo -1) exitWith {["Not enough resources to buy this ship."] remoteExec ["MCCMK_fnc_hint", _u]};
+private _secs = missionNamespace getVariable ["MCCMK_shipArrive", 120];
+private _slot = [_pos, serverTime + _secs, _t, _dir];
+MCCMK_shipInbound = (missionNamespace getVariable ["MCCMK_shipInbound", []]) + [_slot];
+publicVariable "MCCMK_shipInbound";
+["INFO", "ships", "%1 bought a %2 for %3 at grid %4, arriving in %5 s", [name _u, _nm, _side, mapGridPosition _pos, round _secs]] call MCC_fnc_log;
+[format ["%1 on its way to grid %2, about %3 min.", _nm, mapGridPosition _pos, ceil (_secs / 60) max 1]] remoteExec ["systemChat", _side];
+[_pos, _nm, _side, serverTime + _secs] spawn MCCMK_fnc_shipArriving;
+sleep _secs;
+private _h = [_pos, _dir, _side, false, _t, "", true, true] spawn MCC_fnc_LHDspawn;
+waitUntil {sleep 1; scriptDone _h};
+// what was paid, for selling it later (60% of it, less hull damage); free / Eden-placed ships record nothing
+private _new = ((missionNamespace getVariable ["MCC_staticShips", []]) select {!isNull _x && {(_x distance2D _pos) < 60}}) param [0, objNull];
+if (!isNull _new && {!_free}) then {_new setVariable ["MCCMK_shipPaid", _price, true]};
+MCCMK_shipInbound = (missionNamespace getVariable ["MCCMK_shipInbound", []]) - [_slot];
+publicVariable "MCCMK_shipInbound";
+[format ["%1 is in position at grid %2.", _nm, mapGridPosition _pos]] remoteExec ["systemChat", _side];

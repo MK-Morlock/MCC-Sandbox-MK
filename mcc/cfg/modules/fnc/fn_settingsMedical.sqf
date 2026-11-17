@@ -35,7 +35,7 @@ if (typeName (_module getVariable ["medicComplex",true]) == typeName 0) exitWith
 	MCC_medicPunishTK = ((_module getvariable ["medicPunishTK",1])==1);
 
 	//Medic HuD
-	MCC_medicShowWounded = ((_module getvariable ["medicShowUI",1])==1);	// module attribute is "medicShowUI" (the old name never matched, so the setting was ignored)
+	MCC_medicShowWounded = ((_module getvariable ["medicShowUI",1])==1);	// module attribute is "medicShowUI"
 
 	//Only Medic Heals
 	MCC_medicOnlyMedicHeals = ((_module getvariable ["onlyMedicsCanHeal",1])==1);

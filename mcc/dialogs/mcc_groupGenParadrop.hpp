@@ -26,7 +26,7 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 			style = 0;
 			idc = -1;
 
-			text = "Paradrop";
+			text = "Airdrop - Paradrop and HALO";
 			x = 0.008000* safezoneW;
 			y = 0.008000* safezoneH;
 			w = 0.264729* safezoneW;
@@ -49,7 +49,7 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 		class MCC_pdFilterFaction: MCC_RscCheckbox
 		{
 			idc = 1050;
-			tooltip = "Ticked: only your faction's aircraft (and its variants). Unticked: every aircraft on your side";
+			tooltip = "Ticked: only your faction's aircraft (and its variants).\nUnticked: every aircraft on your side";
 			x = 0.033000* safezoneW;
 			y = 0.048000* safezoneH;
 			w = 0.010500* safezoneW;
@@ -175,7 +175,7 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 		};
 		class MCC_pdHaloFixed: MCC_RscText
 		{
-			tooltip = "HALO height is fixed so the formation timings work (4,950 m when players jump)";
+			tooltip = "HALO height is fixed so the formation timings work (4,950 m\nwhen players jump)";
 			idc = -1;
 
 			text = "4,000 m";
@@ -234,7 +234,7 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 		class MCC_pdParaManual: MCC_RscCheckbox
 		{
 			idc = 1060;
-			tooltip = "Manual player chute deployment. AI deployment height";
+			tooltip = "Manual: players open their own chute";
 			x = 0.033000* safezoneW;
 			y = 0.126000* safezoneH;
 			w = 0.010500* safezoneW;
@@ -256,7 +256,7 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 		class MCC_pdParaAuto: MCC_RscCheckbox
 		{
 			idc = 1062;
-			tooltip = "Default auto chute deployment for player and AI";
+			tooltip = "Auto: players' chutes open automatically";
 			x = 0.128000* safezoneW;
 			y = 0.126000* safezoneH;
 			w = 0.010500* safezoneW;
@@ -266,6 +266,7 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 		class MCC_pdParaOpen: MCC_RscCombo
 		{
 			idc = 1061;
+			tooltip = "AI chute opening height: the lowest AI open here, the rest up\nto 50 m higher";
 			x = 0.008000* safezoneW;
 			y = 0.148000* safezoneH;
 			w = 0.057300* safezoneW;
@@ -288,7 +289,7 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 		class MCC_pdHaloManual: MCC_RscCheckbox
 		{
 			idc = 1063;
-			tooltip = "Manual player chute deployment. AI deployment height";
+			tooltip = "Manual: players open their own chute";
 			x = 0.033000* safezoneW;
 			y = 0.222000* safezoneH;
 			w = 0.010500* safezoneW;
@@ -310,7 +311,7 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 		class MCC_pdHaloAuto: MCC_RscCheckbox
 		{
 			idc = 1065;
-			tooltip = "Default auto chute deployment for player and AI";
+			tooltip = "Auto: players' chutes open automatically";
 			x = 0.128000* safezoneW;
 			y = 0.222000* safezoneH;
 			w = 0.010500* safezoneW;
@@ -320,12 +321,83 @@ class MCC_paradropDialogControls:MCC_RscControlsGroup
 		class MCC_pdHaloOpen: MCC_RscCombo
 		{
 			idc = 1064;
+			tooltip = "AI chute opening height: the lowest AI open here, the rest up\nto 50 m higher (highest jumper first)";
 			x = 0.008000* safezoneW;
 			y = 0.244000* safezoneH;
 			w = 0.057300* safezoneW;
 			h = 0.022000* safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 			onLBSelChanged = "[1, 2, _this select 1] call MCCMK_fnc_paradropOpen";
+		};
+		class MCC_pdHaloFormText: MCC_RscText
+		{
+			style = 1;
+			colorText[] = {0.62,0.65,0.68,1};
+			idc = -1;
+			text = "Formation";
+			tooltip = "HALO formation: ticked - jump in formation; unticked -\neveryone falls on his own";
+			x = 0.077000* safezoneW;
+			y = 0.244000* safezoneH;
+			w = 0.050000* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCC_pdHaloForm: MCC_RscCheckbox
+		{
+			idc = 1066;
+			tooltip = "HALO formation: ticked - jump in formation; unticked -\neveryone falls on his own";
+			onCheckedChanged = "if (isNil 'MCCMK_pdMem') then {MCCMK_pdMem = createHashMap}; MCCMK_pdMem set ['haloForm', (_this select 1) == 1]; MCCMK_pdHaloForm = (_this select 1) == 1; ((ctrlParent (_this select 0)) displayCtrl 1067) ctrlEnable ((_this select 1) == 0);";
+			x = 0.128000* safezoneW;
+			y = 0.246000* safezoneH;
+			w = 0.010500* safezoneW;
+			h = 0.018000* safezoneH;
+		};
+		class MCC_pdHaloLeadText: MCC_RscText
+		{
+			style = 1;
+			colorText[] = {0.62,0.65,0.68,1};
+			idc = -1;
+			text = "Lead first";
+			tooltip = "Ticked: the squad leader always jumps first. Unticked: a\nplayer leading the squad takes a random place in the stick\n(not with Formation)";
+			x = 0.198000* safezoneW;
+			y = 0.244000* safezoneH;
+			w = 0.050000* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCC_pdHaloLead: MCC_RscCheckbox
+		{
+			idc = 1067;
+			tooltip = "Ticked: the squad leader always jumps first. Unticked: a\nplayer leading the squad takes a random place in the stick\n(not with Formation)";
+			onCheckedChanged = "if (isNil 'MCCMK_pdMem') then {MCCMK_pdMem = createHashMap}; MCCMK_pdMem set ['haloLead', (_this select 1) == 1]; MCCMK_pdHaloLead = (_this select 1) == 1;";
+			x = 0.249000* safezoneW;
+			y = 0.246000* safezoneH;
+			w = 0.010500* safezoneW;
+			h = 0.018000* safezoneH;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_pdParaGarage: MCCBTN_S
+		{
+			idc = 1068;
+			text = "Garage";
+			tooltip = "Paint and parts for the chosen vehicle.\nKept in your profile, used whenever it is spawned here.\nCtrl + click: back to its own look.";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['para', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.215429* safezoneW;
+			y = 0.124000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_pdHaloGarage: MCCBTN_S
+		{
+			idc = 1069;
+			text = "Garage";
+			tooltip = "Paint and parts for the chosen vehicle.\nKept in your profile, used whenever it is spawned here.\nCtrl + click: back to its own look.";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['halo', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.215429* safezoneW;
+			y = 0.220000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
 		};
 		class MCC_pdClose: MCCBTN_S
 		{

@@ -203,9 +203,11 @@ if (_action == 6) exitWith
 	_control ctrlShow true;
 
 	MCC_groupGenCurrenGroupArray = []; 		//Reset the current group
+	uiNamespace setVariable ["MCCMK_classFilter", ""];	//(MK) the class search starts empty
+	(_mccdialog displayCtrl 9270) ctrlSetText "";
 
-	//Units / Groups first, then the type list that belongs to it: the type list was always filled with the single-unit
-	//types, so with Groups remembered the group list offered single units
+	//Units / Groups first, then the type list that belongs to it, so with Groups remembered the group list doesn't
+	//offer single units
 	_comboBox = _mccdialog displayCtrl MCC_GGUNIT_TYPE;
 	MCC_spawnListsBusy = true;
 	lbClear _comboBox;
@@ -218,6 +220,19 @@ if (_action == 6) exitWith
 	["DEBUG", "controlsHandle", "spawn panel opened on Type %1", [_comboBox lbText (lbCurSel _comboBox)]] call MCC_fnc_log;
 	MCC_type_index = lbCurSel _comboBox;
 
+	//(MK) Behavior, Commandable and Empty remember their choice in the profile, saved as soon as it's changed 
+	// (filling the lists selects entries, which fires the save: nothing is saved until the panel is filled - otherwise
+	// the default would overwrite the remembered choice just before it is restored)
+	MCCMK_memBusy = true;
+	private _fnc_mem = {
+		params ["_c", "_key"];
+		if ((profileNamespace getVariable [_key, ""]) != "") then {[_c, _key] call MCC_fnc_consoleListMemory};
+		if !(_c getVariable ["MCCMK_memEH", false]) then {
+			_c setVariable ["MCCMK_memEH", true];
+			_c setVariable ["MCCMK_memKey", _key];
+			_c ctrlAddEventHandler ["LBSelChanged", {params ["_c"]; if (missionNamespace getVariable ["MCCMK_memBusy", false]) exitWith {}; [_c, _c getVariable ["MCCMK_memKey", ""], true] call MCC_fnc_consoleListMemory}];
+		};
+	};
 	_comboBox = _mccdialog displayCtrl MCC_GGUNIT_BEHAVIOR;
 	lbClear _comboBox;
 	{
@@ -225,11 +240,13 @@ if (_action == 6) exitWith
 		_index = _comboBox lbAdd _displayname;
 	} foreach MCC_spawn_behaviors;
 	_comboBox lbSetCurSel MCC_behavior_index;
+	[_comboBox, "MCCMK_spawnBehavior"] call _fnc_mem;
 
 	_comboBox = _mccdialog displayCtrl 3078;
 	lbClear _comboBox;
 	{_comboBox lbAdd _x} forEach ["No", "Yes"];
-	_comboBox lbSetCurSel ([0, 1] select (missionNamespace getVariable ["MCC_spawnCommandable", false]));
+	_comboBox lbSetCurSel ([0, 1] select (missionNamespace getVariable ["MCC_spawnCommandable", true]));
+	[_comboBox, "MCCMK_spawnCommandable"] call _fnc_mem;
 
 	_comboBox = _mccdialog displayCtrl MCC_GGUNIT_EMPTY;
 	lbClear _comboBox;
@@ -238,6 +255,22 @@ if (_action == 6) exitWith
 		_comboBox lbAdd _displayname;
 	} foreach MCC_spawn_empty;
 	_comboBox lbSetCurSel MCC_empty_index;
+	[_comboBox, "MCCMK_spawnEmpty"] call _fnc_mem;
+
+	//(MK) Start: Flying / Landed (aircraft)
+	_comboBox = _mccdialog displayCtrl 3091;
+	lbClear _comboBox;
+	{_comboBox lbAdd _x} forEach ["Flying", "Landed", "On water"];
+	_comboBox lbSetCurSel (missionNamespace getVariable ["MCCMK_spawnStart", [0, 1] select (missionNamespace getVariable ["MCCMK_spawnLanded", false])]);
+	[_comboBox, "MCCMK_spawnStart"] call _fnc_mem;
+	//(MK) On water only for a class that floats: the Start box follows the chosen Class
+	private _clsBox = _mccdialog displayCtrl 3011;
+	if !(_clsBox getVariable ["MCCMK_startEH", false]) then {
+		_clsBox setVariable ["MCCMK_startEH", true];
+		_clsBox ctrlAddEventHandler ["LBSelChanged", {["panel"] spawn MCCMK_fnc_spawnStartRefresh}];
+	};
+	["panel"] spawn MCCMK_fnc_spawnStartRefresh;
+	MCCMK_memBusy = false;
 
 	_comboBox =(_mccdialog displayCtrl 0);		//fill zone locations
 	lbClear _comboBox;
@@ -317,7 +350,7 @@ if (_action == 7) exitWith
 	if (count _evacVehicles > (missionNameSpace getvariable ["MCC_evacVehicles_index",0])-1 && ((missionNameSpace getvariable ["MCC_evacVehicles_index",0]) >= 0)) then {
 		private _insetionArray = [];
 		private _type = nil;
-		_insetionArray = ["Move (engine on)","Move (engine off)"];
+		_insetionArray = ["Move (engine on)","Move (engine off)","RTB"];
 		(_mccdialog displayCtrl 44) ctrlShow false;
 		_type = _evacVehicles select (missionNameSpace getvariable ["MCC_evacVehicles_index",0]);
 
@@ -326,7 +359,7 @@ if (_action == 7) exitWith
 		//Case we choose aircrft
 		if (_type iskindof "helicopter") then
 		{
-			_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing"];
+			_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing","Paradrop","Water landing (engine on)","Water landing (engine off)","RTB"];
 			(_mccdialog displayCtrl 44) ctrlShow true;
 		};
 
@@ -766,13 +799,18 @@ if (_action == 16) exitWith
 	missionNamespace setVariable ["MCC_airdropIsParachute", _mode];
 	(_mccdialog displayCtrl 1037) lbSetCurSel _mode;
 	for "_i" from 1033 to 1036 do {(_mccdialog displayCtrl _i) ctrlShow (_mode == 0)};
+	//(MK) Taru Pod last chosen: back to it (once the panel's lists are filled)
+	if (MCCMK_adMem getOrDefault ["pod", false]) then {
+		(_mccdialog displayCtrl 1037) lbSetCurSel 2;
+		[] spawn {uiSleep 0.1; [true] call MCCMK_fnc_airdropPodMode};
+	} else {[false] call MCCMK_fnc_airdropPodMode};
 
 	_comboBox = _mccdialog displayCtrl MCC_AIRDROPTYPE;		//Airdrop Type
 	lbClear _comboBox;
 	{
 		_displayname = _x;
 		_comboBox lbAdd _displayname;
-	} foreach ["Vehicles", "Tracked", "Motorcycles", "Ships", "Ammo"];
+	} foreach (["Vehicles", "Tracked", "Motorcycles", "Ships", "Ammo"] + (["", "Taru Pods"] select (_mode == 1) splitString "|"));	//(MK) Taru Pods: Slingload only
 	if !(_comboBox getVariable ["MCC_airdropListEH", false]) then {
 		_comboBox setVariable ["MCC_airdropListEH", true];
 		_comboBox ctrlAddEventHandler ["LBSelChanged", {
@@ -780,7 +818,7 @@ if (_action == 16) exitWith
 			[_this select 1] call MCCMK_fnc_airdropList;
 		}];
 	};
-	_comboBox lbSetCurSel ((MCCMK_adMem getOrDefault ["type", 0]) min 4);
+	_comboBox lbSetCurSel ((MCCMK_adMem getOrDefault ["type", 0]) min ((lbSize _comboBox) - 1));
 	{
 		private _c = _mccdialog displayCtrl _x;
 		if !(_c getVariable ["MCC_airdropSyncEH", false]) then {

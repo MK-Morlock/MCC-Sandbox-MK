@@ -34,7 +34,7 @@ if (_string == "Open Map") then {
 			_control = _mccdialog displayCtrl MCC_MINIMAP;
 			_control ctrlMapAnimAdd [0.5, 0.1, getmarkerpos "mccUAVMarker"];
 			ctrlMapAnimCommit _control;
-			//Keep following it (it used to centre only once) until right-click on the map
+			//Keep following it until right-click on the map
 			[_control, _uav] spawn MCC_fnc_consoleMapFollow;
 			while {ctrlShown (_mccdialog displayctrl MCC_MINIMAP)} do	{
 				"mccUAVMarker" setMarkerposLocal getpos _uav;

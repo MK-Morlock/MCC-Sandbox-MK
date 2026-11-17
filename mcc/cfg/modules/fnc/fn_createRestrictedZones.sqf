@@ -113,7 +113,7 @@ if (isServer) then {
 				{
 					private _v = _x;
 					private _crew = if (_v isKindOf "CAManBase") then {[_v]} else {crew _v};
-					if (alive _v && {count _crew > 0} && {({isPlayer _x} count _crew) == 0}) then {
+					if (alive _v && {!(_v isKindOf "Animal")} && {count _crew > 0} && {({isPlayer _x} count _crew) == 0}) then {
 						private _cmd = if (_v isKindOf "CAManBase") then {_v} else {effectiveCommander _v};
 						if (isNull _cmd) then {_cmd = _crew select 0};
 						private _sd = if (isNull (group _cmd)) then {side _cmd} else {side (group _cmd)};
@@ -137,20 +137,57 @@ if (isServer) then {
 							private _key = if (isNull _g) then {_u} else {_g};
 							if (time >= (_key getVariable ["MCC_rzTurnedAt", -100]) + 6) then {
 								_key setVariable ["MCC_rzTurnedAt", time];
-								private _exit = [_t, getPosATL _u] call _fnc_outside;
+								private _veh = vehicle _u;
+								private _leaving = !isNull _g && {(currentWaypoint _g) < (count (waypoints _g))} && {((waypointPosition [_g, currentWaypoint _g]) distance2D (_g getVariable ["MCC_rzExit", [0, 0, 0]])) < 5};
+								if (_leaving) exitWith {};
+								private _exit = if (_veh != _u) then {
+									private _p0 = getPosATL _veh;
+									private _bd = (getDir _veh) + 180;
+									private _q = _p0;
+									for "_s" from 10 to 3000 step 10 do {_q = _p0 getPos [_s, _bd]; if !(_q inArea _t) exitWith {}};
+									_q = _q getPos [30, _bd];
+									private _rd = (_q nearRoads 150) select {!((getPosATL _x) inArea _t)};
+									if (count _rd > 0) then {getPosATL (([_rd, [], {_x distance2D _q}, "ASCEND"] call BIS_fnc_sortBy) select 0)} else {_q}
+								} else {[_t, getPosATL _u] call _fnc_outside};
 								if (isNull _g || {isAgent teamMember _u}) then {if (local _u) then {_u moveTo _exit} else {[_u, _exit] remoteExec ["moveTo", _u]}} else {
 									{
 										private _wp = _x;
 										private _wpos = waypointPosition _wp;
 										{if (_wpos inArea _x) exitWith {_wp waypointAttachObject objNull; _wp setWaypointPosition [[_x, _wpos] call _fnc_outside, 0]}} forEach _trgs;
 									} forEach (waypoints _g);
-									if ((currentWaypoint _g) >= (count (waypoints _g))) then {
-										private _w = _g addWaypoint [_exit, 0];
-										_w setWaypointType "MOVE";
-										_g setCurrentWaypoint _w;
+									private _ci = currentWaypoint _g;
+									private _hasNext = _ci < (count (waypoints _g));
+									private _w = _g addWaypoint [_exit, 0, _ci];
+									_w setWaypointType "MOVE";
+									_g setVariable ["MCC_rzExit", _exit];
+									private _next = _ci + 1;
+									if (_hasNext) then {
+										if (_veh != _u) then {
+											while {_next < (count (waypoints _g)) && {(waypointType [_g, _next]) != "CYCLE"} && {[_exit, waypointPosition [_g, _next], side _g] call MCCMK_fnc_crossesKeepOut}} do {deleteWaypoint [_g, _next]};
+										} else {
+											if (_next < (count (waypoints _g)) && {[_exit, waypointPosition [_g, _next], side _g] call MCCMK_fnc_crossesKeepOut}) then {
+												private _c = getPosATL _t;
+												_c set [2, 0];
+												private _r = (((triggerArea _t) select 0) max ((triggerArea _t) select 1)) + 30;
+												private _np = waypointPosition [_g, _next];
+												private _dv = _np vectorDiff _exit;
+												_dv set [2, 0];
+												private _l2 = _dv vectorDotProduct _dv;
+												private _tt = if (_l2 > 0) then {((((_c vectorDiff _exit) vectorDotProduct _dv) / _l2) max 0) min 1} else {0};
+												private _near = _exit vectorAdd (_dv vectorMultiply _tt);
+												private _out = _near vectorDiff _c;
+												_out set [2, 0];
+												if ((vectorMagnitude _out) < 1) then {_out = [-(_dv select 1), _dv select 0, 0]};
+												private _det = _c vectorAdd ((vectorNormalized _out) vectorMultiply (_r * 1.15));
+												_det set [2, 0];
+												private _dw = _g addWaypoint [_det, 0, _next];
+												_dw setWaypointType "MOVE";
+											};
+										};
 									};
+									_g setCurrentWaypoint [_g, _ci];
 								};
-								["INFO", "restrictedZones", "turned back %1 (%2) at %3", [typeOf (vehicle _u), _key, mapGridPosition _u]] call MCC_fnc_log;
+								["INFO", "restrictedZones", "turned away %1 (%2) at %3 - leaving by %4", [typeOf _veh, _key, mapGridPosition _u, mapGridPosition _exit]] call MCC_fnc_log;
 							};
 						};
 					} forEach ([_t] call _fnc_aiIn);

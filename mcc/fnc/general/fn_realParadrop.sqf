@@ -15,7 +15,17 @@ params ["_pos", "_units", "_UMUnit"];
 _isHalo		= param [3,0,[0]];
 _spawn		= _this select 4;
 _away		= _this select 5;
-(param [6, [], [[]]]) params [["_pdPara", "", [""]], ["_pdHalo", "", [""]], ["_pdH", 300, [0]], ["_pdOpenP", [0, 100], [[]]], ["_pdOpenH", [0, 150], [[]]]];
+(param [6, [], [[]]]) params [["_pdPara", "", [""]], ["_pdHalo", "", [""]], ["_pdH", 300, [0]], ["_pdOpenP", [0, 120], [[]]], ["_pdOpenH", [0, 120], [[]]], ["_pdForm", true, [true]], ["_pdLead", true, [true]]];
+// Drop pods (MK): the method (0 = parachuted, 1 = winch drop) and the pod ("bench" - 8 seats, open; "covered" - the
+// transport pod, 16 seats, enclosed) come with the drop; older callers fall back to the shared settings.
+(param [7, [], [[]]]) params [["_podMethodP", -1, [0]], ["_podTypeP", "", [""]]];
+//(MK) Pickup (MCCMK_fnc_taruPickup): Tarus already loaded at an LZ - [[Taru, pod, the men aboard], ...] - used instead of
+// new ones (no boarding, no cut-scene), and a route flown first (round the mission areas, to the line-up point)
+private _preset = param [8, [], [[]]];
+private _preRoute = param [9, [], [[]]];
+private _dd = param [10, [], [[]]];	//(MK) the drop id [id, owner] - its green dot goes when the men are all on the ground
+private _podType = if (_podTypeP != "") then {_podTypeP} else {missionNamespace getVariable ["MCC_podType", "bench"]};
+if !(_podType in ["bench", "covered"]) then {_podType = "bench"};
 
 if (count _units == 0) exitWith {};
 
@@ -61,7 +71,7 @@ if (_isHalo == 2) then {_away = _relA getPos [5500, _lineDir]; _away set [2, 0]}
 
 private _haloPlayer = false;
 {if (isPlayer _x) then {_haloPlayer = true}} forEach (if (_UMUnit == 0) then {_units} else {private _all = []; {_all append (units _x)} forEach _units; _all});
-private _podAssault = (_isHalo == 1) && {(missionNamespace getVariable ["MCC_podMethod", 0]) == 1};
+private _podAssault = (_isHalo == 1) && {(if (_podMethodP >= 0) then {_podMethodP} else {missionNamespace getVariable ["MCC_podMethod", 0]}) == 1};
 _flightHight = switch (_isHalo) do
 				{
 					case 1:{[400, 30] select _podAssault};
@@ -73,7 +83,7 @@ _spawn set [2,(_spawn select 2) + _flightHight];
 _away set [2,(_away select 2) + _flightHight];
 _unitsArray	= [];
 _chockArray = [];
-private _load = if (_isHalo == 1) then {private _n = ["MCC_podBench", "allCargo"] call MCC_fnc_crewCount; [8, _n] select (_n > 0)} else {16};
+private _load = if (_isHalo == 1) then {private _n = [["MCC_podBench", "MCC_podCovered"] select (_podType == "covered"), "allCargo"] call MCC_fnc_crewCount; [[8, 16] select (_podType == "covered"), _n] select (_n > 0)} else {16};
 private _pdCl = [_pdPara, "", _pdHalo] param [_isHalo, ""];
 if (_pdCl != "" && {!isClass (configFile >> "CfgVehicles" >> _pdCl)}) then {_pdCl = ""};
 if (_pdCl != "") then {_load = ((([_pdCl, "allCargo"] call MCC_fnc_crewCount) min _load) max 1)};
@@ -99,7 +109,7 @@ if (_UMUnit==0) then {
 	} foreach _units;
 };
 
-//Drop pods need a Taru-family helicopter: the faction own one first, the CSAT Taru otherwise (as before)
+//Drop pods need a Taru-family helicopter: the faction own one first, the CSAT Taru otherwise
 private _podFaction = if ((_units select 0) isEqualType grpNull) then {faction leader (_units select 0)} else {faction (_units select 0)};
 private _podCarriers = [_podFaction, "podCarrier"] call MCC_fnc_factionVehicles;
 private _sideL = ["O", "B", "I", "B"] select (([east, west, independent, civilian] find (side (_units select 0))) max 0);
@@ -127,18 +137,7 @@ if (_isHalo == 2 && {(missionNamespace getVariable ["MCC_haloAircraft", ""]) != 
 	private _sideN = [east, west, independent, civilian] find (side (_units select 0));
 	private _nMen = if (_UMUnit == 0) then {count _units} else {private _c = 0; {_c = _c + count (units _x)} forEach _units; _c};
 	private _need = (_load min _nMen) max 1;
-	private _natl = [["_TKA"], ["USMC", "USAF", "_US"], ["_AAF", "_RACS"], []] param [_sideN max 0, []];
-	private _best = "";
-	private _bs = -1;
-	{
-		private _c = configName _x;
-		if (((toUpper _c) find "VTOL") < 0 && {([_c, "allCargo"] call MCC_fnc_crewCount) >= _need}) then {
-			private _uc = toUpper _c;
-			private _sc = ([0, 100] select ((_uc find "C130") >= 0)) + ([0, 15] select ((_uc find "C130") >= 0 && {(_uc find "CUP_") == 0})) + ([0, 40] select (getText (_x >> "faction") == _podFaction)) + ([0, 10] select (getNumber (_x >> "side") == _sideN))
-				+ ([0, 5] select ((_natl findIf {(_uc find _x) >= 0}) >= 0)) + ([0, 2] select ((_uc find (_natl param [0, "#"])) >= 0));
-			if (_sc > _bs) then {_bs = _sc; _best = _c};
-		};
-	} forEach ("getNumber (_x >> 'scope') == 2 && {(configName _x) isKindOf 'Plane'}" configClasses (configFile >> "CfgVehicles"));
+	private _best = [_podFaction, side (_units select 0), _need] call MCC_fnc_haloAutoAircraft;
 	if (_best != "") then {
 		_heliClass = _best;
 		["INFO", "paradrop", "HALO aircraft: %1 (%2, faction %3)", [_best, getText (configFile >> "CfgVehicles" >> _best >> "displayName"), getText (configFile >> "CfgVehicles" >> _best >> "faction")]] call MCC_fnc_log;
@@ -147,6 +146,19 @@ if (_isHalo == 2 && {(missionNamespace getVariable ["MCC_haloAircraft", ""]) != 
 
 //Add the last chock even if it isn't full
 if (count _unitsArray > 0) then {_chockArray pushBack _unitsArray};
+if (_isHalo == 2 && {!_pdLead} && {!(_pdForm && {missionNamespace getVariable ["MCC_haloFormation", true]})}) then {
+	_chockArray = _chockArray apply {
+		private _s = +_x;
+		private _li = _s findIf {isPlayer _x && {leader group _x == _x}};
+		if (_li >= 0 && {count _s > 1}) then {
+			private _p = _s deleteAt _li;
+			private _ni = floor random ((count _s) + 1);
+			_s = (_s select [0, _ni]) + [_p] + (_s select [_ni]);
+			["INFO", "paradrop", "HALO lead first off: %1 jumps %2 of %3", [name _p, _ni + 1, count _s]] call MCC_fnc_log;
+		};
+		_s
+	};
+};
 private _stickMids = [];
 if (_isHalo == 0) then {
 	_chockArray = _chockArray apply {
@@ -220,15 +232,7 @@ _fnc_findVehicles = {
 };
 
 if (_isHalo == 0) then  {
-	_class = [_chockArray,"airplane","airplaneX"] call _fnc_findVehicles;
-	if (_class != "") then {
-		_heliClass = _class;
-	} else {
-		_class = [_chockArray,"helicopterrtd","helicopterX"] call _fnc_findVehicles;
-		if (_class != "") then {
-			_heliClass = _class;
-		};
-	};
+	_heliClass = [faction ((_chockArray select 0) select 0), side ((_chockArray select 0) select 0), count (_chockArray select 0)] call MCC_fnc_paraAutoAircraft;
 };
 
 //Landing spot for each jumper: spread along the drawn line (parachute), or close around the start point (HALO)
@@ -265,30 +269,45 @@ if (_pdCl != "") then {
 	["DEBUG", "paradrop", "aircraft chosen in the Paradrop panel: %1 (%2 seats, sticks of %3)", [_pdCl, [_pdCl, "allCargo"] call MCC_fnc_crewCount, _load]] call MCC_fnc_log;
 };
 
+if (_preset isNotEqualTo []) then {_chockArray = _preset apply {_x select 2}};	//(MK) Pickup: the men as they boarded
+if (count _dd == 2) then {missionNamespace setVariable [format ["MCCMK_ddN_%1", _dd select 0], count _chockArray]};
 {
 	_unitsArray = _x;
+	private _pre = _preset param [_forEachIndex, []];	//(MK) Pickup: this stick's loaded Taru and pod
 	private _podOff = if (_isHalo == 1 && {count _chockArray > 1}) then {
 		_forEachIndex * ((_lineLen max 30) / ((count _chockArray) - 1))
 	} else {0};
 
 	//Spawn plane 1
-	_plane = [_heliClass, _spawn, _pos, _flightHight,true,civilian] call MCC_fnc_createPlane;
+	_plane = if (_pre isNotEqualTo []) then {_pre select 0} else {[_heliClass, _spawn, _pos, _flightHight,true,civilian] call MCC_fnc_createPlane};
 
+	// The aircraft (drop pod Taru, paradrop or HALO plane): flown by the troops' faction's own pilots (the side's vanilla
+	// ones as a last resort), in the same group as created.
+	if (_pre isEqualTo []) then {
+		[_plane, _podFaction] call MCCMK_fnc_factionCrew;
+		//(MK) the "Support aircraft" options (the side of the faction it flies for)
+		[_plane, (getNumber (configFile >> "CfgFactionClasses" >> _podFaction >> "side")) call BIS_fnc_sideType, "Paradrop aircraft"] call MCCMK_fnc_supportAir;
+	};
 	_pilot = driver _plane;
 	(group _pilot) setVariable ["MCC_dropFor", side group (_unitsArray select 0), true];
 	_plane allowCrewInImmobile true;
 
-	if (_isHalo == 1) then {
+	if (_isHalo == 1 && {_pre isNotEqualTo []}) then {	//(MK) Pickup: its pod is already slung
+		_pod = _pre select 1;
+		_plane setVariable ["MCC_attachedPod", _pod, true];
+	};
+	if (_isHalo == 1 && {_pre isEqualTo []}) then {
 		if (side (_units select 0) != east) then {
 			_null = _plane execVM "\a3\Air_F_Heli\Heli_Transport_04\Scripts\Heli_Transport_04_basic_black.sqf";
 		};
 
-		_pod = (["MCC_podBench", "MCC_podBench_black"] select (((toUpper _heliClass) find "BLACK") >= 0)) createVehicle [0,0,0];
+		_pod = (([["MCC_podBench", "MCC_podBench_black"], ["MCC_podCovered", "MCC_podCovered_black"]] select (_podType == "covered")) select (((toUpper _heliClass) find "BLACK") >= 0)) createVehicle [0,0,0];
 		_pod setPosASL ((getPosASL _plane) vectorAdd [0, 0, -6]);
 		if (false) then {
 			["INFO", "paradrop", "drop pod docked on the sling of %1", [typeOf _plane]] call MCC_fnc_log;
 		} else {
 			_pod attachto [_plane,[0,0,-1.2]];
+			[_pod, _plane] remoteExecCall ["disableCollisionWith", 0, _pod];	//(MK) the pod can't bump the Taru while attached
 			_plane setVariable ["MCC_attachedPod",_pod,true];
 			[_pod,_plane] spawn {
 				private _pod = _this select 0;
@@ -320,29 +339,37 @@ if (_pdCl != "") then {
 	};
 
 
-	_plane setDir _lineDir;
-	private _v0 = if (_plane isKindOf "Helicopter") then {60} else {120};
-	_plane setVelocity [(sin _lineDir) * _v0, (cos _lineDir) * _v0, 0];
+	if (_pre isEqualTo []) then {
+		_plane setDir _lineDir;
+		private _v0 = if (_plane isKindOf "Helicopter") then {60} else {120};
+		_plane setVelocity [(sin _lineDir) * _v0, (cos _lineDir) * _v0, 0];
+	} else {
+		// Pickup: off the LZ - its landing order and the waypoints that brought it there cleared
+		_plane setVariable ["MCCMK_pickupDrop", true, true];	// (MCC_fnc_realParadropPlayer: no fade, no cut-scene)
+		_plane land "NONE";
+		for "_w" from (count waypoints (group _plane)) - 1 to 0 step -1 do {deleteWaypoint [group _plane, _w]};
+	};
 	//Set plane variables
 	_plane flyInHeight _flightHight;
 	_plane setVariable ["MCCJumperNumber",-1,true];																		//Number of unit to jump
 	_plane setVariable ["MCCisHALO",_isHalo,true];
+	_plane setVariable ["MCC_haloFormOn", _pdForm, true];
 	_plane setVariable ["MCCjumpReady",false,true];
 	_plane setVariable ["MCC_dropTargets", [count _unitsArray] call _fnc_targets, true];
 	_plane setVariable ["MCC_stickMid", _stickMids param [_forEachIndex, 0]];
 	_plane setVariable ["MCC_dropLine", [_lineA, _lineDir, _isHalo], true];
 	_plane setVariable ["MCC_haloStick", +_unitsArray, true];
 	//HALO formation followers (every AI but the first, up to 12 in all): they are flown to the ring, so they skip the
-	{_x setVariable ["MCC_haloFollower", false, true]; _x setVariable ["MCC_haloChuteAlt", nil, true]} forEach _unitsArray;
-	if (_isHalo == 2 && {missionNamespace getVariable ["MCC_haloFormation", true]}) then {
+	{_x setVariable ["MCC_haloFollower", false, true]; _x setVariable ["MCC_haloFormMember", false, true]; _x setVariable ["MCC_haloChuteAlt", nil, true]} forEach _unitsArray;
+	if (_isHalo == 2 && {_pdForm} && {missionNamespace getVariable ["MCC_haloFormation", true]}) then {
 		private _ais = _unitsArray select {!isPlayer _x};
 		if ((_unitsArray findIf {isPlayer _x}) >= 0) then {
-			{_x setVariable ["MCC_haloFollower", true, true]} forEach (_ais select [0, 11]);
+			{_x setVariable ["MCC_haloFollower", true, true]; _x setVariable ["MCC_haloFormMember", true, true]} forEach (_ais select [0, 11]);
 		} else {
-			if (count _ais >= 2) then {{_x setVariable ["MCC_haloFollower", true, true]} forEach (_ais select [1, 11])};
+			if (count _ais >= 2) then {{_x setVariable ["MCC_haloFollower", true, true]} forEach (_ais select [1, 11]); {_x setVariable ["MCC_haloFormMember", true, true]} forEach (_ais select [0, 12])};
 		};
 	};
-	//HALO (agreed): each jumping group gets a MOVE waypoint at the start of the red line (the aim point), behaviour AWARE,
+	//HALO: each jumping group gets a MOVE waypoint at the start of the red line (the aim point), behaviour AWARE,
 	//speed FULL, formation unchanged; its old waypoints are removed so this is the one they follow after landing
 	if (_isHalo in [0, 1, 2]) then {
 		private _wpPos = if (_isHalo == 1) then {
@@ -407,8 +434,8 @@ if (_pdCl != "") then {
 						private _ci = currentWaypoint _g;
 						private _cp = if (_ci < count waypoints _g) then {(waypointPosition [_g, _ci]) apply {round _x}} else {"none"};
 						private _ed = expectedDestination _l;
-						["DEBUG", "paradrop", "WAYPOINT %1 | %2 | leader %3 is %4 m from the move waypoint (bearing %5 from it) | current waypoint %6 of %7 at %8 | move waypoint now at %9 | leader heading for %10 (%11) | behaviour %12",
-							[_when, groupId _g, name _l, round (_l distance2D _wp), round ((_wp getDir _l)), _ci, count waypoints _g, _cp, (waypointPosition [_g, _gw select 1]) apply {round _x}, (_ed param [0, [0,0,0]]) apply {round _x}, _ed param [1, "?"], behaviour _l]] call MCC_fnc_log;
+						["DEBUG", "paradrop", "WAYPOINT %1 | %2 | leader %3 is %4 m from the move waypoint (bearing %5 from it) | current waypoint %6 of %7 at %8 | move waypoint now at %9 | leader heading for %10 (%11) | behaviour %12 | leader at %13, %14 km/h, stance %15, anim %16, command %17 | combat mode %18 | AI path %19 move %20 | members over 50 m from the leader: %21",
+							[_when, groupId _g, name _l, round (_l distance2D _wp), round ((_wp getDir _l)), _ci, count waypoints _g, _cp, (waypointPosition [_g, _gw select 1]) apply {round _x}, (_ed param [0, [0,0,0]]) apply {round _x}, _ed param [1, "?"], behaviour _l, (getPosATL _l) apply {round _x}, round (speed _l), stance _l, animationState _l, currentCommand _l, combatMode _g, _l checkAIFeature "PATH", _l checkAIFeature "MOVE", ((units _g) select {alive _x && {(_x distance2D _l) > 50}}) apply {[name _x, round (_x distance2D _l), (getPosATL _x) apply {round _x}, behaviour _x, vehicle _x != _x]}]] call MCC_fnc_log;
 					};
 					["DEBUG", "paradrop", "WAYPOINT created | %1 | move waypoint %2 at %3", [groupId _g, _gw select 1, _wp apply {round _x}]] call MCC_fnc_log;
 					private _t = time + 600;
@@ -421,7 +448,6 @@ if (_pdCl != "") then {
 					};
 				};
 			};
-			//were deleted, so a group that had done waypoints before treated it as done and never moved to the line)
 			["INFO", "paradrop", "%1 move waypoint for %2 at %4%3", [["PARA", "PODS", "HALO"] select _isHalo, groupId _g, ["", " (GAIA paused until it gets there)"] select (count _gi > 0), ["the line start", "its pod spot", "the middle of the line"] select ([[2, 1] select (_isHalo == 1), 0] select (_isHalo == 2))]] call MCC_fnc_log;
 			if (count _gi > 0) then {
 				[_g] spawn {
@@ -458,6 +484,7 @@ if (_pdCl != "") then {
 	for "_x" from 0 to (count _unitsArray -1) step 1 do {
 		_unit = _unitsArray select _x;
 		_unit setVariable ["MCC_paraOpen", [_pdOpenP, [0, 0], _pdOpenH] param [_isHalo, [0, 0]], true];
+		if (_pre isNotEqualTo [] && {_isHalo == 1}) then {continue};	//(MK) Pickup by Taru: already in the pod - nothing more (a paradrop's men still get their jump script - no fade or cut-scene)
 		_null = [_plane, _unit,_x] remoteExec ["MCC_fnc_realParadropPlayer", _unit];
 		private _tb = time + 20;
 		waitUntil {sleep 0.1; (_unit in crew _plane) || {_unit in crew (_plane getVariable ["MCC_attachedPod", objNull])} || {!alive _unit} || {time > _tb}};
@@ -466,11 +493,24 @@ if (_pdCl != "") then {
 
 
 
+	//(MK) this stick done when its men are all out and on the ground (or dead): the last stick takes the green dot away
+	if (count _dd == 2) then {
+		[+_unitsArray, _dd] spawn {
+			params ["_men", "_dd"];
+			private _t = time + 900;
+			sleep 5;
+			waitUntil {sleep 3; time > _t || {(_men findIf {alive _x && {(vehicle _x != _x) || {((getPosATL _x) select 2) > 2}}}) < 0}};
+			private _k = format ["MCCMK_ddN_%1", _dd select 0];
+			private _n = (missionNamespace getVariable [_k, 1]) - 1;
+			missionNamespace setVariable [_k, _n];
+			if (_n <= 0) then {[_dd, -1] call MCCMK_fnc_dropDone};
+		};
+	};
 	if (_isHalo != 1) then {
 		[_plane, _lineA] spawn {
 			params ["_pl", "_at"];
 			waitUntil {sleep 0.5; !alive _pl || {_pl getVariable ["MCC_haloReleased", false]} || {(_pl distance2D _at) < (((vectorMagnitude [(velocity _pl) select 0, (velocity _pl) select 1, 0]) * 30) max 1500)}};
-			if (alive _pl) then {if (_pl isKindOf "Plane") then {[_pl, true] call MCCMK_fnc_aircraftRamp} else {[_pl, true] call MCCMK_fnc_aircraftDoors}};
+			if (alive _pl) then {if (_pl isKindOf "Plane") then {[_pl, true] call MCCMK_fnc_aircraftRamp} else {[_pl, true] call MCCMK_fnc_rampOrDoors}};	//(MK) a helicopter: its ramp (side doors if it has none)
 		};
 	};
 	_plane setVariable ["MCC_podOff", _podOff];
@@ -478,29 +518,34 @@ if (_pdCl != "") then {
 	_plane setVariable ["MCC_podCarry", _podCarry];
 	_plane setVariable ["MCC_podAssault", _podAssault];
 
-	//Waypoints along the drop line: start, end, then away (the pilot used to fly straight at the exit point from where
-	//it spawned, so the run-in did not follow the line)
+	//Waypoints along the drop line: start, end, then away, so the run-in follows the line
 	{
 		_wp = (group _plane) addWaypoint [_x, 0];
-		//HALO: the release waypoint (at the release point) sets the release when Arma completes it (agreed): the release no
-		_wp setWaypointStatements ["true", if (_forEachIndex == 0 && {_isHalo != 0}) then {"(vehicle this) setVariable ['MCC_haloReleaseWP', true, true];"} else {""}];
+		//HALO: the release waypoint (at the release point) sets the release when Arma completes it: the release no
+		_wp setWaypointStatements ["true", if (_isHalo != 0 && {if (_isHalo == 2) then {(_x distance2D _lineA) < 1} else {_forEachIndex == 0}}) then {"(vehicle this) setVariable ['MCC_haloReleaseWP', true, true];"} else {""}];
 		_wp setWaypointType "MOVE";
-		_wp setWaypointSpeed (["NORMAL", "FULL"] select _podAssault);
+		_wp setWaypointSpeed (["NORMAL", "FULL"] select (_podAssault || {((toUpper (typeOf _plane)) find "VTOL") >= 0}));
 		_wp setWaypointCombatMode "BLUE";
 		_wp setWaypointBehaviour "CARELESS";
-		_wp setWaypointCompletionRadius (switch (_isHalo) do {case 2: {[300, 400] select (_forEachIndex == 0)}; case 1: {[300, 60] select (_forEachIndex == 0)}; default {[60, 100, 200] select ((2 - _forEachIndex) max 0)}});
-	} forEach (if (_isHalo == 2) then {
+		_wp setWaypointCompletionRadius (switch (_isHalo) do {case 2: {if ((_x distance2D _lineA) < 1) then {400} else {if ((((_x select 0) - (_lineA select 0)) * (sin _lineDir) + ((_x select 1) - (_lineA select 1)) * (cos _lineDir)) < 0) then {200} else {300}}}; case 1: {[300, 60] select (_forEachIndex == 0)}; default {[60, 100, 200] select ((2 - _forEachIndex) max 0)}});
+	} forEach (((if (_pre isNotEqualTo []) then {_preRoute} else {[]}) apply {[_x select 0, _x select 1, 0]}) + (if (_isHalo == 2) then {
 		//HALO: only two waypoints on the drop line, 2.5 km before the release point and 3 km past it, so the aircraft
 		//Plain MOVE waypoints, Arma's own flying.
 		private _pts = [];
 		_pts = [_lineA, _lineA getPos [3000, _lineDir]];
+		if (((toUpper (typeOf _plane)) find "VTOL_01") >= 0) then {
+			private _mid = [];
+			for "_k" from 1500 to ((_plane distance2D _lineA) - 1000) step 1500 do {_mid pushBack (_lineA getPos [_k, _lineDir + 180])};
+			reverse _mid;
+			_pts = _mid + _pts;
+		};
 		_pts apply {[_x select 0, _x select 1, 0]}
 	} else {
 		private _rp = if (_isHalo == 1) then {_lineA getPos [70 + _podOff - _podCarry, _lineDir]} else {_relA};
 		private _pts = [];
 		{_pts pushBack (_rp getPos [_x, _lineDir])} forEach ([[-1500, 0, 2000], [0, 2000]] select (_isHalo == 1));
 		_pts apply {[_x select 0, _x select 1, 0]}
-	}) + [_away];
+	}) + [_away]);
 	_plane flyInHeight _flightHight;
 	[_plane, _lineA, _lineDir] spawn {
 		params ["_pl", "_la", "_ld"]; if !(missionNamespace getVariable ["MCC_debug", false]) exitWith {};
@@ -528,7 +573,7 @@ if (_pdCl != "") then {
 
 		//Ready for the jump
 		_plane setVariable ["MCCjumpReady",true,true];
-		if (_isHalo != 1) then {[_plane,true] spawn MCC_fnc_heliOpenCloseDoor};
+		if (_isHalo != 1) then {[_plane, true] call MCCMK_fnc_rampOrDoors};	//(MK) the ramp (side doors for a helicopter with none)
 
 		//Go when the aircraft reaches the start of the line (or has just passed it); pods at the middle of the line
 		private _podTgt = _lineA getPos [_plane getVariable ["MCC_podOff", 0], _lineDir];
@@ -537,34 +582,17 @@ if (_pdCl != "") then {
 			_plane setVariable ["MCC_podReleased", true];
 			private _t0 = time;
 			waitUntil {sleep 0.5; !alive _plane || {(_plane distance2D _podTgt) < 1000} || {time - _t0 > 240}};
-			_plane flyInHeight 30;
-			waitUntil {sleep 0.1; !alive _plane || {(_plane distance2D _podTgt) < 450} || {time - _t0 > 300}};
-			_plane setVariable ["MCC_podHoldOn", true];
-			[_plane, _podTgt] spawn {
-				params ["_hh", "_tg"];
-				private _pl = driver _hh;
-				private _held = false;
-				while {alive _hh && {_hh getVariable ["MCC_podHoldOn", false]}} do {
-					private _goal = [_tg select 0, _tg select 1, (getTerrainHeightASL _tg) + 30];
-					private _d = _goal vectorDiff (getPosASL _hh);
-					private _dh = vectorMagnitude [_d select 0, _d select 1, 0];
-					private _want = if (_dh > 0.5) then {(vectorNormalized [_d select 0, _d select 1, 0]) vectorMultiply ((_dh * 0.35) min 25)} else {[0, 0, 0]};
-					_want set [2, ((_d select 2) * 0.5) max -5 min 5];
-					if (!_held && {_dh < 15} && {!isNull _pl}) then {_held = true; _pl disableAI "MOVE"};
-					private _cur = velocity _hh;
-					private _dv = _want vectorDiff _cur;
-					if ((vectorMagnitude _dv) > 0.8) then {_dv = (vectorNormalized _dv) vectorMultiply 0.8};
-					_hh setVelocity (_cur vectorAdd _dv);
-					sleep 0.1;
-				};
-				if (_held && {!isNull _pl} && {alive _pl}) then {_pl enableAI "MOVE"; _pl doFollow (leader group _pl)};
-			};
-			private _t1 = time;
-			waitUntil {sleep 0.25; !alive _plane || {time - _t1 > 90} || {((_plane distance2D _podTgt) < 6) && {((getPosATL _plane) select 2) > 20} && {((getPosATL _plane) select 2) < 45} && {(vectorMagnitude (velocity _plane)) < 3}}};
 			private _pod = _plane getVariable ["MCC_attachedPod", objNull];
-			["INFO", "paradrop", "PODS assault undock | %1 | over its place: %2 m off, %3 m up", [typeOf _plane, round (_plane distance2D _podTgt), round ((getPosATL _plane) select 2)]] call MCC_fnc_log;
-			if (alive _plane) then {[_plane, _podTgt] call MCC_fnc_podAssault};
-			_plane setVariable ["MCC_podHoldOn", false];
+			["INFO", "paradrop", "PODS assault | %1 | %2 m out - the Taru's own winch drop takes over (MCC_fnc_taruAI)", [typeOf _plane, round (_plane distance2D _podTgt)]] call MCC_fnc_log;
+			// (MK) exactly as an AI Taru does it (MCC_fnc_taruAI "winch"): its approach and hover, the pod lowered on its
+			// ropes (a clear spot found first), the troops out, the pod winched back up
+			// the drop-line waypoints (full speed, on past the drop) cleared first, so the pilot isn't flying on to them while the
+			// winch drop holds the Taru over the spot; he's sent to the spot instead, as an AI Taru on its own winch drop is
+			// (the exit gets its own waypoint afterwards - MCC_fnc_haloPlaneExit).
+			private _gp = group _plane;
+			for "_w" from ((count waypoints _gp) - 1) to 0 step -1 do {deleteWaypoint [_gp, _w]};
+			_plane doMove [_podTgt select 0, _podTgt select 1, 0];
+			if (alive _plane) then {[_plane, "winch", _podTgt, false, true] call MCC_fnc_taruAI};	// the pilot's own hover
 			_plane setVariable ["MCC_exitFull", true];
 			[_plane, _pod] spawn {params ["_pl", "_pd"]; [_pl] spawn {sleep 8; if (alive (_this select 0)) then {(_this select 0) flyInHeight 60}; sleep 17; if (alive (_this select 0)) then {(_this select 0) flyInHeight 150}}; [_pl, 35] call MCC_fnc_haloPlaneExit; if (!isNull _pd && {(count crew _pd) == 0} && {isNull (attachedTo _pd)} && {((getPosATL _pd) select 2) > 5}) then {deleteVehicle _pd}};
 		};
@@ -603,7 +631,7 @@ if (_pdCl != "") then {
 				private _sp = vectorMagnitude _vh;
 				private _ahead = if (_sp > 1) then {((AGLToASL _aim) vectorDiff (getPosASL _plane)) vectorDotProduct (vectorNormalized _vh)} else {1000000};
 				private _hRel = ((getPosASL _plane) select 2) - (getTerrainHeightASL _aim);
-				if (_isHalo == 0 && {(_pdOpenP select 0) == 1} && {(_pdOpenP select 1) > 0}) then {_hRel = _hRel - ((((_pdOpenP select 1) + 15) - 125) max 0)};
+				if (_isHalo == 0 && {(_pdOpenP select 1) > 0}) then {_hRel = _hRel - ((((_pdOpenP select 1) + 25) - 125) max 0)};
 				_haloCarry = if (_isHalo == 0 && {!(_plane isKindOf "Plane")}) then {_sp * ((((missionNamespace getVariable ["MCC_paraCarryTimeHeli", 1.7]) + 0.012 * (_hRel - 100)) max 0.5) min 4.6)} else {
 					if (_isParaPlane) then {_sp * (((missionNamespace getVariable ["MCC_paraCarryTimePlane", 1.5]) + 0.00785 * ((_hRel - 100) max 0)) min 3.7)} else {_sp * _carryTime}
 				};

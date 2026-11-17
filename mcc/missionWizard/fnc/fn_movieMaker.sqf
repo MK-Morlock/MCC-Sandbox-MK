@@ -91,7 +91,7 @@ _endCinimeticEH = (findDisplay 46) displayAddEventHandler ["KeyDown", {
 		_cam = missionNamespace getVariable ["MCC_fnc_movieMaker_cam",nil];
 		_cam cameraeffect ["terminate", "back"];
 		camDestroy _cam;
-		camUseNVG false;		// the intro's night vision / thermal view used to stay on after the cinematic ("graphics look weird")
+		camUseNVG false;		// back to the normal view after the cinematic (no night vision / thermal)
 		false setCamUseTi 0;
 		showCinemaBorder false;
 
@@ -305,7 +305,7 @@ ppEffectDestroy _sfx;
 _cam cameraeffect ["terminate", "back"];
 camDestroy _cam;
 
-// back to the normal view: the intro's night vision / thermal filter used to stay on after the cinematic
+// back to the normal view: the intro's night vision / thermal filter is switched off after the cinematic
 camUseNVG false;
 false setCamUseTi 0;
 showCinemaBorder false;

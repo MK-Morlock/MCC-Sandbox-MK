@@ -25,6 +25,7 @@ private _isShown = false;
 
 params ["_action", "_wpLoc", "_wpArray", "_groups"];
 _isShown			= _this param [4, false, [false]];
+private _fromJob = _this param [5, false, [false]];
 
 // Waypoint condition/statement (indexes 5 and 6) must be strings for setWaypointStatements.
 // Several callers pass {} (code) - convert code to its text, anything else to "", and an empty condition to "true".
@@ -49,15 +50,41 @@ if (count _wpArray > 0) then
 _WPTypeIndecator 	= _wpArray select 0;
 
 	_wpTypes = ["MOVE", "DESTROY", "GETIN", "SAD", "JOIN", "LEADER", "GETOUT", "CYCLE", "LOAD", "UNLOAD", "TR UNLOAD", "HOLD", "SENTRY","GUARD","SUPPORT","GETIN NEAREST","DISMISS","Helicopter - Land","Helicopter - Get in","Artillery - Fire Mission","Loiter","Taru - Pick up pod","Taru - Winch drop pod","Taru - Parachute pod","Taru - Release pod"];
-	_wpType  = _wpTypes select _WPTypeIndecator;
+	//(MK) 25-31: the console's troop drops (handled before here); 32 / 33: the water landings (MCCMK_fnc_heliWaterLandWp)
+	_wpTypes append ["MOVE", "MOVE", "MOVE", "MOVE", "MOVE", "MOVE", "MOVE", "Water landing (engine on)", "Water landing (engine off)", "MOVE", "Boat drop (landed)", "Boat drop (low hover)", "Boat load"];
+	_wpType  = _wpTypes param [_WPTypeIndecator, "MOVE"];	//(MK) the console's troop drops (25-30) aren't in this list (Clear with one selected failed)
+};
+
+//(MK) A group riding as passengers in a vehicle driven by another group can't take the vehicle anywhere itself: the order
+// goes to the vehicle's crew (commandable or player-led, same side, not driven by a player), so the vehicle carries
+// them there - once for each vehicle. Orders about the group itself (getting in or out, joining, leading, dismissing)
+// stay with it, and once they're out they're ordered on their own again.
+if !(_wpType in ["GETIN", "JOIN", "LEADER", "GETOUT", "GETIN NEAREST", "DISMISS", "Helicopter - Get in", "Artillery - Fire Mission"]) then {
+	_groups = _groups apply {
+		private _g = _x;
+		private _l = leader _g;
+		private _v = vehicle _l;
+		private _d = driver _v;
+		if (_v != _l && {!isNull _d} && {alive _d} && {!isPlayer _d} && {(group _d) != _g} && {(side group _d) == (side _g)}
+			&& {((group _d) getVariable ["MCC_canbecontrolled", false]) || {isPlayer (leader (group _d))}}) then {
+			["INFO", "console", "%1 is riding in %2: the order goes to its crew (%3)", [_g, typeOf _v, group _d]] call MCC_fnc_log;
+			group _d
+		} else {_g};
+	};
+	_groups = _groups arrayIntersect _groups;
 };
 
 
 {
+	private _mkJobbed = if (_fromJob) then {false} else {[_x, _action, _wpLoc, _wpArray, _isShown, _wpType] call MCCMK_fnc_wpJob};
+	if (!_mkJobbed) then {
 	if (isPlayer (leader _x)) then {["DEBUG", "console", "manageWp: %1 (player-led) action %2 to %3, type %4, had %5 waypoints (current %6)", [_x, _action, _wpLoc apply {round _x}, _wpType, count (waypoints _x), currentWaypoint _x]] call MCC_fnc_log};
 	if (_action != 0 || {isPlayer (leader _x)}) then {while {(count (waypoints _x)) > 0} do {deleteWaypoint ((waypoints _x) select 0)}};	//Delete WP
 	if (_action <2) then																						//Add or replace WP
 		{
+			private _mkN0 = count (waypoints _x);
+			private _mkC0 = currentWaypoint _x;
+			private _mkPend = _mkC0 < _mkN0 && {!(_mkN0 == 1 && {_mkC0 == 0} && {((leader _x) distance2D (waypointPosition [_x, 0])) < 150})};
 			switch _wpType do
 			{
 				case "GETIN":
@@ -218,6 +245,21 @@ _WPTypeIndecator 	= _wpArray select 0;
 						_wp synchronizeWaypoint [_wp2];
 					};
 
+				//(MK) a water landing: its route, down to the water on the way in, settled onto it (the group's aircraft - a boat
+				// carrier; refused, and said why, otherwise or if the point isn't water)
+				case "Water landing (engine on)";
+				case "Water landing (engine off)":
+					{
+						private _ac = vehicle (leader _x);
+						if (_ac isKindOf "Air") then {[_ac, _wpLoc, _wpType == "Water landing (engine on)"] spawn MCCMK_fnc_heliWaterLandWp};
+					};
+				//(MK) Boat drop: a carrier takes the boat aboard to the point and lets it out (MCCMK_fnc_boatDrop)
+				case "Boat drop (landed)";
+				case "Boat drop (low hover)":
+					{
+						private _ac = vehicle (leader _x);
+						if (_ac isKindOf "Air") then {[_ac, _wpLoc, _wpType == "Boat drop (low hover)"] spawn MCCMK_fnc_boatDrop};
+					};
 				case "Helicopter - Land":
 					{
 						_wp = _x addWaypoint [_wpLoc, 0];
@@ -281,6 +323,21 @@ _WPTypeIndecator 	= _wpArray select 0;
 						};
 					};
 			};
+			private _mkFh = _wpArray param [8, 0];
+			private _mkAc = vehicle (leader _x);
+			if (_mkFh > 0 && {_mkAc isKindOf "Air"} && {(count (waypoints _x)) > _mkN0}) then {
+				if (_mkPend) then {
+					private _mkPw = [_x, _mkN0 - 1];
+					(waypointStatements _mkPw) params [["_mkC", "true"], ["_mkS", ""]];
+					private _mkAdd = format ["(vehicle this) flyInHeight %1; (vehicle this) setVariable ['MCCMK_flyH', %1, true]", _mkFh];
+					_mkS = _mkS trim ["; ", 2];
+					_mkPw setWaypointStatements [_mkC, if (_mkS == "") then {_mkAdd} else {_mkS + "; " + _mkAdd}];
+				} else {
+					[_mkAc, _mkFh] remoteExec ["flyInHeight", _mkAc];
+					_mkAc setVariable ["MCCMK_flyH", _mkFh, true];
+				};
+			};
 		};
+	};
 } foreach _groups;
 

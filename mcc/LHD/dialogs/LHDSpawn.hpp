@@ -77,6 +77,7 @@ class MCCDLG_NAME
 				class ammoPic: MCC_RscPicture
 				{
 					idc = 1100;
+					style = 2096;
 
 					text = "\mcc_sandbox_mod\data\IconAmmo.paa"; //--- ToDo: Localize;
 					x = 0.0103125 * safezoneW;
@@ -89,6 +90,7 @@ class MCCDLG_NAME
 				class repairPic: MCC_RscPicture
 				{
 					idc = 1101;
+					style = 2096;
 
 					text = "\mcc_sandbox_mod\data\IconRepair.paa"; //--- ToDo: Localize;
 					x = 0.113438 * safezoneW;
@@ -101,6 +103,7 @@ class MCCDLG_NAME
 				class fuelPic: MCC_RscPicture
 				{
 					idc = 1102;
+					style = 2096;
 
 					text = "\mcc_sandbox_mod\data\IconFuel.paa"; //--- ToDo: Localize;
 					x = 0.216563 * safezoneW;
@@ -113,6 +116,7 @@ class MCCDLG_NAME
 				class ValorPic: MCC_RscPicture
 				{
 					idc = 1103;
+					style = 2096;
 
 					text = "\mcc_sandbox_mod\mcc\rts\data\valorIcon.paa"; //--- ToDo: Localize;
 					x = 0.113438 * safezoneW;
@@ -216,6 +220,7 @@ class MCCDLG_NAME
 				class MCC_Ammo: MCC_RscPicture
 				{
 					idc = 91;
+					style = 2096;
 
 					text = "\mcc_sandbox_mod\data\IconAmmo.paa"; //--- ToDo: Localize;
 					x = 0.309375 * safezoneW;
@@ -228,6 +233,7 @@ class MCCDLG_NAME
 				class MCC_Repair: MCC_RscPicture
 				{
 					idc = 92;
+					style = 2096;
 
 					text = "\mcc_sandbox_mod\data\IconRepair.paa"; //--- ToDo: Localize;
 					x = 0.309375 * safezoneW;
@@ -240,6 +246,7 @@ class MCCDLG_NAME
 				class MCC_Fuel: MCC_RscPicture
 				{
 					idc = 93;
+					style = 2096;
 
 					text = "\mcc_sandbox_mod\data\IconFuel.paa"; //--- ToDo: Localize;
 					x = 0.309375 * safezoneW;
@@ -252,6 +259,7 @@ class MCCDLG_NAME
 				class MCC_ValorPic: MCC_RscPicture
 				{
 					idc = 94;
+					style = 2096;
 
 					text = "\mcc_sandbox_mod\mcc\rts\data\valorIcon.paa"; //--- ToDo: Localize;
 					x = 0.309375 * safezoneW;

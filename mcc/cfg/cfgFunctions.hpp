@@ -25,6 +25,7 @@ class general
 	class roadsideSpot	{description = "(MK) a clear roadside spot for a vehicle, on the nearest roads to a point";};
 	class vehicleCanDriveOut	{description = "(MK) can a vehicle drive from a spot to the nearest road (or the zone centre), by the AI pathfinder";};
 	class nextZoneNumber	{description = "(MK) lowest zone number not in use";};
+	class forceCount	{description = "(MK) players on a side, with AI squadmates at half and controllable AI at a quarter";};
 	class secAction	{description = "(MK) fixed named actions that players can request on other machines";};
 	class secSenderOK	{description = "(MK) server side: was this remote call sent by the server, an admin, the mission maker, a Zeus or a headless client";};
 	class secRemote	{description = "(MK) remote call routed through the server, which checks the sender";};
@@ -58,6 +59,7 @@ class general
 	class uavSetHeight {description = "(MK) Commander console UAV view: set a drone's flight height and have it hold its position there, so it climbs or descends";};
 	class formationMove {description = "(MK) Player-led squad given a move order: each AI goes to his formation slot around the destination (leader's spot left empty) and falls back in when the leader arrives";};
 	class acReticle {description = "(MK) AC-130 console view: draw the gunship sight reticle (cross with ticks and corner brackets) over the video";};
+	class themeButtons {description = "(MK) Buttons console look for a one-version window: its flat rounded buttons swapped for the 3D ones";};
 	class consoleApply3D {description = "(MK) Buttons console: swap the static flat button pictures of a window for their 3D versions";};
 	class openDebug {description = "(MK) Open Arma's debug console from the MCC Debug panel and say so when the game refuses it";};
 	class dialogName {description = "(MK) Name of an MCC window for the chosen console look (Flat or Buttons)";};
@@ -96,6 +98,10 @@ class general
 	class pipOrbit	{description = "Mouse orbit / zoom of the MCC console unit video feed";};
 	class paraGuide	{description = "Steer an AI paratrooper to his landing spot";};
 	class realParadrop	{description = "Create a HALO or regular parachute jump for the given units with simulation of running out of an airplane.";};
+	class haloAutoAircraft	{description = "(MK) the automatic HALO aircraft for a faction";};
+	class paraAutoAircraft	{description = "(MK) the automatic paratrooper aircraft for a faction";};
+	class haloGear	{description = "(MK) the HALO helmet and uniform for a faction (its pilot's)";};
+	class haloAutoLabel	{description = "(MK) list label for the automatic HALO aircraft";};
 	class realParadropPlayer	{description = "Handle the paradrop from the unit side.";};
 	class countGroupHC	{description = "Count the number of infantry, vehicles, tank, air, ships in a group expand.";};
 	class manageWp	{description = "Create and control AI WP on map.";};
@@ -224,7 +230,9 @@ class console
 	#endif
 
 	class consoleClickGroupIcon	{description = "Define icon behaviot when clicked on the MCC Console";};
-	class consoleMapFollow	{description = "Commander console map: follow a moving object until right-click";};
+	class consoleMapFollow	{description = "Commander console map: follow a moving object until the map is clicked, scrolled or dragged";};
+	class consoleListMemory	{description = "(MK) remember and restore a console list's last choice";};
+	class consoleWpFormationFill	{description = "(MK) waypoint menu: formation list, or the aircraft list for HALO";};
 };
 
 class mp
@@ -303,6 +311,8 @@ class evac
 	class evacSide {description = "(MK) Side an evac made in the MCC console belongs to: the console's side if a player is on it, otherwise the mission maker's own side";};
 	class evacPanelRefresh {description = "(MK) Rebuild the Evac panel's evac list from the side's live evac list, keeping the selection on the same vehicle";};
 	class evacMove {description = "Move a vehicle to selected WP";};
+	class evacParaLine {description = "(MK) draw an evac paradrop line on a console map by dragging";};
+	class evacInsertionChanged {description = "(MK) evac insertion list: remember the choice, RTB acts at once";};
 	class evacSpawn {description = "Spawn a vehicle with crew and gunners, mark it as an evac vehicle";};
 	class repairEvac {description = "Repair evac helicopter";};
 	class setEvac {description = "Sets an empty ot AI vehicle into an ecav for a specific side";};
@@ -330,7 +340,6 @@ class uiTheme
 	class haloFormation	{description = "HALO formation free fall (after ROS_HaloFormation)"; file = "\mcc_sandbox_mod\mcc\fnc\general\fn_haloFormation.sqf";};
 	class haloFormationPlayer	{description = "(MK) HALO formation round a player and his AI (ROS_HaloFormation)"; file = "\mcc_sandbox_mod\mcc\fnc\general\fn_haloFormationPlayer.sqf";};
 	class haloPlaneExit	{description = "HALO aircraft flies off the nearest map edge at its drop height and is deleted"; file = "\mcc_sandbox_mod\mcc\fnc\general\fn_haloPlaneExit.sqf";};
-	class dropLight	{description = "(MK) Jump light in a drop aircraft: red / green (ROS Group HALO)"; file = "\mcc_sandbox_mod\mcc\fnc\general\fn_dropLight.sqf";};
 	class umModeSwitch	{description = "Units / Groups switch: the selection follows";};
 	class umSelectionFromList	{description = "MCC_selectedUnits from what is highlighted in the unit list";};
 	class consoleModeButtons	{description = "Commander console mode buttons: show the one in use";};

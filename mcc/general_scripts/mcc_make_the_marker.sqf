@@ -77,5 +77,5 @@ if (!MCC_capture_state) then
 								,mcc_hc
 								,MCC_Marker_dir
 								];
-		hint "Action captured";
+		["Action captured"] call MCCMK_fnc_hint;
 	};

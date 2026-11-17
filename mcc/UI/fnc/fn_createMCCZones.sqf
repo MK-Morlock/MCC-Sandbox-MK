@@ -14,7 +14,7 @@ private _markerlabel = "";
 		// malformed position to createMarkerLocal, which requires exactly 2 or 3 elements.
 		continue;
 	};
-	_zone = createMarkerLocal [str _x, _thisZonePos];
+	_zone = createMarkerLocal [str _x, _thisZonePos]; [_zone] call MCCMK_fnc_genTag;
 	_zone setMarkerShapeLocal "RECTANGLE";
 	_zone setMarkerColorLocal "colorBlack";
 	_zone setMarkerBrushLocal "Solid";
@@ -22,7 +22,7 @@ private _markerlabel = "";
 	_zone setMarkerDirLocal (mcc_zone_dir param [_x, 0]);
 	_zone setMarkerSizeLocal (mcc_zone_size param [_x, [50,50]]);
 
-	_markerlabel = createMarkerLocal [(format["LABEL_%1",_x]), _thisZonePos];
+	_markerlabel = createMarkerLocal [(format["LABEL_%1",_x]), _thisZonePos]; [_markerlabel] call MCCMK_fnc_genTag;
 	_markerlabel setMarkerShapeLocal "ICON";
 	(format["LABEL_%1",_x]) setMarkerTypeLocal "mil_join";
 	(format["LABEL_%1",_x]) setMarkerTextLocal str _x;
@@ -30,7 +30,7 @@ private _markerlabel = "";
 } foreach (missionNamespace getVariable ["MCC_zones_numbers",[]]);
 
 // Zones are only shown while the MCC console is open (it shows them on open and hides them on close). The mission generator calls this
-// after generating, which used to leave every zone drawn on the mission maker's normal map ("zones left behind that can't be deleted").
+// after generating, so it must not leave the zones drawn on the mission maker's normal map.
 if (isNull (findDisplay 2994)) then {
 	{str _x setMarkerAlphaLocal 0; (format["LABEL_%1",_x]) setMarkerAlphaLocal 0;} foreach (missionNamespace getVariable ["MCC_zones_numbers",[]]);
 };

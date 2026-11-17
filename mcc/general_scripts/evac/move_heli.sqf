@@ -22,6 +22,17 @@ if !mcc_isloading then	{
 	deletemarkerlocal "evac_marker2";
 	deletemarkerlocal "evac_marker3";
 
+	if (([MCC_EVAC_INSERTION] call MCCMK_fnc_evacLandingIndex) == 7) exitWith {
+		if ((lbCurSel MCC_EVAC_SELECTED) == -1) exitWith {};
+		private _paraEvac = (missionNamespace getvariable [format ["MCC_evacVehicles_%1", call MCC_fnc_evacSide],[]]) param [lbCurSel MCC_EVAC_SELECTED, objNull];
+		if (isNull _paraEvac || {!(_paraEvac isKindOf "Helicopter")}) exitWith {["Paradrop needs a helicopter"] call MCCMK_fnc_hint};
+		private _paraHeight = MCC_evacFlyInHight_array select (lbCurSel MCC_EVAC_FLIGHTHIGHT) select 1;
+		MCC_evacFlyInHight_index = lbCurSel MCC_EVAC_FLIGHTHIGHT;
+		private _line = ["wait"] call MCC_fnc_evacParaLine;
+		if (count _line < 2) exitWith {["No drop line drawn"] call MCCMK_fnc_hint};
+		[_line, _paraHeight, 7, [netid _paraEvac,_paraEvac], [[0, 0], [1, -1]] select ((lbCurSel 549) == 1)] remoteExec ["MCC_fnc_evacMove", _paraEvac, false];
+	};
+
 	["Left click on the map to put the 1st WP"] call MCC_fnc_hintBrief;
 	click = false;
 	onMapSingleClick "point1 = _pos;
@@ -73,7 +84,7 @@ if !mcc_isloading then	{
 	_point3 =getmarkerpos "evac_marker3";
 	sleep 0.5;
 
-	hint "Markers placed";
+	["Markers placed"] call MCCMK_fnc_hint;
 	if ((lbCurSel MCC_EVAC_SELECTED) == -1) exitWith {};
 
 	_evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1", call MCC_fnc_evacSide],[]];
@@ -82,7 +93,7 @@ if !mcc_isloading then	{
 		_flyInHight =  MCC_evacFlyInHight_array select (lbCurSel MCC_EVAC_FLIGHTHIGHT) select 1;
 		MCC_evacFlyInHight_index = lbCurSel MCC_EVAC_FLIGHTHIGHT;
 		} else {_flyInHight= 5000};
-	_landing = lbCurSel MCC_EVAC_INSERTION;
+	_landing = [MCC_EVAC_INSERTION] call MCCMK_fnc_evacLandingIndex;	//(MK) by its text: the lists differ
 
 	if (MCC_capture_state) then
 		{

@@ -12,10 +12,13 @@ player setVariable ["mcc_dragAnimEH", player addEventHandler [
 		{
 			if((animationState player)=="helper_switchtocarryrfl")then
 			{
-				{detach _x} foreach attachedObjects player;
-				sleep 0.5;
-				player switchMove "aidlpknlmstpsraswrfldnon_AI";
-				player removeEventHandler ["AnimStateChanged", player getVariable ["mcc_dragAnimEH",0]];
+				// (MK) an event handler can't wait: the pause runs in its own thread 
+				[] spawn {
+					{detach _x} foreach attachedObjects player;
+					sleep 0.5;
+					player switchMove "aidlpknlmstpsraswrfldnon_AI";
+					player removeEventHandler ["AnimStateChanged", player getVariable ["mcc_dragAnimEH",0]];
+				};
 			};
 		}
 	]

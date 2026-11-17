@@ -163,7 +163,7 @@ class mcc_consoleF6: MCC_RscButtonConsoleKey	//invisible key over the tablet pic
 	h = 0.0329871 * safezoneH;
 	text = "F6";
 	tooltip = "Fleet Management";
-	onButtonClick ="while {dialog} do {closeDialog 0}; [0,0,0] spawn MCC_fnc_LHDspawnMenuInit";
+	onButtonClick ="while {dialog} do {closeDialog 0}; [0,0,[2,1] select (((missionNamespace getVariable ['MCC_server',objNull]) getVariable [format ['CP_commander%1',playerSide],'']) == getPlayerUID player)] spawn MCC_fnc_LHDspawnMenuInit";
 };
 class MCC_ConsoleExitButton: MCC_RscButtonConsoleKey
 {
@@ -237,7 +237,7 @@ class MCC_ConsoleExitButton: MCC_RscButtonConsoleKey
 		onMouseZChanged = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\console\ACmousez.sqf'");
 		onMouseMoving = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\console\ACmouseMoving.sqf'");
 	};
-	//(was a switch bar; now rounded buttons like the MCC console)
+	//rounded buttons, like the MCC console
 	class MCC_ConsoleACCamBtn0: MCCBTN_R
 	{
 		idc = 9175;
@@ -269,7 +269,7 @@ class MCC_ConsoleExitButton: MCC_RscButtonConsoleKey
 		h = 0.0329871 * safezoneH;
 	};
 
-	//(was a switch bar; now rounded buttons like the MCC console)
+	//rounded buttons, like the MCC console
 	class MCC_ConsoleACWpnBtn0: MCCBTN_R
 	{
 		idc = 9180;

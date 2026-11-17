@@ -43,7 +43,7 @@ if (_index == 0) exitWith {
 				//opens MCC again, which shows the console once this player is the mission maker. One try at a time, so a
 				//refused login (someone else is the mission maker) does not keep retrying.
 				if (time < (missionNamespace getVariable ["MCC_loginTryUntil", -1])) exitWith {
-					hint format ["MCC is in use by the mission maker %1", missionNamespace getVariable ["mcc_missionmaker", ""]];
+					[format ["MCC is in use by the mission maker %1", missionNamespace getVariable ["mcc_missionmaker", ""]]] call MCCMK_fnc_hint;
 				};
 				MCC_loginTryUntil = time + 6;
 				[] spawn MCC_fnc_loginDialog;
@@ -51,17 +51,17 @@ if (_index == 0) exitWith {
 			case 1:
 			{
 				_ok = createDialog ("MCC3D_Dialog" call MCC_fnc_dialogName);
-				if !(_ok) exitWith { hint "createDialog failed" };
+				if !(_ok) exitWith { ["createDialog failed"] call MCCMK_fnc_hint };
 			};
 			case 2:
 			{
 				_ok = createDialog (['mcc_groupGen', 'mcc_groupGenButtons'] select (profileNamespace getVariable ['MCC_consoleButtons', false]));
-				if !(_ok) exitWith { hint "createDialog failed" };
+				if !(_ok) exitWith { ["createDialog failed"] call MCCMK_fnc_hint };
 			};
 			case 3:
 			{
 				_ok = createDialog ("MCCMWDialog" + (['', 'Buttons'] select (profileNamespace getVariable ['MCC_consoleButtons', false])));
-				if !(_ok) exitWith { hint "createDialog failed" };
+				if !(_ok) exitWith { ["createDialog failed"] call MCCMK_fnc_hint };
 			};
 		};
 

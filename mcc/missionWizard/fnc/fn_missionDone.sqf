@@ -44,7 +44,10 @@ if (_mission == "Main") then {
 		_resourceGain = _resourceGain + (floor (_sumTickets*_difficulty) max 1);
 	};
 
-//Collateral damage penalty is taken off the gain before it is shared out (it used to be shown in the summary only)
+// Reward multiplier (Addon Options): campaign, or without a campaign
+_resourceGain = floor (_resourceGain * ([0.5, 1, 2, 3] param [missionNamespace getVariable [["MCCMK_rewardMultSandbox", "MCCMK_rewardMultCampaign"] select (missionNamespace getVariable ["MCCMK_campaignSetupDone", false]), 1], 1]));
+
+//Collateral damage penalty is taken off the gain before it is shared out
 _sumResource = (_resourceGain - _penalty) max 0;
 
 _allocatedResources = [];

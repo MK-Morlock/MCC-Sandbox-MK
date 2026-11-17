@@ -80,7 +80,7 @@ class MCCDLG_NAME
 		{
 			idc = -1;
 			text = "Reset";
-			tooltip = "Clear the search and go back to the previous faction";
+			tooltip = "Clear the search (show every faction)";
 			onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\dialogs\mcc_3d_factionSearch.sqf'");
 			x = 0.1406 * safezoneW + safezoneX;
 			y = 0.0821629 * safezoneH + safezoneY;
@@ -96,6 +96,19 @@ class MCCDLG_NAME
 			w = 0.0458333 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			text = "Search";
+		};
+		//(MK) Garage: paint and parts for the vehicle chosen to place (MCCMK_fnc_garageButton / MCCMK_fnc_garage3D); Ctrl + click: its own look again
+		class MCC3DGarageButton: MCCBTN_R
+		{
+			idc = 8037;
+			text = "Garage";
+			tooltip = "Paint and parts for the chosen vehicle.\nKept in your profile, used whenever it is placed.\nCtrl + click: back to its own look.";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['3d', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.033 * safezoneW + safezoneX;
+			y = 0.459000 * safezoneH + safezoneY;
+			w = 0.0714583 * safezoneW;
+			h = 0.03 * safezoneH;
+			class TextPos {left = 0; top = "((0.03 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};
 		};
 		class MCC3DSpawnButton: MCCBTN_R
 		{
@@ -139,9 +152,21 @@ class MCCDLG_NAME
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 			x = 0.053125 * safezoneW + safezoneX;
 			y = 0.181137 * safezoneH + safezoneY;
-			w = 0.120313 * safezoneW;
+			w = 0.0575 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			onLBSelChanged=__EVAL("[1] execVM '"+MCCPATH+"mcc\pop_menu\spawn_group3d.sqf'");
+		};
+		//(MK) Start (aircraft): Landed / Flying, beside Empty
+		class start3D : MCC_RscCombo
+		{
+			idc = 8036;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+			tooltip = "Start (aircraft with crew). Landed: on the ground where you\nplace it, engine off, held there until the group's first order\n(a waypoint from either console, or a High Command order) -\nthen it starts up and takes off (a plane taxis: face it down\nthe runway). Flying: in the air where you place it (at least\n50 m up), engine running. On water: afloat on the sea where\nyou place it, engine off, held the same way (only an aircraft\nFloatary floats stays up).";
+			onLBSelChanged = "MCC_3D_start = [1, 0, 2] select (_this select 1); MCC_3D_landed = ((_this select 1) != 1); if (!isNil 'MCC_3D_panel') then {[] call MCC_3D_panel};";
+			x = 0.1138 * safezoneW + safezoneX;
+			y = 0.181137 * safezoneH + safezoneY;
+			w = 0.0596 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class behaviour3D : MCC_RscCombo
 		{
@@ -158,7 +183,7 @@ class MCCDLG_NAME
 		{
 			idc = 8035;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
-			tooltip = "Yes: can be commanded from the Commander Console and RTS, and counts towards food and bunks";
+			tooltip = "Yes: can be commanded from the Commander Console and RTS, and\ncounts towards food and bunks";
 			onLBSelChanged = "MCC_3D_cmd = ((_this select 1) == 1); if (!isNil 'MCC_3D_panel') then {[] call MCC_3D_panel};";
 			x = 0.053125 * safezoneW + safezoneX;
 			y = 0.247 * safezoneH + safezoneY;

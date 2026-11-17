@@ -35,7 +35,7 @@ for "_x" from 0 to _toPlace step 1 do
 	_pos = [(_pos select 0) select 0, (_pos select 0) select 1,0];
 
 	for "_k" from 1 to (3 + floor random 5) do {
-		private _animal = createAgent [selectRandom _animalType, (([_pos, 15, 8, 2] call MCC_fnc_landSpot) call {if (_this isEqualTo []) then {_pos getPos [random 8, random 360]} else {_this}}), [], 0, "NONE"];
+		private _animal = createAgent [selectRandom _animalType, (([_pos, 15, 8, 2] call MCC_fnc_landSpot) call {if (_this isEqualTo []) then {_pos getPos [random 8, random 360]} else {_this}}), [], 0, "NONE"]; [_animal] call MCCMK_fnc_genTag;
 		{_x addCuratorEditableObjects [[_animal],false]} forEach allCurators;
 	};
 

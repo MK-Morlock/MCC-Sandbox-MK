@@ -19,7 +19,14 @@ private _groupOf = {
 	if (_i select 1) exitWith {1};
 	2
 };
-private _c = [configSourceMod _cfg] call _groupOf;
-private _f = [configSourceMod (configFile >> "CfgFactionClasses" >> _faction)] call _groupOf;
+// Where a class comes from: the mod of the addon that first DEFINED it. configSourceMod gives whichever mod last
+// changed the class, so a vanilla vehicle that a DLC or mod adjusts would count as that DLC's or mod's content.
+private _srcOf = {
+	params ["_c"];
+	private _adds = configSourceAddonList _c;
+	if (_adds isEqualTo []) then {configSourceMod _c} else {configSourceMod (configFile >> "CfgPatches" >> (_adds select 0))}
+};
+private _c = [[_cfg] call _srcOf] call _groupOf;
+private _f = [[configFile >> "CfgFactionClasses" >> _faction] call _srcOf] call _groupOf;
 if (_c == _f) exitWith {true};
 (_mode == 1) && {_c == 1}

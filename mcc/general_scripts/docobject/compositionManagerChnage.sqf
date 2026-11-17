@@ -37,14 +37,14 @@ switch (_type) do
 	case 1: //Save MCC Composition to uinamespace
 		{
 			_string = ctrlText MCC_3DCsaveNameIDC;
-			if (_string == "" ) exitWith {hint "Composition save failed! Please type a name for your saved composition"};
+			if (_string == "" ) exitWith {["Composition save failed! Please type a name for your saved composition"] call MCCMK_fnc_hint};
 			MCC_3DCompSaveNames set [_saveIndex,_string];
 			_string = [position MCC_dummyObject] call MCC_fnc_saveToComp;
 			MCC_3DCompSaveFiles set [_saveIndex,_string];
 			profileNamespace setVariable ["MCC_3DCompSaveNames", MCC_3DCompSaveNames];
 			profileNamespace setVariable ["MCC_3DCompSaveFiles", MCC_3DCompSaveFiles];
 			saveProfileNamespace;
-			hint "Saved MCC Composition.";
+			["Saved MCC Composition."] call MCCMK_fnc_hint;
 			
 			_comboBox = _mccdialog displayCtrl MCC_3DCompssaveListIDC; 
 			lbClear _comboBox;
@@ -59,7 +59,7 @@ switch (_type) do
 	case 2: //Load MCC Composition from uinamespace
 		{
 			_string = (profileNamespace getVariable "MCC_3DCompSaveFiles") select _saveIndex;
-			if (_string == "" ) exitWith {hint "Composition load failed: no MCC composition pasted from the namespace"};
+			if (_string == "" ) exitWith {["Composition load failed: no MCC composition pasted from the namespace"] call MCCMK_fnc_hint};
 			_tempText = ctrlText MCC_INITBOX;
 			_string = "[position _this, getdir _this," + _string +"] call MCC_fnc_objectMapper; deleteVehicle _this;" + _tempText; 			
 			ctrlSetText [MCC_INITBOX,_string];

@@ -24,9 +24,8 @@ _ctrl = ((uiNamespace getVariable "MCC_interactionPB") displayCtrl 2);
 _ctrl ctrlSetText _text;
 _ctrl = ((uiNamespace getVariable "MCC_interactionPB") displayCtrl 1);
 sleep 2;
-// The bandage stopped part-way: the check above only accepted 4 exact animation names, but the medic animation
-// cycles through others (medic1..medic5, medicOther, pistol/no-weapon/prone variants), so it "failed" as soon as one
-// of those played. Any medic animation now counts; moving away, dying or other actions still cancel.
+// Any medic animation counts (it cycles through medic1..medic5, medicOther and the pistol / no-weapon / prone variants);
+// moving away, dying or other actions still cancel.
 for [{_x=1},{_x<_time},{_x=_x+0.1}]  do
 {
 	_ctrl progressSetPosition (_x/_time);

@@ -146,7 +146,7 @@ class MCC_evacDialogControls:MCC_RscControlsGroup
 
 			text = "Spawn"; //--- ToDo: Localize;
 			x = 0.158138* safezoneW;
-			y = 0.112000* safezoneH;
+			y = 0.370000* safezoneH;	//(MK) bottom right (the Chute box is up beside Type)
 			w = 0.057300* safezoneW;
 			h = 0.022000* safezoneH;
 			tooltip = "Spawn Evac Vehicle on map click"; //--- ToDo: Localize;
@@ -213,6 +213,7 @@ class MCC_evacDialogControls:MCC_RscControlsGroup
 		class MCC_evacInsertion: MCC_RscCombo
 		{
 			idc = 43;
+			onLBSelChanged = "[_this select 0, _this select 1, 'mcc'] call MCC_fnc_evacInsertionChanged";
 
 			x = 0.008000* safezoneW;
 			y = 0.286000* safezoneH;
@@ -291,6 +292,30 @@ class MCC_evacDialogControls:MCC_RscControlsGroup
 			y = 0.370000* safezoneH;
 			w = 0.057300* safezoneW;
 			h = 0.022000* safezoneH;
+		};
+		//(MK) the Virtual Garage for the chosen class: paint and parts only (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCC_evacGarage: MCCBTN_S
+		{
+			idc = 548;
+			text = "Garage";
+			tooltip = "Paint and parts for the chosen vehicle.\nKept in your profile, used whenever it is spawned here.\nCtrl + click: back to its own look.";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['evac', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.096538* safezoneW;
+			y = 0.370000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
+		};
+		class MCC_evacChute: MCC_RscCombo
+		{
+			idc = 549;
+			tooltip = "Paradrop insertion only - Auto: players' chutes open by\nthemselves. Manual: players open their own chute (AI open\ntheirs on exit).";
+			onLoad = "params ['_c']; _c lbAdd 'Chute: Auto'; _c lbAdd 'Chute: Manual'; _c lbSetCurSel ((profileNamespace getVariable ['MCC_mccEvacChute', 0]) min 1)";
+			onLBSelChanged = "profileNamespace setVariable ['MCC_mccEvacChute', _this select 1]";
+			x = 0.158138* safezoneW;
+			y = 0.112000* safezoneH;	//(MK) beside Type (where Spawn was)
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
 	};
 };

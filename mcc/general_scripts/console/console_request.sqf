@@ -30,8 +30,12 @@ switch (_type) do {
    	case 0:	{
 		_arrayName	= format ["MCC_ConsoleAirdropArray%1",side player];
 		_array = missionNameSpace getVariable [_arrayName,[]];
+		// Taru supply pods (MK): listed after the earned airdrops
+		private _podIdx = (lbCurSel MCC_ConsoleAirdropAvailableTextBox_IDD) - (count _array);
+		if (_podIdx >= 0 && {_podIdx < 5}) exitWith {[_podIdx] spawn MCCMK_fnc_podRequest};
 
 		if (count _array > 0) then {
+			[(findDisplay 2993) displayCtrl MCC_ConsoleAirdropAvailableTextBox_IDD, "MCC_ccAirdrop", true] call MCC_fnc_consoleListMemory;
 			_index = lbCurSel MCC_ConsoleAirdropAvailableTextBox_IDD;
 			_selected = _array select _index;
 
@@ -45,7 +49,7 @@ switch (_type) do {
 			if (count _cost > 0) then {
 				{
 					_available = [playerSide, _x] call MCC_fnc_checkRes;
-					if (!_available) exitWith {hint "Not Enough Resources"; sleep 5; hintSilent ""};
+					if (!_available) exitWith {["Not Enough Resources"] call MCCMK_fnc_hint; sleep 5; hintSilent ""};
 				} foreach _cost;
 			} else {
 				_available = true;
@@ -59,9 +63,9 @@ switch (_type) do {
 
 				//supply drop with no helicopter simulation
 				if ((toLower (MCC_planeType select 0)) == "") then {
-					hint "Left click on the map, hold and drag the cursor to mark the target and the direction it comes in from";
+					["Left click on the map, hold and drag the cursor to mark the target and the direction it comes in from"] call MCCMK_fnc_hint;
 				} else {
-					hint "Left click on the map,hold and drag the cursor to mark the area and direction of the Air Support";
+					["Left click on the map,hold and drag the cursor to mark the area and direction of the Air Support"] call MCCMK_fnc_hint;
 				};
 
 				MCC_CASrequestMarker = true;
@@ -72,7 +76,7 @@ switch (_type) do {
 				_counter = 0;
 				{
 					_counter = _counter + 1;
-					_displayname = format ["%1: %2", _counter, ((((_x select 0) select 0) apply {getText (configFile >> "CfgVehicles" >> _x >> "displayname")}) joinString ", ")];
+					_displayname = ((((_x select 0) select 0) apply {getText (configFile >> "CfgVehicles" >> _x >> "displayname")}) joinString ", ");
 					_displayname = _displayname;
 					_pic = if (!(_x select 2 isEqualTo 1) || (_x isEqualTo true)) then {"\a3\ui_f\data\gui\cfg\CommunicationMenu\supplydrop_ca.paa"} else {"\A3\ui_f\data\map\markers\handdrawn\pickup_CA.paa"};
 					_index = _comboBox lbAdd _displayname;
@@ -95,7 +99,7 @@ switch (_type) do {
 						} foreach _cost;
 					};
 				} foreach (missionNameSpace getVariable [_arrayName,[]]);
-				_comboBox lbSetCurSel 0;
+				[_comboBox, "MCC_ccAirdrop"] call MCC_fnc_consoleListMemory;
 
 			};
 		};
@@ -107,6 +111,7 @@ switch (_type) do {
 		_array = missionNameSpace getVariable [_arrayName,[]];
 
 		if (count _array > 0) then {
+			[(findDisplay 2993) displayCtrl MCC_ConsoleCASAvailableTextBox_IDD, "MCC_ccCAS", true] call MCC_fnc_consoleListMemory;
 			_index = lbCurSel MCC_ConsoleCASAvailableTextBox_IDD;
 			_selected = _array select _index;
 
@@ -120,7 +125,7 @@ switch (_type) do {
 			if (count _cost > 0) then {
 				{
 					_available = [playerSide, _x] call MCC_fnc_checkRes;
-					if (!_available) exitWith {hint "Not Enough Resources"; sleep 5; hintSilent ""};
+					if (!_available) exitWith {["Not Enough Resources"] call MCCMK_fnc_hint; sleep 5; hintSilent ""};
 				} foreach _cost;
 			} else {
 				_available = true;
@@ -129,13 +134,15 @@ switch (_type) do {
 			if (_available) exitWith {
 				//remove resources
 				MCCMK_consolePending = [_cost, _arrayName, +_selected];
-				if ((toLower (MCC_spawnkind select 0)) == "cruise missile") then {
+				if (((toLower (MCC_spawnkind select 0)) find "air patrol") >= 0) then {	//(MK)
+					["Left click on the map on the side the aircraft should come from, hold and drag to the area it should patrol"] call MCCMK_fnc_hint;
+				} else {if ((toLower (MCC_spawnkind select 0)) == "cruise missile") then {
 					["Left click on the map at the target, hold and drag towards where the missile comes from"] call MCC_fnc_hintBrief;
 				} else {if ((toLower (MCC_spawnkind select 0)) in ["uav","ac-130"]) then {
-					hint "Left click on the map, hold and drag the cursor to mark the target and the direction it comes in from";
+					["Left click on the map, hold and drag the cursor to mark the target and the direction it comes in from"] call MCCMK_fnc_hint;
 				} else {
-					hint "Left click on the map,hold and drag the cursor to mark the area and direction of the Air Support";
-				};};
+					["Left click on the map,hold and drag the cursor to mark the area and direction of the Air Support"] call MCCMK_fnc_hint;
+				};};};
 
 				MCC_CASrequestMarker = true;
 
@@ -169,7 +176,7 @@ switch (_type) do {
 					};
 
 				} foreach (missionNameSpace getVariable [_arrayName,[]]);
-				_comboBox lbSetCurSel 0;
+				[_comboBox, "MCC_ccCAS"] call MCC_fnc_consoleListMemory;
 			};
 		};
 	};

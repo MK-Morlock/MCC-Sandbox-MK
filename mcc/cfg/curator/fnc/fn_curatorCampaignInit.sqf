@@ -40,6 +40,9 @@ if (typeName (_module getVariable ["factionPlayer",true]) == typeName "") exitWi
 		if (_v isEqualType "") then {_v = parseNumber _v};
 		if (_v isEqualType 0) then {_v} else {_d}
 	};
+	private _sideOverride = [_module getVariable ["enemySide", 0], 0] call _num;
+	if (_sideOverride > 0) then {_sideEnemy = [east, west, resistance] param [_sideOverride - 1, _sideEnemy]};
+	if (_sideEnemy isEqualTo _sidePlayer) exitWith {["ERROR", "campaign", "the enemy faction %1 is on the players' side (%2) - set the module's Enemy Side to East, West or Independent", [_factionEnemy, _sidePlayer]] call MCC_fnc_log};
 	_missionMax = [_module getVariable ["missionMax",10], 10] call _num;
 	_difficulty = [_module getVariable ["difficulty",20], 20] call _num;
 	//Rival players side: 0 OPFOR, 1 BLUFOR, 2 Independent, 3 Civilian, 7 none (BIS_fnc_sideType has no side for 7)
@@ -70,9 +73,9 @@ if (typeName (_module getVariable ["factionPlayer",true]) == typeName "") exitWi
 	if (_playersOverride isEqualType "") then {_playersOverride = parseNumber _playersOverride};
 	if !(_playersOverride isEqualType 0) then {_playersOverride = 0};
 	if (isNil "MCC_MWContentModes") then {MCC_MWContentModes = createHashMap};
-	MCC_MWContentModes set [toLower _factionPlayer, (([_module getVariable ["playerContent", 1], 1] call _num) max 0) min 2];
-	MCC_MWContentModes set [toLower _factionCiv, (([_module getVariable ["civContent", 1], 1] call _num) max 0) min 2];
-	MCC_MWContentModes set [toLower _factionEnemy, (([_module getVariable ["enemyContent", 1], 1] call _num) max 0) min 2];
+	MCC_MWContentModes set [toLower _factionPlayer, (([_module getVariable ["playerContent", 1], 1] call _num) max 0) min 4];
+	MCC_MWContentModes set [toLower _factionCiv, (([_module getVariable ["civContent", 1], 1] call _num) max 0) min 4];
+	MCC_MWContentModes set [toLower _factionEnemy, (([_module getVariable ["enemyContent", 1], 1] call _num) max 0) min 4];
 	MCC_campaignSpreadIndex = (([_module getVariable ["forceSpread", 1], 1] call _num) max 0) min 2;
 
 	//Start ambient civilians
@@ -95,15 +98,15 @@ _factionArray = [];
 
  _resualt = ["Starts MCC Campaign - Need: MCC Start Location",[
  						["Players Faction",_factionArray,"",(U_FACTIONS findIf {toUpper (_x select 2) == "BLU_F"}) max 0],
- 						["Players Content",["Faction only","Faction + Creator DLC","All loaded mods"],"Which units and vehicles the players' faction may use: its own, plus Creator DLC, or every loaded mod",1],
+ 						["Players Content",["Faction only","Faction + DLC","Faction + mods","Faction + DLC + mods","Whole side"],"Which units and vehicles the players' faction may use: its own, its DLC relatives, mods' additions, or the whole side",1],
  						["Rival Players Side",["East","West","Resistance","None"],"",3],
  						["Enemy Faction",_factionArray,"",(U_FACTIONS findIf {toUpper (_x select 2) == "OPF_F"}) max 0],
- 						["Enemy Content",["Faction only","Faction + Creator DLC","All loaded mods"],"Which units and vehicles the enemy faction may use: its own, plus Creator DLC, or every loaded mod",1],
+ 						["Enemy Content",["Faction only","Faction + DLC","Faction + mods","Faction + DLC + mods","Whole side"],"Which units and vehicles the enemy faction may use: its own, its DLC relatives, mods' additions, or the whole side",1],
  						["Civilians Faction",_factionArray,"",(U_FACTIONS findIf {toUpper (_x select 2) == "CIV_F"}) max 0],
- 						["Civilian Content",["Faction only","Faction + Creator DLC","All loaded mods"],"Which units and vehicles the civilian faction may use: its own, plus Creator DLC, or every loaded mod",1],
+ 						["Civilian Content",["Faction only","Faction + DLC","Faction + mods","Faction + DLC + mods","Whole side"],"Which units and vehicles the civilian faction may use: its own, its DLC relatives, mods' additions, or the whole side",1],
  						["Force Spread",["Tight","Normal","Wide"],"Where enemy forces start: Tight = near the centre, Normal = original MCC, Wide = evenly over the zone",1],
  						["Missions Before Campaign Ends",50],
- 						["Difficulty",["Easy","Medium","Hard"]],
+ 						["Difficulty",["Easy","Medium","Hard"],"",1],
  						["Intro",["Cinematic","Pop-Up","None"]],
  						["Tickets",200],
  						["Players (enemy scaling)",32,"Enemy numbers are sized for at least this many players (0 = count the real players). Enemies per mission: about 5, 10 or 20 per player (Easy / Medium / Hard), rising 10% after each mission.",0],
@@ -112,7 +115,8 @@ _factionArray = [];
  						["Map Overlay Transparency",["0% (normal)","25%","50%","75%","90%","100% (hidden)"],"Makes the red/blue territory squares more see-through. Shading differences are kept; 100% hides them. Territory, enemy spawns and saving are unaffected."],
  						["Objective Markers",["Area (search)","Precise"],"Area: task markers are placed up to ~400 m from the objective and must be searched for (classic MCC campaign). Precise: markers sit on the objective with a 3D icon.",1],
  						["Resources Over Storage Limit",["Cut at mission end (original)","Keep (lose 10% per hour)"],"What happens to resources above your storage limit when a campaign mission ends."],
- 						["Load From DB",false]
+ 						["Load From DB",false],
+ 						["Enemy Side",["Faction's own","East","West","Independent"],"Which side the enemy faction fights for. Use East, West or Independent to fight a faction from your own side (it keeps its own units and vehicles).",0]
  					  ]] call MCC_fnc_initDynamicDialog;
 
 if (count _resualt == 0) exitWith {deleteVehicle _module};
@@ -124,7 +128,7 @@ _factionEnemy = (U_FACTIONS select (_resualt select 3)) select 2;
 _sideEnemy = [([_factionEnemy] call MCC_fnc_factionSide)] call BIS_fnc_sideType;
 _factionCiv	= (U_FACTIONS select (_resualt select 5)) select 2;
 _missionMax = _resualt select 8;
-_difficulty = ((_resualt select 9)+1)*10;
+_difficulty = [10, 20, 40] select (((_resualt select 9) max 0) min 2);
 _playMusic = _resualt select 10;
 _tickets = _resualt select 11;
 private _playersOverride = round (_resualt select 12);
@@ -134,10 +138,16 @@ _tileTransparency = [0, 0.25, 0.5, 0.75, 0.9, 1] select ((_resualt select 15) ma
 _preciseMarkers = (_resualt select 16) == 1;
 _keepOverStorage = (_resualt select 17) == 1;
 _loadDb = _resualt select 18;
+private _sideOverride = _resualt param [19, 0];
+if (_sideOverride > 0) then {_sideEnemy = [east, west, resistance] param [_sideOverride - 1, _sideEnemy]};
+if (_sideEnemy isEqualTo _sidePlayer) exitWith {
+	["MCC: the enemy faction is on the players' side - choose an Enemy Side (East, West or Independent)."] spawn MCC_fnc_halt;
+	deleteVehicle _module;
+};
 if (isNil "MCC_MWContentModes") then {MCC_MWContentModes = createHashMap};
-MCC_MWContentModes set [toLower _factionPlayer, ((_resualt select 1) max 0) min 2];
-MCC_MWContentModes set [toLower _factionCiv, ((_resualt select 6) max 0) min 2];
-MCC_MWContentModes set [toLower _factionEnemy, ((_resualt select 4) max 0) min 2];
+MCC_MWContentModes set [toLower _factionPlayer, ((_resualt select 1) max 0) min 4];
+MCC_MWContentModes set [toLower _factionCiv, ((_resualt select 6) max 0) min 4];
+MCC_MWContentModes set [toLower _factionEnemy, ((_resualt select 4) max 0) min 4];
 MCC_campaignSpreadIndex = ((_resualt select 7) max 0) min 2;
 publicVariableServer "MCC_MWContentModes";
 publicVariableServer "MCC_campaignSpreadIndex";

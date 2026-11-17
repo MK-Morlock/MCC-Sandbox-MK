@@ -59,8 +59,6 @@ if (_faction == "") then
 	};
 };
 
-_simTypesUnits 	= ["soldier", "car","carx", "motorcycle", "tank", "helicopter", "airplane", "ship", "parachute","helicopterX","shipx","shipX","tankX","submarinex","airplanex","helicopterrtd"];
-_CfgVehicles 		= [_faction] call MCC_fnc_factionClasses;	//only the faction public classes, picked by the engine (was every class, one by one)
 
 MCC_MWunitsArrayMen = [];			//vehicleClass = "Men";
 MCC_MWunitsArrayMenDiver = []; 		// vehicleClass = "MenDiver";
@@ -81,214 +79,36 @@ MCC_MWunitsArraySubmarine = []; 	// vehicleClass = "Submarine";
 MCC_MWunitsArrayStatic = []; 		// vehicleClass = "Static";
 
 
-for "_i" from 0 to (count _CfgVehicles - 1) do
-{
-	_CfgVehicle = _CfgVehicles select _i;
-	if (isclass _CfgVehicle) then
-	{
-		//Keep going when it is a public entry
-		if ((getNumber(_CfgVehicle >> "scope") == 2)) then
-		{
-			_vehicleDisplayName 	= getText(_CfgVehicle >> "displayname");
-			_cfgclass 				= (configName (_CfgVehicle));
-			_cfgFaction 			= getText(_CfgVehicle >> "faction");
-			_simulation 			= getText(_CfgVehicle >> "simulation");
-			_vehicleDisplayName		= [_vehicleDisplayName, gettext(_CfgVehicle >> "picture")];
-			_vehicleclass			= "";
-
-			private _mdl = toLower getText (_CfgVehicle >> "model");
-			private _dnr = getText (_CfgVehicle >> "displayName");
-			private _dnl = toLower (if ((_dnr select [0, 1]) == "$") then {localize (_dnr select [1])} else {_dnr});
-			private _lcc = toLower _cfgclass;
-			private _isMan = toLower _simulation in ["soldier", "soldierx"];
-			private _isTemplate = ((_lcc select [((count _lcc) - 5) max 0]) == "_base") || {(_lcc find "_base_") >= 0};
-			if (_isTemplate) then {["DEBUG", "spawn lists", "template class left out: %1", [_cfgclass]] call MCC_fnc_log};
-			private _junk = _isTemplate || {!_isMan && {_cfgclass isKindOf "Car"} && {[_cfgclass] call MCC_fnc_isUtilityVehicle}} || {(_mdl find "invisible") >= 0} || {(_dnl find "invisible") >= 0}
-				|| {(["invisibletarget", "targetvehicle", "target_vehicle", "targetsoldier"] findIf {(_lcc find _x) >= 0}) >= 0}
-				|| {_mdl in ["", "\a3\weapons_f\empty", "\a3\weapons_f\empty.p3d"]}
-				|| {(_mdl find "pod_heli_transport_04") >= 0} || {_cfgclass isKindOf "Pod_Heli_Transport_04_base_F"} || {_cfgclass isKindOf "Slingload_base_F"}
-				|| {_isMan && {(["virtual", "uav_ai", "uavai", "dummy"] findIf {((_lcc find _x) >= 0) || {(_dnl find _x) >= 0}}) >= 0}}
-				|| {!_isMan && {getNumber (_CfgVehicle >> "hasDriver") == 0} && {getNumber (_CfgVehicle >> "isUav") != 1} && {!(_cfgclass isKindOf "StaticWeapon")}};
-			if ((_simulation in _simTypesUnits) && {!_junk} && {[_CfgVehicle, _faction, _mode] call MCC_fnc_contentAllowed}) then
-			{
-				if (toUpper(_cfgFaction) == toUpper _faction) then
-				{
-					_vehicleclass = [_CfgVehicle] call MCC_fnc_unitCategory;	//mod vehicleClass names mapped to MCCs (GitHub #48)
-					if ((_vehicleclass in ["Car","Armored","Support","Air","Ship","Submarine"]) && {(getNumber (_CfgVehicle >> "hasDriver") == 0 && {getNumber (_CfgVehicle >> "isUav") != 1}) || {_cfgclass isKindOf "Pod_Heli_Transport_04_base_F"} || {_cfgclass isKindOf "Slingload_base_F"} || {((toLower getText (_CfgVehicle >> "model")) find "pod_heli_transport_04") >= 0}}) then {_vehicleclass = ""};
-					if (_vehicleclass in ["Men","MenDiver","MenRecon","MenSniper","MenSupport","MenStory","Car","Armored","Air","Autonomous","Support","Ship","Submarine","Static"]) then
-					{
-						switch (toLower(_vehicleclass)) do
-						{
-							case "men"		: 	{
-													_type="LAND";
-													if (count(getArray (_CfgVehicle >> "weapons")) > 2) then {
-														MCC_MWunitsArrayMen pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-													};
-												};
-
-							case "mendiver"	: 	{
-													_type="WATER";
-													if (count(getArray (_CfgVehicle >> "weapons")) > 2) then {
-														MCC_MWunitsArrayMenDiver pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-													};
-												};
-
-							case "menrecon"	: 	{
-													_type="LAND";
-													if (count(getArray (_CfgVehicle >> "weapons")) > 2) then {
-														MCC_MWunitsArrayMenRecon pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-													};
-												};
-
-							case "mensniper": 	{
-													_type="LAND";
-													if (count(getArray (_CfgVehicle >> "weapons")) > 2) then {
-														MCC_MWunitsArrayMenSniper pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-													};
-												};
-
-							case "mensupport": 	{
-													_type="LAND";
-													if (count(getArray (_CfgVehicle >> "weapons")) > 2) then {
-														MCC_MWunitsArrayMenSupport pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-													};
-												};
-
-							case "car"		: 	{
-													_type="LAND";
-													MCC_MWunitsArrayCar pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-												};
-
-							case "armored"	: 	{
-													_type="LAND";
-													MCC_MWunitsArrayArmored pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-												};
-
-							case "support"		: 	{
-													_type="LAND";
-													MCC_MWunitsArraySupport pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-												};
-
-							case "air"		: 	{
-													_type="AIR";
-													if (_simulation == "helicopterrtd") then {
-														MCC_MWunitsArrayHeli pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-													} else {
-														MCC_MWunitsArrayAir pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-													};
-												};
-
-							case "ship"		: 	{
-													_type="WATER";
-													MCC_MWunitsArrayShip pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-												};
-
-							case "submarine"	: 	{
-													_type="WATER";
-													MCC_MWunitsArraySubmarine pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-												};
-
-							case "static"	: 	{
-													_type="LAND";
-													MCC_MWunitsArrayStatic pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-												};
-
-						};
-					}
-					else
-					{
-						switch (toLower(_simulation)) do
-						{
-							case "soldier":
-							{
-								_type="LAND";
-								if (count(getArray (_CfgVehicle >> "weapons")) > 2) then {
-									MCC_MWunitsArrayMen pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-								};
-							};
-
-							case "car":
-							{
-								_type="LAND";
-								MCC_MWunitsArrayCar pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-
-							case "carx":
-							{
-								_type="LAND";
-								MCC_MWunitsArrayCar pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "motorcycle":
-							{
-								_type="LAND";
-								MCC_MWunitsArrayCar pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "tank":
-							{
-								_type="LAND";
-								MCC_MWunitsArrayArmored pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "tankx":
-							{
-								_type="LAND";
-								MCC_MWunitsArrayArmored pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "helicopter":
-							{
-								_type="AIR";
-								MCC_MWunitsArrayAir pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "helicopterx":
-							{
-								_type="AIR";
-								MCC_MWunitsArrayAir pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "airplane":
-							{
-								_type="AIR";
-								MCC_MWunitsArrayAir pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "airplanex":
-							{
-								_type="AIR";
-								MCC_MWunitsArrayAir pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "ship":
-							{
-								_type="WATER";
-								MCC_MWunitsArrayShip pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "shipx":
-							{
-								_type="WATER";
-								MCC_MWunitsArrayShip pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-							case "submarinex":
-							{
-								_type="WATER";
-								MCC_MWunitsArraySubmarine pushBack [_type,_cfgclass,_side,_vehicleDisplayName];
-							};
-						};
-					};
-				};
-			};
-		};
-	};
+//(MK) From the faction's pools (MCCMK_fnc_pools - MCC MK's single faction filter, based on the MK Faction Framework's
+// sorting): its own content, then official DLC, then all, by this generator's content setting; then a sibling faction's;
+// then - with the "Vanilla vehicle fallback" setting on (the default) - the side's vanilla vehicle for a kind it has
+// none of (MCCMK_fnc_poolOwn). The lists keep their shape:
+// [type, class, side, [name, picture]]. (The diver, story, recon, sniper, support-soldier and submarine lists aren't
+// read by anything; they stay empty.)
+private _entry = {
+	params ["_type", "_cls"];
+	[_type, _cls, _side, [getText (configFile >> "CfgVehicles" >> _cls >> "displayName"), getText (configFile >> "CfgVehicles" >> _cls >> "picture")]]
 };
-
-if (_mode < 2) then {
-	private _names = ["MCC_MWunitsArrayMen", "MCC_MWunitsArrayMenDiver", "MCC_MWunitsArrayMenRecon", "MCC_MWunitsArrayMenSniper", "MCC_MWunitsArrayMenSupport", "MCC_MWunitsArrayMenStory", "MCC_MWunitsArrayCar", "MCC_MWunitsArrayArmored", "MCC_MWunitsArrayAir", "MCC_MWunitsArrayHeli", "MCC_MWunitsArrayAutonomous", "MCC_MWunitsArraySupport", "MCC_MWunitsArrayShip", "MCC_MWunitsArraySubmarine", "MCC_MWunitsArrayStatic"];
-	private _kept = _names apply {+(missionNamespace getVariable [_x, []])};
-	[_faction, _side, 2] call MCC_fnc_MWCreateUnitsArray;
-	{
-		private _f = _kept select _forEachIndex;
-		if (count _f > 0 || {count (missionNamespace getVariable [_x, []]) == 0}) then {
-			missionNamespace setVariable [_x, _f];
-		} else {
-			["INFO", "MCC_fnc_MWCreateUnitsArray", "%1: nothing left in %2 with the content filter - using all content", [_faction, _x]] call MCC_fnc_log;
-		};
-	} forEach _names;
+private _fill = {
+	params ["_kinds", "_type", ["_filter", {true}]];
+	private _l = [];
+	{_l append ([_faction, _x, _mode] call MCCMK_fnc_poolOwn)} forEach _kinds;
+	((_l arrayIntersect _l) select _filter) apply {[_type, _x] call _entry}
 };
+// the soldiers: the armed ones (more than two weapons) when there are any
+private _inf = [_faction, "Inf", _mode] call MCCMK_fnc_poolOwn;
+private _armedInf = _inf select {count (getArray (configFile >> "CfgVehicles" >> _x >> "weapons")) > 2};
+MCC_MWunitsArrayMen = ([_inf, _armedInf] select (_armedInf isNotEqualTo [])) apply {["LAND", _x] call _entry};
+MCC_MWunitsArrayCar = [["Car", "Motorcycle"], "LAND"] call _fill;
+MCC_MWunitsArrayArmored = [["Tank", "APC", "AA"], "LAND"] call _fill;	// no artillery: it isn't armour on patrol (the artillery features have their own lists)
+MCC_MWunitsArraySupport = [["Utility"], "LAND"] call _fill;
+MCC_MWunitsArrayAir = [["Plane", "Heli"], "AIR"] call _fill;
+MCC_MWunitsArrayHeli = [["Heli"], "AIR"] call _fill;
+MCC_MWunitsArrayAutonomous = [["UAV"], "AIR"] call _fill;
+MCC_MWunitsArrayShip = [["Ship"], "WATER", {!(_x isKindOf "SDV_01_base_F")}] call _fill;
+MCC_MWunitsArraySubmarine = [["Ship"], "WATER", {_x isKindOf "SDV_01_base_F"}] call _fill;
+MCC_MWunitsArrayStatic = [["Static", "Mortar"], "LAND"] call _fill;
+["INFO", "MCC_fnc_MWCreateUnitsArray", "%1 (content %2): men %3, cars %4, armour %5, support %6, air %7, drones %8, boats %9, statics %10", [_faction, _mode, count MCC_MWunitsArrayMen, count MCC_MWunitsArrayCar, count MCC_MWunitsArrayArmored, count MCC_MWunitsArraySupport, count MCC_MWunitsArrayAir, count MCC_MWunitsArrayAutonomous, count MCC_MWunitsArrayShip, count MCC_MWunitsArrayStatic]] call MCC_fnc_log;
 
 publicvariableserver "MCC_MWunitsArrayMen";
 publicvariableserver "MCC_MWunitsArrayMenDiver";

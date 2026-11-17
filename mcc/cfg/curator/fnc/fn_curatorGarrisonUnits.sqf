@@ -39,7 +39,7 @@ private "_groupUnits";
 private _side = [];
 _faction = (U_FACTIONS select (_resualt select 0)) select 2;
 _radius = _resualt select 1;
-_intanse = _resualt select 2;	//0-10 (the slider used to go 0-1, so ~3 % of building positions got a soldier while vehicles still spawned)
+_intanse = _resualt select 2;	//0-10: the chance per building position, as MCC_fnc_garrison expects
 _spawnVehicles = _resualt select 3;
 _locked = _resualt select 4;
 _groupUnits = _resualt select 5;

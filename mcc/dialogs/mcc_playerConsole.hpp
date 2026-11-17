@@ -174,7 +174,7 @@ class mcc_consoleF6: MCC_RscButtonConsoleKey
 	w = 0.0229167 * safezoneW;
 	h = 0.0329871 * safezoneH;
 	tooltip = "Fleet Management";
-	onButtonClick ="while {dialog} do {closeDialog 0}; [0,0,0] spawn MCC_fnc_LHDspawnMenuInit";
+	onButtonClick ="while {dialog} do {closeDialog 0}; [0,0,[2,1] select (((missionNamespace getVariable ['MCC_server',objNull]) getVariable [format ['CP_commander%1',playerSide],'']) == getPlayerUID player)] spawn MCC_fnc_LHDspawnMenuInit";
 };
 class mcc_consoleFn: MCC_RscButtonConsoleKey
 {
@@ -240,7 +240,7 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 
 			class MCC_ConsoleCASAvailableText: MCC_RscText
 			{
-				idc = -1;
+				idc = 9330;	//(MK) the selected Air Patrol's time and cost (MCCMK_fnc_apConsoleInfo)
 
 				text = "CAS Available";
 				x = 0.00515602 * safezoneW;
@@ -254,6 +254,9 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 			class MCC_ConsoleCASAvailableTextBox: MCC_RscListbox
 			{
 				idc = MCC_ConsoleCASAvailableTextBox_IDD;
+				onLBSelChanged = "['sel'] call MCCMK_fnc_apConsoleInfo";	//(MK) an Air Patrol's time, cost and loadout
+				onMouseEnter = "ctrlSetFocus (_this select 0)";	//(MK) prices on hover: Arma shows a list's tooltips only once it has focus
+				onMouseMoving = "if (_this select 3) then {ctrlSetFocus (_this select 0)}";
 
 				x = 0.00515602 * safezoneW;
 				y = 0.055 * safezoneH;
@@ -269,6 +272,18 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 				w = 0.226875 * safezoneW;
 				h = 0.077 * safezoneH;
 			};
+			//(MK) An Air Patrol's loadout: Mixed / Air / Ground, cycled by clicking (only what the aircraft can carry)
+			class MCCMK_ConsoleAPLoadout: MCCBTN_S
+			{
+				idc = 9331;
+				text = "Mixed";
+				onLoad = "(_this select 0) ctrlShow false";
+				onButtonClick = "['cycle'] call MCCMK_fnc_apConsoleInfo";
+				x = 0.127000 * safezoneW;
+				y = 0.016500 * safezoneH;
+				w = 0.050000 * safezoneW;
+				h = 0.022000 * safezoneH;
+			};
 			class MCC_ConsoleCallCASButton: MCCBTN_S
 			{
 				idc = -1;
@@ -279,7 +294,7 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 				y = 0.016500 * safezoneH;
 				w = 0.050000 * safezoneW;
 				h = 0.022000 * safezoneH;
-				tooltip = "Call selected CAS - Click and drag on the mini-map to set the CAS approach";
+				tooltip = "Call selected CAS - Click and drag on the mini-map to set the\nCAS approach";
 			};
 
 			class MCC_ConsoleCASFolderIn: MCC_RscButtonMenu
@@ -366,6 +381,8 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 			class MCC_ConsoleAirdropAvailableTextBox: MCC_RscListbox
 			{
 				idc = MCC_ConsoleAirdropAvailableTextBox_IDD;
+				onMouseEnter = "ctrlSetFocus (_this select 0)";	//(MK) prices on hover: Arma shows a list's tooltips only once it has focus
+				onMouseMoving = "if (_this select 3) then {ctrlSetFocus (_this select 0)}";
 
 				x = 0.00515602 * safezoneW;
 				y = 0.055 * safezoneH;
@@ -391,7 +408,30 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 				y = 0.016500 * safezoneH;
 				w = 0.050000 * safezoneW;
 				h = 0.022000 * safezoneH;
-				tooltip = "Call selected airdrop - Click and drag on the mini-map to set the airdrop approach";
+				tooltip = "Call selected airdrop - Click and drag on the mini-map to set\nthe airdrop approach";
+			};
+			//(MK) Smoke: every airdrop marks its landing with green smoke (ticked) or none (unticked) - remembered per player
+			class MCC_ConsoleAirdropSmokeText: MCC_RscText
+			{
+				idc = 9231;
+				text = "Smoke";
+				style = 1;
+				x = 0.138000 * safezoneW;
+				y = 0.016500 * safezoneH;
+				w = 0.031000 * safezoneW;
+				h = 0.022000 * safezoneH;
+				sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				tooltip = "Ticked: every airdrop (crates, vehicles, Taru pods) is marked\nwith green smoke where it lands";
+			};
+			class MCC_ConsoleAirdropSmoke: MCC_RscCheckBox
+			{
+				idc = 9230;
+				x = 0.171000 * safezoneW;
+				y = 0.020000 * safezoneH;
+				w = 0.008500 * safezoneW;
+				h = 0.015000 * safezoneH;
+				tooltip = "Ticked: every airdrop (crates, vehicles, Taru pods) is marked\nwith green smoke where it lands";
+				onCheckedChanged = "profileNamespace setVariable ['MCCMK_dropSmoke', (_this select 1) == 1]; MCCMK_dropSmoke = (_this select 1) == 1; publicVariable 'MCCMK_dropSmoke';";
 			};
 
 			class MCC_ConsoleADFolderIn: MCC_RscButtonMenu
@@ -541,10 +581,23 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 			class MCC_ConsoleEvacApproachComboBox: MCC_RscCombo
 			{
 				idc = MCC_ConsoleEvacApproachComboBox_IDD;
+				onLBSelChanged = "[_this select 0, _this select 1, 'cc'] call MCC_fnc_evacInsertionChanged";
 
 				x = 0.06651 * safezoneW;
 				y = 0.085222 * safezoneH;
 				w = 0.103125 * safezoneW;
+				h = 0.022 * safezoneH;
+				sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			};
+			class MCC_ConsoleEvacChuteCombo: MCC_RscCombo
+			{
+				idc = 9195;
+				tooltip = "Paradrop insertion only - Auto: players' chutes open by\nthemselves. Manual: players open their own chute (AI open\ntheirs on exit).";
+				onLoad = "params ['_c']; _c lbAdd 'Chute: Auto'; _c lbAdd 'Chute: Manual'; _c lbSetCurSel ((profileNamespace getVariable ['MCC_ccEvacChute', 0]) min 1)";
+				onLBSelChanged = "profileNamespace setVariable ['MCC_ccEvacChute', _this select 1]";
+				x = 0.174800 * safezoneW;
+				y = 0.085222 * safezoneH;
+				w = 0.060000 * safezoneW;
 				h = 0.022 * safezoneH;
 				sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			};
@@ -567,7 +620,7 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 
 				text = "Call EVAC 3 WP";
 				x = 0.174800 * safezoneW;
-				y = 0.107222 * safezoneH;
+				y = 0.118222 * safezoneH;	//(MK) level with Flight Height
 				w = 0.060000 * safezoneW;
 				h = 0.022000 * safezoneH;
 				tooltip = "Call selected EVAC - Mouse click on the mini-map to call it";
@@ -775,6 +828,7 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 	class MCC_ConsoleWPCombo: MCC_RscCombo
 	{
 		idc = MCC_CONSOLEWPCOMBO;
+		onLBSelChanged = "[ctrlParent (_this select 0)] call MCC_fnc_consoleWpFormationFill";
 		x = 0.1 * safezoneW + safezoneX;
 		y = 0.1 * safezoneH + safezoneY;
 		w = 0.105 * safezoneW;
@@ -804,6 +858,51 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 		w = 0.105 * safezoneW;
 		h = 0.0280062 * safezoneH;
 	};
+	class MCC_ConsoleWPflyCombo: MCC_RscCombo
+	{
+		idc = 9219;
+		onLoad = "(_this select 0) ctrlShow false";
+		x = 0.1 * safezoneW + safezoneX;
+		y = 0.1 * safezoneH + safezoneY;
+		w = 0.105 * safezoneW;
+		h = 0.0280062 * safezoneH;
+	};
+	class MCC_ConsoleWPHaloFormText: MCC_RscText
+	{
+		idc = 9207;
+		style = 1;
+		text = "Formation";
+		tooltip = "HALO formation: ticked - jump in formation; unticked -\neveryone falls on his own";
+		onLoad = "(_this select 0) ctrlShow false";
+		sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		x = 0; y = 0; w = 0; h = 0;
+	};
+	class MCC_ConsoleWPHaloForm: MCC_RscCheckBox
+	{
+		idc = 9208;
+		tooltip = "HALO formation: ticked - jump in formation; unticked -\neveryone falls on his own";
+		onLoad = "(_this select 0) ctrlShow false";
+		onCheckedChanged = "profileNamespace setVariable ['MCC_ccHaloForm', (_this select 1) == 1]; ((ctrlParent (_this select 0)) displayCtrl 9210) ctrlEnable ((_this select 1) == 0);";
+		x = 0; y = 0; w = 0; h = 0;
+	};
+	class MCC_ConsoleWPHaloLeadText: MCC_RscText
+	{
+		idc = 9209;
+		style = 1;
+		text = "Lead first";
+		tooltip = "Ticked: the squad leader always jumps first. Unticked: a\nplayer leading the squad takes a random place in the stick\n(not with Formation)";
+		onLoad = "(_this select 0) ctrlShow false";
+		sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		x = 0; y = 0; w = 0; h = 0;
+	};
+	class MCC_ConsoleWPHaloLead: MCC_RscCheckBox
+	{
+		idc = 9210;
+		tooltip = "Ticked: the squad leader always jumps first. Unticked: a\nplayer leading the squad takes a random place in the stick\n(not with Formation)";
+		onLoad = "(_this select 0) ctrlShow false";
+		onCheckedChanged = "profileNamespace setVariable ['MCC_ccHaloLead', (_this select 1) == 1]";
+		x = 0; y = 0; w = 0; h = 0;
+	};
 	class MCC_ConsoleWPAdd: MCCBTN_R {
 		idc = MCC_CONSOLEWPADD;
 		text = "ADD";
@@ -821,7 +920,7 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 		y = 0.1 * safezoneH + safezoneY;
 		w = 0.1 * safezoneW;
 		h = 0.1 * safezoneH;
-		tooltip = "Remove all waypoints from any selected groups and add a new waypoint";
+		tooltip = "Remove all waypoints from any selected groups and add a new\nwaypoint";
 		onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\console\manageWP.sqf'");
 	};
 	class MCC_ConsoleWPClear: MCCBTN_R {
@@ -841,7 +940,7 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 		y = 0.1 * safezoneH + safezoneY;
 		w = 0.1 * safezoneW;
 		h = 0.1 * safezoneH;
-		tooltip = "Close the waypoint panel - the selected unit and its camera feed stay";
+		tooltip = "Close the waypoint panel - the selected unit and its camera\nfeed stay";
 		onButtonClick = __EVAL("[3] execVM '"+MCCPATH+"mcc\general_scripts\console\manageWP.sqf'");
 	};
 	class MCC_ConsoleInfoText: MCC_RscStructuredText
@@ -874,10 +973,20 @@ class mcc_consoleFn: MCC_RscButtonConsoleKey
 		onButtonClick =  __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\console\consoleTakeControl.sqf'");
 	};
 
+	class MCC_ConsoleMakeHQButton: MCCBTN_S {
+		idc = -1;
+		text = "Make HQ";
+		tooltip = "Make one of your F.O.B.s (or a ship) the HQ - click it on the\nmap, then confirm the cost";
+		x = 0.35 * safezoneW + safezoneX;
+		y = 0.7675 * safezoneH + safezoneY;
+		w = 0.045 * safezoneW;
+		h = 0.0219914 * safezoneH;
+		onButtonClick = "['start', false] call MCCMK_fnc_makeHQPick";
+	};
 	class MCC_ConsoleMapRulerButton: MCCBTN_S {
 		idc = MCC_ConsoleMapRulerButton;
 		text = "Ruler";
-		tooltip = "Activate the map ruler - left click on the map and drag from one point to another to measure distance and direction";
+		tooltip = "Activate the map ruler - left click on the map and drag from\none point to another to measure distance and direction";
 		x = 0.4 * safezoneW + safezoneX;
 		y = 0.7675 * safezoneH + safezoneY;
 		w = 0.045 * safezoneW;

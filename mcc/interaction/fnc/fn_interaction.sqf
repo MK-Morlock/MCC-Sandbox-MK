@@ -28,7 +28,7 @@ MCC_interactionKey_holding = _this select 0;
 
 //Find out the key
 if (MCC_isCBA) then {
-	_key = ["MCC","interactionKey"] call CBA_fnc_getKeybind;
+	_key = ["MCCMK","interactionKey"] call CBA_fnc_getKeybind;
 	if (((_key select 5) select 1) select 0) then {_text = "Shift + "};
 	if (((_key select 5) select 1) select 1) then {_text = _text + "Ctrl + "};
 	if (((_key select 5) select 1) select 2) then {_text = _text + "Alt + "};
@@ -195,7 +195,8 @@ if (vehicle player == player) then {
 		switch (true) do {
 			case (_ctrlData in ["commander","driver"]) : {player action [format ["moveTo%1",_ctrlData], _object]};
 			case (_ctrlData == "cargo") : {player action ["MoveToCargo", _object, (_object emptyPositions "cargo")-1]};
-			case (_ctrlData == "load") : {player setVariable ["interactWith",_object]; [_object] spawn MCC_fnc_logisticsCargoInit;}; //[player] call MCC_fnc_loadTruckUI
+			case (_ctrlData == "load") : {player setVariable ["interactWith",_object]; [_object] spawn MCC_fnc_logisticsCargoInit;};
+			case (_ctrlData == "crates") : {[player] spawn MCC_fnc_loadTruckUI};	//(MK) the crate screen, which only ACE could open
 			case (_ctrlData == "dropOff") : {[] call MCC_fnc_requestDropOff};
 			case (["gunner",_ctrlData] call BIS_fnc_inString) : 	{
 				call compile format ["player action ['MoveToTurret',vehicle player,%1]",([_ctrlData,"[01234567890]"] call BIS_fnc_filterString)];
@@ -279,7 +280,14 @@ if (vehicle player == player) then {
 	//Logistics
 	if (((_vehiclePlayer call MCC_fnc_logisticsCargoGetMass)>10) && (missionNamespace getVariable ["MCC_allowlogistics",true])) then
 	{
-		_array pushBack ["['load'] spawn MCC_fnc_vehicleCargoMenuClicked","Logistics",_pic];
+		_array pushBack ["['load'] spawn MCC_fnc_vehicleCargoMenuClicked","Cargo",_pic];
+	};
+
+	//(MK) Logistics crates: the driver of a supply truck (or of a helicopter in the air, for sling loads), nearly stopped
+	if ((missionNamespace getVariable ["MCC_allowlogistics",true]) && {player == driver _vehiclePlayer} && {(speed _vehiclePlayer) < 10}
+		&& {([_vehiclePlayer] call MCCMK_fnc_isSupplyTruck) || {(_vehiclePlayer isKindOf "Helicopter") && {((getPos _vehiclePlayer) select 2) > 15}}}) then
+	{
+		_array pushBack ["['crates'] spawn MCC_fnc_vehicleCargoMenuClicked","Logistics (crates)",_pic];
 	};
 
 	//Artillery

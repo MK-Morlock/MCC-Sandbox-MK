@@ -31,5 +31,8 @@ if (surfaceIsWater _pos) then {
 };
 
 _evac setDir _dir;
+[_evac] call MCCMK_fnc_garageApply;	//(MK) its class's garage paint and parts, if any
 
+// the faction picked in the evac menu: its own pilots fly a Taru (MCC_fnc_setEvac)
+_evac setVariable ["MCCMK_evacFaction", param [5, "", [""]]];
 [_evac, _side, true,_campaignEvac] call MCC_fnc_setEvac;

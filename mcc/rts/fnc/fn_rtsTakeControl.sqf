@@ -76,7 +76,7 @@ MCC_backToplayerIndex = _targetUnit addaction ["<t color=""#CC0000"">Back To Pla
 _ok = _targetUnit addEventHandler ["Killed", format ["[_this select 0] execVM '%1mcc\general_scripts\unitManage\backToPlayer.sqf'",MCC_path]];
 
 if (MCC_PrevHijacked_Group != "") then {
-	// back into the controlled unit's own group (_group here is the temporary group deleted above - joining it hung the waitUntil)
+	// back into the controlled unit's own group (_group here is the temporary group deleted above, which can't be joined)
 	[player] joinSilent (groupFromNetID MCC_PrevHijacked_Group);
 	waituntil {group player == (groupFromNetID MCC_PrevHijacked_Group)};
 

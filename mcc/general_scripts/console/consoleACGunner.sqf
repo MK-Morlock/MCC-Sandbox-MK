@@ -1,8 +1,8 @@
 params [["_path", [1], [[]]]];
 private _uav = missionNamespace getVariable ["MCC_ACConsoleUp", objNull];
-if (!alive _uav) exitWith {hint "No AC-130 up"};
+if (!alive _uav) exitWith {["No AC-130 up"] call MCCMK_fnc_hint};
 private _g = _uav turretUnit _path;
-if (isNull _g || {!alive _g}) exitWith {hint "That gunner seat is empty"};
+if (isNull _g || {!alive _g}) exitWith {["That gunner seat is empty"] call MCCMK_fnc_hint};
 MCC_acRemoteToken = (missionNamespace getVariable ["MCC_acRemoteToken", 0]) + 1;
 private _tok = MCC_acRemoteToken;
 MCC_consoleTakingControl = true;

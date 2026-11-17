@@ -46,45 +46,47 @@ if !mcc_isloading then
 
 		MCCEvacHeliType = (_mccdialog displayCtrl MCC_EVAC_CLASS) lbData (lbCurSel MCC_EVAC_CLASS);
 		MCCEvacSide = call MCC_fnc_evacSide;
-		if (MCCEvacHeliType == "") exitWith {hint "No vehicle of this type for that faction"};
+		if (MCCEvacHeliType == "") exitWith {["No vehicle of this type for that faction"] call MCCMK_fnc_hint};
 
 		//Spawn on LHD
 		if (_option == 0) then
 		{
 			if (MCCLHDSpawned) then
 			{
-				hint "Evac Vehicle spawned on LHD";
+				["Evac Vehicle spawned on LHD"] call MCCMK_fnc_hint;
 				_pos = getmarkerpos "pos4";
-				[MCCEvacHeliType, _pos, false, 0, MCCEvacSide] remoteExec ["MCC_fnc_evacSpawn", 2, false];
+				[MCCEvacHeliType, _pos, false, 0, MCCEvacSide, missionNamespace getVariable ["MCCMK_evacFaction", ""]] remoteExec ["MCC_fnc_evacSpawn", 2, false];
 				mcc_safe = mcc_safe + FORMAT ["
-											['%1',%2, false, 0, %3] remoteExec ['MCC_fnc_evacSpawn', 2, false];
+											['%1',%2, false, 0, %3, '%4'] remoteExec ['MCC_fnc_evacSpawn', 2, false];
 											"
 											, MCCEvacHeliType
 											, _pos
 											, MCCEvacSide call BIS_fnc_sideID
+											, missionNamespace getVariable ["MCCMK_evacFaction", ""]
 											];
 			}
 			else
 			{
-				hint "LHD is not available, evac chopper can't be spawned"
+				["LHD is not available, evac chopper can't be spawned"] call MCCMK_fnc_hint
 			};
 		};
 
 		//Spawn on land
 		if (_option == 1) then
 		{
-			if (missionNamespace getVariable ["MCC_evacSpawnPending", false]) exitWith {onMapSingleClick ""; MCC_evacSpawnPending = false; hint "Evac spawn cancelled"};
+			if (missionNamespace getVariable ["MCC_evacSpawnPending", false]) exitWith {onMapSingleClick ""; MCC_evacSpawnPending = false; ["Evac spawn cancelled"] call MCCMK_fnc_hint};
 			MCC_evacSpawnPending = true;
-			hint "Click on the map to spawn the evac vehicle (right-click to cancel)";
+			["Click on the map to spawn the evac vehicle (right-click to cancel)"] call MCCMK_fnc_hint;
 			onMapSingleClick " 	hint ""Evac Vehicle spawned."";
 								MCC_evacSpawnPending = false;
-								[MCCEvacHeliType, _pos, false, 0, MCCEvacSide] remoteExec [""MCC_fnc_evacSpawn"", 2, false];
+								[MCCEvacHeliType, _pos, false, 0, MCCEvacSide, missionNamespace getVariable [""MCCMK_evacFaction"", """"]] remoteExec [""MCC_fnc_evacSpawn"", 2, false];
 								mcc_safe=mcc_safe + FORMAT ['
-									[""%1"",%2, false, 0, %3] remoteExec [""MCC_fnc_evacSpawn"", 2, false];
+									[""%1"",%2, false, 0, %3, ""%4""] remoteExec [""MCC_fnc_evacSpawn"", 2, false];
 									sleep 1;'
 									, MCCEvacHeliType
 									, _pos
 									, MCCEvacSide call BIS_fnc_sideID
+									, missionNamespace getVariable [""MCCMK_evacFaction"", """"]
 									];
 								onMapSingleClick """";
 								";

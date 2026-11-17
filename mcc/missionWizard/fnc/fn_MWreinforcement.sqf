@@ -63,14 +63,27 @@ _size = 0;
 if (_totalEnemyUnits > 40) then {_size = 1};
 if (_totalEnemyUnits > 60) then {_size = 2};
 
-_trigger = createTrigger ["emptydetector",_missionCenterTriggerPos];
+// (MK) The QRF's mission finished or deleted: it stops waiting (its trigger removed) The mission is found in the records
+// by its zone; once found, a record that's gone counts as deleted.
+private _qrfZone = if (_zoneNumber isEqualType "") then {_zoneNumber} else {str _zoneNumber};
+private _qrfMission = "";
+private _missionOver = {
+	private _reg = missionNamespace getVariable ["MCC_generatedMissions", createHashMap];
+	if (_qrfMission == "") then {
+		{if (_qrfZone in (_y getOrDefault ["zones", []])) exitWith {_qrfMission = _x}} forEach _reg;
+	};
+	if (_qrfMission == "") exitWith {false};
+	private _r = _reg getOrDefault [_qrfMission, createHashMap];
+	(count _r == 0) || {_r getOrDefault ["done", false]} || {missionNamespace getVariable [format ["MCC_missionDeleted_%1", _qrfMission], false]}
+};
+_trigger = createTrigger ["emptydetector",_missionCenterTriggerPos]; [_trigger] call MCCMK_fnc_genTag;
 _trigger settriggerarea _missionCenterTriggerArea;
 _trigger setTriggerActivation [str _side, "PRESENT", true];
 sleep 5;
 
 //Wait untill player is nearby to work with cache and delayed spawn
 if (_waitForPlayers && {!isNil "GAIA_fnc_isNearPlayer"}) then {
-	while {!([getposAtl _trigger,((missionNamespace getVariable ["GAIA_CACHE_STAGE_1",1000])/2)] call GAIA_fnc_isNearPlayer)} do {sleep 10};
+	while {!([getposAtl _trigger,((missionNamespace getVariable ["GAIA_CACHE_STAGE_1",1000])/2)] call GAIA_fnc_isNearPlayer) && {!(call _missionOver)}} do {sleep 10};
 };
 
 _tlist = (_side countSide (list _trigger)) max 1;
@@ -80,13 +93,14 @@ private _distance = false;
 private _newPos = nil;
 private _rfc = 0;
 
-for "_i" from 0 to (count _cond) step 1 do
+for "_i" from 0 to ((count _cond) - 1) step 1 do	//(MK) one pass per wave (there was one extra)
 {
 	//Create Zone
 	_found = false;
 
 	_rfc = if (_reinforcement == 3) then {[1,2] call BIS_fnc_selectRandom} else {_reinforcement};
-	if (_rfc == 2 && (count MCC_MWunitsArrayCar) <= 0) then {_rfc = 1};
+	//(MK) a faction without cars: the motorised QRF uses the side's vanilla trucks (MCC_fnc_reinforcement), as the
+	// helicopter QRF uses the side's vanilla helicopter
 
 	while {!_found} do
 	{
@@ -103,7 +117,16 @@ for "_i" from 0 to (count _cond) step 1 do
 		};
 	};
 
-	while {(1-(_side countSide (list _trigger))/_tlist) < (_cond select _i)} do {sleep 10};
+	while {((1-(_side countSide (list _trigger))/_tlist) < (_cond select _i)) && {!(call _missionOver)}} do {sleep 10};
+	if (call _missionOver) exitWith {};	//(MK) the mission is over: no more waves
+	// (MK) Checked before the message, so "QRF moving in" only shows for one that will come: the troops must exist (the
+	// faction's own after the content filter, or a sibling faction's). The helicopter and the vehicles always exist (the
+	// side's vanilla ones as the last resort), and a mission's start point is on a road.
+	private _qrfSoldiers = [[[_faction,"soldier","",false] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry, _faction] call MCC_fnc_contentFilterList;
+	if (_qrfSoldiers isEqualTo []) then {
+		{if (_qrfSoldiers isEqualTo []) then {_qrfSoldiers = [[_x,"soldier","",false] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry}} forEach ([_faction] call MCC_fnc_factionSiblings);
+	};
+	if (_qrfSoldiers isEqualTo []) exitWith {["INFO", "MCC_fnc_MWreinforcement", "%1 has no soldiers to send - no QRF (and no message)", [_faction]] call MCC_fnc_log};
 
 	switch (_rfc) do
 	{

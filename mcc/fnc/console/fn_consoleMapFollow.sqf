@@ -2,7 +2,7 @@
 	Commander console maps: keep the map centred on a moving object (cruise missile, UAV, gunship, evac helicopter) until
 	the object is gone, another follow starts, or you right-click on the map to look elsewhere (then it stays where you put it).
 	Done in the map's Draw event (every frame, smooth). Each frame the object's offset from the middle of the map is corrected,
-	so it stays centred even where the map's own centre is not the middle of the control (it sat in the top-left corner).
+	so it stays centred even where the map's own centre is not the middle of the control.
 	<IN>	0: CONTROL map
 			1: OBJECT  what to follow
 ==============================================================================================================================================================*/
@@ -17,10 +17,8 @@ MCC_mapFollowStopped = false;
 if !(_map getVariable ["MCC_followEH", false]) then {
 	_map setVariable ["MCC_followEH", true];
 	//Right mouse button on the map: stop following
-	_map ctrlAddEventHandler ["MouseButtonDown", {
-		params ["", "_button"];
-		if (_button == 1) then {MCC_mapFollowStopped = true};
-	}];
+	_map ctrlAddEventHandler ["MouseButtonDown", {MCC_mapFollowStopped = true}];
+	_map ctrlAddEventHandler ["MouseZChanged", {MCC_mapFollowStopped = true}];
 	_map ctrlAddEventHandler ["Draw", {
 		params ["_m"];
 		private _t = _m getVariable ["MCC_followTarget", objNull];

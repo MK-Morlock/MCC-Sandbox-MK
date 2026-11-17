@@ -48,7 +48,7 @@ if (!_cpActivated && _respawnDialog) then {
 		sleep 0.1;
 
 		_ok = createDialog ("CP_RESPAWNPANEL" call MCC_fnc_dialogName);
-		if !(_ok) exitWith { hint "createDialog failed"; if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log  "CP: create respawn Dialog failed"};};
+		if !(_ok) exitWith { ["createDialog failed"] call MCCMK_fnc_hint; if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log  "CP: create respawn Dialog failed"};};
 
 		waituntil {playerDeploy};
 		closedialog 0;
@@ -95,10 +95,9 @@ switch (_playerSideNr) do {
 };
 
 // Only mark a start / base respawn when MCC actually has a start location for this side.
-// This used to fall back to "position player" and (re)create a local RESPAWN_<SIDE> marker there every time the player
-// respawned. The Respawn EH fires while the new unit is still at the death position (e.g. before the BI respawn menu
-// moves it), so the menu and BASE respawn got a "respawn_west" position where the player had died. It also deleted the
-// missions own respawn_<side> marker (locally) and replaced it.
+// The Respawn EH fires while the new unit is still at the death position (e.g. before the BI respawn menu moves it), so
+// falling back to the player's position would put the base respawn where he died and replace the mission's own
+// respawn_<side> marker.
 _pos = missionNamespace getVariable [_startLocationName, []];
 if !(_pos isEqualType [] && {count _pos >= 2} && {!(_pos isEqualTo [0,0,0])}) exitWith {
 	if (missionNamespace getVariable [format ["MCC_ownRespawnMarker_%1", _respawnName], false]) then {

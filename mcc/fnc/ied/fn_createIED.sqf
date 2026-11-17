@@ -181,7 +181,7 @@ _fnc_iedHandle = {
 		//If IED is a car lets make it burn
 		if (_fakeIed isKindOf "Car" || _fakeIed isKindOf "Wreck_Base") then {
 			_fakeIed setdamage 1;
-			_effect = "test_EmptyObjectForFireBig" createVehicle (getpos _fakeIed);
+			_effect = "test_EmptyObjectForFireBig" createVehicle (getpos _fakeIed); [_effect] call MCCMK_fnc_genTag;
 			_effect attachto [_fakeIed,[0,0,0]];
 			_effect spawn
 			{
@@ -225,7 +225,7 @@ if (typeName _iedside == typeName sideLogic) then {_iedside = [_iedside]};
 _pos 	= getposatl _fakeIed;
 _iedDir =  getdir _fakeIed;
 
-_dummy = createVehicle [MCC_dummy, _pos, [], 0, "NONE"];
+_dummy = createVehicle [MCC_dummy, _pos, [], 0, "NONE"]; [_dummy] call MCCMK_fnc_genTag;
 
 //If it is a mini-game
 if (_IEDTriggerType >=3) then {
@@ -258,7 +258,7 @@ _dummy setvariable ["iedAmbush", false, true];
 _dummy setvariable ["MCC_IEDtype", "ied", true];
 
 //Create helper
-[_dummy,"Hold %1 to disarm"] remoteExec ["MCC_fnc_createHelper", 2, false];
+(if (isServer) then {[[_dummy,"Hold %1 to disarm"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_createHelper"] spawn MCCMK_fnc_genRun} else {[_dummy,"Hold %1 to disarm"] remoteExec ["MCC_fnc_createHelper", 2, false]});
 
 //If it is radio IED
 if (_IEDTriggerType == 1) then {

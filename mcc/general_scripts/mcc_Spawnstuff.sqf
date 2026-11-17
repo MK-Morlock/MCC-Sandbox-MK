@@ -73,7 +73,7 @@ if !(mcc_classtype in ["WATER", "DIVER"] || {mcc_classtype == "AIR" && {mcc_spaw
 //safe that string man!
 if (MCC_capture_state) then
 {
-	hint "Action captured";
+	["Action captured"] call MCCMK_fnc_hint;
 	if (mcc_spawntype == "GROUP") then
 	{
 		MCC_capture_var=MCC_capture_var + FORMAT ["
@@ -317,7 +317,7 @@ else
 				, mcc_safe_pos
 				, mcc_caching
 				, mcc_delayed_spawn
-				, missionNamespace getVariable ["MCC_spawnCommandable", false]
+				, missionNamespace getVariable ["MCC_spawnCommandable", true]
 				];
 
 		if (missionNamespace getVariable ["MCC_Chat",true]) then {systemchat str _ar};

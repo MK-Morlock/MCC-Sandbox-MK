@@ -37,7 +37,7 @@ _attachPoint = switch (getnumber(configfile >> "CfgVehicles" >> typeof _truck >>
 				};
 if (str _attachPoint == "[0,0,0]") exitWith {};
 
-_loadedCrates = _truck getVariable ["mcc_supplyTruckCurrentLoad",[]];
+_loadedCrates = ([_truck] call MCCMK_fnc_crateOnTruck) apply {typeOf _x};	//(MK) vehicle-in-vehicle and attached crates
 
 _res = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 _unload	= false;
@@ -56,7 +56,7 @@ if (count _loadedCrates >0) then {
 
 
 	//remove from truck
-	_attachedObjects = attachedObjects _truck;
+	_attachedObjects = [_truck] call MCCMK_fnc_crateOnTruck;
 	_crate =  (_attachedObjects select (count _attachedObjects)-1);
 	_crate disableCollisionWith _truck;
 
@@ -70,9 +70,12 @@ if (count _loadedCrates >0) then {
 							case 2 : {getFuelCargo _crate};
 						};
 					} else {1};
+		_factor = _factor * ([_crate] call MCCMK_fnc_crateFrac);	//(MK) only what the crate still holds
 		deleteVehicle _crate;
 		_unload		= true;
 	} else {
+		//(MK) vehicle-in-vehicle cargo: Arma unloads it
+		if (!isNull isVehicleCargo _crate) exitWith {objNull setVehicleCargo _crate; _unload = true};
 
 		_position = ATLtoASL(_truck modelToworld [0,(-12 + (count _loadedCrates*1.6)),0]);
 
@@ -102,7 +105,6 @@ if (count _loadedCrates >0) then {
 	};
 
 	if (_unload) then {
-		waituntil {count ( attachedObjects _truck) != count _attachedObjects};
 
 		_loadedCrates set [(count _loadedCrates)-1, -1];
 		_loadedCrates = _loadedCrates - [-1];

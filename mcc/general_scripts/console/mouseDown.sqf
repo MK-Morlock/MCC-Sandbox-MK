@@ -46,6 +46,8 @@ _posY = _params select 3;
 _shift = _params select 4;
 _ctrlKey = _params select 5;
 _alt = _params select 6;
+if ((missionNamespace getVariable ["MCC_evacParaWait", false]) && {_pressed == 0}) exitWith {["down", _ctrl, _posX, _posY] call MCC_fnc_evacParaLine};
+if ((missionNamespace getVariable ["MCCMK_makeHQPick", false]) && {_pressed in [0, 1]}) exitWith {["click", _ctrl ctrlMapScreenToWorld [_posX, _posY], _pressed] call MCCMK_fnc_makeHQPick};
 
 if (_pressed == 1 && {missionNamespace getVariable ["MCCMK_lineDrawing", false]}) exitWith {MCCMK_lineCancel = true};
 MCC_ConsoleMouseButtonDown = true;	//Mouse state
@@ -69,6 +71,7 @@ if ((_pressed == 0 || _pressed == 1)&& !MCC_doubleClicked) then
 	ctrlShow [MCC_CONSOLEWPREPLACE,false];
 	ctrlShow [MCC_CONSOLEWPCLEAR,false];
 	ctrlShow [MCC_CONSOLEWPCANCEL,false];
+	ctrlShow [9219,false];
 	ctrlShow [MCC_CONSOLEINFOUAVCONTROL,false];
 };
 
@@ -83,27 +86,99 @@ if (MCC_CASrequestMarker && _pressed==0) exitWith {
 	private _lm = [["strike", "supply"] select _isDrop, MCC_pointA, MCC_pointA, [], _w] call MCCMK_fnc_supportLine;
 	MCCMK_lineCancel = false;
 	MCCMK_lineDrawing = true;
+	//(MK) a strike: the target cross shown live while drawing, a little BEYOND the arrow's tip (not hidden under the
+	// cursor) - the same gap on screen at any zoom - and the strike aimed at exactly where it is. The line is a 300 m TOWED
+	// stick: past 300 m its start slides along behind the cursor, so the whole line and the cross follow it to the
+	// target. Its strength (1-4: a quarter .. all of the payload) shown as a number in the middle of the line.
+	// Supply drops and Air Patrol lines: unchanged.
+	private _aimed = !_isDrop && {(_kind find "air patrol") < 0};
+	private _fnc_aim = {
+		params ["_a", "_m"];
+		private _lead = (_ctrl ctrlMapScreenToWorld [0.5, 0.5]) distance2D (_ctrl ctrlMapScreenToWorld [0.525, 0.5]);
+		private _tp = _m getPos [_lead, _a getDir _m];
+		[_tp select 0, _tp select 1, 0]
+	};
+	private _live = "";
+	private _lbl = "";
 	sleep 0.25;
 
 	while {MCC_ConsoleMouseButtonDown} do {
+		if (_aimed && {(MCC_pointA distance2D MCCConsoleDispPosXY) > 300}) then {	// towed: the start slides behind the cursor
+			private _np = MCCConsoleDispPosXY getPos [300, MCCConsoleDispPosXY getDir MCC_pointA];
+			MCC_pointA = [_np select 0, _np select 1, 0];
+		};
 		_lm = [["strike", "supply"] select _isDrop, MCC_pointA, MCCConsoleDispPosXY, _lm, _w] call MCCMK_fnc_supportLine;
-		sleep 0.25;
+		if (_aimed && {(MCC_pointA distance2D MCCConsoleDispPosXY) > 1}) then {
+			private _tp = [MCC_pointA, MCCConsoleDispPosXY] call _fnc_aim;
+			if (_live == "") then {_live = [_tp, false] call MCCMK_fnc_strikeMarker} else {_live setMarkerPosLocal _tp};
+			// the strength in the middle of the line
+			private _len = (MCC_pointA distance2D MCCConsoleDispPosXY) min 300;
+			private _mid = MCC_pointA getPos [_len / 2, MCC_pointA getDir MCCConsoleDispPosXY];
+			if (_lbl == "") then {
+				_lbl = format ["mccmk_lineStr_%1", round (diag_tickTime * 1000)];
+				createMarkerLocal [_lbl, _mid];
+				_lbl setMarkerTypeLocal "EmptyIcon";
+				_lbl setMarkerColorLocal "ColorRed";
+				_lbl setMarkerSizeLocal [0.6, 0.6];
+			};
+			_lbl setMarkerPosLocal _mid;
+			_lbl setMarkerTextLocal str ((floor (((_len + 1) / 2) / 50) + 1) min 4);	// (+1 m: a towed line measures 299.99)
+		};
+		sleep 0.1;
 	};
 	MCCMK_lineDrawing = false;
+	// the aim at the moment it was released (the cross moved there too - the strike lands on it)
+	private _aimPos = if (_aimed) then {[MCC_pointA, MCCConsoleDispPosXY] call _fnc_aim} else {[]};
+	if (_live != "") then {deleteMarkerLocal _live};
+	if (_lbl != "") then {deleteMarkerLocal _lbl};
 	if (missionNamespace getVariable ["MCCMK_lineCancel", false]) exitWith {
 		MCCMK_lineCancel = false;
 		{deleteMarkerLocal _x} forEach _lm;
 		MCC_CASrequestMarker = false;
 		MCCMK_consolePending = [];
-		hint "Line cancelled.";
+		["Line cancelled."] call MCCMK_fnc_hint;
+	};
+
+	//(MK) Air Patrol: the line's end is where it patrols; it comes in along the line, from the map edge behind its start
+	if ((_kind find "air patrol") >= 0) exitWith {
+		{deleteMarkerLocal _x} forEach _lm;
+		private _tgt = +MCCConsoleDispPosXY;
+		private _bdir = (MCC_pointA getDir _tgt) + 180;
+		private _dx = sin _bdir;
+		private _dy = cos _bdir;
+		private _edge = {params ["_p", "_d"]; if (_d > 0.001) exitWith {(worldSize - _p) / _d}; if (_d < -0.001) exitWith {(0 - _p) / _d}; 1e9};
+		private _t = ([_tgt select 0, _dx] call _edge) min ([_tgt select 1, _dy] call _edge);
+		private _entry = [(_tgt select 0) + _dx * _t, (_tgt select 1) + _dy * _t, 0];
+		private _pend = missionNamespace getVariable ["MCCMK_consolePending", []];
+		if (count _pend > 0) then {
+			_pend params ["_pc", "_pa", "_ps"];
+			if (count _pc > 0) then {[_pc] spawn MCC_fnc_baseResourceReduce} else {
+				private _arr = missionNamespace getVariable [_pa, []];
+				private _i = _arr findIf {_x isEqualTo _ps};
+				if (_i >= 0) then {_arr deleteAt _i; missionNamespace setVariable [_pa, _arr]; publicVariable _pa};
+			};
+			MCCMK_consolePending = [];
+		};
+		//(MK) the loadout chosen in the panel (an entry added from the MCC console names its own)
+		[playerSide, _tgt, _entry, _k0, _p0, faction player, uiNamespace getVariable ["MCCMK_apLoadoutNow", ""]] remoteExec ["MCCMK_fnc_airPatrol", 2];
+		MCC_CASrequestMarker = false;
+		private _mk = createMarkerLocal [format ["MCCMK_airPatrol_%1", diag_tickTime], _tgt];
+		_mk setMarkerShapeLocal "ELLIPSE";
+		_mk setMarkerSizeLocal ([[4000, 4000], [1500, 1500]] select ((_p0 isEqualType "" && {_p0 isKindOf "Helicopter"}) || {((toLower _k0) find "heli") >= 0}));
+		_mk setMarkerBrushLocal "Border";
+		_mk setMarkerColorLocal "ColorBlue";
+		["Air Patrol called in."] call MCCMK_fnc_hint;
+		sleep 60;
+		deleteMarkerLocal _mk;
 	};
 
 	private _len = (MCC_pointA distance2D MCCConsoleDispPosXY) min 300;
 	_markerDir 	= MCC_pointA getDir MCCConsoleDispPosXY;
 	_markerPos 	= MCC_pointA getPos [[_len, 0] select _isDrop, _markerDir];
+	if (_aimed) then {_markerPos = _aimPos};	//(MK) exactly where the cross was shown
 	_spawn 		= [_markerPos,2000,(_markerDir -180)] call BIS_fnc_relpos;
 	_away 		= [_markerPos,2000,_markerDir] call BIS_fnc_relpos;
-	_ammount	=  floor ((_len / 2)/50) + 1;
+	_ammount	=  (floor (((_len + 1) / 2)/50) + 1) min 4;	//(MK) +1 m: a towed 300 m line can measure 299.99 - still full strength
 	if (!_isDrop) then {{deleteMarkerLocal _x} forEach _lm; _lm = [[_markerPos, _kind == "cruise missile"] call MCCMK_fnc_strikeMarker]};
 
 	//Check if not on trigger
@@ -115,7 +190,20 @@ if (MCC_CASrequestMarker && _pressed==0) exitWith {
 		} forEach _trg;
 	} forEach allMissionObjects "logic";
 
-	if !(_ok) exitWith {{deleteMarkerLocal _x} forEach _lm; hint "Can't call support to this location try again"};
+	if !(_ok) exitWith {{deleteMarkerLocal _x} forEach _lm; ["Can't call support to this location try again"] call MCCMK_fnc_hint};
+
+	//(MK) a supply drop's green dot: kept until the drop is complete (MCCMK_fnc_dropDots), the line goes on its timer
+	private _dd = [format ["dd%1_%2", clientOwner, round (diag_tickTime * 1000)], clientOwner];
+	private _dots = _lm select {(markerType _x) == "mil_dot"};
+	if (_dots isNotEqualTo []) then {["add", _dd select 0, _dots] call MCCMK_fnc_dropDots; _lm = _lm - _dots};
+	// Taru supply pod (MK): the pod, the method, the mark and the direction it comes in from
+	if (_k0 isEqualTo "MCCMK_TARUPOD") exitWith {
+		(missionNamespace getVariable ["MCCMK_podReq", [0, 0]]) params [["_pi", 0], ["_pm", 0]];
+		[player, playerSide, _pi, _pm, +MCC_pointA, _markerDir, false, "", _dd] remoteExec ["MCCMK_fnc_supplyPod", 2];
+		MCC_CASrequestMarker = false;
+		sleep 40;
+		{deleteMarkerLocal _x} forEach _lm;
+	};
 
 	[MCC_spawnkind] call MCC_fnc_supportHint;
 	MCC_cruiseFromCommander = true;
@@ -131,7 +219,7 @@ if (MCC_CASrequestMarker && _pressed==0) exitWith {
 		};
 		MCCMK_consolePending = [];
 	};
-	[_ammount, MCC_spawnkind , _markerPos, MCC_planeType, _spawn,_away,(missionNamespace getVariable ["MCC_airdropIsParachute",0])] spawn MCC_fnc_airDrop;
+	[_ammount, MCC_spawnkind , _markerPos, MCC_planeType, _spawn,_away,(missionNamespace getVariable ["MCC_airdropIsParachute",0]), _dd] spawn MCC_fnc_airDrop;
 
 	//Wait and delete the marker
 	MCC_CASrequestMarker = false;
@@ -173,6 +261,16 @@ if (_pressed==0 && MCC_ConsoleRuler) exitWith
 
 };
 
+if (_pressed == 0 && !_shift && !_ctrlKey && !_alt && !MCC_ConsoleRuler && {["active"] call MCCMK_fnc_wpChain}) exitWith
+{
+	private _mkP = _ctrl ctrlMapScreenToWorld [_posX, _posY];
+	private _mkT = diag_tickTime;
+	["pend", _mkP] call MCCMK_fnc_wpChain;
+	sleep 0.35;
+	if ((missionNamespace getVariable ["MCCMK_ccDblClickTime", -1]) >= (_mkT - 0.5)) exitWith {["unpend"] call MCCMK_fnc_wpChain};
+	["add", _mkP] call MCCMK_fnc_wpChain;
+};
+
 //Box drawing select
 if (_pressed==0 && !MCC_ConsoleRuler && !MCC_doubleClicked) exitWith
 {
@@ -202,6 +300,7 @@ if (_pressed==0 && !MCC_ConsoleRuler && !MCC_doubleClicked) exitWith
 	ctrlShow [MCC_CONSOLEWPREPLACE,false];
 	ctrlShow [MCC_CONSOLEWPCLEAR,false];
 	ctrlShow [MCC_CONSOLEWPCANCEL,false];
+	ctrlShow [9219,false];
 
 	//Start creating the box
 	MCC_pointA = _ctrl ctrlmapscreentoworld [_posX,_posY];									//Base of the arrow

@@ -94,6 +94,78 @@ class MCC_convoyDialogControls:MCC_RscControlsGroup
 			h = 0.018000* safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_convoyGarage1: MCCBTN_S
+		{
+			idc = 57;
+			text = "Garage 1";
+			tooltip = "Garage\nCtrl + click: back to its own look";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['convoy1', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.150094* safezoneW;
+			y = 0.232000* safezoneH;
+			w = 0.065047* safezoneW;
+			h = 0.022000* safezoneH;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_convoyGarage2: MCCBTN_S
+		{
+			idc = 58;
+			text = "Garage 2";
+			tooltip = "Garage\nCtrl + click: back to its own look";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['convoy2', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.219141* safezoneW;
+			y = 0.232000* safezoneH;
+			w = 0.065047* safezoneW;
+			h = 0.022000* safezoneH;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_convoyGarage3: MCCBTN_S
+		{
+			idc = 59;
+			text = "Garage 3";
+			tooltip = "Garage\nCtrl + click: back to its own look";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['convoy3', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.150094* safezoneW;
+			y = 0.262000* safezoneH;
+			w = 0.065047* safezoneW;
+			h = 0.022000* safezoneH;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_convoyGarage4: MCCBTN_S
+		{
+			idc = 60;
+			text = "Garage 4";
+			tooltip = "Garage\nCtrl + click: back to its own look";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['convoy4', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.219141* safezoneW;
+			y = 0.262000* safezoneH;
+			w = 0.065047* safezoneW;
+			h = 0.022000* safezoneH;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_convoyGarage5: MCCBTN_S
+		{
+			idc = 61;
+			text = "Garage 5";
+			tooltip = "Garage\nCtrl + click: back to its own look";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['convoy5', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.150094* safezoneW;
+			y = 0.292000* safezoneH;
+			w = 0.065047* safezoneW;
+			h = 0.022000* safezoneH;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_convoyGarageHVT: MCCBTN_S
+		{
+			idc = 62;
+			text = "Garage HVT";
+			tooltip = "Garage\nCtrl + click: back to its own look";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['convoyHVT', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.219141* safezoneW;
+			y = 0.292000* safezoneH;
+			w = 0.065047* safezoneW;
+			h = 0.022000* safezoneH;
+		};
 		class MCC_ConvoyCar1: MCC_RscCombo
 		{
 			idc = 50;
@@ -243,7 +315,7 @@ class MCC_convoyDialogControls:MCC_RscControlsGroup
 
 			text = "Close"; //--- ToDo: Localize;
 			x = 0.008000* safezoneW;
-			y = 0.290000* safezoneH;
+			y = 0.292000* safezoneH;
 			w = 0.057300* safezoneW;
 			h = 0.022000* safezoneH;
 		};

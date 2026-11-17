@@ -64,9 +64,8 @@ _synced = synchronizedobjects _module;
 	deleteVehicle _x;
 } forEach _synced;
 
-//Apply the list. This step was missing (also in the original MCC), so the module never changed anything.
-//Only when the module was actually set up for it - Variable Class edited away from its default or objects synced -
-//so a module placed just for # Players does not override a list set in the CBA settings.
+//Apply the list. Only when the module was actually set up for it - Variable Class edited away from its default or
+//objects synced - so a module placed just for # Players does not override a list set in the CBA settings.
 private _defaultClasses = ["b_officer_f","o_officer_f","i_officer_f","c_nikos"];
 private _edited = (count _synced > 0) || {!((_varClases apply {toLower _x}) isEqualTo _defaultClasses)};
 _varClases = _varClases select {_x isEqualType "" && {isClass (configFile >> "CfgVehicles" >> _x)}};

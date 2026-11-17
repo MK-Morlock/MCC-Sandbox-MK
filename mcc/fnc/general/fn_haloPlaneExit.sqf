@@ -1,8 +1,7 @@
 /*================================================================== MCC_fnc_haloPlaneExit ==================================================================
-	HALO aircraft after the drop (agreed): it keeps its drop height (no dive) and its fuel, turns gradually towards the
+	HALO aircraft after the drop: it keeps its drop height (no dive) and its fuel, turns gradually towards the
 	nearest edge of the map (the in-game map area, worldSize square), flies past it into the empty area beyond and is
-	then deleted with its crew. (MCC_fnc_deletePlane set flyInHeight 300 and 20% fuel: from 4 km it dived and often hit
-	the ground.)
+	then deleted with its crew. (MCC_fnc_deletePlane sets flyInHeight 300 and 20% fuel: from 4 km up that is a dive.)
 	<IN>	0: OBJECT aircraft
 			1: NUMBER height to keep (m)
 ==============================================================================================================================================================================*/
@@ -14,6 +13,7 @@ _plane flyInHeight _height;
 _grp setBehaviour "CARELESS";
 _grp setCombatMode "BLUE";
 _grp setVariable ["MCC_canbecontrolled", false, true];
+if (_grp getVariable ["MCCMK_hcAdded", false]) then {["INFO", "commandable", "%1 set NOT commandable by fn_haloPlaneExit (it was in the commander's High Command)", [groupId _grp]] call MCC_fnc_log};
 
 //Nearest map edge from where it is; aim 2 km beyond it, into the empty area
 private _ws = worldSize;
@@ -28,20 +28,16 @@ _exit sort true;
 private _target = (_exit select 0) select 1;
 private _route = [_plane getPos [2000, getDir _plane], _target];
 private _isPlane = _plane isKindOf "Plane";
-if (_isPlane) then {
+//(MK) a mission area near: it turns AWAY from it first (left if it's on the right, right if on the left), not back over it
+private _awayP = [_plane, [1500, 2500] select _isPlane] call MCCMK_fnc_turnAwayPoint;
+if (_awayP isNotEqualTo []) then {_route = [_awayP, _target]; ["INFO", "haloPlaneExit", "%1 turns away from the mission area first", [typeOf _plane]] call MCC_fnc_log};
+if (_isPlane && {_awayP isEqualTo []}) then {
 	private _p1 = _route select 0;
 	private _turn = ((((_p1 getDir _target) - (getDir _plane)) + 540) mod 360) - 180;
 	if ((abs _turn) > 90) then {_route = [_p1, _p1 getPos [2500, (getDir _plane) + (if (_turn > 0) then {90} else {-90})], _target]};
 };
 if (_plane isKindOf "Helicopter" || {_avoidZones}) then {
-	private _zones = [];
-	{
-		private _m = str _x;
-		if !((getMarkerPos _m) isEqualTo [0,0,0]) then {
-			private _sz = getMarkerSize _m;
-			_zones pushBack [getMarkerPos _m, ((_sz select 0) max (_sz select 1)) + 500];
-		};
-	} forEach (missionNamespace getVariable ["MCC_zones_numbers", []]);
+	private _zones = [500] call MCCMK_fnc_activeAOs;	//(MK) the MCC zones and the generated missions' areas
 	if (count _zones > 0) then {
 		private _from = getPosATL _plane;
 		private _out = [];
@@ -97,7 +93,8 @@ waitUntil {
 		_px < -500 || {_px > _ws + 500} || {_py < -500} || {_py > _ws + 500}
 	}
 };
-if (!isNull _plane) then {
+// (MK) only an aircraft still flying is removed at the exit - one shot down stays a wreck, as in Arma
+if (!isNull _plane && {alive _plane}) then {
 	{deleteVehicle _x} forEach (crew _plane);
 	deleteVehicle _plane;
 };

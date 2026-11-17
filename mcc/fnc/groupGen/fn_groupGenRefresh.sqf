@@ -65,6 +65,9 @@ MCC_fnc_mapDrawWP =
 			_map drawLine _x;
 		};
 	} foreach (missionNamespace getVariable ["MCC_GGLines",[]]);
+	if (!isNull (uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull])) then {
+		[_map, missionNamespace getVariable ["MCC_GroupGenGroupSelected", []], (["MCC_artilleryEnabled", "MCC_spawnEnabled", "MCC_ConsoleRuler", "MCC_zone_drawing", "MCC3DRuning", "MCC_CASrequestMarker", "MCC_brush_drawing", "MCC_drawTriggers", "MCC_drawMinefield", "MCC_delete_drawing", "MCC_ambushPlacing", "MCC_UMParadropRequestMarker", "MCC_DrawLine", "MCC_evacParaWait", "MCCMK_makeHQPick", "MCC_evacSpawnPending"] findIf {(missionNamespace getVariable [_x, false]) isEqualTo true}) >= 0] call MCCMK_fnc_wpChainDraw;
+	};
 
 	//Show towns name up to1.5Km
 	if (!isnil "MCC_3D_CAM") then
@@ -140,6 +143,78 @@ MCC_fnc_mapDrawWP =
 };
 
 _handler = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 9000) ctrladdeventhandler ["draw","_this call MCC_fnc_mapDrawWP;"];
+uiNamespace setVariable ["MCCMK_wpChain", nil];
+// (MK) THE CONSOLE'S ICONS HELD AGAINST ARMA'S HIGH COMMAND. While the player is his side's commander, Arma's High Command
+// script goes round EVERY group about once a second and blanks its icon's colour and name (colour [0,0,0,0], name '', on
+// friendly and enemy groups alike, in his High Command or not, and its own "dummy" icons added). The console's colour
+// and name are put back at three points of every frame: at its start, when the scene is drawn (after the scripts have
+// run,
+// before the map is), and when the map is drawn.
+MCCMK_iconHold = {
+	{
+		private _w = _x getVariable "MCCMK_iconWant";
+		private _id = _x getVariable "MCCgroupIconData";
+		if (!isNil "_w" && {!(_x getVariable ["MCCMK_miFlashing", false])}) then {_x setGroupIconParams ([_x, _w] call MCCMK_fnc_iconWithWp)};
+	} forEach allGroups;
+};
+// (MK) THE ICONS AND ARMA'S "MILITARY SYMBOLS". Arma's High Command starts Arma's Military Symbols module (MARTA - read in
+// A3\modules_f: hc.sqf creates it, marta_local.fsm runs it; MCC's UAV console starts it too). For every group of the
+// player's side and every enemy group his side knows of, it keeps two icons of its own on the group - a symbol (its id in
+// the group's BIS_MARTA_ICON_TYPE) and a size marker (BIS_MARTA_ICON_SIZE) - and on every pass (about twice a second) it
+// sets the symbol, the size marker and the icon's colour (the side's) and name (none). High Command's own scripts read
+// that symbol back by its id. So:
+//   - its icons are NEVER removed or cleared (High Command then fails: "Undefined variable _grpIconClass" / "_icon");
+//   - a group that has them is shown THROUGH its symbol: the console names the symbol it wants in the group's
+//     MARTA_customicon - the module's own setting for exactly this - so the module itself shows the console's symbol
+//     (the half-and-half "in combat" ones included) and, with a custom symbol, leaves its size marker alone (set empty
+//     here; the console's own size marker is used). The console adds no symbol of its own to such a group: one box;
+//   - a group without them gets the console's own symbol, as always;
+//   - the colour and name are held every frame (MCCMK_iconHold): the module writes its own on every pass;
+//   - a group the console does not show (its side filtered out, or its leader riding in another group's vehicle) is
+//     held invisible instead of having its icons cleared;
+//   - when the console closes, MARTA_customicon is taken off again and the module goes back to its own symbols.
+MCCMK_iconMartaHas = {
+	params ["_g"];
+	private _t = _g getVariable "BIS_MARTA_ICON_TYPE";
+	!isNil "_t" && {((_g getGroupIcon _t) param [0, ""]) != ""}
+};
+MCCMK_iconMartaOff = {
+	{
+		if (_x getVariable ["MCCMK_iconMarta", false]) then {_x setVariable ["MARTA_customicon", nil]; _x setVariable ["MCCMK_iconMarta", nil]};
+		_x setVariable ["MCCMK_iconWant", nil];
+	} forEach allGroups;
+};
+{_x setVariable ["MCCMK_iconWant", nil]} forEach allGroups;	// (nothing left over from the other console)
+private _holdEHs = [addMissionEventHandler ["EachFrame", {call MCCMK_iconHold}], addMissionEventHandler ["Draw3D", {call MCCMK_iconHold}]];
+
+// (MK) EVERY group this console shows has its own colour and name put back every frame, just before the map is drawn - not
+// only the groups under Arma's High Command. Something else writes the icons' colour and name while the player is the
+// side's commander; whatever writes them, it doesn't reach the screen.
+((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 9000) ctrlAddEventHandler ["Draw", {
+	{
+		private _w = _x getVariable "MCCMK_iconWant";
+		// (only where this console's own icon is really on the group - Map Intel's icons on other groups are its own - and not
+		// during Map Intel's gunfire flash)
+		private _id = _x getVariable "MCCgroupIconData";
+		if (!isNil "_w" && {!(_x getVariable ["MCCMK_miFlashing", false])}) then {
+			// (debug on: said once a group, the first time its colour or name was found changed by something else)
+			if ((missionNamespace getVariable ["MCC_debug", false]) && {!(_x getVariable ["MCCMK_iconFought", false])}) then {
+				private _now = getGroupIconParams _x;
+				// (a colour read back is rounded to 1/255 - compared with that allowance)
+				private _dc = 0;
+				{_dc = _dc max (abs (_x - ((_w select 0) param [_forEachIndex, 0])))} forEach (_now select 0);
+				// its icons: the console's own (its symbol, its size marker, the selection ring) and any put there by something else
+				private _all = getGroupIcons _x;
+				private _own = {private _i = _x; !isNil "_i" && {_i isEqualType 0}} count [_id, (_x getVariable ["MCCgroupIconSize", [nil]]) select 0, _x getVariable "MCCgroupIconDataSelected"];
+				if (_dc > 0.01 || {!((_now select 1) isEqualTo (_w select 1))} || {(count _all) > _own}) then {
+					_x setVariable ["MCCMK_iconFought", true];
+					["INFO", "console icons", "%1 (leader %8): found colour %2, name '%3' (the console's: %4, '%5') | in the player's High Command: %6 | Map Intel icon on it: %7 | %9 icon(s) on the group, %10 of them the console's: %11", [groupId _x, _now select 0, _now select 1, _w select 0, _w select 1, _x in (hcAllGroups player), (_x getVariable ["MCCMK_miIcon", -1]) >= 0, typeOf (leader _x), count _all, _own, _all]] call MCC_fnc_log;
+				};
+			};
+			_x setGroupIconParams ([_x, _w] call MCCMK_fnc_iconWithWp);
+		};
+	} forEach allGroups;
+}];
 
 //Draw WP
 MCC_UMListSig = [];
@@ -155,14 +230,14 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 		_behaviour = behaviour _leader;
 		_players = if ("players" in MCC_groupGenGroupStatus && (count MCC_groupGenGroupStatus == 1)) then {alive _leader && isPlayer _leader} else {alive _leader};
 		//Civilians that joined a side (suicide bombers, armed civilians) are listed under Civ, not under that side
-		private _lside = if (getNumber (configFile >> "CfgVehicles" >> typeOf _leader >> "side") == 3 && {_leader isKindOf "CAManBase"}) then {civilian} else {side _leader};
+		private _lside = if (getNumber (configFile >> "CfgVehicles" >> typeOf _leader >> "side") == 3 && {_leader isKindOf "CAManBase"}) then {civilian} else {side group _leader};	//(MK) the group's side (a leader of another side showed the wrong colour)
 		if (!isNil {(group _leader) getVariable "MCC_dropFor"}) then {_lside = (group _leader) getVariable ["MCC_dropFor", side group _leader]};
 
 		//Draw loop
 		if (alive _leader && {!(_leader iskindof "Logic")} && {["shows", _leader] call MCC_fnc_consoleFilter}) then
 		{
-			//Draw WP
-			if (count _wpArray > 0) then
+			//Draw WP (MK: unless the Orders button has them hidden)
+			if (count _wpArray > 0 && {missionNamespace getVariable ["MCCMK_showOrders", true]}) then
 			{
 				private _wp = [];
 				private _wPos = [];
@@ -184,6 +259,23 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 						_lastPos = _wPos;
 					};
 				};
+			};
+			private _mkPlan = (group _leader) getVariable ["MCCMK_wpPlan", []];
+			if (_mkPlan isNotEqualTo [] && {missionNamespace getVariable ["MCCMK_showOrders", true]}) then
+			{
+				private _mkTex = gettext (configfile >> "CfgMarkers" >> "waypoint" >> "icon");
+				private _mkLp = getPos _leader;
+				private _mkWps = waypoints (group _leader);
+				for "_mkK" from (currentWaypoint (group _leader)) to ((count _mkWps) - 1) do {
+					private _mkP = waypointPosition (_mkWps select _mkK);
+					if ((_mkP distance [0,0,0]) > 50) then {_mkLp = _mkP};
+				};
+				{
+					_x params ["_mkP", "_mkT"];
+					_tempArray1 set [count _tempArray1, [_mkTex,[0,0,1,1],_mkP,24,24,0,_mkT,0,0.04,"PuristaBold","center"]];
+					_tempArray2 set [count _tempArray2, [[_mkLp select 0, _mkLp select 1],_mkP,[0,0,1,1]]];
+					_mkLp = _mkP;
+				} forEach _mkPlan;
 			};
 
 			//Draw group markers
@@ -254,7 +346,15 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 			if (_x getVariable ["mcc_gaia_cache",false]) then {_IsGaiaControlled = _IsGaiaControlled + "(C) ";};
 			if ((_x getVariable ["MCC_GAIA_RESPAWN",0]) > 0) then {_IsGaiaControlled = _IsGaiaControlled + "(R-" + (str (_x getVariable ["MCC_GAIA_RESPAWN",0])) + ") ";};
 
-			_x setGroupIconParams [_markerColor,format ["%1%2",_IsGaiaControlled,(groupID _x)],1,true];
+			//(MK) debug: what decides each group's icon colour - logged the first time it's drawn, and again if that changes
+			if (missionNamespace getVariable ["MCC_debug", false]) then {
+				private _matched = _lside in [east, west, resistance, civilian];
+				private _iconKey = str [_lside, _markerColor, _markerInf];
+				if ((_x getVariable ["MCCMK_iconLogged", ""]) != _iconKey) then {
+					_x setVariable ["MCCMK_iconLogged", _iconKey];
+					[["INFO", "WARN"] select (!_matched), "console icons", "%1: group side %2 | leader %3 (%4, faction %5, config side %6), side %7 | dropFor %8 | console side %9%10 | colour %11, symbol %12 | %13", [groupId _x, side _x, name _leader, typeOf _leader, faction _leader, getNumber (configOf _leader >> "side"), side _leader, _x getVariable ["MCC_dropFor", "-"], _lside, ["", " - MATCHES NO SIDE (colour and symbol left over from the previous group)"] select (!_matched), _markerColor, _markerInf, ["", "GAIA"] select (_IsGaiaControlled find "(G)" >= 0)]] call MCC_fnc_log;
+				};
+			};
 			_unitsCount = [group _leader] call MCC_fnc_countGroupHC; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 			_unitsSize = 0;
 			_markerType = _markerInf;
@@ -282,50 +382,77 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 			if (_unitsSize > 10) then {_unitsSize = 10};
 			_unitsSizeMarker = format ["group_%1",_unitsSize];
 
+			//(MK) the icon updated in place, not deleted and re-created twice a second
 			_icon = (_x getvariable "MCCgroupIconData");
-			if (!isnil "_icon") then {_x removeGroupIcon _icon};
 
 			//No icon for a group riding as passengers in someone else's vehicle (the driver's group has the icon). A group whose
 			//leader is a passenger but which also drives the vehicle, or whose vehicle has no driver (e.g. the convoy HVT group),
 			//gets its icon: without one it could not be selected / deleted on the map.
 			private _veh = vehicle _leader;
-			if (!(_leader in (assignedCargo _veh)) || {isNull (driver _veh)} || {(group (driver _veh)) == _x}) then
+			// (MK) ONE icon a vehicle: a group whose leader rides in a vehicle driven by ANOTHER group has no icon of its own, in
+			// whatever seat he sits - not only as a passenger. An evac helicopter has two groups (its pilot's, and its gunners' -
+			// their leader in a gun turret): both had an icon on the same spot, one name written over the other ("Alpha 2-2"
+			// over "Alpha 2-3").
+			if ((_veh isEqualTo _leader) || {isNull (driver _veh)} || {(group (driver _veh)) == _x}) then
 			{
 				private _iconType = _markerType;
 				if (_behaviour == "COMBAT" && {_side != civilian}) then {
 					private _c = format [["MCC_%1_combat", "MCC_%1_combatP"] select (isPlayer _leader), _markerType];
 					if (isClass (configFile >> "CfgGroupIcons" >> _c)) then {_iconType = _c};
 				};
-				_icon = _x addGroupIcon [_iconType,[0,0]];
-				_x setGroupIconParams [_markerColor,format ["%1%2",_IsGaiaControlled,(groupID _x)],1,true];
-				_x setvariable ["MCCgroupIconData",_icon,false];
+				// (MK) the symbol: through Arma's Military Symbols icon where the group has one (see MCCMK_iconMartaHas, above),
+				// else the console's own
+				if ([_x] call MCCMK_iconMartaHas) then {
+					private _mT = _x getVariable "BIS_MARTA_ICON_TYPE";
+					if !((_x getVariable ["MARTA_customicon", []]) isEqualTo [_iconType]) then {_x setVariable ["MARTA_customicon", [_iconType]]};
+					if (((_x getGroupIcon _mT) param [0, ""]) != _iconType) then {_x setGroupIcon [_mT, _iconType]};	// (at once - the module sets the same on its next pass)
+					private _mS = _x getVariable "BIS_MARTA_ICON_SIZE";
+					if (!isNil "_mS" && {!((toLower ((_x getGroupIcon _mS) param [0, ""])) in ["", "dummy"])}) then {_x setGroupIcon [_mS, "dummy"]};
+					if (!(_x getVariable ["MCCMK_iconMarta", false]) && {missionNamespace getVariable ["MCC_debug", false]}) then {["INFO", "console icons", "%1: shown through Arma's Military Symbols icon (id %2), set to %3 | icons on the group: %4", [groupId _x, _mT, _iconType, getGroupIcons _x]] call MCC_fnc_log};
+					_x setVariable ["MCCMK_iconMarta", true];
+					if (!isNil "_icon") then {_x removeGroupIcon _icon};
+					_x setVariable ["MCCgroupIconData", nil];
+				} else {
+					if (!isNil "_icon" && {((_x getGroupIcon _icon) param [0, ""]) != ""}) then {_x setGroupIcon [_icon, _iconType]} else {_icon = _x addGroupIcon [_iconType,[0,0]]};
+					_x setvariable ["MCCgroupIconData",_icon,false];
+				};
 
-				_icon = (_x getvariable "MCCgroupIconSize") select 0;
-				if (!isnil "_icon") then {_x removeGroupIcon _icon};
-
-				_icon = _x addGroupIcon [_unitsSizeMarker,[0,0]];
+				_icon = (_x getvariable ["MCCgroupIconSize", [nil]]) select 0;
+				if (!isNil "_icon" && {((_x getGroupIcon _icon) param [0, ""]) != ""}) then {_x setGroupIcon [_icon, _unitsSizeMarker]} else {_icon = _x addGroupIcon [_unitsSizeMarker,[0,0]]};
 				_x setvariable ["MCCgroupIconSize",[_icon,_unitsSizeMarker],false];
 
-				if (! isnil "_groupStatus") then 					//Draw group status
-				{
-					private _time = _groupStatus select 1;
-					private _status = _groupStatus select 0;
-
-					if (abs (time - _time) < 180) then
-						{
-
-							_x setGroupIconParams [_markerColor,format ["%1%2%3",_IsGaiaControlled,groupID _x,_status],1,true];
-						}
-						else
-						{
-							_x setGroupIconParams [_markerColor,format ["%1%2",_IsGaiaControlled,groupID _x],1,true];
-						};
+				//(MK) the colour and name worked out first and set ONCE a pass - set in steps (plain, the status, white
+				//in combat), the map draws the steps in between: icons flash dark / light, names flicker
+				private _iconCol = _markerColor;
+				private _iconTxt = format ["%1%2",_IsGaiaControlled,groupID _x];
+				if (!isnil "_groupStatus" && {(abs (time - (_groupStatus select 1))) < 180}) then {_iconTxt = format ["%1%2%3",_IsGaiaControlled,groupID _x,_groupStatus select 0]};
+				if (_behaviour == "COMBAT") then {_iconCol = [1,1,1,1]; _iconTxt = format ["%1%2",_IsGaiaControlled,groupID _x]};	//Show in combat
+				_x setGroupIconParams ([_x, [_iconCol,_iconTxt,1,true]] call MCCMK_fnc_iconWithWp);
+				_x setVariable ["MCCMK_iconWant", [_iconCol,_iconTxt,1,true]];
+			} else {
+				// A group with Arma's Military Symbols icons is held invisible (its second group in the same vehicle
+				// would show Arma's box under the first's)
+				_x setVariable ["MCCMK_iconWant", if ([_x] call MCCMK_iconMartaHas) then {[[0,0,0,0], "", 1, false]} else {nil}];
+				if (!isNil "_icon") then {_x removeGroupIcon _icon; _x setVariable ["MCCgroupIconData", nil]};
+				private _szi = (_x getVariable ["MCCgroupIconSize", [-1]]) param [0, -1];
+				if (_szi >= 0) then {_x removeGroupIcon _szi; _x setVariable ["MCCgroupIconSize", nil]};
+			};
+		} else {
+			//(MK) hidden by the filter (or gone): all its icons cleared (group icons belong to the game, not to one
+			//window: left, they'd show on the Commander console and the main map too)
+			// (MK) a group with Arma's Military Symbols icons keeps them (cleared, High Command's own scripts fail): only this
+			// console's own three are taken off it, and it is held invisible
+			private _hasM = !isNil {_x getVariable "BIS_MARTA_ICON_TYPE"};
+			_x setVariable ["MCCMK_iconWant", if (_hasM) then {[[0,0,0,0], "", 1, false]} else {nil}];
+			if (count (getGroupIcons _x) > 0) then {
+				if (!_hasM) then {clearGroupIcons _x} else {
+					_x removeGroupIcon (_x getVariable ["MCCgroupIconData", -1]);
+					_x removeGroupIcon ((_x getVariable ["MCCgroupIconSize", [-1]]) param [0, -1]);
+					_x removeGroupIcon (_x getVariable ["MCCgroupIconDataSelected", -1]);
 				};
-
-				if (_behaviour == "COMBAT") then				//Show in combat
-				{
-					_x setGroupIconParams [[1,1,1,1],format ["%1%2",_IsGaiaControlled,groupID _x],1,true];
-				};
+				_x setVariable ["MCCgroupIconData", nil];
+				_x setVariable ["MCCgroupIconSize", nil];
+				_x setVariable ["MCCgroupIconDataSelected", nil];
 			};
 		};
 	} foreach allgroups;
@@ -333,7 +460,9 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 	//Draw IEDs. Armed civilians and suicide bombers are civilians: shown only with Civ (or All) selected, like the
 	//civilian groups - they showed with West / East / Guer as well
 	{
-		if ((_x getVariable ["armed",false]) && {!((_x getVariable ["iedMarkerName", ""]) in ["Armed Civilian", "Suicide Bomber"]) || {civilian in MCC_groupGenGroupStatus}}) then
+		private _isCivHazard = (_x getVariable ["iedMarkerName", ""]) in ["Armed Civilian", "Suicide Bomber"];
+		//(MK) IEDs and ambushes follow the IEDs button; suicide bombers and armed civilians follow Civ
+		if ((_x getVariable ["armed",false]) && {if (_isCivHazard) then {civilian in MCC_groupGenGroupStatus} else {missionNamespace getVariable ["MCCMK_showIEDs", true]}}) then
 		{
 			_texture =	if (_x getVariable ["isAmbush",false]) then
 						{
@@ -358,8 +487,8 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 	MCC_GGIcons = _tempArray1;
 	MCC_GGLines = _tempArray2;
 
-	//Units / Groups mode, side filter) - it was rebuilt every 0.5 s. Spawning, deaths, joins and side / mode changes
-	//all change this summary; mode switch and auto-select still rebuild it directly.
+	//The unit list is rebuilt only when this summary changes (spawning, deaths, joins, the Units / Groups mode, the
+	//side filter); mode switch and auto-select still rebuild it directly.
 	private _picked = +(missionNamespace getVariable ["MCC_GroupGenGroupSelected", []]);
 	private _umSig = [missionNamespace getVariable ["MCC_UMUnit", 0], +(missionNamespace getVariable ["MCC_groupGenGroupStatus", []]), allGroups apply {[_x, {alive _x} count (units _x)]}, _picked];
 	if (!(_umSig isEqualTo (missionNamespace getVariable ["MCC_UMListSig", []])) && {!(missionNamespace getVariable ["MCC_UMFocus", false])}) then {
@@ -386,14 +515,40 @@ while {dialog && (str (finddisplay groupGen_IDD) != "no display") && !MCC_groupG
 		};
 	};
 
+	//(MK) the faction box: the factions on the map, every 2 s (rebuilt only when that changes)
+	if (diag_tickTime > (missionNamespace getVariable ["MCCMK_factionBoxNext", 0])) then {
+		MCCMK_factionBoxNext = diag_tickTime + 2;
+		[uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull]] call MCCMK_fnc_factionBox;
+	};
+
 	sleep .5;
 };
 
 	//Clear stuff after exiting
+	//(MK) the unit feed's camera stopped with the console, however it closes (the 3D View included): a picture-in-picture
+	// camera left on can keep rendering the scene in the background. The feed starts afresh when a unit is clicked again.
+	// (Broadcast has its own camera - not touched.)
+	if (!isNil "MCC_PIPcam" && {!isNull MCC_PIPcam}) then {MCC_PIPcam cameraEffect ["TERMINATE", "BACK"]; camDestroy MCC_PIPcam; MCC_PIPcam = objNull};
+	private _pipEH = missionNamespace getVariable ["MCC_pipFollowEH", -1];
+	if (_pipEH >= 0) then {removeMissionEventHandler ["EachFrame", _pipEH]; MCC_pipFollowEH = -1};
+	MCC_pipState = [];
+	["restore"] call MCCMK_fnc_feedDist;
+	removeMissionEventHandler ["EachFrame", _holdEHs select 0];
+	removeMissionEventHandler ["Draw3D", _holdEHs select 1];
+	call MCCMK_iconMartaOff;
 	{
 		_x removeGroupIcon (_x getVariable ["MCCgroupIconData",-1]);
 		_x removeGroupIcon ((_x getVariable ["MCCgroupIconSize",[-1]]) select 0);
 		_x removeGroupIcon (_x getVariable ["MCCgroupIconDataSelected",-1]);
+		//(MK) other sides' groups: every icon cleared - the stored ids are shared with the Commander console, so
+		//clearing by id would miss some
+		if ((side _x) != (side player)) then {
+			// (MK) not when the group carries Arma's own icons: those are never cleared (this console's own went just above)
+			if (isNil {_x getVariable "BIS_MARTA_ICON_TYPE"}) then {clearGroupIcons _x};
+			_x setVariable ["MCCgroupIconData", nil];
+			_x setVariable ["MCCgroupIconSize", nil];
+			_x setVariable ["MCCgroupIconDataSelected", nil];
+		};
 	} foreach allgroups;
 
 setGroupIconsVisible _groupIconVisible;

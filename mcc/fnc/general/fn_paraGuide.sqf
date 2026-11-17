@@ -1,7 +1,7 @@
 /*================================================================== MCC_fnc_paraGuide ==================================================================
 	Steers an AI paratrooper (in free fall and under canopy) to his landing spot on the drop line.
-	Jumpers used to keep the aircraft speed and land wherever their momentum and the pilot line took them, often well off to
-	the side of the line drawn in the MCC console. The horizontal speed is now eased each moment towards what is needed to
+	Left alone, jumpers keep the aircraft's speed and land wherever their momentum and the pilot's line take them. The
+	horizontal speed is eased each moment towards what is needed to
 	reach the spot by the time he lands (at most 6 m/s under canopy, 30 m/s in free fall), so a little drift remains.
 	Runs where the unit is local. Players steer their own parachute and are not guided.
 

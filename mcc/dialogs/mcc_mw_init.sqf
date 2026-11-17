@@ -15,6 +15,7 @@
 #define MCC_MWArmedCiviliansIDC 6014
 #define MCC_MWCQBIDC 6015
 #define MCC_MWRoadBlocksIDC 6016
+#define MCC_MWDronesIDC 6040
 #define MCC_MWWeatherComboIDC 6017
 #define MCC_MCC_MWAreaComboIDC 6018
 #define MCC_MWDebugComboIDC 6019
@@ -32,6 +33,7 @@ private _missionTypeIcons = [];
 disableSerialization;
 
 uiNamespace setVariable ["MCC_MWDialog", _this select 0];
+[_this select 0] call MCC_fnc_consoleApply3D;	//(MK) Buttons look: the map-layers button's round picture
 params ["_mccdialog"];
 
 MCC_mcc_screen = 3;
@@ -60,9 +62,13 @@ _comboBox lbSetCurSel ((U_FACTIONSCIV findIf {toLower (_x select 2) == toLower (
 	_x params ["_idc", "_var"];
 	private _c = _mccdialog displayCtrl _idc;
 	lbClear _c;
-	{_c lbAdd _x} forEach ["Faction only", "Faction + Creator DLC", "All loaded mods"];
-	_c lbSetCurSel (((profileNamespace getVariable [_var, 1]) max 0) min 2);
+	{_c lbAdd _x} forEach ["Faction only", "Faction + DLC", "Faction + mods", "Faction + DLC + mods", "Whole side"];
+	_c lbSetCurSel (((profileNamespace getVariable [_var, 1]) max 0) min 4);
 } forEach [[6027, "MCC_MWContentIndex"], [6028, "MCC_MWCivContentIndex"]];
+private _sideCtrl = _mccdialog displayCtrl 6041;
+lbClear _sideCtrl;
+{_sideCtrl lbAdd _x} forEach ["Faction's own", "East", "West", "Independent"];
+_sideCtrl lbSetCurSel (((profileNamespace getVariable ["MCC_MWEnemySideIndex", 0]) max 0) min 3);
 private _spreadCtrl = _mccdialog displayCtrl 6029;
 lbClear _spreadCtrl;
 {_spreadCtrl lbSetTooltip [_spreadCtrl lbAdd (_x select 0), _x select 1]} forEach [["Tight", "Most forces start near the zone centre"], ["Normal", "Original MCC: forces lean towards the centre"], ["Wide", "Forces start evenly spread over the whole zone"]];
@@ -180,6 +186,10 @@ _comboBox lbSetCurSel (profileNamespace getVariable ["MCC_MWCQBIndex",3]);
 _comboBox = _mccdialog displayCtrl MCC_MWRoadBlocksIDC;
 _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWRoadBlockIndex",2]),true];
 
+//AI drones
+_comboBox = _mccdialog displayCtrl MCC_MWDronesIDC;
+_comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWDronesIndex",1]),true];
+
 //Animals
 _comboBox = _mccdialog displayCtrl MCC_MWAnimalsIDC;
 _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWAnimalsIndex",2]),true];
@@ -197,4 +207,4 @@ _comboBox lbSetCurSel (profileNamespace getVariable ["MCC_MWWeatherIndex",1]);
 _comboBox = _mccdialog displayCtrl MCC_MCC_MWAreaComboIDC;
 _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWAreaIndex",0]),true];
 
-
+["init", "mw"] call MCC_fnc_consoleMapLayers;

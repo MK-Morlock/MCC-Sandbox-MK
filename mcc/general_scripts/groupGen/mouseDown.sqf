@@ -31,6 +31,8 @@ _posY = _params select 3;
 _shift = _params select 4;
 _ctrlKey = _params select 5;
 _alt = _params select 6;
+if ((missionNamespace getVariable ["MCC_evacParaWait", false]) && {_pressed == 0}) exitWith {["down", _ctrl, _posX, _posY] call MCC_fnc_evacParaLine};
+if ((missionNamespace getVariable ["MCCMK_makeHQPick", false]) && {_pressed in [0, 1]}) exitWith {["click", _ctrl ctrlMapScreenToWorld [_posX, _posY], _pressed] call MCCMK_fnc_makeHQPick};
 MCC_XYmap = [_posX,_posY];
 
 if (mcc_missionmaker != (name player)) exitWith {};
@@ -38,7 +40,7 @@ private _clickT0 = diag_tickTime; private _mct = missionNamespace getVariable ["
 private _clickHit = false;
 
 if (_pressed == 1 && {missionNamespace getVariable ["MCCMK_lineDrawing", false]}) exitWith {MCCMK_lineCancel = true};
-if (_pressed == 1 && {missionNamespace getVariable ["MCC_evacSpawnPending", false]}) exitWith {onMapSingleClick ""; MCC_evacSpawnPending = false; hint "Evac spawn cancelled"};
+if (_pressed == 1 && {missionNamespace getVariable ["MCC_evacSpawnPending", false]}) exitWith {onMapSingleClick ""; MCC_evacSpawnPending = false; ["Evac spawn cancelled"] call MCCMK_fnc_hint};
 MCC_GroupGenMouseButtonDown = true;	//Mouse state
 MCC_GroupGenMouseButtonUp = false;
 
@@ -48,6 +50,7 @@ if (isnil "MCC_doubleClicked") then {MCC_doubleClicked =false};
 if (_pressed == 1 && !MCC_doubleClicked) then {
 	ctrlShow [510,false];
 	ctrlShow [MCC_GroupGenInfo_IDC,false];
+	ctrlSetFocus _ctrl;
 	hintsilent "";
 };
 
@@ -110,7 +113,7 @@ if (_pressed == 0) then {
 		};
 	} foreach (missionNamespace getVariable ["MCC_activeMarkers",[]]);
 
-	if ((_nearZone || _nearMarker) && !(missionNameSpace getVariable ["MCC_artilleryEnabled",false]) && !(missionNameSpace getVariable ["MCC_spawnEnabled",false]) && !MCC_ConsoleRuler && !MCC_doubleClicked && !MCC_zone_drawing && !MCC_CASrequestMarker && !MCC_brush_drawing && !MCC_drawTriggers
+	if ((_nearZone || _nearMarker) && {!(["active"] call MCCMK_fnc_wpChain)} && !(missionNameSpace getVariable ["MCC_artilleryEnabled",false]) && !(missionNameSpace getVariable ["MCC_spawnEnabled",false]) && !MCC_ConsoleRuler && !MCC_doubleClicked && !MCC_zone_drawing && !MCC_CASrequestMarker && !MCC_brush_drawing && !MCC_drawTriggers
 		&& !MCC_drawMinefield && !MCC_delete_drawing && !MCC_ambushPlacing && !MCC_UMParadropRequestMarker) exitWith
 	{
 			_clickHit = true;
@@ -196,7 +199,7 @@ if ((missionNameSpace getVariable ["MCC_artilleryEnabled",false]) &&  _pressed =
 	if (!_ctrlKey) then {missionNameSpace setVariable ["MCC_artilleryEnabled",false]};
 	if (MCC_capture_state) then
 	{
-		hint "Artillery captured.";
+		["Artillery captured."] call MCCMK_fnc_hint;
 		MCC_capture_var = MCC_capture_var + FORMAT ["
 		[%1, '%2', %3, %4, %5, %6] remoteExec ['MCC_fnc_artillery', 0, false];
 		"
@@ -210,7 +213,7 @@ if ((missionNameSpace getVariable ["MCC_artilleryEnabled",false]) &&  _pressed =
 	}
 	else
 	{
-		hint "Artillery inbound.";
+		["Artillery inbound."] call MCCMK_fnc_hint;
 		[_ctrl ctrlMapScreenToWorld [_posX,_posY], shelltype, shellspread, nshell,MCCSimulate,MCC_artyDelay] remoteExec ["MCC_fnc_artillery",2];
 	};
 	sleep 0.5;
@@ -223,7 +226,7 @@ if ((missionNameSpace getVariable ["MCC_spawnEnabled",false]) &&  _pressed == 0)
 	if (!_ctrlKey) then {missionNameSpace setVariable ["MCC_spawnEnabled",false]};
 	if (MCC_capture_state) then
 	{
-		hint "Spawned Captured";
+		["Spawned Captured"] call MCCMK_fnc_hint;
 		MCC_capture_var = MCC_capture_var + FORMAT ["
 								[%1 , %2, %3, %4, %5] remoteExec ['MCC_fnc_groupSpawn', 2, false];
 								"
@@ -236,12 +239,22 @@ if ((missionNameSpace getVariable ["MCC_spawnEnabled",false]) &&  _pressed == 0)
 	}
 	else
 	{
-		hint "Spawned";
+		["Spawned"] call MCCMK_fnc_hint;
 
 		private _groupsBefore = +allGroups;
-		[_ctrl ctrlMapScreenToWorld [_posX,_posY], MCC_groupBroadcast, mcc_hc, mcc_sidename, MCC_isEmpty,missionNamespace getVariable ["mcc_caching",false], missionNamespace getVariable ["mcc_spawnbehavior", ""], missionNamespace getVariable ["MCC_spawnCommandable", false]] remoteExec ["MCC_fnc_groupSpawn", 2, false];
+		[_ctrl ctrlMapScreenToWorld [_posX,_posY], MCC_groupBroadcast, mcc_hc, mcc_sidename, MCC_isEmpty,missionNamespace getVariable ["mcc_caching",false], missionNamespace getVariable ["mcc_spawnbehavior", ""], missionNamespace getVariable ["MCC_spawnCommandable", true], missionNamespace getVariable ["MCCMK_spawnStart", [0, 1] select (missionNamespace getVariable ["MCCMK_spawnLanded", false])]] remoteExec ["MCC_fnc_groupSpawn", 2, false];
 		//Select what was spawned in the unit list (Groups / Units) so it is on the camera at once
-		if !(MCC_isEmpty) then {[_ctrl ctrlMapScreenToWorld [_posX,_posY], (lbCurSel ((uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull]) displayCtrl 3012)) == 1, _groupsBefore] spawn MCC_fnc_umAutoSelect};
+		if !(MCC_isEmpty) then {[_ctrl ctrlMapScreenToWorld [_posX,_posY], (lbCurSel ((uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull]) displayCtrl 3012)) == 1, _groupsBefore] spawn MCC_fnc_umAutoSelect} else {
+			//(MK) an empty vehicle shows nothing on the map: a black dot for 2 s where you clicked, so the click registers
+			[_ctrl ctrlMapScreenToWorld [_posX,_posY]] spawn {
+				params ["_p"];
+				private _m = createMarkerLocal [format ["MCCMK_emptySpawn_%1", diag_tickTime], _p];
+				_m setMarkerTypeLocal "mil_dot";
+				_m setMarkerColorLocal "ColorBlack";
+				sleep 2;
+				deleteMarkerLocal _m;
+			};
+		};
 	};
 	sleep 0.5;
 	deleteMarkerLocal "mcc_spawnMarker";
@@ -295,7 +308,7 @@ if (MCC_CASrequestMarker && _pressed==0) then
 		MCCMK_lineCancel = false;
 		{deleteMarkerLocal _x} forEach _lm;
 		MCC_CASrequestMarker = false;
-		hint "Line cancelled.";
+		["Line cancelled."] call MCCMK_fnc_hint;
 	};
 
 	private _len = (MCC_pointA distance2D MCCGroupGenDispPosXY) min 300;
@@ -306,8 +319,42 @@ if (MCC_CASrequestMarker && _pressed==0) then
 	_ammount	=  floor ((_len / 2)/50) + 1;
 	if (!_isDrop) then {{deleteMarkerLocal _x} forEach _lm; _lm = [[_markerPos, _kind == "cruise missile"] call MCCMK_fnc_strikeMarker]};
 
+	//(MK) a Taru supply pod (Supply Drop, Taru Pod): free for the mission maker, for the console's chosen faction
+	if (_k0 isEqualTo "MCCMK_TARUPOD") exitWith {
+		(missionNamespace getVariable ["MCCMK_podReq", [0, 0, true, 120]]) params [["_pi", 0], ["_pm", 0], ["_psm", true], ["_ph", 120]];
+		private _ps = switch (toLower mcc_sidename) do {case "east": {east}; case "guer": {resistance}; case "civ": {civilian}; default {west}};
+		[player, _ps, _pi, _pm, +MCC_pointA, _markerDir, true, missionNamespace getVariable ["mcc_faction", ""], [0, 1] select _psm, _ph] remoteExec ["MCCMK_fnc_supplyPod", 2];
+		MCC_CASrequestMarker = false;
+		sleep 40;
+		{deleteMarkerLocal _x} forEach _lm;
+	};
+
+	//(MK) an Air Patrol (MCCMK_fnc_airPatrol), free for the mission maker: it comes in along the line from the map edge
+	// behind its start and patrols round its end - the console's faction flies it, loaded as the attack type says
+	if ((_kind find "air patrol") == 0) exitWith {
+		{deleteMarkerLocal _x} forEach _lm;
+		private _tgt = +MCCGroupGenDispPosXY;
+		private _bdir = (MCC_pointA getDir _tgt) + 180;
+		private _dx = sin _bdir;
+		private _dy = cos _bdir;
+		private _edge = {params ["_p", "_d"]; if (_d > 0.001) exitWith {(worldSize - _p) / _d}; if (_d < -0.001) exitWith {(0 - _p) / _d}; 1e9};
+		private _t = ([_tgt select 0, _dx] call _edge) min ([_tgt select 1, _dy] call _edge);
+		private _entry = [(_tgt select 0) + _dx * _t, (_tgt select 1) + _dy * _t, 0];
+		private _ps = switch (toLower mcc_sidename) do {case "east": {east}; case "guer": {resistance}; case "civ": {civilian}; default {west}};
+		[_ps, _tgt, _entry, _k0, _p0, missionNamespace getVariable ["mcc_faction", ""], ""] remoteExec ["MCCMK_fnc_airPatrol", 2];
+		MCC_CASrequestMarker = false;
+		private _mk = createMarkerLocal [format ["MCCMK_airPatrol_%1", diag_tickTime], _tgt];
+		_mk setMarkerShapeLocal "ELLIPSE";
+		_mk setMarkerSizeLocal ([[4000, 4000], [1500, 1500]] select (_p0 isEqualType "" && {_p0 isKindOf "Helicopter"}));
+		_mk setMarkerBrushLocal "Border";
+		_mk setMarkerColorLocal "ColorBlue";
+		["Air Patrol called in."] call MCCMK_fnc_hint;
+		sleep 60;
+		deleteMarkerLocal _mk;
+	};
+
 	if (MCC_capture_state) then {
-		hint "Air support captured.";
+		["Air support captured."] call MCCMK_fnc_hint;
 		MCC_capture_var=MCC_capture_var + FORMAT ['
 			[%1, %2 , %3, %4, %5, %6] remoteExec ["MCC_fnc_airDrop", 2, false];
 			'
@@ -332,7 +379,7 @@ if (MCC_CASrequestMarker && _pressed==0) then
 //UM Paradrop Request
 if (MCC_UMParadropRequestMarker && _pressed==0 && {isNil "MCC_selectedUnits" || {count (MCC_selectedUnits select {!isNull _x}) == 0}}) exitWith {
 	MCC_UMParadropRequestMarker = false;
-	hint "No group or unit selected.\nSelect one or more groups or units in the list first.";
+	["No group or unit selected.\nSelect one or more groups or units in the list first."] call MCCMK_fnc_hint;
 };
 
 if (MCC_UMParadropRequestMarker && _pressed==0) then
@@ -367,7 +414,7 @@ if (MCC_UMParadropRequestMarker && _pressed==0) then
 		MCCMK_lineCancel = false;
 		{deleteMarkerLocal _x} forEach _lm;
 		MCC_UMParadropRequestMarker = false;
-		hint "Line cancelled.";
+		["Line cancelled."] call MCCMK_fnc_hint;
 	};
 
 	private _len = (MCC_pointA distance2D MCCGroupGenDispPosXY) min 5000;
@@ -380,8 +427,11 @@ if (MCC_UMParadropRequestMarker && _pressed==0) then
 
 	//Pass the line actually drawn (start and end), not the middle of the arrow marker: the drop follows the line,
 	//HALO drops over the start point (where you clicked)
-	[[+MCC_pointA, +(missionNamespace getVariable ["MCC_pointB", MCC_pointA])], MCC_selectedUnits, MCC_UMUnit, MCC_UMparadropIsHalo,_spawn,_away, [missionNamespace getVariable ["MCCMK_pdAirPara", ""], missionNamespace getVariable ["MCCMK_pdAirHalo", ""], missionNamespace getVariable ["MCCMK_pdHeight", 300], missionNamespace getVariable ["MCCMK_pdOpenPara", [0, 100]], missionNamespace getVariable ["MCCMK_pdOpenHalo", [0, 150]]]] remoteExec ["MCC_fnc_realParadrop", 2, false];
+	[[+MCC_pointA, +(missionNamespace getVariable ["MCC_pointB", MCC_pointA])], MCC_selectedUnits, MCC_UMUnit, MCC_UMparadropIsHalo,_spawn,_away, [missionNamespace getVariable ["MCCMK_pdAirPara", ""], missionNamespace getVariable ["MCCMK_pdAirHalo", ""], missionNamespace getVariable ["MCCMK_pdHeight", 300], missionNamespace getVariable ["MCCMK_pdOpenPara", [0, 120]], missionNamespace getVariable ["MCCMK_pdOpenHalo", [0, 120]], missionNamespace getVariable ["MCCMK_pdHaloForm", true], missionNamespace getVariable ["MCCMK_pdHaloLead", true]]] remoteExec ["MCC_fnc_realParadrop", 2, false];
 
+	if (if (MCC_UMUnit == 0) then {player in MCC_selectedUnits} else {(MCC_selectedUnits findIf {_x isEqualType grpNull && {player in (units _x)}}) >= 0}) then {
+		(uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull]) closeDisplay 2;
+	};
 	MCC_UMParadropRequestMarker = false;			//Wait and delete the marker
 	sleep 40;
 	{deleteMarkerLocal _x} forEach _lm;
@@ -542,6 +592,26 @@ if (_pressed==0 && (missionNameSpace getVariable ["MCC_DrawLine",false] )) exitW
 
 };
 
+if (_pressed == 0 && !_shift && !_ctrlKey && !_alt && {["active"] call MCCMK_fnc_wpChain}
+    && !MCC_ConsoleRuler
+    && !MCC_zone_drawing
+    && !MCC3DRuning
+    && !MCC_CASrequestMarker
+    && !MCC_brush_drawing
+    && !MCC_drawTriggers
+    && !MCC_drawMinefield
+    && !MCC_delete_drawing
+    && !MCC_ambushPlacing
+    && !MCC_UMParadropRequestMarker && !(missionNameSpace getVariable ["MCC_DrawLine",false])) exitWith
+{
+	private _mkP = _ctrl ctrlMapScreenToWorld [_posX, _posY];
+	private _mkT = diag_tickTime;
+	["pend", _mkP] call MCCMK_fnc_wpChain;
+	sleep 0.35;
+	if ((missionNamespace getVariable ["MCC_mapDblClickTime", -1]) >= (_mkT - 0.5)) exitWith {["unpend"] call MCCMK_fnc_wpChain};
+	["add", _mkP] call MCCMK_fnc_wpChain;
+};
+
 //Box drawing select
 if (_pressed==0
     && !MCC_ConsoleRuler
@@ -578,8 +648,10 @@ if (_pressed==0
 	private _groupControl = nil;
 
 	//Close WP dialog and hints
+	private _mkWas = [ctrlIDC (focusedCtrl (ctrlParent _ctrl)), ctrlShown ((ctrlParent _ctrl) displayCtrl MCC_GroupGenInfo_IDC), ctrlShown ((ctrlParent _ctrl) displayCtrl 510)];
 	ctrlShow [510,false];
 	ctrlShow [MCC_GroupGenInfo_IDC,false];
+	ctrlSetFocus _ctrl;
 	hintsilent "";
 
 	//Start creating the box
@@ -625,11 +697,12 @@ if (_pressed==0
 		if (!isNil "MCC_PIPcam" && {!isNull MCC_PIPcam}) then {
 			MCC_PIPcam cameraEffect ["TERMINATE", "BACK"];
 			camDestroy MCC_PIPcam;
+			["restore"] call MCCMK_fnc_feedDist;
 		};
 		MCC_pipState = [];
 		(_d displayCtrl 3070) ctrlSetText "";
 		[] call MCC_fnc_groupGenUMRefresh;
-		["INFO", "mouseDown.sqf", "map click on empty space: selection and camera cleared", []] call MCC_fnc_log;
+		["INFO", "mouseDown.sqf", "map click on empty space: selection and camera cleared | focus was on control %1, unit menu open %2, waypoint box open %3 | last icon click %4 s before this click | icons selectable %5", [_mkWas select 0, _mkWas select 1, _mkWas select 2, (_clickT0 - (missionNamespace getVariable ["MCC_groupIconClickTime", -1000])) toFixed 2, groupIconSelectable]] call MCC_fnc_log;
 	};
 	{_x removeGroupIcon (_x getvariable "MCCgroupIconDataSelected")} foreach MCC_GroupGenGroupSelected;
 

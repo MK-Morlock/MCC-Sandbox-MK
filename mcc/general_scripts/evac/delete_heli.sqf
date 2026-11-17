@@ -12,17 +12,17 @@ switch (_type) do
 	case 0:
 	{
 		if (!alive driver _evac) exitWith {};
-		hint "pilot deleted";
+		["pilot deleted"] call MCCMK_fnc_hint;
 	};
 	case 1:
 	{
 		if (alive driver _evac) exitWith {};
-		hint "pilot respawned";
+		["pilot respawned"] call MCCMK_fnc_hint;
 	};
 	case 2:
 	{
 		if (!alive _evac) exitWith {};
-		hint "Pilot & Chopper deleted";
+		["Pilot & Chopper deleted"] call MCCMK_fnc_hint;
 	};
 
 };

@@ -31,7 +31,7 @@ switch (_case) do
 		Mbrush = (MCC_brushesarray select (lbCurSel MCC_MARKER_BRUSH)) select 2;
 		Mtype = (MCC_markerarray select (lbCurSel MCC_MARKER_TYPE)) select 2;
 		Mtext = ctrlText (_dlg displayCtrl MCC_MARKER_TEXT);
-		hint "Left click on the map to set a marker";
+		["Left click on the map to set a marker"] call MCCMK_fnc_hint;
 		onMapSingleClick " 	hint 'marker added.';
 							[Mcase, Mcolor, Msize, Mshape, Mbrush, Mtype, Mtext, _pos, MCC_Marker_dir] call MCC_fnc_makeMarker;
 							onMapSingleClick """";";
@@ -46,7 +46,7 @@ switch (_case) do
 		Mtype = (MCC_markerarray select (lbCurSel MCC_MARKER_TYPE)) select 2;
 		Mtext = ctrlText (_dlg displayCtrl MCC_MARKER_TEXT);
 		MCC_brush_drawing = true;
-		hint "Left click and drag on the mini-map to create a brush";
+		["Left click and drag on the mini-map to create a brush"] call MCCMK_fnc_hint;
 	};
 
   case 2:	//Delete Markers

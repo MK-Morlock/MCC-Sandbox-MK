@@ -57,6 +57,11 @@ private _build = {
 		private _offs = [_anchor, _parts] call (uiNamespace getVariable ["MCC_fnc_rtsGroundOffsets", {[]}]);
 		if (_offs isEqualType [] && {count _offs == count _parts}) then {
 			{(_x select 0) setPosWorld (_anchor modelToWorldWorld (_offs select _forEachIndex))} forEach _parts;
+			// a camouflage net lies along the slope, as when it's built
+			{
+				_x params ["_o"];
+				if (((toLower (typeOf _o)) find "camonet") >= 0) then {[_o, _anchor, [_anchor vectorWorldToModel (vectorDir _o), _anchor vectorWorldToModel (vectorUp _o)], false] call (uiNamespace getVariable ["MCCMK_fnc_rtsNetTilt", {}])};
+			} forEach _parts;
 		};
 	} else {
 		private _base = [["UserTexture10m_F", "Land_TBox_F"] select (_size == "FOB")] call _mk;
@@ -81,7 +86,7 @@ while {is3DEN && {(uiNamespace getVariable ["MCC_slPrevToken", 0]) == _token}} d
 			_seen pushBack _id;
 			private _pos = getPosASL _x;
 			private _dir = getDir _x;
-			private _size = toUpper str ((_x get3DENAttribute "size") param [0, "FOB"]);
+			private _size = toUpper str ((_x get3DENAttribute "size") param [0, "MAIN"]);
 			_size = ["MAIN", "FOB"] select ("FOB" in _size);
 			private _con = (_x get3DENAttribute "construct") param [0, 1];
 			_con = _con isEqualTo 1 || {_con isEqualTo true} || {_con isEqualTo "1"};
@@ -108,6 +113,40 @@ while {is3DEN && {(uiNamespace getVariable ["MCC_slPrevToken", 0]) == _token}} d
 			if (count _old == 0 || {!((_old select 0) isEqualTo _sig)}) then {
 				if (count _old > 0) then {[_old select 1] call _clear};
 				private _objs = [_pos, _dir, "", true, _cls] call _build;
+				_data set [_id, [_sig, _objs, _pos, _dir]];
+			};
+		};
+		//(MK) the Vehicle Shop module: its notice board 5 m ahead and its spawn pad 15 m ahead (shown as a visible helipad with
+		// a direction arrow - the real pad is invisible), at the module's rotation - so it's clear where vehicles will appear
+		// and that the pad is reachable. Synced to its own board and pad: nothing to preview (they're placed already).
+		if (typeOf _x == "mcc_sandbox_modulevehicleSpawner") then {
+			private _id = get3DENEntityID _x;
+			_seen pushBack _id;
+			private _pos = getPosASL _x;
+			private _dir = getDir _x;
+			private _synced = {(_x select 0) == "Sync"} count (get3DENConnections _x);
+			private _sig = [(_pos apply {round (_x * 10)}), round _dir, "shop", _synced >= 2];
+			private _old = _data getOrDefault [_id, []];
+			if (count _old == 0 || {!((_old select 0) isEqualTo _sig)}) then {
+				if (count _old > 0) then {[_old select 1] call _clear};
+				private _objs = [];
+				if (_synced < 2) then {
+					private _ground = {
+						params ["_o", "_p"];
+						private _bb = boundingBoxReal _o;
+						_o setPosWorld ((ATLToASL [_p select 0, _p select 1, 0]) vectorAdd [0, 0, -((_bb select 0) select 2)]);
+					};
+					{
+						_x params ["_cls", "_dist", ["_lift", 0]];
+						private _o = createSimpleObject [_cls, [0, 0, 0], true];
+						if (!isNull _o) then {
+							_o setDir _dir;
+							[_o, _pos getPos [_dist, _dir]] call _ground;
+							if (_lift > 0) then {_o setPosWorld ((getPosWorld _o) vectorAdd [0, 0, _lift])};
+							_objs pushBack _o;
+						};
+					} forEach [["Land_Noticeboard_F", 5], ["Land_HelipadCircle_F", 15], ["Sign_Arrow_Direction_Blue_F", 15, 0.3]];
+				};
 				_data set [_id, [_sig, _objs, _pos, _dir]];
 			};
 		};

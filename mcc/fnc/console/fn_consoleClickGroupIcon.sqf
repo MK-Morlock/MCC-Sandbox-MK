@@ -37,6 +37,7 @@ if (MCC_Console2Open) then {_mccdialog = findDisplay mcc_playerConsole2_IDD};
 if (MCC_Console3Open) then {_mccdialog = findDisplay mcc_playerConsole3_IDD};
 
 params ["_group", "_button"];
+if (_button == 0 && {["active"] call MCCMK_fnc_wpChain}) exitWith {};
 _posX = (_this select 2) select 0;
 _posY = (_this select 2) select 1;
 _shift = _this select 3;
@@ -100,7 +101,17 @@ if (_button == 0) then {
 if (_button == 1) then {
 	_rank = [leader _group,"displayNameShort"] call BIS_fnc_rankParams;
 
-	_groupSize	= gettext (configfile >> "CfgMarkers" >> ((_group getvariable "MCCgroupIconSize") select 1) >> "name");
+	//(MK) the size from the console's own size marker - or, for a group the console doesn't draw (its icon Arma's Military
+	// Symbols' or Map Intel's: a spotted enemy aircraft), worked out from the group as the console does
+	private _szData = _group getvariable ["MCCgroupIconSize", []];
+	private _szMarker = if ((count _szData) > 1) then {_szData select 1} else {
+		private _c = [_group] call MCC_fnc_countGroupHC;
+		if (isNil "_c" || {!(_c isEqualType [])}) then {_c = [0,0,0,0,0,0,0,0]};
+		private _n = 0;
+		{_n = _n + ((_c param [_forEachIndex, 0]) * _x)} forEach [1, 3, 3, 3, 3, 1, 3, 1];
+		format ["group_%1", (floor (_n / 4)) min 10]
+	};
+	_groupSize	= gettext (configfile >> "CfgMarkers" >> _szMarker >> "name");
 	_html = "<t color='#818960' size='1' shadow='1' align='left' underline='true'>" +groupID _group + " - " + toupper _groupSize +"</t><br/>";
 
 	_info = [_group] call MCC_fnc_countGroupHC;

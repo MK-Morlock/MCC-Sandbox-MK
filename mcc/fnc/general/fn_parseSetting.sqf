@@ -1,9 +1,9 @@
 /*======================================================MCC_fnc_parseSetting=================================================================================
 	Safely turn an MCC CBA "EDITBOX" setting (text such as '["B_officer_F","O_officer_F"]') into a value.
 
-	The old handlers did `call compile _value` directly. Any malformed text (hand-edited setting,
-	corrupted profile, a value written by another mod) threw an engine "Error in expression"
-	with no hint of which setting it was. This checks the text is a single well-formed array
+	Compiled directly, any malformed text (hand-edited setting, corrupted profile, a value written by another mod)
+	throws an engine "Error in expression" with no hint of which setting it is. This checks the text is a single
+	well-formed array
 	[...] or string "..." (brackets balanced outside quotes) before compiling it. If it is not,
 	the setting's default is used and the setting name is written to the RPT.
 

@@ -11,7 +11,6 @@ private _comboBox = controlNull;
 private _displayname = "";
 private "_pic";
 private "_index";
-private _html = "";
 // By: Shay_gman
 // Version: 1.1 (April 2012)
 #define groupGen_IDD 2994
@@ -37,6 +36,9 @@ MCC_mcc_screen = 2;	//Group gen for poping up the same menu again
 missionNamespace setVariable ["MCC_selectedUnits",[]];
 missionNamespace setVariable ["MCC_GroupGenGroupSelected",[]];
 
+//(MK) this mission maker's garage choices (paint and parts per class - his profile) sent to the server (MCCMK_fnc_garageApply)
+private _gStore = profileNamespace getVariable ["MCCMK_garage", createHashMap];
+if (_gStore isEqualType createHashMap && {count _gStore > 0}) then {[(keys _gStore) apply {[_x, _gStore get _x]}] remoteExec ["MCCMK_fnc_garageSync", 2]};
 uiNamespace setVariable ["MCC_groupGen_Dialog", _this select 0]; {((_this select 0) displayCtrl _x) ctrlAddEventHandler ["MouseButtonDown", {MCC_mapClickTime = diag_tickTime}]} forEach [9000, 9010];
 
 //Add delete button
@@ -79,20 +81,17 @@ if (missionNamespace getVariable ["CP_activated",false]) then {
 if !(missionNamespace getVariable ["MCC_capture_state",false]) then { ctrlEnable [MCCSTOPCAPTURE,false];};
 
 //Respawn
-[] call MCC_fnc_respawnButton;	//Disable Respawn / Enable Respawn (was greyed out for good once respawn was off)
+[] call MCC_fnc_respawnButton;	//Disable Respawn / Enable Respawn
 
 //Mission Maker
 ctrlSetText [MCCMISSIONMAKERNAME, format["%1",mcc_missionmaker]];
 
 _mccdialog = findDisplay groupGen_IDD;
 
-_comboBox = _mccdialog displayCtrl MCC_FACTION; //fill combobox CFG factions
-lbClear _comboBox;
-{
-	_displayname = format ["%1(%2)",_x select 0,_x select 1];
-	_comboBox lbAdd _displayname;
-} foreach U_FACTIONS;
-_comboBox lbSetCurSel MCC_faction_index;
+//fill combobox CFG factions: narrowed by the side buttons (remembered) - the search starts empty each time
+//(MK) the faction search keeps its text if the console reloads
+(_mccdialog displayCtrl 9240) ctrlSetText (uiNamespace getVariable ["MCCMK_factionTextRaw_2994", ""]);
+["apply", "", 2994] call MCCMK_fnc_factionFilter;
 
 //-------------------------------------------- GAIA --------------------------------------------------------------------------------------------------
 _comboBox =((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 1);
@@ -105,29 +104,6 @@ _comboBox lbSetCurSel 0;
 
 //------------------------------------------- ZONES --------------------------------------------------------------------------------------------------
 ["fill"] call MCC_fnc_zoneList;
-
-//------------------------------------------- Tooltip --------------------------------------------------------------------------------------------------
-_comboBox = ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 303); //fill combobox zone's numbers
-
-_html = "<t color='#E1E3E5' size='0.85' shadow='1' align='left' underline='true'>HELP:</t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Scroll down this menu to get help. </t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Open 3D Editor: ALT + LMB on map. </t><br/><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.85' shadow='1' align='left' underline='true'>GROUPS: </t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Assign Waypoint: Select a group and double Click on map. </t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Assign Quick Waypoint: Select groups hold Ctrl + double Click on map. </t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Groups' multi-select: Hold and drag on map. </t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Group Info:  Right-click on the group's icon. </t><br/><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Delete Selected Groups: Press the Delete button </t><br/><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.85' shadow='1' align='left' underline='true'>ZONES: </t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Select Zone: Left Click on Zone's icon.</t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Move Zone: Click on Zone's icon and drag.</t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Resize Zone: Shift + click on Zone's icon and drag.</t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Rotate Zone: Ctrl + click on Zone's icon and rotate. </t><br/><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.85' shadow='1' align='left' underline='true'>IED: </t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Manual Detonate: Ctrl + Left mouse button on an IED icon.</t><br/>";
-_html = _html + "<t color='#E1E3E5' size='0.8' shadow='1' align='left' underline='false'>* Sync IEDs: Drag a line between two IEDs while holding Shift + Left mouse button.</t><br/>";
-
-_comboBox ctrlSetStructuredText parseText _html;
 
 //Is it first time we around? Let's respawn the zone markers if they are available
 if (isnil "MCCFirstOpenUI") then
@@ -144,7 +120,7 @@ if (isnil "MCCFirstOpenUI") then
 [] spawn MCC_fnc_groupGenRefresh;
 
 //-------------------------------------------------FPS Loop  -----------------------------
-//Units / Groups switch of the unit list shows the choice in use (it showed Units while the list held groups)
+//Units / Groups switch of the unit list shows the choice in use
 if !((missionNamespace getVariable ["MCC_UMUnit", 0]) in [0, 1]) then {MCC_UMUnit = 0};
 ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 9134) lbSetCurSel MCC_UMUnit;
 
@@ -167,7 +143,21 @@ private _mapSlider = (uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl
 _mapSlider sliderSetRange [0, 1];
 _mapSlider sliderSetSpeed [0.01, 0.05];	//arrows: 1 % steps, clicking the bar: 5 %
 _mapSlider sliderSetPosition (profileNamespace getVariable ["MCC_consoleMapAlpha", 1]);
+//(MK) Map zones: how strongly the campaign territory tiles are drawn, for everyone
+private _zoneSlider = (uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl 9122;
+_zoneSlider sliderSetRange [0, 1];
+_zoneSlider sliderSetSpeed [0.05, 0.1];
+_zoneSlider sliderSetPosition (1 - (missionNamespace getVariable ["MCC_campaignTileTransparency", 0]));
 [] call MCC_fnc_consoleTheme;	//console colour (also applies the transparency)
+["init"] call MCCMK_fnc_consoleTips;
+["init"] call MCCMK_fnc_zoneToggle;
+["init"] call MCCMK_fnc_sideFold;
+["init"] call MCCMK_fnc_infoToggle;
+private _mkScope = (uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull]) displayCtrl 3094;
+if (!isNull _mkScope && {(lbSize _mkScope) == 0}) then {
+	{_mkScope lbAdd _x} forEach ["Faction only", "Faction + DLC", "Faction + mods", "Faction + DLC + mods", "Whole side", "All sides"];
+	_mkScope lbSetCurSel (missionNamespace getVariable ["MCCMK_spawnScope", ((profileNamespace getVariable ["MCCMK_spawnScope", 2]) max 0) min 5]);
+};
 
 //No campaign territory overlay on the console map (only while the console is open, only on this computer)
 ["start"] call MCC_fnc_consoleCampaignTiles;
@@ -199,5 +189,5 @@ while {(str (finddisplay groupGen_IDD) != "no display")} do {
 
 //------------------------------------------------------------------------------------------
 
-//Console closed: the selected unit's red marker belongs to the console map only (it showed on every map)
+//Console closed: the selected unit's red marker belongs to the console map only
 deleteMarkerLocal "currentUnitSelected";

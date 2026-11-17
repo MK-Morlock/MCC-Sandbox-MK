@@ -19,6 +19,7 @@ if (isNil "mcc_faction") exitWith {};
 
 _factionDisplayName = getText (configFile >> "CfgFactionClasses" >> MCC_faction >> "displayName");
 
+isNil {	//(MK) in one go, not stretched over many frames as a background script
 for "_i" from 0 to ((count CONFIG) - 1)  do
 {
 	_Cfgside = (CONFIG select _i);
@@ -61,6 +62,7 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 			};
 		};
 	};
+};
 };
 
 //Add this two for general stuff

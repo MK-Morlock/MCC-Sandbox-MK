@@ -24,7 +24,7 @@ switch (_type) do {
 	//Teleport
 	case 0:{
 		mapClick = false;
-		hint "Click on the map";
+		["Click on the map"] call MCCMK_fnc_hint;
 		onMapSingleClick " 	hint format ['%1 teleported', UMName];
 							teleportPos = _pos;
 							mapClick = true;
@@ -63,11 +63,11 @@ switch (_type) do {
 			{
 				//then ran with no unit: "_targetUnit" undefined); no new hijack while already in a hijacked unit (it overwrote
 				//the real player, so Back To Player could not get back, and each one added another MCC menu)
-				if (!isNil "MCC_Prev_Player" && {!isNull MCC_Prev_Player} && {alive MCC_Prev_Player} && {player != MCC_Prev_Player}) exitWith {hint "Go back to your player first (Back To Player), then hijack another unit"};
+				if (!isNil "MCC_Prev_Player" && {!isNull MCC_Prev_Player} && {alive MCC_Prev_Player} && {player != MCC_Prev_Player}) exitWith {["Go back to your player first (Back To Player), then hijack another unit"] call MCCMK_fnc_hint};
 				[] call MCC_fnc_umSelectionFromList;
 				_targetUnit = MCC_selectedUnits param [0, objNull];	//Hijacked unit
-				if (isNil "_targetUnit" || {!(_targetUnit isEqualType objNull)} || {isNull _targetUnit}) exitWith {hint "Select a unit to hijack first"};
-				if (isplayer _targetUnit) exitwith {hint "Can't hijack other players"};
+				if (isNil "_targetUnit" || {!(_targetUnit isEqualType objNull)} || {isNull _targetUnit}) exitWith {["Select a unit to hijack first"] call MCCMK_fnc_hint};
+				if (isplayer _targetUnit) exitwith {["Can't hijack other players"] call MCCMK_fnc_hint};
 				MCC_PrevHijacked_Group = netID (group _targetUnit);
 				MCC_Prev_HijackedGroupIsLeader = if (leader group _targetUnit == _targetUnit) then {true} else {false};
 
@@ -151,7 +151,7 @@ switch (_type) do {
 				};
 			}
 			else
-			{hint "Can only hijack units, not groups"};
+			{["Can only hijack units, not groups"] call MCCMK_fnc_hint};
 		};
 
 		case 3:	//Markers
@@ -192,18 +192,17 @@ switch (_type) do {
 			{
 				if (MCC_UMisJoining) then //Joining
 				{
-					//(it used to error on an undefined UMJoin); the OLD, now empty group is deleted (it used to try to delete
-					//the group joined into)
+					//the OLD, now empty group is deleted (not the group joined into)
 					MCC_UMisJoining = false;
 					private _src = missionNamespace getVariable ["UMJoin", objNull];
 					if (MCC_UMUnit==0) then
 					{
 						UMName = MCC_UMunitsNames param [_row, objNull];
 						if (!(_src isEqualType objNull) || {isNull _src} || {isNull UMName} || {_src == UMName}) then {
-							hint "Join cancelled - select the unit, press Join, then click a different unit";
+							["Join cancelled - select the unit, press Join, then click a different unit"] call MCCMK_fnc_hint;
 						} else {
 							[_src] joinSilent (group UMName);
-							hint format ["%1 joined %2", name _src, groupId (group UMName)];
+							[format ["%1 joined %2", name _src, groupId (group UMName)]] call MCCMK_fnc_hint;
 							["INFO", "um.sqf", "join: %1 -> %2", [name _src, groupId (group UMName)]] call MCC_fnc_log;
 						};
 					}
@@ -211,11 +210,11 @@ switch (_type) do {
 					{
 						UMName = UMgroupNames param [_row, grpNull];
 						if (!(_src isEqualType grpNull) || {isNull _src} || {isNull UMName} || {_src == UMName}) then {
-							hint "Join cancelled - select the group, press Join, then click a different group";
+							["Join cancelled - select the group, press Join, then click a different group"] call MCCMK_fnc_hint;
 						} else {
 							private _srcName = groupId _src;
 							(units _src) joinSilent UMName;
-							hint format ["%1 joined %2", _srcName, groupId UMName];
+							[format ["%1 joined %2", _srcName, groupId UMName]] call MCCMK_fnc_hint;
 							["INFO", "um.sqf", "join: group %1 -> %2", [_srcName, groupId UMName]] call MCC_fnc_log;
 							[_src] spawn {params ["_g"]; sleep 0.5; if (!isNull _g && {(count units _g) == 0}) then {_g remoteExecCall ["deleteGroup", 0]}};
 						};
@@ -252,18 +251,23 @@ switch (_type) do {
 				createMarkerLocal ["currentUnitSelected", getpos (vehicle UMName)];
 				"currentUnitSelected" setMarkerTypelocal "Select";
 				"currentUnitSelected" setMarkerColorlocal "ColorRed";
-				_control = _mccdialog displayCtrl MCC_MINIMAP;
-				_control ctrlMapAnimAdd [0.5, (ctrlMapScale ((uiNamespace getVariable "MCC_groupGen_Dialog") displayCtrl MCC_MINIMAP)), getpos UMName];
-				ctrlMapAnimCommit _control;
+				//(MK) both maps (normal and contour) centred on him, each keeping its own zoom - with the contour map shown, only
+				// the hidden normal one moved
+				{
+					_control = _mccdialog displayCtrl _x;
+					if (!isNull _control) then {
+						_control ctrlMapAnimAdd [0.5, ctrlMapScale _control, getpos UMName];
+						ctrlMapAnimCommit _control;
+					};
+				} forEach [MCC_MINIMAP, 9010];
 
 				//Feed switched off with the On / Off button (MCC_fnc_umFeedToggle): the unit is selected, no camera
 				if !(missionNamespace getVariable ["MCC_umFeedOn", true]) exitWith {["INFO", "um.sqf", "unit feed is off: %1 selected without camera", [_name]] call MCC_fnc_log};
 
-				//Unit feed. The first click often gave no picture: the picture asked for the render target before any camera
-				//was bound to it (the panel opens with that picture, and here it was set straight after the camera was made),
-				//and a second run (two list events for one click) could replace the camera the follow code was moving.
-				//Now: a newer click cancels an older one, the camera is made and bound first and renders while the static
-				//plays, then the picture is set; the camera is bound once more a moment later (MCC_fnc_pipFollow).
+				//Unit feed. A newer click cancels an older one (two list events can come for one click); the camera is
+				//made and bound first
+				//and renders while the static plays, then the picture is set; the camera is bound once more a moment
+				//later (MCC_fnc_pipFollow).
 				private _feedToken = (missionNamespace getVariable ["MCC_umFeedToken", 0]) + 1;
 				MCC_umFeedToken = _feedToken;
 
@@ -276,6 +280,7 @@ switch (_type) do {
 				_feedCam camSetTarget (vehicle UMName);
 				_feedCam camCommit 0;
 				_feedCam cameraEffect ["INTERNAL", "BACK", "rendertarget10"];
+				["apply"] call MCCMK_fnc_feedDist;	//(MK) the feed's view distance (the slider under it)
 
 				_control = _mccdialog displayCtrl MCC_UM_PIC;
 				[_control] call MCC_fnc_pipOpen;
@@ -298,7 +303,7 @@ switch (_type) do {
 									// Normal
 									case 0:
 									{
-										[0]	//vanilla camera picture (was a blue-tinted colour correction)
+										[0]	//vanilla camera picture
 									};
 
 									// Night vision
@@ -326,7 +331,7 @@ switch (_type) do {
 			{
 			if (MCC_UMUnit==1) then
 				{
-				hint "Only units can be assigned as high commanders";
+				["Only units can be assigned as high commanders"] call MCCMK_fnc_hint;
 				}
 				else
 				{
@@ -343,7 +348,7 @@ switch (_type) do {
 			if (MCC_UMUnit==0) then
 				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)}
 				else {UMName = leader (UMgroupNames select (lbCurSel MCC_UM_LIST))};
-			hint "cleared all High Command units";
+			["cleared all High Command units"] call MCCMK_fnc_hint;
 			[[netID UMName,UMName],1] remoteExec ["MCC_fnc_highCommand", 0, false];
 			};
 		};
@@ -355,7 +360,7 @@ switch (_type) do {
 			if (MCC_UMUnit==0) then
 				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)}
 				else {UMName = leader (UMgroupNames select (lbCurSel MCC_UM_LIST))};
-			hint "Group Added";
+			["Group Added"] call MCCMK_fnc_hint;
 			[[netID UMName,UMName],2] remoteExec ["MCC_fnc_highCommand", 0, false];
 			};
 		};
@@ -382,7 +387,7 @@ switch (_type) do {
 		{
 			[] call MCC_fnc_umSelectionFromList;
 			if (count (MCC_selectedUnits select {!isNull _x}) == 0) exitWith {
-				hint "No group or unit selected.\nSelect one or more groups or units in the list first.";
+				["No group or unit selected.\nSelect one or more groups or units in the list first."] call MCCMK_fnc_hint;
 				playSound "MCC_pop";
 			};
 			/*
@@ -419,7 +424,7 @@ switch (_type) do {
 		{
 			[] call MCC_fnc_umSelectionFromList;
 			if (count (MCC_selectedUnits select {!isNull _x}) == 0) exitWith {
-				hint "No group or unit selected.\nSelect one or more groups or units in the list first.";
+				["No group or unit selected.\nSelect one or more groups or units in the list first."] call MCCMK_fnc_hint;
 				playSound "MCC_pop";
 			};
 			//Small one-line window: [Drop pods] [Cancel] [Parachute]; Cancel / Esc calls nothing
@@ -427,9 +432,12 @@ switch (_type) do {
 			if (_choice == "") exitWith {};
 			MCC_UMparadropIsHalo = [1, 0] select (_choice == "right");	//0 = parachutes, 1 = drop pods (2 = HALO) in MCC_fnc_realParadrop
 			if (MCC_UMparadropIsHalo == 1) then {
-				private _m = ["Paradrop", "Cancel", "Winch drop"] call MCC_fnc_choiceBar;
+				private _m = ["Pod drop", "Cancel", "Winch drop"] call MCC_fnc_choiceBar;
 				if (_m == "") exitWith {MCC_UMparadropIsHalo = -1};
 				missionNamespace setVariable ["MCC_podMethod", [1, 0] select (_m == "left"), true];
+				private _pt = ["Bench (8)", "Cancel", "Transport (16)"] call MCC_fnc_choiceBar;
+				if (_pt == "") exitWith {MCC_UMparadropIsHalo = -1};
+				missionNamespace setVariable ["MCC_podType", ["covered", "bench"] select (_pt == "left"), true];
 			};
 			if (MCC_UMparadropIsHalo < 0) exitWith {};
 			MCC_UMParadropRequestMarker = true;
@@ -438,9 +446,10 @@ switch (_type) do {
 
 		case 11:	//Broadcast
 		{
-			if (MCC_UMUnit==0) then
-				{UMName =  MCC_UMunitsNames select (lbCurSel MCC_UM_LIST)}
-				else {UMName = leader (UMgroupNames select (lbCurSel MCC_UM_LIST))};
+			UMName = if (MCC_UMUnit==0) then
+				{MCC_UMunitsNames param [lbCurSel MCC_UM_LIST, objNull]}
+				else {leader (UMgroupNames param [lbCurSel MCC_UM_LIST, grpNull])};
+			if (isNull UMName) exitWith {["Select a unit to broadcast."] call MCCMK_fnc_hint};
 			//Everyone sees the console camera as it is now, and its swing / zoom while the broadcast runs (25 s)
 			private _orbit = +(missionNamespace getVariable ["MCC_pipOrbit", [0, 0, 0.75]]);
 			missionNamespace setVariable ["MCC_bcOrbit", _orbit, true];
@@ -482,21 +491,21 @@ switch (_type) do {
 
 		case 13:	//Join
 		{
-			//list is often -1 - it errored and the join then failed); nothing highlighted = a message, no joining
+			//nothing highlighted = a message, no joining
 			[] call MCC_fnc_umSelectionFromList;
 			UMJoin = MCC_selectedUnits param [0, objNull];
 			if (isNull UMJoin) then {
 				MCC_UMisJoining = false;
-				hint "Select the unit or group that should join, then press Join";
+				["Select the unit or group that should join, then press Join"] call MCCMK_fnc_hint;
 			} else {
 				MCC_UMisJoining = true;
-				hint format ["Now click the %1 that %2 should join", ["unit", "group"] select (MCC_UMUnit != 0), if (UMJoin isEqualType grpNull) then {groupId UMJoin} else {name UMJoin}];
+				[format ["Now click the %1 that %2 should join", ["unit", "group"] select (MCC_UMUnit != 0), if (UMJoin isEqualType grpNull) then {groupId UMJoin} else {name UMJoin}]] call MCCMK_fnc_hint;
 			};
 		};
 
 		case 14:	//Parachute
 		{
-			hint "Units parachuted";
+			["Units parachuted"] call MCCMK_fnc_hint;
 			if (MCC_UMUnit==0) then
 				{
 					{while {!(isnull _x) && !(isplayer _x)} do {deletevehicle vehicle _x}} foreach MCC_selectedUnits;

@@ -95,6 +95,9 @@ if (_activeSpawn == leader player) then {
 	};
 };
 
+if (((_activeSpawn getVariable ["MCCMK_repositionUntil", 0]) - serverTime) > 0) then {_spawnErrorCode = 5};
+if ((_activeSpawn getVariable ["MCCMK_disabled", false]) || {_activeSpawn getVariable ["MCCMK_sinking", false]}) then {_spawnErrorCode = 6};
+
 //Error in spawning
 if (_spawnErrorCode > 0) exitWith {
 	switch (_spawnErrorCode) do
@@ -103,6 +106,8 @@ if (_spawnErrorCode > 0) exitWith {
 		case 2: {["You must select a role first!"] spawn MCC_fnc_rsMessage};
 		case 3: {["Enemies nearby can't spawn select another spawn point!"] spawn MCC_fnc_rsMessage};
 		case 4: {["Can't respawn no free space in leader vehicle!"] spawn MCC_fnc_rsMessage};
+		case 5: {["This ship is repositioning - choose another spawn point."] spawn MCC_fnc_rsMessage};
+		case 6: {["This ship is disabled or sinking - choose another spawn point."] spawn MCC_fnc_rsMessage};
 	};
 };
 

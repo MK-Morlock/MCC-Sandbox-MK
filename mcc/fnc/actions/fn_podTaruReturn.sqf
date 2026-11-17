@@ -23,7 +23,9 @@ _grp setBehaviour "CARELESS";
 _grp setCombatMode "BLUE";
 _heli allowCrewInImmobile true;
 _grp setVariable ["MCC_canbecontrolled", false, true];
+if (_grp getVariable ["MCCMK_hcAdded", false]) then {["INFO", "commandable", "%1 set NOT commandable by fn_podTaruReturn (it was in the commander's High Command)", [groupId _grp]] call MCC_fnc_log};
 
+_pod setVariable ["MCCMK_collectBy", _heli, true];	//(MK) its Taru is coming back for it - no "Pick up pod" while it lives
 private _podPos = getPosATL _pod;
 private _tBack = time + 300;
 _heli flyInHeight 200;
@@ -78,7 +80,22 @@ MCC_podTaruHoldH = 13;
 		private _d = _tgt vectorDiff (getPosASL _h);
 		private _dh = vectorMagnitude [_d select 0, _d select 1, 0];
 		private _vh = if (_dh > 0.5) then {(vectorNormalized [_d select 0, _d select 1, 0]) vectorMultiply ((_dh * 0.35) min 25)} else {[0, 0, 0]};
-		_h setVelocity [_vh select 0, _vh select 1, ((_d select 2) * 0.5) max -10 min 4];
+		// (MK) Look-ahead: the same low approach, but anything in the way (buildings, hangars, trees, walls, rising
+		// ground) is looked for 15-90 m ahead - straight down at each point - and climbed over with 10 m to spare, then it
+		// drops back to its low height once past. Not within 25 m of the pod.
+		private _clear = -1e9;
+		if (_dh > 25) then {
+			private _hp = getPosASL _h;
+			private _fd = vectorNormalized [_d select 0, _d select 1, 0];
+			{
+				private _q = _hp vectorAdd (_fd vectorMultiply _x);
+				private _hit = lineIntersectsSurfaces [[_q select 0, _q select 1, (_hp select 2) + 60], [_q select 0, _q select 1, (_hp select 2) - 40], _h, _p, true, 1, "GEOM", "NONE"];
+				if (count _hit > 0) then {_clear = _clear max ((((_hit select 0) select 0) select 2) + 10)};
+			} forEach [15, 35, 60, 90];
+		};
+		private _vz = if (_clear > ((getPosASL _h) select 2) - 2) then {((_clear - ((getPosASL _h) select 2)) * 0.8) max 0.5 min 6} else {((_d select 2) * 0.5) max -10 min 4};
+		if (_clear > (_tgt select 2)) then {_vz = _vz max (((_clear - ((getPosASL _h) select 2)) * 0.5) min 6)};
+		_h setVelocity [_vh select 0, _vh select 1, _vz];
 		sleep 0.1;
 	};
 };
@@ -121,7 +138,8 @@ if (!alive _heli) exitWith {};
 if (!scriptDone _dock) then {
 	terminate _dock;
 	{ropeDestroy _x} forEach (ropes _heli);
-	if (alive _pod) then {_pod attachTo [_heli, [0, 0, -1.2]]; _heli setVariable ["MCC_attachedPod", _pod, true]};
+	if (alive _pod) then {_pod attachTo [_heli, [0, 0, -1.2]]; [_pod, _heli] remoteExecCall ["disableCollisionWith", 0, _pod];	//(MK) the pod can't bump the Taru while attached
+		_heli setVariable ["MCC_attachedPod", _pod, true]};
 	["INFO", "podTaru", "%1: winch did not finish in 40 s - pod docked directly", [typeOf _heli]] call MCC_fnc_log;
 } else {
 	["INFO", "podTaru", "%1: pod winched up and docked", [typeOf _heli]] call MCC_fnc_log;

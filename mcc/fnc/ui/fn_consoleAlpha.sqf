@@ -10,12 +10,13 @@ profileNamespace setVariable ["MCC_consoleMapAlpha", _m];
 private _d = uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull];
 if (isNull _d) exitWith {};
 
-private _theme = [["Black", [0.11,0.12,0.13], [0,0,0]], ["Gunmetal", [0.19,0.21,0.24], [0.10,0.11,0.13]], ["Olive", [0.20,0.22,0.15], [0.11,0.12,0.08]], ["Navy", [0.10,0.14,0.22], [0.05,0.07,0.12]], ["Coyote", [0.29,0.25,0.19], [0.16,0.13,0.10]], ["Burgundy", [0.25,0.09,0.11], [0.13,0.04,0.05]], ["Teal", [0.11,0.20,0.21], [0.05,0.11,0.12]]] param [profileNamespace getVariable ["MCC_consoleTheme", 0], ["Black", [0.11,0.12,0.13], [0,0,0]]];
+private _theme = (call MCCMK_fnc_consoleThemes) param [profileNamespace getVariable ["MCC_consoleTheme", 0], ["Black", [0.12,0.12,0.12], [0,0,0]]];	// the same list as the colour squares
 _theme params ["", "_rgb", "_dark"];
 private _panel = if (_v <= 0.5) then {_rgb + [0.96 * (_v / 0.5)]} else {
 	private _f = (_v - 0.5) / 0.5;
 	((_rgb vectorMultiply (1 - _f)) vectorAdd (_dark vectorMultiply _f)) + [0.96 + 0.04 * _f]
 };
+uiNamespace setVariable ["MCCMK_consolePanel", +_panel];
 {(_d displayCtrl _x) ctrlSetTextColor _panel; (_d displayCtrl _x) ctrlCommit 0} forEach [9002, 9006, 9110, 9111, 9112];
 {(_d displayCtrl _x) ctrlSetBackgroundColor _panel; (_d displayCtrl _x) ctrlCommit 0} forEach [9004, 9005];
 

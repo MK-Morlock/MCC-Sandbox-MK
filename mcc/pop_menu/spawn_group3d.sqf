@@ -56,7 +56,7 @@ if (mcc_missionmaker == (name player)) then
 					if (mcc_spawntype == "GROUP3D") then {
 						[MCC3DValue select 0, MCC_3D_groupCfg, mcc_hc, mcc_sidename, MCC3DValue select 1, (MCC3DValue select 0) param [2, 0], missionNamespace getVariable ["MCC_3D_beh", "hold"], missionNamespace getVariable ["MCC_3D_cmd", false]] remoteExec ["MCC_fnc_groupPlace3D", 2, false];
 					} else {
-					[MCC3DValue select 0, MCC3DValue select 1, mcc_spawnname, mcc_spawntype, mcc_spawnfaction, mcc_spawnwithcrew,(if (isNil "MCC_3D_cargoInit") then {MCC_unitInit} else {[MCC_unitInit] call MCC_3D_cargoInit}),MCC_unitName,mcc_hc, MCC3DValue param [2, false], missionNamespace getVariable ["MCC_3D_beh", "hold"], missionNamespace getVariable ["MCC_3D_cmd", false]] remoteExec ["MCC_fnc_simpleSpawn", if (mcc_hc == 0) then {2} else {[2] + ([missionNamespace getVariable ["MCC_ownerHC", objNull]] select {!isNull _x})}, false];
+					[MCC3DValue select 0, MCC3DValue select 1, mcc_spawnname, mcc_spawntype, mcc_spawnfaction, mcc_spawnwithcrew,(if (isNil "MCC_3D_cargoInit") then {MCC_unitInit} else {[MCC_unitInit] call MCC_3D_cargoInit}),MCC_unitName,mcc_hc, MCC3DValue param [2, false], missionNamespace getVariable ["MCC_3D_beh", "hold"], missionNamespace getVariable ["MCC_3D_cmd", false], missionNamespace getVariable ["MCC_3D_start", [0, 1] select (missionNamespace getVariable ["MCC_3D_landed", true])]] remoteExec ["MCC_fnc_simpleSpawn", if (mcc_hc == 0) then {2} else {[2] + ([missionNamespace getVariable ["MCC_ownerHC", objNull]] select {!isNull _x})}, false];
 					};		
 				};
 			};
@@ -421,6 +421,7 @@ if (mcc_missionmaker == (name player)) then
 		mcc_hc = (MCC_ZoneLocation select (lbCurSel MCC_ZONE_LOC)) select 1;
 		
 		if (!isNil "MCC_3D_makePreview") then {[mcc_spawnname, mcc_spawntype] call MCC_3D_makePreview};
+		["3d"] spawn MCCMK_fnc_spawnStartRefresh;	//(MK) On water only for a class that floats
 	};
 		
 	if (_3d == 2) then //Case we adding presets

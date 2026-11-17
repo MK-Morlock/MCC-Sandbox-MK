@@ -82,6 +82,7 @@ ctrlShow [MCC_CONSOLEWPADD,false];
 ctrlShow [MCC_CONSOLEWPREPLACE,false];
 ctrlShow [MCC_CONSOLEWPCLEAR,false];
 ctrlShow [MCC_CONSOLEWPCANCEL,false];
+ctrlShow [9219,false];
 ctrlShow [MCC_CONSOLEINFOUAVCONTROL,false];
 ctrlShow [MCC_ResourcesControlsGroup,false];
 
@@ -95,38 +96,12 @@ _mccdialog = findDisplay mcc_playerConsole_IDD;
 MCC_Console1Open = true;
 _evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1",playerSide],[]];
 
+//(MK) the side panels' tabs and grey arrow bars: open (out and down) / close, one at a time (MCCMK_fnc_consoleFolder)
 {
-	(_mccdialog displayCtrl _x) ctrlAddEventHandler ["MouseButtonClick",{
-		_idc = (ctrlIDC (_this select 0)) +1000;
-		_pos = ctrlPosition ((ctrlParent (_this select 0)) displayCtrl _idc);
-		_pos set [2,0];
-
-
-		((ctrlParent (_this select 0)) displayCtrl _idc) ctrlSetPosition _pos;
-		((ctrlParent (_this select 0)) displayCtrl _idc) ctrlCommit 0.1;
-
-		_pos = ctrlPosition ((ctrlParent (_this select 0)) displayCtrl (ctrlIDC (_this select 0))+1);
-		_pos set [2,0.02 * safezoneW];
-		((ctrlParent (_this select 0)) displayCtrl (ctrlIDC (_this select 0))+1) ctrlSetPosition _pos;
-		((ctrlParent (_this select 0)) displayCtrl (ctrlIDC (_this select 0))+1) ctrlCommit 0;
-		playSound "click";
-	}];
+	(_mccdialog displayCtrl _x) ctrlAddEventHandler ["MouseButtonClick", {["close", (ctrlIDC (_this select 0)) + 1000] call MCCMK_fnc_consoleFolder; playSound "click"}];
 } forEach [1010,1020,1030];
-
 {
-	(_mccdialog displayCtrl _x) ctrlAddEventHandler ["MouseButtonClick",{
-		_idc = (ctrlIDC (_this select 0)) +999;
-		_pos = ctrlPosition ((ctrlParent (_this select 0)) displayCtrl _idc);
-		_pos set [2,(0.257813 * safezoneW)];
-
-		((ctrlParent (_this select 0)) displayCtrl _idc) ctrlSetPosition _pos;
-		((ctrlParent (_this select 0)) displayCtrl _idc) ctrlCommit 0.1;
-		_pos = ctrlPosition (_this select 0);
-		_pos set [2,0];
-		(_this select 0) ctrlSetPosition _pos;
-		(_this select 0) ctrlCommit 0;
-		playSound "click";
-	}];
+	(_mccdialog displayCtrl _x) ctrlAddEventHandler ["MouseButtonClick", {["open", (ctrlIDC (_this select 0)) + 999] call MCCMK_fnc_consoleFolder; playSound "click"}];
 } forEach [1011,1021,1031];
 
 //Add default drops & CAS
@@ -203,6 +178,24 @@ if (([["hq",3], playerSide] call MCC_fnc_CheckBuildings || (missionNamespace get
 	publicVariable "MCC_RTSAddDefaultCAS";
 };
 
+//(MK) Air Patrol: one entry per aircraft of the commander's faction (MCCMK_fnc_airPatrolList), each with its cost (ammo
+// per call, fuel for its time on station) and details for the CAS panel (MCCMK_fnc_apConsoleInfo); once per faction.
+// The old two generic entries (from older saves) go.
+if (([["hq",3], playerSide] call MCC_fnc_CheckBuildings || (missionNamespace getVariable ["MCC_defaultCASEnabled",false]))
+	&& {!(missionNamespace getVariable [format ["MCCMK_apAdded_%1_%2", playerSide, faction player], false])}) then {
+	private _vn = format ["MCC_CASConsoleArray%1", playerSide];
+	private _arr = (missionNamespace getVariable [_vn, []]) select {!((toLower ((_x select 0) select 0)) in ["air patrol - jet (air-to-air)", "air patrol - helicopter (air-to-ground)"])};
+	{
+		_x params ["_cls", "_nm", "_type", "_aa", "_ag", "_am", "_fu", "_mi"];
+		private _e = [[format ["Air Patrol - %1", _nm]], [_cls]];
+		if !(_e in _arr) then {_arr pushBack _e};
+		missionNamespace setVariable [str _e, [["ammo", _am], ["fuel", _fu]], true];
+		missionNamespace setVariable [format ["MCCMK_ap_%1", _cls], [_type, _aa, _ag, _mi, _am, _fu], true];
+	} forEach ([faction player] call MCCMK_fnc_airPatrolList);
+	missionNamespace setVariable [_vn, _arr, true];
+	missionNamespace setVariable [format ["MCCMK_apAdded_%1_%2", playerSide, faction player], true, true];
+};
+
 [] spawn {
 	disableSerialization;
 	while {!isNull (findDisplay 2993)} do {
@@ -218,7 +211,7 @@ if (count _evacVehicles > 0) then {
 	{
 		if (alive _x) then	{
 			_vehicleDisplayName 	= getText(configFile >> "CfgVehicles" >> typeof _x >> "displayname");
-			_displayname 			= format ["%1, %2",_x,_vehicleDisplayName];
+			_displayname 			= [_x] call MCCMK_fnc_evacLabel;	//(MK)
 			_index 					= _comboBox lbAdd _displayname;
 		} else {
 			_displayname 			= "N/A";
@@ -229,18 +222,18 @@ if (count _evacVehicles > 0) then {
 
 	_type = _evacVehicles select (lbCurSel MCC_ConsoleEvacTypeText_IDD);
 	ctrlShow [MCC_ConsoleEvacFlyHightComboBox_IDD,false];
-	_insetionArray = ["Move (engine on)","Move (engine off)"];
+	_insetionArray = ["Move (engine on)","Move (engine off)","RTB"];
 
 	if (_type iskindof "helicopter") then {									//Case we choose aircrft
 		ctrlShow [MCC_ConsoleEvacFlyHightComboBox_IDD,true];
-		_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope"];
+		_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing","Paradrop","Water landing (engine on)","Water landing (engine off)","RTB"];
 		_comboBox = _mccdialog displayCtrl MCC_ConsoleEvacFlyHightComboBox_IDD;		//fill combobox Fly in Hight
 		lbClear _comboBox;
 		{
 			_displayname = format ["%1",_x  select 0];
 			_index = _comboBox lbAdd _displayname;
 		} foreach MCC_evacFlyInHight_array;
-		_comboBox lbSetCurSel 0;
+		[_comboBox, "MCC_ccEvacHeight"] call MCC_fnc_consoleListMemory;
 	};
 
 		_comboBox = _mccdialog displayCtrl MCC_ConsoleEvacApproachComboBox_IDD;		//fill combobox Approach
@@ -249,7 +242,7 @@ if (count _evacVehicles > 0) then {
 		_displayname = _x;
 		_index = _comboBox lbAdd _displayname;
 	} foreach _insetionArray;
-	_comboBox lbSetCurSel 0;
+	[_comboBox, "MCC_ccEvacInsertion"] call MCC_fnc_consoleListMemory;
 };
 if (count _evacVehicles > 0 && {(lbCurSel MCC_ConsoleEvacTypeText_IDD) >= 0}) then {missionNamespace setVariable ["MCC_evacConsoleObj", _evacVehicles select (lbCurSel MCC_ConsoleEvacTypeText_IDD)]};
 [] spawn {
@@ -299,17 +292,25 @@ lbClear _comboBox;
 	};
 
 } foreach (missionNameSpace getVariable [_arrayName,[]]);
-_comboBox lbSetCurSel 0;
+[_comboBox, "MCC_ccCAS"] call MCC_fnc_consoleListMemory;
 
 //----------------------------------------------Airdrop--------------------------------------------------------------------------------------
 _arrayName	= format ["MCC_ConsoleAirdropArray%1",(player getVariable ["CP_side",  playerside])];
 
+//(MK) the Smoke tick box, as this player left it (shared with the side, so every airdrop follows it)
+private _smk = _mccdialog displayCtrl 9230;
+if (!isNull _smk) then {
+	private _on = profileNamespace getVariable ["MCCMK_dropSmoke", true];
+	_smk cbSetChecked _on;
+	MCCMK_dropSmoke = _on;
+	publicVariable "MCCMK_dropSmoke";
+};
 _comboBox = _mccdialog displayCtrl MCC_ConsoleAirdropAvailableTextBox_IDD;		//fill list box for Airdrop Types
 lbClear _comboBox;
 _counter = 0;
 {
 	_counter = _counter + 1;
-	_displayname = format ["%1: %2", _counter, ((((_x select 0) select 0) apply {getText (configFile >> "CfgVehicles" >> _x >> "displayname")}) joinString ", ")];
+	_displayname = ((((_x select 0) select 0) apply {getText (configFile >> "CfgVehicles" >> _x >> "displayname")}) joinString ", ");
 	_displayname = _displayname;
 	_pic = if (!(_x select 2 isEqualTo 1) || (_x isEqualTo true)) then {"\a3\ui_f\data\gui\cfg\CommunicationMenu\supplydrop_ca.paa"} else {"\A3\ui_f\data\map\markers\handdrawn\pickup_CA.paa"};
 	_index = _comboBox lbAdd _displayname;
@@ -337,7 +338,22 @@ _counter = 0;
 	};
 
 } foreach (missionNameSpace getVariable [_arrayName,[]]);
-_comboBox lbSetCurSel 0;
+// Taru supply pods (MK): always on offer, paid from the side's resources
+{
+	_x params ["_kind", "_label"];
+	private _c = [_forEachIndex] call MCCMK_fnc_podCost;
+	private _free = call MCCMK_fnc_resFree;
+	private _parts = [];
+	{if ((_c select _forEachIndex) > 0) then {_parts pushBack format ["%1 %2", _c select _forEachIndex, _x]}} forEach ["Ammo", "Supply", "Fuel", "Meds"];
+	_index = _comboBox lbAdd format ["Taru pod: %1", _label];
+	_comboBox lbSetPictureRight [_index, "\a3\ui_f\data\gui\cfg\CommunicationMenu\supplydrop_ca.paa"];
+	_comboBox lbSetTooltip [_index, if (_free) then {toString [8734]} else {_parts joinString ", "}];
+	if (!_free) then {
+		private _r = missionNamespace getVariable [format ["MCC_res%1", playerSide], [0, 0, 0, 0, 0]];
+		if ((_r select 0) < (_c select 0) || {(_r select 1) < (_c select 1)} || {(_r select 2) < (_c select 2)} || {(_r select 4) < (_c select 3)}) then {_comboBox lbSetColor [_index, [0.311, 0.311, 0.311, 0.8]]};
+	};
+} forEach (call MCCMK_fnc_podInfo);
+[_comboBox, "MCC_ccAirdrop"] call MCC_fnc_consoleListMemory;
 
 //------------------------------------------Group Control-------------------------------------------------------------------------------------
 //---------------------Console Groups management
@@ -352,6 +368,7 @@ private _groupIconHandle = addMissionEventHandler ["GroupIconClick", {
 								];
 
    								 if (!(MCC_Console1Open) && dialog) exitWith {};
+								if !([side group player, side _group] call BIS_fnc_sideIsFriendly) exitWith {};	//(MK) Map Intel's enemy icons: not selectable
 
 								[_group,_mouseButton,[_posX,_posY],_shift,_control,_alt] execVM format ["%1mcc\fnc\console\fn_consoleClickGroupIcon.sqf",MCC_path];
 								//[_group,_button,[_posx,_posy],_shift,_ctrl,_alt] spawn MCC_fnc_consoleClickGroupIcon;
@@ -365,10 +382,11 @@ if (isnil "MCC_consoleGroupSelectionEH") then {
 MCC_fnc_mapDrawWPConsole =
 {
 	_map = _this select 0;
+	[_map, missionNamespace getVariable ["MCC_ConsoleGroupSelected", []], (["MCC_ConsoleRuler", "MCC_CASrequestMarker", "MCC_evacParaWait", "MCCMK_makeHQPick"] findIf {(missionNamespace getVariable [_x, false]) isEqualTo true}) >= 0] call MCCMK_fnc_wpChainDraw;
 	{
 		_leader = (leader _x);
 		_groupControl = if ((isplayer _leader) || (getText (configfile >> "CfgVehicles" >> typeOF vehicle _leader >> "vehicleClass")== "Autonomous")) then {true} else {_x getvariable ["MCC_canbecontrolled",false]};	//Can we control this group
-		_haveGPS =  if ((vehicle _leader != _leader) || !isPlayer _leader) then {true} else {("ItemGPS" in (assignedItems _leader) || "B_UavTerminal" in (assignedItems _leader) || "MCC_Console" in (assignedItems _leader))};
+		_haveGPS =  if ((vehicle _leader != _leader) || !isPlayer _leader) then {true} else {(((assignedItems _leader) findIf {(_x isKindOf ["ItemGPS", configFile >> "CfgWeapons"]) || {_x isKindOf ["UavTerminal_base", configFile >> "CfgWeapons"]}}) >= 0)};
 		if (isnil "_haveGPS") then {_haveGPS = false};
 		if ((side _leader == side player) && alive _leader && _groupControl && ((MCC_ConsoleOnlyShowUnitsWithGPS && _haveGPS) || !MCC_ConsoleOnlyShowUnitsWithGPS)) then
 		{
@@ -415,6 +433,22 @@ MCC_fnc_mapDrawWPConsole =
 					};
 				};
 			};
+			private _mkPlan = (group _leader) getVariable ["MCCMK_wpPlan", []];
+			if (_mkPlan isNotEqualTo []) then
+			{
+				private _mkTex = gettext (configfile >> "CfgMarkers" >> "waypoint" >> "icon");
+				private _mkLp = getPos _leader;
+				for "_mkK" from (currentWaypoint (group _leader)) to ((count _wpArray) - 1) do {
+					private _mkP = waypointPosition (_wpArray select _mkK);
+					if ((_mkP distance [0,0,0]) > 50) then {_mkLp = _mkP};
+				};
+				{
+					_x params ["_mkP", "_mkT"];
+					_map drawIcon [_mkTex, [0,0,1,1], _mkP, 24, 24, 0, _mkT, 0, 0.04, "PuristaBold", "center"];
+					_map drawLine [[_mkLp select 0, _mkLp select 1], _mkP, [0,0,1,1]];
+					_mkLp = _mkP;
+				} forEach _mkPlan;
+			};
 		};
 	} foreach allgroups;
 
@@ -456,6 +490,61 @@ MCC_fnc_mapDrawWPConsole =
 	setGroupIconsSelectable true;
 
 	_handler = (_mccdialog displayCtrl 9120) ctrladdeventhandler ["draw","_this call MCC_fnc_mapDrawWPConsole;"];
+	uiNamespace setVariable ["MCCMK_wpChain", nil];
+	// (MK) groups under Arma's High Command (the commandable ones): its module keeps writing their icon colour and name. This
+	// console's own are put back every frame, just before the map is drawn, so its rewrite never reaches the screen.
+	// (MK) THE CONSOLE'S ICONS HELD AGAINST ARMA'S HIGH COMMAND. While the player is his side's commander, Arma's High Command
+	// script goes round EVERY group about once a second and blanks its icon's colour and name (colour [0,0,0,0], name
+	// '', on friendly and enemy groups alike, in his High Command or not, and its own "dummy" icons added). The
+	// console's colour and name are put back at three points of every frame: at its start, when the scene is drawn
+	// (after the scripts have run,
+	// before the map is), and when the map is drawn.
+	MCCMK_iconHold = {
+		{
+			private _w = _x getVariable "MCCMK_iconWant";
+			private _id = _x getVariable "MCCgroupIconData";
+			if (!isNil "_w" && {!(_x getVariable ["MCCMK_miFlashing", false])}) then {_x setGroupIconParams ([_x, _w] call MCCMK_fnc_iconWithWp)};
+		} forEach allGroups;
+	};
+	// (MK) THE ICONS AND ARMA'S "MILITARY SYMBOLS". Arma's High Command starts Arma's Military Symbols module (MARTA - read in
+	// A3\modules_f: hc.sqf creates it, marta_local.fsm runs it; MCC's UAV console starts it too). For every group of the
+	// player's side and every enemy group his side knows of, it keeps two icons of its own on the group - a symbol (its id in
+	// the group's BIS_MARTA_ICON_TYPE) and a size marker (BIS_MARTA_ICON_SIZE) - and on every pass (about twice a second) it
+	// sets the symbol, the size marker and the icon's colour (the side's) and name (none). High Command's own scripts read
+	// that symbol back by its id. So:
+	//   - its icons are NEVER removed or cleared (High Command then fails: "Undefined variable _grpIconClass" / "_icon");
+	//   - a group that has them is shown THROUGH its symbol: the console names the symbol it wants in the group's
+	//     MARTA_customicon - the module's own setting for exactly this - so the module itself shows the console's symbol
+	//     (the half-and-half "in combat" ones included) and, with a custom symbol, leaves its size marker alone (set empty
+	//     here; the console's own size marker is used). The console adds no symbol of its own to such a group: one box;
+	//   - a group without them gets the console's own symbol, as always;
+	//   - the colour and name are held every frame (MCCMK_iconHold): the module writes its own on every pass;
+	//   - a group the console does not show (its side filtered out, or its leader riding in another group's vehicle) is
+	//     held invisible instead of having its icons cleared;
+	//   - when the console closes, MARTA_customicon is taken off again and the module goes back to its own symbols.
+	MCCMK_iconMartaHas = {
+		params ["_g"];
+		private _t = _g getVariable "BIS_MARTA_ICON_TYPE";
+		!isNil "_t" && {((_g getGroupIcon _t) param [0, ""]) != ""}
+	};
+	MCCMK_iconMartaOff = {
+		{
+			if (_x getVariable ["MCCMK_iconMarta", false]) then {_x setVariable ["MARTA_customicon", nil]; _x setVariable ["MCCMK_iconMarta", nil]};
+			_x setVariable ["MCCMK_iconWant", nil];
+		} forEach allGroups;
+	};
+	{_x setVariable ["MCCMK_iconWant", nil]} forEach allGroups;	// (nothing left over from the other console)
+	private _holdEHs = [addMissionEventHandler ["EachFrame", {call MCCMK_iconHold}], addMissionEventHandler ["Draw3D", {call MCCMK_iconHold}]];
+	// (every group this console shows, not only those under High Command - see MCC_fnc_groupGenRefresh)
+	(_mccdialog displayCtrl 9120) ctrlAddEventHandler ["Draw", {
+		{
+			private _w = _x getVariable "MCCMK_iconWant";
+			// (only where this console's own icon is really on the group - Map Intel's icons on other groups are its own - and not
+			// during Map Intel's gunfire flash)
+			private _id = _x getVariable "MCCgroupIconData";
+			if (!isNil "_w" && {!(_x getVariable ["MCCMK_miFlashing", false])}) then {_x setGroupIconParams ([_x, _w] call MCCMK_fnc_iconWithWp)};
+		} forEach allGroups;
+	}];
 	while {MCC_Console1Open && (str (finddisplay mcc_playerConsole_IDD) != "no display")} do 		//Draw WP
 	{
 		{
@@ -464,7 +553,7 @@ MCC_fnc_mapDrawWPConsole =
 			_wpArray = waypoints (group _leader);
 			_behaviour = behaviour _leader;
 			_groupControl = if ((isplayer _leader) || (getText (configfile >> "CfgVehicles" >> typeOF vehicle _leader >> "vehicleClass")== "Autonomous")) then {true} else {_x getvariable ["MCC_canbecontrolled",false]};	//Can we control this group
-			_haveGPS =  if ((vehicle _leader != _leader) || !isPlayer _leader) then {true} else {("ItemGPS" in (assignedItems _leader) || "B_UavTerminal" in (assignedItems _leader) || "MCC_Console" in (assignedItems _leader))};
+			_haveGPS =  if ((vehicle _leader != _leader) || !isPlayer _leader) then {true} else {(((assignedItems _leader) findIf {(_x isKindOf ["ItemGPS", configFile >> "CfgWeapons"]) || {_x isKindOf ["UavTerminal_base", configFile >> "CfgWeapons"]}}) >= 0)};
 			if (isnil "_haveGPS") then {_haveGPS = false};
 
 			_side = side _leader;
@@ -477,44 +566,44 @@ MCC_fnc_mapDrawWPConsole =
 				_markerType = _groupIconData select 2;
 				_unitsSizeMarker = _groupIconData select 3;
 
-				//Set markers
-				_x setGroupIconParams [_markerColor,_groupName ,1,true];
+				//Set markers (the colour and name: set once, below)
 
+				//(MK) the icon updated in place, not deleted and re-created twice a second
 				_icon = (_x getvariable "MCCgroupIconData");
-				if (!isnil "_icon") then {_x removeGroupIcon _icon};
 				private _iconType = _markerType;
 				if (_behaviour == "COMBAT" && {_side != civilian}) then {
 					private _c = format [["MCC_%1_combat", "MCC_%1_combatP"] select (isPlayer _leader), _markerType];
 					if (isClass (configFile >> "CfgGroupIcons" >> _c)) then {_iconType = _c};
 				};
-				_icon = _x addGroupIcon [_iconType,[0,0]];
-				_x setGroupIconParams [_markerColor,format ["%1",_groupName],1,true];
-				_x setvariable ["MCCgroupIconData",_icon,false];
+				// (MK) the symbol: through Arma's Military Symbols icon where the group has one (see MCCMK_iconMartaHas, above),
+				// else the console's own
+				if ([_x] call MCCMK_iconMartaHas) then {
+					private _mT = _x getVariable "BIS_MARTA_ICON_TYPE";
+					if !((_x getVariable ["MARTA_customicon", []]) isEqualTo [_iconType]) then {_x setVariable ["MARTA_customicon", [_iconType]]};
+					if (((_x getGroupIcon _mT) param [0, ""]) != _iconType) then {_x setGroupIcon [_mT, _iconType]};	// (at once - the module sets the same on its next pass)
+					private _mS = _x getVariable "BIS_MARTA_ICON_SIZE";
+					if (!isNil "_mS" && {!((toLower ((_x getGroupIcon _mS) param [0, ""])) in ["", "dummy"])}) then {_x setGroupIcon [_mS, "dummy"]};
+					if (!(_x getVariable ["MCCMK_iconMarta", false]) && {missionNamespace getVariable ["MCC_debug", false]}) then {["INFO", "console icons", "%1: shown through Arma's Military Symbols icon (id %2), set to %3 | icons on the group: %4", [groupId _x, _mT, _iconType, getGroupIcons _x]] call MCC_fnc_log};
+					_x setVariable ["MCCMK_iconMarta", true];
+					if (!isNil "_icon") then {_x removeGroupIcon _icon};
+					_x setVariable ["MCCgroupIconData", nil];
+				} else {
+					if (!isNil "_icon" && {((_x getGroupIcon _icon) param [0, ""]) != ""}) then {_x setGroupIcon [_icon, _iconType]} else {_icon = _x addGroupIcon [_iconType,[0,0]]};
+					_x setvariable ["MCCgroupIconData",_icon,false];
+				};
 
-				_icon = (_x getvariable "MCCgroupIconSize") select 0;
-				if (!isnil "_icon") then {_x removeGroupIcon _icon};
-				_icon = _x addGroupIcon [_unitsSizeMarker,[0,0]];
+				_icon = (_x getvariable ["MCCgroupIconSize", [nil]]) select 0;
+				if (!isNil "_icon" && {((_x getGroupIcon _icon) param [0, ""]) != ""}) then {_x setGroupIcon [_icon, _unitsSizeMarker]} else {_icon = _x addGroupIcon [_unitsSizeMarker,[0,0]]};
 				_x setvariable ["MCCgroupIconSize",[_icon,_unitsSizeMarker],false];
 
-				if (! isnil "_groupStatus") then 					//Draw group status
-					{
-						private _time = _groupStatus select 1;
-						private _status = _groupStatus select 0;
-
-						if (abs (time - _time) < 180) then
-							{
-								_x setGroupIconParams [_markerColor,format ["%1%2",_groupName,_status],1,true];
-							}
-							else
-							{
-								_x setGroupIconParams [_markerColor,_groupName,1,true];
-							};
-					};
-
-				if (_behaviour == "COMBAT") then				//Show in combat
-					{
-						_x setGroupIconParams [[1,1,1,1],_groupName,1,true];
-					};
+				//(MK) the colour and name worked out first and set ONCE a pass - set in steps (plain, the status, white
+				//in combat), the map draws the steps in between: icons flash dark / light, names flicker
+				private _iconCol = _markerColor;
+				private _iconTxt = format ["%1",_groupName];
+				if (!isnil "_groupStatus" && {(abs (time - (_groupStatus select 1))) < 180}) then {_iconTxt = format ["%1%2",_groupName,_groupStatus select 0]};
+				if (_behaviour == "COMBAT") then {_iconCol = [1,1,1,1]; _iconTxt = _groupName};	//Show in combat
+				_x setGroupIconParams ([_x, [_iconCol,_iconTxt,1,true]] call MCCMK_fnc_iconWithWp);
+				_x setVariable ["MCCMK_iconWant", [_iconCol,_iconTxt,1,true]];
 			};
 		} foreach allgroups;
 
@@ -536,6 +625,9 @@ MCC_fnc_mapDrawWPConsole =
 	setGroupIconsSelectable false;
 
 	//Remove EH
+	removeMissionEventHandler ["EachFrame", _holdEHs select 0];
+	removeMissionEventHandler ["Draw3D", _holdEHs select 1];
+	call MCCMK_iconMartaOff;
 	(_mccdialog displayCtrl 9120) ctrlRemoveEventHandler ["draw",_handler];
 
 	removeMissionEventHandler ["GroupIconClick",_groupIconHandle];

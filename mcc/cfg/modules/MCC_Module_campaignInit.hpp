@@ -21,7 +21,7 @@ class MCC_Module_campaignInit : Module_F
 		class playerContent : Combo
 		{
 			displayName = "Players Content";
-			description = "Which units and vehicles the players' faction may use: its own, plus Creator DLC, or every loaded mod";
+			description = "Which units and vehicles the players' faction may use: its own, its DLC relatives, mods' additions, or the whole side";
 			typeName = "NUMBER";
 			property = "MCC_Module_campaignInit_playerContent";
 			class values
@@ -33,14 +33,24 @@ class MCC_Module_campaignInit : Module_F
 				};
 				class creatorDLC
 				{
-					name = "Faction + Creator DLC";
+					name = "Faction + DLC";
 					value = 1;
 					default = 1;
 				};
 				class allMods
 				{
-					name = "All loaded mods";
+					name = "Faction + mods";
 					value = 2;
+				};
+				class dlcMods
+				{
+					name = "Faction + DLC + mods";
+					value = 3;
+				};
+				class wholeSide
+				{
+					name = "Whole side";
+					value = 4;
 				};
 			};
 		};
@@ -93,10 +103,24 @@ class MCC_Module_campaignInit : Module_F
 			property = "MCC_Module_campaignInit_factionEnemy";
 		};
 
+		class enemySide : Combo
+		{
+			displayName = "Enemy Side";
+			description = "Which side the enemy faction fights for. Use East, West or Independent to fight a faction from your own side (it keeps its own units and vehicles).";
+			typeName = "NUMBER";
+			property = "MCC_Module_campaignInit_enemySide";
+			class values
+			{
+				class own {name = "Faction's own"; value = 0; default = 1;};
+				class east {name = "East"; value = 1;};
+				class west {name = "West"; value = 2;};
+				class guer {name = "Independent"; value = 3;};
+			};
+		};
 		class enemyContent : Combo
 		{
 			displayName = "Enemy Content";
-			description = "Which units and vehicles the enemy faction may use: its own, plus Creator DLC, or every loaded mod";
+			description = "Which units and vehicles the enemy faction may use: its own, its DLC relatives, mods' additions, or the whole side";
 			typeName = "NUMBER";
 			property = "MCC_Module_campaignInit_enemyContent";
 			class values
@@ -108,14 +132,24 @@ class MCC_Module_campaignInit : Module_F
 				};
 				class creatorDLC
 				{
-					name = "Faction + Creator DLC";
+					name = "Faction + DLC";
 					value = 1;
 					default = 1;
 				};
 				class allMods
 				{
-					name = "All loaded mods";
+					name = "Faction + mods";
 					value = 2;
+				};
+				class dlcMods
+				{
+					name = "Faction + DLC + mods";
+					value = 3;
+				};
+				class wholeSide
+				{
+					name = "Whole side";
+					value = 4;
 				};
 			};
 		};
@@ -133,7 +167,7 @@ class MCC_Module_campaignInit : Module_F
 		class civContent : Combo
 		{
 			displayName = "Civilian Content";
-			description = "Which units and vehicles the civilian faction may use: its own, plus Creator DLC, or every loaded mod";
+			description = "Which units and vehicles the civilian faction may use: its own, its DLC relatives, mods' additions, or the whole side";
 			typeName = "NUMBER";
 			property = "MCC_Module_campaignInit_civContent";
 			class values
@@ -145,14 +179,24 @@ class MCC_Module_campaignInit : Module_F
 				};
 				class creatorDLC
 				{
-					name = "Faction + Creator DLC";
+					name = "Faction + DLC";
 					value = 1;
 					default = 1;
 				};
 				class allMods
 				{
-					name = "All loaded mods";
+					name = "Faction + mods";
 					value = 2;
+				};
+				class dlcMods
+				{
+					name = "Faction + DLC + mods";
+					value = 3;
+				};
+				class wholeSide
+				{
+					name = "Whole side";
+					value = 4;
 				};
 			};
 		};
@@ -310,7 +354,7 @@ class MCC_Module_campaignInit : Module_F
 		{
 			displayName = "Map Overlay Transparency";
 			description = "Makes the red/blue territory squares on the map more see-through. Shading differences between squares are kept; 100% hides them completely. Territory, enemy spawns and saving are not affected.";
-			tooltip = "Makes the red/blue territory squares on the map more see-through. Shading differences between squares are kept; 100% hides them completely. Territory, enemy spawns and saving are not affected.";
+			tooltip = "Makes the red/blue territory squares on the map more\nsee-through. Shading differences between squares are kept;\n100% hides them completely. Territory, enemy spawns and saving\nare not affected.";
 			control = "Slider";
 			typeName = "NUMBER";
 			defaultValue = "0";
@@ -320,7 +364,7 @@ class MCC_Module_campaignInit : Module_F
 		class objectiveMarkers : Combo
 		{
 			displayName = "Objective Markers";
-			tooltip = "Area: task markers are placed up to ~400 m from the objective and must be searched for (classic MCC campaign). Precise: markers sit on the objective with a 3D icon.";
+			tooltip = "Area: task markers are placed up to ~400 m from the objective\nand must be searched for (classic MCC campaign). Precise:\nmarkers sit on the objective with a 3D icon.";
 			typeName = "NUMBER";
 			property = "MCC_Module_campaignInit_objectiveMarkers";
 			defaultValue = "1";
@@ -345,7 +389,7 @@ class MCC_Module_campaignInit : Module_F
 		{
 			displayName = "Resources Over Storage Limit";
 			description = "What happens to resources above your storage limit (HQ + Storage Areas) when a campaign mission ends. Cut: anything over the limit is lost at once (original MCC). Keep: only the new reward is capped; stock already over the limit stays and is lost at 10% per in-game hour instead.";
-			tooltip = "What happens to resources above your storage limit (HQ + Storage Areas) when a campaign mission ends. Cut: anything over the limit is lost at once (original MCC). Keep: only the new reward is capped; stock already over the limit stays and is lost at 10% per in-game hour instead.";
+			tooltip = "What happens to resources above your storage limit (HQ +\nStorage Areas) when a campaign mission ends. Cut: anything\nover the limit is lost at once (original MCC). Keep: only the\nnew reward is capped; stock already over the limit stays and\nis lost at 10% per in-game hour instead.";
 			typeName = "NUMBER";
 			property = "MCC_Module_campaignInit_overStorage";
 			defaultValue = "0";

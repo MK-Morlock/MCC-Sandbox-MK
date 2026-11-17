@@ -8,11 +8,11 @@ for "_i" from 1 to 20 do {if (random 30 < _intensity) then {_count = _count + 1}
 _count = _count max 1;
 private _units = [[[_faction, "soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry, _faction] call MCC_fnc_contentFilterList;
 if (_units isEqualTo []) exitWith {};
-private _grp = createGroup _side;
+private _grp = createGroup _side; [_grp] call MCCMK_fnc_genTag;
 for "_i" from 1 to _count do {
 	private _spot = [_pos, (_radius * 0.8) max 10, 25, 2] call MCC_fnc_landSpot;
 	if (_spot isEqualTo []) then {_spot = _pos getPos [5 + random 10, random 360]};
-	private _unit = _grp createUnit [(selectRandom _units) select 0, _spot, [], 0, "NONE"];
+	private _unit = _grp createUnit [(selectRandom _units) select 0, _spot, [], 0, "NONE"]; [_unit] call MCCMK_fnc_genTag;
 	_unit setDir (_pos getDir _unit);
 	doStop _unit;
 	{_x addCuratorEditableObjects [[_unit], false]} forEach allCurators;

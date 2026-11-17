@@ -10,7 +10,7 @@ _list spawn {
 		_name setMarkerBrushLocal "SolidFull";
 		_name setMarkerSizeLocal _size;
 		_name setMarkerColorLocal _color;
-		if (missionNamespace getVariable ["MCC_consoleTilesHidden", false]) then {MCC_consoleTilesShown set [_name, _alpha]; _name setMarkerAlphaLocal 0} else {_name setMarkerAlphaLocal _alpha};
+		[_name, _alpha, true] call MCCMK_fnc_tileDraw;
 		_n = _n + 1;
 		if (_n % 50 == 0) then {sleep 0.001};
 	} forEach _this;

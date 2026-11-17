@@ -19,7 +19,7 @@ class MCC_waypointsDialogControls:MCC_RscControlsGroup
 			colorText[] = {0.11,0.12,0.13,0.96};
 			text = "\mcc_sandbox_mod\data\panel_round_ca.paa";
 			style = 48;
-			idc = -1;
+			idc = 9025;
 			colorBackground[] = {0,0,0,0};
 
 			w = 0.189063 * safezoneW;
@@ -42,6 +42,28 @@ class MCC_waypointsDialogControls:MCC_RscControlsGroup
 			h = 0.0219914 * safezoneH;
 		};
 		
+		class MCCMK_wpChainBox: MCC_RscCheckbox
+		{
+			idc = 9026;
+			tooltip = "Place Move waypoints with click. Right-click or double-click\nadd waypoint to finish.";
+			onCheckedChanged = "profileNamespace setVariable ['MCCMK_wpChainOn', (_this select 1) == 1]";
+			x = 0.0744797 * safezoneW;
+			y = 0.0121958 * safezoneH;
+			w = 0.011000 * safezoneW;
+			h = 0.019600 * safezoneH;
+		};
+		class MCCMK_wpChainLabel: MCC_RscText
+		{
+			idc = -1;
+			text = "Chain";
+			tooltip = "Place Move waypoints with click. Right-click or double-click\nadd waypoint to finish.";
+			colorText[] = {0.89,0.90,0.91,1};
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+			x = 0.0874797 * safezoneW;
+			y = 0.0109958 * safezoneH;
+			w = 0.04 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
 		class MCC_GroupGenWPCombo: MCC_RscCombo
 		{
 			idc = MCC_GroupGenWPCombo_IDC;
@@ -83,11 +105,33 @@ class MCC_waypointsDialogControls:MCC_RscControlsGroup
 			h = 0.0219914 * safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";	//same text size as the Spawn panel
 		};
+		class MCC_GroupGenWPflyCombo: MCC_RscCombo
+		{
+			idc = 9019;
+
+			x = 0.0744797 * safezoneW;
+			y = 0.175932 * safezoneH;
+			w = 0.108854 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+		};
+		class MCC_GroupGenWPflyTittle: MCC_RscText
+		{
+			colorText[] = {0.62,0.65,0.68,1};
+			idc = 9020;
+			text = "Fly height";
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
+
+			x = 0.00572965 * safezoneW;
+			y = 0.175932 * safezoneH;
+			w = 0.0572917 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
 		class MCC_GroupGenWPCancel: MCCBTN_S
 		{
-			idc = -1;
+			idc = 9021;
 			onButtonClick = "ctrlShow [510, false];";
-			tooltip = "Close the waypoint panel - the selected unit and its camera feed stay";
+			tooltip = "Close the waypoint panel - the selected unit and its camera\nfeed stay";
 			text = "Cancel";
 			x = 0.00572965 * safezoneW;
 			y = 0.175932 * safezoneH;
@@ -96,7 +140,7 @@ class MCC_waypointsDialogControls:MCC_RscControlsGroup
 		};
 		class MCC_GroupGenWPAdd: MCCBTN_S
 		{
-			idc = -1;
+			idc = 9022;
 			onButtonClick = __EVAL("[0] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\manageWP.sqf'");
 
 			text = "ADD"; //--- ToDo: Localize;
@@ -108,7 +152,7 @@ class MCC_waypointsDialogControls:MCC_RscControlsGroup
 		};
 		class MCC_GroupGenWPReplace: MCCBTN_S
 		{
-			idc = -1;
+			idc = 9023;
 			onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\manageWP.sqf'");
 
 			text = "Replace"; //--- ToDo: Localize;
@@ -116,11 +160,11 @@ class MCC_waypointsDialogControls:MCC_RscControlsGroup
 			y = 0.175932 * safezoneH;
 			w = 0.0415 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			tooltip = "Remove all waypoints from any selected groups and add a new waypoint"; //--- ToDo: Localize;
+			tooltip = "Remove all waypoints from any selected groups and add a new\nwaypoint"; //--- ToDo: Localize;
 		};
 		class MCC_GroupGenWPClear: MCCBTN_S
 		{
-			idc = -1;
+			idc = 9024;
 			onButtonClick = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\manageWP.sqf'");
 
 			text = "Clear"; //--- ToDo: Localize;

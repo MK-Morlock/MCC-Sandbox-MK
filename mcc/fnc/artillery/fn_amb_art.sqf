@@ -11,11 +11,13 @@ if (!isserver) exitWith {};
 if (_type<4) then
 {
 	_arti = _this select 1;
-	_arti addeventhandler["fired", {[4,_this select 0, _this select 4] spawn MCC_fnc_amb_Art}]; //Delete the projectile.
+	[_arti] call MCCMK_fnc_crewFix;	//(MK) the enemy faction's crew (the camp's guns are the side's vanilla ones)
+	_arti addeventhandler["fired", {[[4,_this select 0, _this select 4], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_amb_Art}}]; //Delete the projectile.
 	_dummypos = [getpos _arti, 50, getdir _arti] call BIS_fnc_relPos;
 
 	if (isNull gunner _arti) then {
 		createVehicleCrew _arti;
+		[_arti] call MCCMK_fnc_crewFix;
 		sleep 1;
 		{
 			private _curator = _x;

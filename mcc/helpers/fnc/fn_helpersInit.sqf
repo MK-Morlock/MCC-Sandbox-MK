@@ -17,7 +17,7 @@ if (player == player && !( isDedicated) && !(missionNamespace getVariable ["MCC_
 
 			private _key = [];
 			if (missionNamespace getVariable ["MCC_isCBA",false]) then {
-				_key = ["MCC","interactionKey"] call CBA_fnc_getKeybind;
+				_key = ["MCCMK","interactionKey"] call CBA_fnc_getKeybind;
 				while {(count _key <=0)} do {
 					["Assign the MCC Interaction key!", 5] spawn MCC_fnc_rsMessage;
 					sleep 5;
@@ -92,7 +92,7 @@ if (player == player && !( isDedicated) && !(missionNamespace getVariable ["MCC_
 		//Logistics Trucks
 		0 spawn {
 			if (profileNamespace getVariable ["MCC_FCtutorialLogistics",true]) then {
-				waituntil {typeof vehicle player in (missionNamespace getvariable ["MCC_supplyTracks",[]]) && !dialog && cameraOn == vehicle player};
+				waituntil {([vehicle player] call MCCMK_fnc_isSupplyTruck) && !dialog && cameraOn == vehicle player};
 				_answer = ["<img size='9' img image=" + format ["'%1mcc\helpers\data\PRlogistics.paa'", MCC_path] + " align='center'/>
 							<br />While inside this vehicle and within 50 meters from HQ you can load logistics crates from the HQ and delieve them to the front.
 							<br/><br/><t color='#C48214'>Ammo crates</t> will resupply units and vehicles.

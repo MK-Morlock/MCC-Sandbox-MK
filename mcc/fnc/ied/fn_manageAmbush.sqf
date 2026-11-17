@@ -26,7 +26,7 @@ _group setBehaviour "STEALTH";
 _group setSpeedMode "FULL";	
 _group setCombatMode "GREEN";
 
-_dummyAmbush = MCC_dummy createVehicle (getpos _leader);
+_dummyAmbush = MCC_dummy createVehicle (getpos _leader); [_dummyAmbush] call MCCMK_fnc_genTag;
 waituntil {!isnil "_dummyAmbush"};
 _dummyAmbush setdir _groupDir;
 _dummyAmbush attachto [_leader,[0,0,0]];
@@ -50,7 +50,7 @@ if (_isSpotter > 0) then
 	} 
 	else	
 	{
-		_null = [_leader,_targetSide,15] spawn MCC_fnc_manageAC;
+		_null = [[_leader,_targetSide,15], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_manageAC};
 	};
 	
 	[_leader,_move] spawn 

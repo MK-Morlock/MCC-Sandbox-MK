@@ -46,7 +46,7 @@ _vehiclesArray = switch _objType do
 	{
 		case "fuel":{missionNamespace getVariable ["MCC_MWFuelTanks",["Land_dp_smallTank_F","Land_ReservoirTank_V1_F","Land_dp_bigTank_F"]]};
 		case "radio":{missionNamespace getVariable ["MCC_MWRadio",["Land_TTowerBig_2_F"]]};
-		case "tanks":{missionNamespace getVariable ["MCC_MWTanks",["B_MBT_01_cannon_F","O_MBT_02_cannon_F"]]};
+		case "tanks":{missionNamespace getVariable ["MCC_MWTanks",["B_MBT_01_cannon_F","O_MBT_02_cannon_F","I_MBT_03_cannon_F"]]};
 		case "aa":{missionNamespace getVariable ["MCC_MWAA",["B_APC_Tracked_01_AA_F","O_APC_Tracked_02_AA_F","I_APC_Wheeled_03_cannon_F"]]};
 		case "artillery": {missionNamespace getVariable ["MCC_MWArtillery",["B_MBT_01_arty_F","B_MBT_01_mlrs_F","O_MBT_02_arty_F","O_Mortar_01_F","I_Mortar_01_F"]]};
 		case "air":{missionNamespace getVariable ["MCC_MWAir",["O_Heli_Attack_02_F","O_Heli_Attack_02_black_F","O_UAV_02_F","O_UAV_02_CAS_F","B_Heli_Attack_01_F","I_Plane_Fighter_03_CAS_F","I_Plane_Fighter_03_AA_F"]]};
@@ -71,6 +71,11 @@ if (count _factionOwn > 0) then {_vehiclesArray = _factionOwn};
 //Find the objects from the enemy side
 _vehiclesArrayFlitered = if (_customList) then {+_vehiclesArray} else {_vehiclesArray select {([(getNumber (configFile >> "cfgVehicles" >> _x >> "side"))] call BIS_fnc_sideType) isEqualTo _side}};
 
+//(MK) an Independent enemy with no tank of its own, and a tank list without one for its side (a list saved before the
+// Kuma was added): the AAF's Kuma, not a NATO or CSAT tank
+if (count _vehiclesArrayFlitered <= 0 && {!_customList} && {_objType == "tanks"} && {_side isEqualTo resistance} && {isClass (configFile >> "CfgVehicles" >> "I_MBT_03_cannon_F")}) then {
+	_vehiclesArrayFlitered = ["I_MBT_03_cannon_F"];
+};
 //Couldn't find any object just select all
 if (count _vehiclesArrayFlitered <= 0) then {
 	_vehiclesArrayFlitered = _vehiclesArray;
@@ -169,10 +174,10 @@ sleep 1;
 
 //Create the object
 if (_objType in ["artillery","aa"]) then {
-	_object = ([_spawnPos,_spawndir,_type,_side] call MCC_fnc_spawnVehicle) select 0;
+	_object = ([_spawnPos,_spawndir,_type,_side,true,true,_faction] call MCC_fnc_spawnVehicle) select 0;
 } else {
 	if (_objType == "air") then {
-		_object = createVehicle [_type, _spawnPos, [], 0, "CAN_COLLIDE"];
+		_object = createVehicle [_type, _spawnPos, [], 0, "CAN_COLLIDE"]; [_object] call MCCMK_fnc_genTag;
 		_object allowDamage false;
 		_object setDir _spawndir;
 		_object setPos _spawnPos;
@@ -194,7 +199,7 @@ if (_objType in ["artillery","aa"]) then {
 			_object allowDamage true;
 		};
 	} else {
-		_object = _type createvehicle _spawnPos;
+		_object = _type createvehicle _spawnPos; [_object] call MCCMK_fnc_genTag;
 		_object allowDamage false;
 		_object setpos _spawnPos;
 		_object setdir _spawndir;
@@ -208,8 +213,8 @@ if (_objType in ["tanks","aa","artillery","air"]) then {
 	_init = '_this setVehicleLock "LOCKED";';
 	["MCC_fnc_setVehicleInit", [[netID _object,_object], _init, false], 2, false] call MCC_fnc_secRemote;
 
-	if (_objType isEqualTo "artillery") then {[0,_object] spawn MCC_fnc_amb_Art};
-	if (_objType isEqualTo "aa") then {[2,_object] spawn MCC_fnc_amb_Art};
+	if (_objType isEqualTo "artillery") then {[[0,_object], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_amb_Art}};
+	if (_objType isEqualTo "aa") then {[[2,_object], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_amb_Art}};
 };
 
 

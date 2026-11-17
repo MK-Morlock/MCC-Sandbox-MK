@@ -46,8 +46,8 @@ if !(_isCQB) then {
 
 //Lets spawn some body guards
 _range = if (_isCQB) then {30} else {60};
-[_objPos,_range,0,4,_faction, _side] remoteExec ["MCC_fnc_garrison",2];
-[_objPos, 30, 4, _faction, _side] remoteExec ["MCC_fnc_MWcampGuards", 2];
+(if (isServer) then {[[_objPos,_range,0,4,_faction, _side], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_garrison"] spawn MCCMK_fnc_genRun} else {[_objPos,_range,0,4,_faction, _side] remoteExec ["MCC_fnc_garrison",2]});
+(if (isServer) then {[[_objPos, 30, 4, _faction, _side], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_MWcampGuards"] spawn MCCMK_fnc_genRun} else {[_objPos, 30, 4, _faction, _side] remoteExec ["MCC_fnc_MWcampGuards", 2]});
 
 //Lets find out if we have a building close by
 _selectedBuilding = ([_objPos, 100] call MCC_fnc_MWFindbuildingPos) call BIS_fnc_selectRandom;
@@ -78,7 +78,7 @@ if (!(isnil "_buildingPos") &&
 
 
 if (_isDownloadIntel) then {
-	_object = _objType createvehicle _spawnPos;
+	_object = _objType createvehicle _spawnPos; [_object] call MCCMK_fnc_genTag;
 	if !(_foundBuilding) then {
 		private _e = _spawnPos findEmptyPosition [2,40,_objType];
 		if (count _e > 0) then {_spawnPos = _e};
@@ -89,7 +89,7 @@ if (_isDownloadIntel) then {
 
 } else {
 	//Spawn the intel
-	_dummyObject = "Land_WoodenTable_small_F" createvehicle _spawnPos;
+	_dummyObject = "Land_WoodenTable_small_F" createvehicle _spawnPos; [_dummyObject] call MCCMK_fnc_genTag;
 	_dummyObject enablesimulation false;
 
 	{_x addCuratorEditableObjects [[_dummyObject],false]} forEach allCurators;
@@ -101,7 +101,7 @@ if (_isDownloadIntel) then {
 
 	_dummyObject setPos _spawnPos;
 
-	_object = _objType createvehicle _spawnPos;
+	_object = _objType createvehicle _spawnPos; [_object] call MCCMK_fnc_genTag;
 	_object setPos (_dummyObject modelToWorld [0,0,0.43]);
 	_object setdir (getdir _dummyObject);
 	_object enablesimulation false;

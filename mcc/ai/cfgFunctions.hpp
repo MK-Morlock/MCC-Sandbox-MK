@@ -18,4 +18,5 @@ class ai
 	class doHaltAI			{description = "Can an AI unit be halted by a player";};
 	class enemyCAS			{description = "Can an AI unit be halted by a player";};
 	class AI_assignToZone	{description = "Assign AI unit/group to a specific zone";};
+	class aiDrones			{description = "(MK) enemy AI UAV operators launch their backpack drones";};
 };

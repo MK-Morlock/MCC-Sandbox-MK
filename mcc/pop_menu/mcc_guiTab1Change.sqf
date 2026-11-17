@@ -20,7 +20,7 @@ _mccdialog = findDisplay MCC_SANDBOX_IDD;
 if ((_task ==0) && (MCC_faction_index != lbCurSel FACTIONCOMBO)) then					//Change Faction
 {
 	mcc_sidename = (U_FACTIONS select (lbCurSel FACTIONCOMBO)) select 1;
-	mcc_faction = (U_FACTIONS select (lbCurSel FACTIONCOMBO)) select 2;
+	mcc_faction = (U_FACTIONS select (lbCurSel FACTIONCOMBO)) select 2; player setVariable ["MCCMK_faction", mcc_faction, true];
 	MCC_faction_index = lbCurSel FACTIONCOMBO;
 	[] call mcc_fnc_faction_choice;
 	if (!isNull (findDisplay 2994)) then {isNil {["sync"] call MCC_fnc_spawnLists}};
@@ -44,7 +44,7 @@ if ((_task ==1)&& (MCC_type_index != lbCurSel SPAWNTYPE)) then																	/
 			{
 				_displayname =  _x;
 				_index = _comboBox lbAdd _displayname;
-			} foreach ["Infantry", "Vehicles", "Tracked/Static", "Motorcycle", "Helicopter", "Fixed-wing", "Ship", "D.O.C", "Ammo", "Fortifications", "Dead Bodies", "Furniture", 
+			} foreach ["Infantry", "Vehicles", "Tracked/Static", "Motorcycle", "Helicopter", "Fixed-wing", "Boat", "D.O.C", "Ammo", "Fortifications", "Dead Bodies", "Furniture", 
 						"Market", "Misc", "Signs", "Warfare", "Wrecks", "Buildings", "Ruins","Garbage","Lamps","Container","Small Items","Structures","Helpers","Training"];
 			_comboBox lbSetCurSel 0; //MCC_class_index;	
 			};

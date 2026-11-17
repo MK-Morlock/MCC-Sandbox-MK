@@ -21,13 +21,13 @@ U_GEN_MOTORCYCLE	= [];
 U_GEN_CAR			= [];
 U_GEN_SOLDIER    	= [];
 
-//Start on the faction set in the (Settings) Mission Generator module, otherwise the first in the list (as before)
+//Start on the faction set in the (Settings) Mission Generator module, otherwise the first in the list
 //(the faction of the player's own unit, otherwise the first in the list; the Mission Generator has its own enemy faction)
 private _startFaction = faction player;
 private _startIndex = (U_FACTIONS findIf {toLower (_x select 2) == toLower _startFaction}) max 0;
 MCC_faction_index = _startIndex;
 mcc_sidename =(U_FACTIONS select _startIndex) select 1;
-mcc_faction = (U_FACTIONS select _startIndex) select 2;
+mcc_faction = (U_FACTIONS select _startIndex) select 2; player setVariable ["MCCMK_faction", mcc_faction, true];
 [] call mcc_fnc_faction_choice;
 waituntil {(MCC_unit_array_ready)};
 MCC_initMenuDone = true;

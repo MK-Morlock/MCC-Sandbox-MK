@@ -43,87 +43,94 @@ _item = _cargoItems select _index;
 if ((_item select 0) == (_ctrl lbData _index)) then {
 	_cargoItems deleteAt _index;
 	_class = _item select 0;
+	//(MK) a kept object comes back as it went in; entries without one are recreated
+	private _kept = _item param [4, objNull];
+	if (!isNull _kept) then {
+		[_kept, _object, false] call MCCMK_fnc_cargoStow;
+		_dummy = _kept;
+	} else {
 
-	//If we are flying spawn parachute
-	if (((getpos _object) select 2)>20) then {
-		private _pos = (_object modelToWorld [0,-10,-10]);
-		_dummy = createVehicle [_class, _pos, [], 1, "NONE"];
-		_dummy setPos _pos;
+		//If we are flying spawn parachute
+		if (((getpos _object) select 2)>20) then {
+			private _pos = (_object modelToWorld [0,-10,-10]);
+			_dummy = createVehicle [_class, _pos, [], 1, "NONE"];
+			_dummy setPos _pos;
 
-		[_dummy,_object] spawn {
-			params ["_dummy","_vehicle"];
+			[_dummy,_object] spawn {
+				params ["_dummy","_vehicle"];
 
-			private _class = "";
-			private _para = objNull;
-			private "_velocity";
-			_class = "I_parachute_02_F";
-			_para = createVehicle [_class, getpos _dummy,[],0,"CAN_COLLIDE"];
-			_para attachTo [_dummy, [0,0,0]];
-			_velocity = velocity _vehicle;
-			_velocity set [2,-22];
-			detach _para;
+				private _class = "";
+				private _para = objNull;
+				private "_velocity";
+				_class = "I_parachute_02_F";
+				_para = createVehicle [_class, getpos _dummy,[],0,"CAN_COLLIDE"];
+				_para attachTo [_dummy, [0,0,0]];
+				_velocity = velocity _vehicle;
+				_velocity set [2,-22];
+				detach _para;
 
-			_para setVelocity _velocity;
-			_dummy attachto [_para,[0,0,1]];
+				_para setVelocity _velocity;
+				_dummy attachto [_para,[0,0,1]];
 
-			waitUntil {getPos _dummy select 2 < 4 || !alive _dummy};
-			detach _para;
-			sleep 1;
-			deleteVehicle _para;
+				waitUntil {getPos _dummy select 2 < 4 || !alive _dummy};
+				detach _para;
+				sleep 1;
+				deleteVehicle _para;
+			};
+
+		} else {
+			_dummy = createVehicle [_class, position _object, [], 1, "NONE"];
+			_pos = position _object findEmptyPosition [1, 8,_class];
+			if (count _pos> 0) then {_dummy setPos _pos};
 		};
 
-	} else {
-		_dummy = createVehicle [_class, position _object, [], 1, "NONE"];
-		_pos = position _object findEmptyPosition [1, 8,_class];
-		if (count _pos> 0) then {_dummy setPos _pos};
-	};
-
-	//Add to curator
-	{_x addCuratorEditableObjects [[_dummy],true]} forEach allCurators;
+		//Add to curator
+		{_x addCuratorEditableObjects [[_dummy],true]} forEach allCurators;
 
 
 
-	//If it is an ammobox
-	_weapons = (_item select 1) select 0;
-	_magazines = (_item select 1) select 1;
-	_items = (_item select 1) select 2;
+		//If it is an ammobox
+		_weapons = (_item select 1) select 0;
+		_magazines = (_item select 1) select 1;
+		_items = (_item select 1) select 2;
 
-	//Clear Cargo
-	clearWeaponCargoGlobal _dummy;
-	clearMagazineCargoGlobal _dummy;
-	clearItemCargoGlobal _dummy;
+		//Clear Cargo
+		clearWeaponCargoGlobal _dummy;
+		clearMagazineCargoGlobal _dummy;
+		clearItemCargoGlobal _dummy;
 
-	{
-		_classNames = _x select 0;
-		_counter = _x select 1;
-
-		for "_i" from 0 to (count _classNames) step 1 do
 		{
-			switch (_forEachIndex) do
+			_classNames = _x select 0;
+			_counter = _x select 1;
+
+			for "_i" from 0 to (count _classNames) step 1 do
 			{
-				case 0:
+				switch (_forEachIndex) do
 				{
-					_dummy addWeaponCargoGlobal [_classNames select _i,_counter select _i];
-				};
+					case 0:
+					{
+						_dummy addWeaponCargoGlobal [_classNames select _i,_counter select _i];
+					};
 
-				case 1:
-				{
-					_dummy addMagazineCargoGlobal [_classNames select _i,_counter select _i];
-				};
+					case 1:
+					{
+						_dummy addMagazineCargoGlobal [_classNames select _i,_counter select _i];
+					};
 
-				default
-				{
-					_dummy addItemCargoGlobal [_classNames select _i,_counter select _i];
+					default
+					{
+						_dummy addItemCargoGlobal [_classNames select _i,_counter select _i];
+					};
 				};
 			};
-		};
-	} forEach [_weapons,_magazines,_items];
+		} forEach [_weapons,_magazines,_items];
 
-	//Set damage
-	_dummy setDamage (_item select 2);
+		//Set damage
+		_dummy setDamage (_item select 2);
 
-	//Set Fuel
-	_dummy setFuel (_item select 3);
+		//Set Fuel
+		_dummy setFuel (_item select 3);
+	};
 };
 
 lbClear _ctrl;

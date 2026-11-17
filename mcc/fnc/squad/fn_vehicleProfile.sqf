@@ -63,11 +63,9 @@ private _atgm = 0;
 private _blast = 0;   // (the widest blast of any round it carries, in metres - see the artillery entry below)
 {
 	private _ammo = getText (configFile >> "CfgMagazines" >> _x >> "ammo");
-	// Not armament: smoke launchers, flares / chaff, laser designators. A smoke launcher's rounds are
-	// rockets to the game, so a vehicle with nothing but a smoke launcher - the plain Strider, say - was
-	// read as "armed with rockets" (level 4, heavy): it was never offered for an unarmed car (the Hunter
-	// got a truck) and it was an exact match for a cannon APC (the Marshall got the plain Strider, ahead
-	// of the HMG and GMG ones). Told by name, and - for rockets, missiles and bombs - by doing next to no damage.
+	// Not armament: smoke launchers, flares / chaff, laser designators. A smoke launcher's rounds are rockets to the
+	// game, so a vehicle with nothing but a smoke launcher - the plain Strider, say - would read as "armed with rockets"
+	// (level 4, heavy). Told by name, and - for rockets, missiles and bombs - by doing next to no damage.
 	private _nameL = (toLower _x) + " " + (toLower _ammo);
 	if ((["smoke", "flare", "chaff", "laser", "cmflare"] findIf {(_nameL find _x) >= 0}) >= 0) then { _ammo = ""; };
 	if (_ammo != "" && {(toLower (getText (configFile >> "CfgAmmo" >> _ammo >> "simulation"))) in ["shotrocket", "shotmissile", "shotbomb"]}
@@ -75,10 +73,8 @@ private _blast = 0;   // (the widest blast of any round it carries, in metres - 
 	if (_ammo != "") then {
 		private _a = configFile >> "CfgAmmo" >> _ammo;
 		private _sim = toLower (getText (_a >> "simulation"));
-		// A round that only carries other rounds - artillery rockets and shells, cluster and airburst rounds -
-		// is neither bullet, shell, rocket nor missile to the game, so it was not counted at all: a rocket
-		// artillery truck read as UNARMED and was handed out as a plain truck (it replaced fuel and ammo
-		// trucks). Such a round is now read as what it carries; if that cannot be told, as a rocket.
+		// A round that only carries other rounds - artillery rockets and shells, cluster and airburst rounds. Such a
+		// round is read as what it carries; if that cannot be told, as a rocket.
 		if ((getNumber (_a >> "indirectHit")) >= 50) then { _blast = _blast max (getNumber (_a >> "indirectHitRange")); };
 		if (_sim == "shotsubmunitions") then {
 			private _subCfg = _a >> "submunitionAmmo";
@@ -200,19 +196,45 @@ private _fnc_personTurrets = {
 private _seats = (getNumber (_cfg >> "transportSoldier")) + ([_cfg] call _fnc_personTurrets);
 
 // Size. "sizeOf" only answers for a class that already has an object in the mission - for most candidates
-// it gave 0, and every size check in the matcher was then skipped (a 16-seat Taru passed as "similar in
-// size" to a Hummingbird). Every class is now measured the same way: a plain local model of it is made,
+// it gives 0. So every class is measured the same way: a plain local model of it is made,
 // its bounding sphere read, and it is deleted again. sizeOf is only the fallback if that cannot be done.
+// (MK) REMEMBERED BETWEEN SESSIONS: a class once measured is read from the profile and its model is not made again (keyed by
+// the class and its model file, so a changed mod is measured afresh). 
+// With debug on, one line a little after the last one: how many were measured this session and how many read back.
 private _size = 0;
-private _sizeObj = createSimpleObject [_cls, [0, 0, 0], true];
+private _sizeKey = format ["%1|%2", toLower _cls, toLower (getText (_cfg >> "model"))];
+private _sizeStore = profileNamespace getVariable ["MCCMK_vehSizes", []];
+if !(_sizeStore isEqualType createHashMap) then {_sizeStore = createHashMap; profileNamespace setVariable ["MCCMK_vehSizes", _sizeStore]};
+private _sizeKnown = _sizeStore getOrDefault [_sizeKey, 0];
+if (_sizeKnown > 0) then {
+	_size = _sizeKnown;
+	missionNamespace setVariable ["MCCMK_sizeRead", (missionNamespace getVariable ["MCCMK_sizeRead", 0]) + 1];
+};
+private _sizeObj = if (_size > 0) then {objNull} else {createSimpleObject [_cls, [0, 0, 0], true]};
+if (_size <= 0) then {
+	missionNamespace setVariable ["MCCMK_sizeMeasured", (missionNamespace getVariable ["MCCMK_sizeMeasured", 0]) + 1];
+	missionNamespace setVariable ["MCCMK_sizeMeasuredList", (missionNamespace getVariable ["MCCMK_sizeMeasuredList", []]) + [_cls]];
+};
+missionNamespace setVariable ["MCCMK_sizeT", time];
+if !(missionNamespace getVariable ["MCCMK_sizeWatch", false]) then {
+	missionNamespace setVariable ["MCCMK_sizeWatch", true];
+	[] spawn {
+		waitUntil {sleep 2; (time - (missionNamespace getVariable ["MCCMK_sizeT", time])) > 10};
+		private _l = missionNamespace getVariable ["MCCMK_sizeMeasuredList", []];
+		["INFO", "vehicle sizes", "%1 model(s) MADE to be measured this session, %2 read from the profile (no model made)%3", [missionNamespace getVariable ["MCCMK_sizeMeasured", 0], missionNamespace getVariable ["MCCMK_sizeRead", 0], if (_l isEqualTo []) then {""} else {format [" | made: %1%2", (_l select [0, 40]) joinString ", ", ["", " ..."] select ((count _l) > 40)]}]] call MCC_fnc_log;
+		if (_l isNotEqualTo []) then {saveProfileNamespace};	// (the new sizes kept, once for the batch)
+		missionNamespace setVariable ["MCCMK_sizeMeasuredList", []];
+		missionNamespace setVariable ["MCCMK_sizeWatch", false];
+	};
+};
 if (!isNull _sizeObj) then {
 	// THE SIZE is the longer side of the box round what is SEEN of the vehicle (length, or width if that is more).
-	// It was the diameter of the sphere round it, which the game gives wrongly for a model it has not fully
-	// loaded: 36 mod vehicles read two-thirds of their size in the first mission of a session and their full
-	// size afterwards, and picks changed with it. The box read the same every time, for all 782 classes measured.
+	// The bounding sphere the game reports is wrong for a model it has not fully loaded (a mod vehicle can read
+	// two-thirds of its size in the first mission of a session); the box reads the same every time.
 	private _bb = 0 boundingBoxReal _sizeObj;
 	_size = (abs (((_bb select 1) select 1) - ((_bb select 0) select 1))) max (abs (((_bb select 1) select 0) - ((_bb select 0) select 0)));
 	deleteVehicle _sizeObj;
+	if (_size > 0) then {_sizeStore set [_sizeKey, _size]};
 };
 if (_size <= 0) then { _size = sizeOf _cls; };
 
@@ -226,7 +248,7 @@ private _profile = [
 	// artillery: it has an artillery computer, or the editor lists it under Artillery - or it is a ground
 	// vehicle carrying a round with a very wide blast (20 m or more: howitzer shells, artillery rockets and
 	// ballistic missiles are there; tank shells, autocannon rounds and anti-tank missiles are far below it).
-	// The last is for a launcher with no artillery computer of its own, which read as a plain missile truck.
+	// The last is for a launcher with no artillery computer of its own, which would otherwise read as a plain missile truck.
 	(getNumber (_cfg >> "artilleryScanner")) > 0 || {(toLower (getText (_cfg >> "editorSubcategory"))) == "edsubcat_artillery"}
 		|| {_dom in ["wheeled", "tracked"] && {_blast >= 20}},
 	// a truck (the 18th entry): the game's own truck class. A truck is not offered for a car, or a car for a truck,

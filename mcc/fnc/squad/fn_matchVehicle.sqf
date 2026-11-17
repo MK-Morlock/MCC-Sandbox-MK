@@ -86,7 +86,7 @@ private _profiles = (_pool arrayIntersect _pool) apply {[_x] call MCCMK_fnc_vehi
 _profiles = _profiles select {count _x > 0};
 
 // VEHICLE-CARRYING is only asked for when the pool has a vehicle that can carry vehicles at all: with none,
-// a flatbed found nothing whatever and stayed as it was - it now takes the nearest plain truck.
+// a flatbed takes the nearest plain truck.
 private _poolHasViv = (_profiles findIf {(_x param [14, 0]) > 0}) >= 0;
 // A SUPPORT VEHICLE (fuel / repair / ammo / medical) is matched on its job: the seat floor and the ACE cargo
 // floor are not asked of a candidate that does the job - a medical carrier with 3 seats stands in for a medical
@@ -164,7 +164,7 @@ private _bestFloor = 0;
 
 					// armour band (ground, stages 0-5): protected stays protected
 					if (_ok && {_oGround} && {_stageIndex < 6} && {_oArmor > 0} && {_cArmor > 0}) then {
-						if (((_cArmor / _oArmor) max (_oArmor / _cArmor)) > 2.7) then {_ok = false;};   // (2.7, was 2.5: a light protected car - armour 80 - may take a jeep of 30; 3x and over stays out)
+						if (((_cArmor / _oArmor) max (_oArmor / _cArmor)) > 2.7) then {_ok = false;};   // (2.7: a light protected car - armour 80 - may take a jeep of 30; 3x and over stays out)
 					};
 					// shortfall: how much worse it is on what the original could do (summed, proportional)
 					private _short = 0;
@@ -196,7 +196,7 @@ private _bestFloor = 0;
 						if (_oSize > 0 && {_cSize > 0}) then {_s = _s + (2 * (abs (ln (_cSize / _oSize))));};
 						_s = _s + (1.5 * (abs (ln ((_cSeats + 1) / (_oSeats + 1)))));
 						if (_oSpeed > 0 && {_cSpeed > 0}) then {_s = _s + (1.2 * (abs (ln (_cSpeed / _oSpeed))));};
-						// armour: an MRAP is not a soft-skinned truck (read from config before, never scored)
+						// armour: an MRAP is not a soft-skinned truck (scored from config)
 						_s = _s + (0.8 * (abs (ln ((_cArmor + 1) / (_oArmor + 1)))));
 						// closest cargo and lift within the floors
 						if (_oCargo > 0 && {_oGround}) then {_s = _s + (0.6 * (abs (ln ((_cCargo + 1) / (_oCargo + 1)))));};

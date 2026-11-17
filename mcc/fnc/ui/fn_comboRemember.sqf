@@ -1,6 +1,6 @@
 /*================================================================== MCC_fnc_comboRemember ==================================================================
 	MCC console panels (Spawn, CAS, Supply Drop, Artillery, Evac, IED, ...): a drop-down list opens on the entry chosen last
-	time instead of the first entry. Used where a panel fills a list and used to select entry 0.
+	time instead of the first entry.  Used where a panel fills a list.
 	The choice is kept per list (idc) for the game session; it is saved whenever the list changes. Because choosing an
 	entry can refill a list that depends on it (e.g. Type -> Class), the remembered entry is set again a moment later.
 	<IN>	0: CONTROL the drop-down list (already filled)

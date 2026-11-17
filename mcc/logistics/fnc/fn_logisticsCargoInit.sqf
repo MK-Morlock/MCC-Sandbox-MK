@@ -25,8 +25,9 @@ _cargoItems = _object getVariable ["MCC_logisticsCargo",[]];
 
 //First time make sure we have at least one spare tire or track
 if (count _cargoItems <=0 && !(_object getVariable ["MCC_logisticsCargoInit",false])) then {
-	_sparePart =  if (_object isKindOf "car") then {"Tire_Van_02_Cargo_F"} else {"Land_TankTracks_01_long_F"};
-	_cargoItems pushBack [_sparePart,[[[],[]],[[],[]],[[],[]]],0,1];
+	//(MK) a spare tyre for wheeled vehicles, a spare track for tracked ones - nothing for pods, crates and the like
+	_sparePart = switch (true) do {case (_object isKindOf "Car"): {"Tire_Van_02_Cargo_F"}; case (_object isKindOf "Tank"): {"Land_TankTracks_01_long_F"}; default {""}};
+	if (_sparePart != "") then {_cargoItems pushBack [_sparePart,[[[],[]],[[],[]],[[],[]]],0,1]};
 	_object setVariable ["MCC_logisticsCargo",_cargoItems,true];
 	_object setVariable ["MCC_logisticsCargoInit",true,true];
 };

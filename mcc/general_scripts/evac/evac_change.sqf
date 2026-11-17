@@ -19,25 +19,25 @@ switch (_type) do		//Which evac do we want
 		case 0:			//Choppers
 			{
 				_evacArray = U_GEN_HELICOPTER;
-				_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing"];
+				_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing","Paradrop","Water landing (engine on)","Water landing (engine off)","RTB"];
 				ctrlShow [MCC_EVAC_FLIGHTHIGHT,true];
 			};
 		case 1:			//Vehicles
 			{
 				_evacArray = U_GEN_CAR;
-				_insetionArray = ["Move (engine on)","Move (engine off)"];
+				_insetionArray = ["Move (engine on)","Move (engine off)","RTB"];
 				ctrlShow [MCC_EVAC_FLIGHTHIGHT,false];
 			};
 		case 2:			//Tracked
 			{
 				_evacArray = U_GEN_TANK;
-				_insetionArray = ["Move (engine on)","Move (engine off)"];
+				_insetionArray = ["Move (engine on)","Move (engine off)","RTB"];
 				ctrlShow [MCC_EVAC_FLIGHTHIGHT,false];
 			};
 		case 3:			//Ships
 			{
 				_evacArray = U_GEN_SHIP;
-				_insetionArray = ["Move (engine on)","Move (engine off)"];
+				_insetionArray = ["Move (engine on)","Move (engine off)","RTB"];
 				ctrlShow [MCC_EVAC_FLIGHTHIGHT,false];
 			};
 		};

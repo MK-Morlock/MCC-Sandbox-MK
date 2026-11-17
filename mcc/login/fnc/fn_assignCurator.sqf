@@ -1,10 +1,9 @@
 /*======================================================== MCC_fnc_assignCurator =========================================================
 	Give a player MCC's Zeus (MCC_curator). SERVER.
 
-	A player can only own one Zeus. MCC used to take the player off whatever Zeus he already had (e.g. a Game Master module
-	set to "All addons, including unofficial") and put him on MCC's own Zeus, which only knows the mission's addons - so
-	modded factions "disappeared" from Zeus and people's Zeus settings were "overwritten". Now a player who already owns
-	another Zeus keeps it (MCC's own features use every Zeus); MCC's Zeus is only handed out to players without one.
+	A player can only own one Zeus. A player who already owns another Zeus (e.g. a Game Master module set to "All
+	addons, including unofficial" - MCC's own Zeus only knows the mission's addons) keeps it (MCC's own features use
+	every Zeus); MCC's Zeus is only handed out to players without one.
 
 	<IN>	_this: OBJECT player
 ==========================================================================================================================================*/

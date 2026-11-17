@@ -78,7 +78,7 @@ switch _mode do {
 
 	case "init": {
 		//did we get here from the 2d editor?
-		_null = [_logic,[],_activated,"server"] spawn MCC_fnc_moduleCapturePoint;
+		_null = [[_logic,[],_activated,"server"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_moduleCapturePoint};
 	};
 
 	case "server": {
@@ -111,7 +111,7 @@ switch _mode do {
 
 		//Start ticket bleed
 		if (_type == 3) then {
-			_null = [_logic,[],true,"initTickets"] spawn MCC_fnc_moduleCapturePoint;
+			_null = [[_logic,[],true,"initTickets"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_moduleCapturePoint};
 		};
 
 		//--- Register the expression as a scripted event handler
@@ -157,7 +157,7 @@ switch _mode do {
 			_size = (triggerArea _trigger);
 			_size resize 2;
 			_triggerMarkers = _trigger getvariable ["markers",[]];
-			_markerArea = createmarker ["MCC_fnc_moduleSector_area" + str _trigger,position _trigger];
+			_markerArea = createmarker ["MCC_fnc_moduleSector_area" + str _trigger,position _trigger]; [_markerArea] call MCCMK_fnc_genTag;
 			_markerArea setMarkerBrush "Grid";
 			_markerArea setMarkerColor "colorwhite";
 			_markerArea setMarkerShape "ELLIPSE";
@@ -168,13 +168,13 @@ switch _mode do {
 
 			_triggerMarkers set [count _triggerMarkers,_markerArea];
 
-			_markerIcon = createmarker ["MCC_fnc_moduleSector_icon" + str _logic,position _trigger];
+			_markerIcon = createmarker ["MCC_fnc_moduleSector_icon" + str _logic,position _trigger]; [_markerIcon] call MCCMK_fnc_genTag;
 			_markerIcon setmarkertype _icon;
 			_markerIcon setmarkercolor "colorwhite";
 			_markerIcon setmarkersize [1.5,1.5];
 			_triggerMarkers set [count _triggerMarkers,_markerIcon];
 
-			_markerIconText = createmarker ["MCC_fnc_moduleSector_iconText" + str _logic,position _trigger];
+			_markerIconText = createmarker ["MCC_fnc_moduleSector_iconText" + str _logic,position _trigger]; [_markerIconText] call MCCMK_fnc_genTag;
 			_markerIconText setmarkertype "EmptyIcon";
 			_markerIconText setmarkercolor "colorblack";
 			_markerIconText setmarkertext _markerName;
@@ -183,7 +183,7 @@ switch _mode do {
 
 			//build flag pole
 			if (_flag) then {
-				_dummy = "FlagPole_F" createVehicle position _trigger;
+				_dummy = "FlagPole_F" createVehicle position _trigger; [_dummy] call MCCMK_fnc_genTag;
 				{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
 
 			};
@@ -215,7 +215,7 @@ switch _mode do {
 
 		//--- No synced triggers found - create a default one
 		if (count _areas == 0) then {
-			_areaTrigger = createtrigger ["emptydetector",position _logic];
+			_areaTrigger = createtrigger ["emptydetector",position _logic]; [_areaTrigger] call MCCMK_fnc_genTag;
 			_areaTrigger settriggerarea [_radius,_radius,0,false];
 			_areaTrigger call _fnc_initArea;
 			_areaTrigger attachto [_logic];

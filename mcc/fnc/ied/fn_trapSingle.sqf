@@ -54,14 +54,14 @@ _init = "";
 _playersSides = [west,east,resistance] - [_ambushSide];
 
 //Ammo?
-_fakeIed = _trapkind createVehicle _pos;
+_fakeIed = _trapkind createVehicle _pos; [_fakeIed] call MCCMK_fnc_genTag;
 _fakeIed setpos _pos;
 _fakeIed setdir _iedDir;
 _fakeIed setVariable ["isIED",true,true];
 _fakeIed setvariable ["vehicleinit",format ["_null =[_this,'%1',%2,%3,%4,%5,%6,'%7'] remoteExec ['MCC_fnc_createIED', 2, false];",_trapvolume,_IEDExplosionType,_IEDDisarmTime,_IEDJammable,_IEDTriggerType,_trapdistance,_iedside]];
 {_x addCuratorEditableObjects [[_fakeIed],false]} forEach allCurators;
 
-[_fakeIed,_trapvolume,_IEDExplosionType,_IEDDisarmTime,_IEDJammable,_IEDTriggerType,_trapdistance,_iedside] remoteExec ["MCC_fnc_createIED",2];
+(if (isServer) then {[[_fakeIed,_trapvolume,_IEDExplosionType,_IEDDisarmTime,_IEDJammable,_IEDTriggerType,_trapdistance,_iedside], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_createIED"] spawn MCCMK_fnc_genRun} else {[_fakeIed,_trapvolume,_IEDExplosionType,_IEDDisarmTime,_IEDJammable,_IEDTriggerType,_trapdistance,_iedside] remoteExec ["MCC_fnc_createIED",2]});
 
 //Spawn AMBUSH
 private _ambushFaction = _this param [13, "", [""]];

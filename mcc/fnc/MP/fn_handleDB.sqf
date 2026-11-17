@@ -1,7 +1,7 @@
 /*============================================================MCC_fnc_handleDB=============================================================================================
 	read/write a single value to/from persistent storage.
 	Backend is extDB3 (MySQL/MariaDB) when available (MCC_iniDBenabled == true, set by MCC_fnc_initExtDB3),
-	otherwise falls back to profileNamespace - same as before, only the DB-enabled branch changed.
+	otherwise falls back to profileNamespace .
 
 	This keeps the ORIGINAL calling contract so every other script that calls MCC_fnc_handleDB is untouched.
 

@@ -58,6 +58,8 @@ _saveAirDrop = param [7, true, [false]];
 _saveArtillery = param [8, true, [false]];
 _saveStartLoc = param [9, true, [false]];
 _saveRTSBuildngs = param [10, true, [false]];
+//(MK) the mission's saving switched on without a campaign: Valor is kept with it (a campaign has set its own key already)
+if (isServer && {(missionNamespace getVariable ["MCCMK_creditKey", ""]) == ""}) then {[[] call MCCMK_fnc_creditGen] call MCCMK_fnc_creditKeySet};
 
 if (!isServer) exitWith {};
 
@@ -66,8 +68,8 @@ if (missionNamespace getVariable ["MCC_fnc_saveServerIsrunning",false]) exitWith
 missionNamespace setVariable ["MCC_fnc_saveServerIsrunning",true];
 
 while {true} do {
-	//Write every value first and save the profile once (each write used to save the whole profile: about 60 disk saves
-	//in a few seconds, which froze the game at the campaign start and every save after)
+	//Write every value first and save the profile once (saving after each write means about 60 disk saves in a few
+	//seconds, which freezes the game)
 	MCC_dbDeferSave = true;
 
 

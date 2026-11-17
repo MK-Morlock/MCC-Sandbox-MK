@@ -32,11 +32,11 @@ if (missionNamespace getVariable ["MCC_teleportToTeam",false]) then {
 	};
 
 	if (_sucess) then {
-		hint "Teleporting";
+		["Teleporting"] call MCCMK_fnc_hint;
 		if (MCC_t2tIndex !=3) then // 3 = always allow teleport
 		{
 			MCC_teleportToTeam = false;
 		};
 	};
 
-} else {hint "Teleport is N/A"};
+} else {["Teleport is N/A"] call MCCMK_fnc_hint};

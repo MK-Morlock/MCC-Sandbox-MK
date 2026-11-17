@@ -2,7 +2,7 @@
 MCC_fnc_mapDrawPlayersWPConsole =
 {
 	_map = _this select 0;
-	if (MCC_ConsolePlayersCanSeeWPonMap && ("ItemGPS" in (assignedItems player) || "B_UavTerminal" in (assignedItems player) || "MCC_Console" in (assignedItems player))) then
+	if (MCC_ConsolePlayersCanSeeWPonMap && (((assignedItems player) findIf {(_x isKindOf ["ItemGPS", configFile >> "CfgWeapons"]) || {_x isKindOf ["UavTerminal_base", configFile >> "CfgWeapons"]}}) >= 0)) then
 	{
 		_wpArray = waypoints (group player);
 		if (count _wpArray > 0)then {

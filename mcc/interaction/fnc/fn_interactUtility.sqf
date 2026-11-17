@@ -27,6 +27,11 @@ if ((missionNamespace getVariable ["MCC_interactionKey_holding",false]) && !(_ob
 		_array pushBack ["[player getVariable ['interactWith',objNull]] call MCC_fnc_breakdown","Break Down",format ["%1data\IconAmmo.paa",MCC_path]];
 		_array pushBack ["[player getVariable ['interactWith',objNull]] call MCC_fnc_dragObject","Drag",format ["%1data\iconDrag.paa",MCC_path]];
 
+		//(MK) onto a vehicle that can carry it with vehicle-in-vehicle (Arma's check), within 10 m
+		{
+			_array pushBack [format ["[%1, %2] call {[(_this select 0) call BIS_fnc_objectFromNetId, (_this select 1) call BIS_fnc_objectFromNetId] call MCCMK_fnc_cargoViV}", str (_object call BIS_fnc_netId), str (_x call BIS_fnc_netId)], format ["Load onto %1", getText (configfile >> "CfgVehicles" >> typeof _x >> "displayName")], format ["%1mcc\logistics\data\unloadIcon.paa",MCC_path]];
+		} forEach ([_object] call MCCMK_fnc_vivTargets);
+
 		if ([player,player,50] call MCC_fnc_nearRespawn) then {
 			_array pushBack ["[(player getVariable ['interactWith',objNull]),side player] call MCC_fnc_logisticsBoxDeposit","Deposit",format ["%1mcc\logistics\data\unloadIcon.paa",MCC_path]];
 		};

@@ -97,7 +97,7 @@ switch (_type) do {
 	//Link to zone
    	case 5:	{
 		_zone = (missionNamespace getVariable ["MCC_zones_numbers",[]]) select (lbCurSel MCC_JUKEBOX_ZONE);
-		if (count mcc_zone_pos < _zone) exitWith {hint "Invalid zone selected"};
+		if (count mcc_zone_pos < _zone) exitWith {["Invalid zone selected"] call MCCMK_fnc_hint};
 		_zonePos = mcc_zone_pos select _zone;
 		_zoneX = mcc_zone_size select (_zone) select 0;
 		_zoneY = mcc_zone_size select (_zone) select 1;
@@ -125,7 +125,7 @@ switch (_type) do {
 						  , _track
 						  , _jukeBoxMusic
 						  ];
-		hint format ["Trigger linked to zone: %1 \nCondition: %2, %3 \nOn activation play: %4",_zone,_activate,_cond,_track];
+		[format ["Trigger linked to zone: %1 \nCondition: %2, %3 \nOn activation play: %4",_zone,_activate,_cond,_track]] call MCCMK_fnc_hint;
 
 		//create  marker for MM
 		_markerName = format ["%1: %2", _zone, _track];

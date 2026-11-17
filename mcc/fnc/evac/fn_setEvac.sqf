@@ -30,6 +30,8 @@ _gunnersGroup setcombatmode "red";
 _type = typeOf _object;														//Find turrets
 _entry = configFile >> "CfgVehicles" >> _type;
 _pilotClass = getText (configFile >> "CfgVehicles" >> _type >> "crew");
+// A Taru (a CSAT design): flown by the faction's own helicopter pilots, the side's vanilla pilot as a last resort.
+if (((toLower _type) find "heli_transport_04") >= 0) then {_pilotClass = [_object getVariable ["MCCMK_evacFaction", ""], _side] call MCCMK_fnc_factionPilot};
 _turrets = [_entry >> "turrets"] call BIS_fnc_returnVehicleTurrets;			//All turrets were found, now spawn crew for them
 _path = [];
 
@@ -96,14 +98,17 @@ if (_campaignEvac) then {
 	params [["_object", objNull, [objNull]], ["_side", sideLogic, [sideLogic]], ["_gg", grpNull, [grpNull]]];
 	private _displayName = getText (configFile >> "CfgVehicles" >> typeOf _object >> "displayname");
 	private _grps = [_gg];
-	while {alive _object} do {
+	//(MK) and out of the list once it has had no live pilot for 30 s (a crewless one stayed listed and answered nothing)
+	private _noPilot = -1;
+	while {alive _object && {_noPilot < 0 || {(time - _noPilot) < 30}}} do {
 		{_grps pushBackUnique (group _x)} forEach ((crew _object) select {!isPlayer _x});
+		if (alive (driver _object)) then {_noPilot = -1} else {if (_noPilot < 0) then {_noPilot = time}};
 		sleep 2;
 	};
-	private _evacVehicles = (missionNamespace getVariable [format ["MCC_evacVehicles_%1", _side], []]) select {alive _x};
+	private _evacVehicles = (missionNamespace getVariable [format ["MCC_evacVehicles_%1", _side], []]) select {alive _x && {!(_x isEqualTo _object)}};
 	missionNamespace setVariable [format ["MCC_evacVehicles_%1", _side], _evacVehicles];
 	publicVariable (format ["MCC_evacVehicles_%1", _side]);
-	if (!isNull _object) then {["MCCNotificationBad", ["Evac", format ["%1 Evac is down", _displayName], ""]] remoteExec ["bis_fnc_showNotification", _side]};
+	if (!isNull _object) then {["MCCNotificationBad", ["Evac", format [["%1 Evac is down", "%1 Evac has lost its pilot"] select (alive _object), _displayName], ""]] remoteExec ["bis_fnc_showNotification", _side]};
 	{
 		private _g = _x;
 		{if (!isPlayer _x) then {if (vehicle _x != _x) then {moveOut _x}; deleteVehicle _x}} forEach (units _g);

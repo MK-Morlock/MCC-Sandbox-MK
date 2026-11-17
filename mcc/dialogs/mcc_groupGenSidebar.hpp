@@ -21,7 +21,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_sideHeadFORCES: MCC_RscText
 		{
-			idc = -1;
+			idc = 9400;
 			text = "FORCES";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.6)";
 			colorText[] = {0.55,0.58,0.62,1};
@@ -33,7 +33,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_groupGenSpawnButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9410;
 			tooltip = "Spawn units or groups";
 			onButtonClick = __EVAL("[6] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			text = "Spawn";
@@ -44,7 +44,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_callConvoyButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9411;
 			tooltip = "Open Convoy Menu";
 			onButtonClick = __EVAL("[9] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			text = "Convoy";
@@ -55,7 +55,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_callIEDButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9412;
 			tooltip = "Open IEDs Menu";
 			onButtonClick = __EVAL("[8] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			text = "IED";
@@ -66,7 +66,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_sideHeadSUPPORT: MCC_RscText
 		{
-			idc = -1;
+			idc = 9401;
 			text = "SUPPORT";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.6)";
 			colorText[] = {0.55,0.58,0.62,1};
@@ -78,7 +78,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_callCASButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9413;
 			tooltip = "Open Close Air Support Menu";
 			onButtonClick = __EVAL("[4] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			text = "CAS";
@@ -89,7 +89,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_callArtilleryButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9414;
 			tooltip = "Open artillery Menu";
 			onButtonClick = __EVAL("[5] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			text = "Artillery";
@@ -101,7 +101,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		class MCC_AC130Button: MCCBTN_SIDE
 		{
 			idc = 620; // idc set to allow hiding button when no mcc_console available
-			tooltip = "Call a gunship (your faction gunship if it has one, otherwise the Blackfish): then click and drag on the map to set the area and approach direction. Control its guns from the MCC Commander Console";
+			tooltip = "Call a gunship (your faction gunship if it has one, otherwise\nthe Blackfish): then click and drag on the map to set the area\nand approach direction. Control its guns from the MCC\nCommander Console";
 			onButtonClick = "if !(call MCC_fnc_supportFactionOK) exitWith {}; MCC_CASrequestMarker = true;MCC_spawnkind = ['ac-130'];MCC_planeType = [call MCC_fnc_gunshipClass];[parseText '<t size=''1.1'' color=''#33CC00''>Gunship</t><br/>Click and drag on the map to draw an arrow. It circles over the middle of the arrow and flies in from the direction the arrow points from.<br/><br/>Its guns are controlled from the MCC Commander Console (Live Feed / AC-130). Press Gunship again and drag to send it away.'] call MCC_fnc_hintBrief";
 			text = "Gunship";
 			x = 0.003 * safezoneW;
@@ -111,7 +111,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_airdropButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9415;
 			tooltip = "Open Supply Drop Menu";
 			onButtonClick = __EVAL("[16] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			text = "Supply Drop";
@@ -122,10 +122,10 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_paradropButton: MCCBTN_SIDE
 		{
-			idc = -1;
-			tooltip = "Paradrop settings: aircraft and height for paratrooper and HALO drops";
+			idc = 9416;
+			tooltip = "Paradrop settings: aircraft and height for paratrooper and\nHALO drops";
 			onButtonClick = __EVAL("[18] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
-			text = "Paradrop";
+			text = "Airdrop";
 			x = 0.003 * safezoneW;
 			y = 0.213100 * safezoneH;
 			w = 0.074208 * safezoneW;
@@ -133,7 +133,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_callEvacButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9417;
 			tooltip = "Open Evac Menu";
 			onButtonClick = __EVAL("[7] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			text = "Evac";
@@ -144,7 +144,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_sideHeadMISSION: MCC_RscText
 		{
-			idc = -1;
+			idc = 9402;
 			text = "MISSION";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.6)";
 			colorText[] = {0.55,0.58,0.62,1};
@@ -156,7 +156,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_openMWButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9418;
 			onButtonClick = "createDialog ('MCCMWDialog' + (['', 'Buttons'] select (profileNamespace getVariable ['MCC_consoleButtons', false])))";
 			tooltip = "Open mission Generator";
 			text = "Mission Generator";
@@ -167,9 +167,9 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_deleteMissionsButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9419;
 			onButtonClick = "[] spawn MCC_fnc_deleteMissionDialog";
-			tooltip = "Delete a generated mission (Mission Generator, campaign or Front Lines) with its tasks, AI, objects, mines and map markers";
+			tooltip = "Delete a generated mission (Mission Generator, campaign or\nFront Lines) with its tasks, AI, objects, mines and map\nmarkers";
 			text = "Delete Missions";
 			x = 0.003 * safezoneW;
 			y = 0.306800 * safezoneH;
@@ -178,7 +178,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_briefingCallButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9420;
 			onButtonClick = __EVAL("[11] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Briefing Menu"; //--- ToDo: Localize;
 			text = "Briefing";
@@ -189,7 +189,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_tasksCallButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9421;
 			onButtonClick = __EVAL("[12] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Tasks Menu"; //--- ToDo: Localize;
 			text = "Tasks";
@@ -200,7 +200,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_triggersCallButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9422;
 			onButtonClick = __EVAL("[14] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Triggers Menu"; //--- ToDo: Localize;
 			text = "Triggers";
@@ -211,7 +211,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_markersCallButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9423;
 			onButtonClick = __EVAL("[10] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Markers Menu"; //--- ToDo: Localize;
 			text = "Markers";
@@ -222,7 +222,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_StartLocation: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9424;
 			onButtonClick = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Locations Menu"; //--- ToDo: Localize;
 			text = "Start Locations";
@@ -233,7 +233,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_MissionSettings: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9425;
 			tooltip = "Open Mission Settings Menu"; //--- ToDo: Localize;
 			onButtonClick = "if (mcc_missionmaker == (name player)) then {createDialog ('missionSettings' + (['', 'Buttons'] select (profileNamespace getVariable ['MCC_consoleButtons', false])));} else {player globalchat 'Access Denied'};";
 			text = "Mission Settings";
@@ -244,7 +244,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_sideHeadWORLD: MCC_RscText
 		{
-			idc = -1;
+			idc = 9403;
 			text = "WORLD";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.6)";
 			colorText[] = {0.55,0.58,0.62,1};
@@ -256,7 +256,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_setWeatherButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9426;
 			onButtonClick = __EVAL("[0] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Weather Menu"; //--- ToDo: Localize;
 			text = "Weather";
@@ -267,7 +267,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_setTimeButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9427;
 			onButtonClick = __EVAL("[1] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Time Menu"; //--- ToDo: Localize;
 			text = "Time";
@@ -278,7 +278,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_DeleteButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9428;
 			tooltip = "Brushes Menu";
 			onButtonClick = __EVAL("[17] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			text = "Brushes";
@@ -289,7 +289,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_jukeBoxCallButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9429;
 			onButtonClick = __EVAL("[13] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Jukebox Menu"; //--- ToDo: Localize;
 			text = "Jukebox";
@@ -300,7 +300,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_sideHeadADMIN: MCC_RscText
 		{
-			idc = -1;
+			idc = 9404;
 			text = "ADMIN";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.6)";
 			colorText[] = {0.55,0.58,0.62,1};
@@ -312,7 +312,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_curatorButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9430;
 			tooltip = "Click on map to open BIS Zeus";
 			onButtonClick = "uiNameSpace setVariable ['MCC_ZeusOpen',true]";
 			text = "Zeus";
@@ -323,7 +323,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_arsenalButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9431;
 			tooltip = "Click to open BIS arsenal";
 			onButtonClick = "closeDialog 0; ['Open',true] call BIS_fnc_arsenal;";
 			text = "Arsenal";
@@ -356,7 +356,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_debugButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9432;
 			onButtonClick = __EVAL("[3] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Debug Menu"; //--- ToDo: Localize;
 			text = "Debug";
@@ -367,7 +367,7 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 		};
 		class MCC_clientSideCallButton: MCCBTN_SIDE
 		{
-			idc = -1;
+			idc = 9433;
 			onButtonClick = __EVAL("[15] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\controlsHandle.sqf'");
 			tooltip = "Open Client Side Menu"; //--- ToDo: Localize;
 			text = "Client Side";
@@ -375,6 +375,56 @@ class MCC_sidebarControls: MCC_RscControlsGroup
 			y = 0.730200 * safezoneH;
 			w = 0.074208 * safezoneW;
 			h = 0.022000 * safezoneH;
+		};
+		class MCC_sideHeadFORCESClick: MCC_RscSideItem
+		{
+			idc = 9405;
+			text = "";
+			onButtonClick = "['toggle', 0] call MCCMK_fnc_sideFold";
+			x = 0.003 * safezoneW;
+			y = 0.006000 * safezoneH;
+			w = 0.074208 * safezoneW;
+			h = 0.019000 * safezoneH;
+		};
+		class MCC_sideHeadSUPPORTClick: MCC_RscSideItem
+		{
+			idc = 9406;
+			text = "";
+			onButtonClick = "['toggle', 1] call MCCMK_fnc_sideFold";
+			x = 0.003 * safezoneW;
+			y = 0.099700 * safezoneH;
+			w = 0.074208 * safezoneW;
+			h = 0.019000 * safezoneH;
+		};
+		class MCC_sideHeadMISSIONClick: MCC_RscSideItem
+		{
+			idc = 9407;
+			text = "";
+			onButtonClick = "['toggle', 2] call MCCMK_fnc_sideFold";
+			x = 0.003 * safezoneW;
+			y = 0.264200 * safezoneH;
+			w = 0.074208 * safezoneW;
+			h = 0.019000 * safezoneH;
+		};
+		class MCC_sideHeadWORLDClick: MCC_RscSideItem
+		{
+			idc = 9408;
+			text = "";
+			onButtonClick = "['toggle', 3] call MCCMK_fnc_sideFold";
+			x = 0.003 * safezoneW;
+			y = 0.475900 * safezoneH;
+			w = 0.074208 * safezoneW;
+			h = 0.019000 * safezoneH;
+		};
+		class MCC_sideHeadADMINClick: MCC_RscSideItem
+		{
+			idc = 9409;
+			text = "";
+			onButtonClick = "['toggle', 4] call MCCMK_fnc_sideFold";
+			x = 0.003 * safezoneW;
+			y = 0.593200 * safezoneH;
+			w = 0.074208 * safezoneW;
+			h = 0.019000 * safezoneH;
 		};
 	};
 };

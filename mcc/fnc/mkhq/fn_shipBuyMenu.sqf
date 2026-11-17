@@ -1,0 +1,56 @@
+disableSerialization;
+params [["_ctrl", controlNull, [controlNull]]];
+private _parent = if (isNull _ctrl) then {findDisplay 46} else {ctrlParent _ctrl};
+private _res = missionNamespace getVariable [format ["MCC_res%1", playerSide], [0, 0, 0, 0, 0]];
+private _types = [0, 1, 2];
+if (isClass (configFile >> "CfgVehicles" >> "CUP_LHD_BASE")) then {_types pushBack 3};
+private _d = _parent createDisplay "RscDisplayEmpty";
+private _btnC = ["MCC_RscButtonRound", "MCC_RscButtonRound3D"] select (profileNamespace getVariable ["MCC_consoleButtons", false]);
+private _rowH = 0.03 * safezoneH;
+// the MCC console's text size (as the RTS panels' numbers)
+private _fs = ((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8;
+// the aircraft carrier and LHD also need Sat-Comms (HQ level 3); the destroyer and submarine the Naval Workshop
+private _hq3 = [["hq", 3], missionNamespace getVariable ["MCC_selectedRtsObject", player], 3000] call MCC_fnc_CheckBuildings;
+private _gap = 0.008 * safezoneH;
+private _panW = 0.34 * safezoneW;
+private _panH = (0.105 * safezoneH) + (count _types) * (_rowH + _gap);
+private _panX = safezoneX + (safezoneW - _panW) / 2;
+private _panY = safezoneY + (safezoneH - _panH) / 2;
+private _pad = 0.012 * safezoneW;
+private _bg = _d ctrlCreate ["RscText", -1];
+_bg ctrlSetPosition [_panX, _panY, _panW, _panH];
+_bg ctrlSetBackgroundColor [0.08, 0.09, 0.1, 0.95];
+_bg ctrlCommit 0;
+private _ti = _d ctrlCreate ["RscStructuredText", -1];
+_ti ctrlSetPosition [_panX + _pad, _panY + 0.012 * safezoneH, _panW - 2 * _pad, 0.05 * safezoneH];
+_ti ctrlSetFontHeight _fs;
+_ti ctrlSetStructuredText parseText "<t size='1.15' font='RobotoCondensedBold'>Buy ship</t><br/><t size='1' color='#aaaaaa'>Choose a ship, then where it should arrive.</t>";
+_ti ctrlCommit 0;
+uiNamespace setVariable ["MCCMK_buyShipParent", _parent];
+{
+	private _t = _x;
+	([_t] call MCCMK_fnc_shipCfg) params ["_nm", "_price"];
+	_price params ["_s", "_a", "_f"];
+	private _can = (call MCCMK_fnc_resFree) || {(_res select 1) >= _s && {(_res select 0) >= _a} && {(_res select 2) >= _f}};
+	private _big = _t in [1, 3];
+	private _b = _d ctrlCreate [_btnC, 7900 + _t];
+	_b ctrlSetPosition [_panX + _pad, _panY + 0.068 * safezoneH + _forEachIndex * (_rowH + _gap), _panW - 2 * _pad, _rowH];
+	_b ctrlSetFontHeight _fs;
+	_b ctrlSetText (if (call MCCMK_fnc_resFree) then {format ["%1  -  %2", _nm, toString [8734]]} else {format ["%1  -  %2 Supply, %3 Ammo, %4 Fuel", _nm, _s, _a, _f]});
+	_b ctrlEnable (_can && {!_big || _hq3});
+	if (!_can) then {_b ctrlSetTooltip "Not enough resources"};
+	if (_big && {!_hq3}) then {_b ctrlSetTooltip "Needs Sat-Comms (HQ level 3)"; _b ctrlSetText format ["%1  -  needs Sat-Comms", _nm]};
+	_b ctrlAddEventHandler ["ButtonClick", {
+		params ["_c"];
+		private _t = (ctrlIDC _c) - 7900;
+		(ctrlParent _c) closeDisplay 1;
+		["buy", _t, objNull, uiNamespace getVariable ["MCCMK_buyShipParent", findDisplay 46]] call MCCMK_fnc_shipPick;
+	}];
+	_b ctrlCommit 0;
+} forEach _types;
+private _no = _d ctrlCreate [_btnC, -1];
+_no ctrlSetPosition [_panX + _panW - _pad - 0.07 * safezoneW, _panY + _panH - 0.038 * safezoneH, 0.07 * safezoneW, 0.028 * safezoneH];
+_no ctrlSetFontHeight _fs;
+_no ctrlSetText "Cancel";
+_no ctrlAddEventHandler ["ButtonClick", {(ctrlParent (_this select 0)) closeDisplay 2}];
+_no ctrlCommit 0;

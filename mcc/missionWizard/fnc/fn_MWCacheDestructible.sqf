@@ -51,7 +51,7 @@ switch (_mode) do {
 	};
 
 	default {
-		if (!isServer) exitWith {[_cache] remoteExec ["MCC_fnc_MWCacheDestructible", 2]};
+		if (!isServer) exitWith {(if (isServer) then {[[_cache], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_MWCacheDestructible"] spawn MCCMK_fnc_genRun} else {[_cache] remoteExec ["MCC_fnc_MWCacheDestructible", 2]})};
 		if (_cache getVariable ["MCC_cacheWatched", false]) exitWith {};
 		_cache setVariable ["MCC_cacheWatched", true];
 
@@ -62,7 +62,7 @@ switch (_mode) do {
 			_damage
 		}];
 
-		[_cache] spawn {
+		[[_cache], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; _this = _this select 0; 
 			params ["_cache"];
 			private _ordnance = [];     // [projectile, lastPos, blastRadius] flying near the cache (fallback if Explode is not raised on the server)
 			private _cachePos = getPosASL _cache;
@@ -126,8 +126,8 @@ switch (_mode) do {
 			deleteVehicle _cache;
 			{deleteVehicle _x} forEach _crates;
 
-			//The two small secondary blasts that follow the main blast (kept from earlier builds)
-			[_pos] spawn {
+			//The two small secondary blasts that follow the main blast 
+			[[_pos], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; _this = _this select 0; 
 				params ["_pos"];
 				for "_i" from 1 to 2 do {
 					sleep (0.6 + random 1.2);
@@ -138,7 +138,7 @@ switch (_mode) do {
 			//Crater where the cache stood (stays for the rest of the mission)
 			private _craterType = ["Land_ShellCrater_02_small_F", "Land_ShellCrater_01_F", "Crater"] select {isClass (configFile >> "CfgVehicles" >> _x)};
 			if (count _craterType > 0) then {
-				private _crater = createVehicle [_craterType select 0, _pos, [], 0, "CAN_COLLIDE"];
+				private _crater = createVehicle [_craterType select 0, _pos, [], 0, "CAN_COLLIDE"]; [_crater] call MCCMK_fnc_genTag;
 				_crater setDir random 360;
 				_crater setVectorUp (surfaceNormal _pos);
 			};
@@ -148,7 +148,7 @@ switch (_mode) do {
 			{
 				_x params ["_type", "_life"];
 				if (isClass (configFile >> "CfgVehicles" >> _type)) then {
-					private _obj = createVehicle [_type, _pos, [], 0, "CAN_COLLIDE"];
+					private _obj = createVehicle [_type, _pos, [], 0, "CAN_COLLIDE"]; [_obj] call MCCMK_fnc_genTag;
 					_burn pushBack [_obj, _life];
 				} else {
 					["WARNING", "MCC_fnc_MWCacheDestructible", "%1 is not in this game's config - not created", [_type]] call MCC_fnc_log;
@@ -164,7 +164,7 @@ switch (_mode) do {
 
 			//Ammo cook-off (as well as the two secondary blasts): starts a second or two after the main blast and runs about 25 seconds - rapid pops at first,
 			//thinning out as the ammo is used up. Pops are scattered up to 4 m around the cache, at different heights.
-			[_pos] spawn {
+			[[_pos], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; _this = _this select 0; 
 				params ["_pos"];
 				sleep (0.8 + random 1.2);
 				private _end = time + 22 + random 8;

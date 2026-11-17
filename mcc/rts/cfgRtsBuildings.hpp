@@ -13,7 +13,8 @@ class MCC_rts_hq1
 	needelectricity = 0;
 	upgradeTo[] = {"MCC_rts_hq2"};
 	buildings[] = {"MCC_rts_barracks1","MCC_rts_house1","MCC_rts_workshop1","MCC_rts_triage1","MCC_rts_tradePost1"};
-	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_addArtilleryAmmo","MCC_rts_evacHelicopterBuy"};
+	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_addArtilleryAmmo","MCC_rts_evacHelicopterBuy","MCC_rts_clearWrecks","MCC_rts_clearBodies","MCC_rts_spacer","MCC_rts_rtsHelipadUIContainer"};
+	helipads[] = {"MCC_rts_helipadSquare","MCC_rts_helipadCircle","MCC_rts_helipadCivil","MCC_rts_helipadRescue","MCC_rts_helipadSquareLit","MCC_rts_helipadCircleLit","MCC_rts_helipadCivilLit","MCC_rts_helipadRescueLit","MCC_rts_helipadInvisible"};
 	sideActions[] = {"MCC_rts_scanResourcesBasic"};
 	sideActionsEnd[] = {"MCC_rts_scanResourcesCancel"};
 	fortifications[] = {"MCC_rts_fortSandbagLong","MCC_rts_fortSandbagRound","MCC_rts_fortRazorwire"};
@@ -34,7 +35,8 @@ class MCC_rts_hq2 : MCC_rts_hq1
 	requiredBuildings[] = {{"workshop",2},{"barracks",1},{"elecPower",1}};
 	needelectricity = 1;
 	upgradeTo[] = {"MCC_rts_hq3"};
-	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_addArtilleryAmmo","MCC_rts_evacHelicopterBuy"};
+	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_addArtilleryAmmo","MCC_rts_evacHelicopterBuy","MCC_rts_clearWrecks","MCC_rts_clearBodies","MCC_rts_spacer","MCC_rts_rtsHelipadUIContainer"};
+	helipads[] = {"MCC_rts_helipadSquare","MCC_rts_helipadCircle","MCC_rts_helipadCivil","MCC_rts_helipadRescue","MCC_rts_helipadSquareLit","MCC_rts_helipadCircleLit","MCC_rts_helipadCivilLit","MCC_rts_helipadRescueLit","MCC_rts_helipadInvisible"};
 	sideActions[] = {"MCC_rts_scanResourcesBasic","MCC_rts_scanResourcesAdvanced"};
 	sideActionsEnd[] = {"MCC_rts_scanResourcesCancel"};
 	level = 2;
@@ -327,7 +329,7 @@ class MCC_rts_workshop3 : MCC_rts_workshop2
 
 	displayName = "Mechanic Workshop";
 	descriptionShort = "Builds vehicles and armor and repairs all vehicles damage.";
-	buildings[] = {"MCC_rts_storage1","MCC_rts_elecPower1","MCC_rts_workshop4","MCC_rts_workshop5"};
+	buildings[] = {"MCC_rts_storage1","MCC_rts_elecPower1","MCC_rts_workshop4","MCC_rts_workshop5","MCC_rts_workshop6"};
 	actions[]={"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsFortUIContainer","MCC_rts_rtsbuyVehicle","","","","","","","","","MCC_rts_destroyLogic"};
 	fortifications[] = {"MCC_rts_fortAA","MCC_rts_fortAT","MCC_rts_fortgmg","MCC_rts_fortgmgHigh","MCC_rts_fortmg","MCC_rts_fortmgHigh","MCC_rts_fortMortar"};
 	requiredBuildings[] = {{"hq",2}};
@@ -349,12 +351,32 @@ class MCC_rts_workshop4 : MCC_rts_workshop2
 	displayName = "Aerial Workshop";
 	descriptionShort = "Builds some air vehicles and repairs all air vehicles damage.";
 	buildings[] = {"MCC_rts_storage1","MCC_rts_elecPower1"};
-	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsbuyVehicle","","","","","","","","","","MCC_rts_destroyLogic"};
+	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_rtsbuyVehicle","MCC_rts_taruPods","","","","","","","","","MCC_rts_destroyLogic"};
 	requiredBuildings[] = {{"hq",3}};
 	needelectricity = 1;
 	upgradeTo[] = {};
 	level = 4;
 	resources[] = {{"ammo",1600},{"repair",1000},{"fuel",1600},{"time",3}};
+	objectsArray[] = {{"Land_EngineCrane_01_F",{3,-3,0.2},{{0,1,0},{0,0,1}}},{"Land_WeldingTrolley_01_F",{-3,0,0},{{1,1,0},{0,0,1}}},{"Land_Workbench_01_F",{0,-1,-0.2},{{0,1,0},{0,0,1}}},{"Oil_Spill_F",{0,-2,-0.2},{{0,1,0},{0,0,1}}},{"Land_Camping_Light_F",{-1,-1,0.23},{{-1,-1,0},{0,0,1}}},{"Land_Cargo_House_V3_F",{0,3,0},{{0,1,0},{0,0,1}}},{"Land_MobileLandingPlatform_01_F",{-5,-1,-0.5},{{1,0,0},{0,0,1}}},{"ContainmentArea_02_sand_F",{7,-1,-0.44},{{1,0,0},{0,0,1}}},{"StorageBladder_02_water_sand_F",{7,-1,-0.2},{{1,0,0},{0,0,1}}},{"PortableHelipadLight_01_blue_F",{7,4,-0.6},{{1,0,0},{0,0,1}}},{"PortableHelipadLight_01_blue_F",{14,4,-0.6},{{1,0,0},{0,0,1}}},{"PortableHelipadLight_01_blue_F",{14,14,-0.6},{{1,0,0},{0,0,1}}},{"PortableHelipadLight_01_blue_F",{7,14,-0.6},{{1,0,0},{0,0,1}}}};
+};
+
+class MCC_rts_workshop6 : MCC_rts_workshop2
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\workshop6.paa";
+	#else
+	picture = "mcc\rts\data\workshop6.paa";
+	#endif
+
+	displayName = "Naval Workshop";
+	descriptionShort = "Unlocks buying ships (destroyer, submarine; the aircraft carrier and LHD also need Sat-Comms) and boats.";
+	buildings[] = {"MCC_rts_storage1","MCC_rts_elecPower1"};
+	actions[] = {"MCC_rts_rtsBuildUIContainer","MCC_rts_buyShip","MCC_rts_buyBoat","","","","","","","","","MCC_rts_destroyLogic"};
+	requiredBuildings[] = {{"hq",2},{"storage",2}};
+	needelectricity = 1;
+	upgradeTo[] = {};
+	level = 6;
+	resources[] = {{"ammo",800},{"repair",1000},{"fuel",800},{"time",3}};
 	objectsArray[] = {{"Land_EngineCrane_01_F",{3,-3,0.2},{{0,1,0},{0,0,1}}},{"Land_WeldingTrolley_01_F",{-3,0,0},{{1,1,0},{0,0,1}}},{"Land_Workbench_01_F",{0,-1,-0.2},{{0,1,0},{0,0,1}}},{"Oil_Spill_F",{0,-2,-0.2},{{0,1,0},{0,0,1}}},{"Land_Camping_Light_F",{-1,-1,0.23},{{-1,-1,0},{0,0,1}}},{"Land_Cargo_House_V3_F",{0,3,0},{{0,1,0},{0,0,1}}},{"Land_MobileLandingPlatform_01_F",{-5,-1,-0.5},{{1,0,0},{0,0,1}}},{"ContainmentArea_02_sand_F",{7,-1,-0.44},{{1,0,0},{0,0,1}}},{"StorageBladder_02_water_sand_F",{7,-1,-0.2},{{1,0,0},{0,0,1}}},{"PortableHelipadLight_01_blue_F",{7,4,-0.6},{{1,0,0},{0,0,1}}},{"PortableHelipadLight_01_blue_F",{14,4,-0.6},{{1,0,0},{0,0,1}}},{"PortableHelipadLight_01_blue_F",{14,14,-0.6},{{1,0,0},{0,0,1}}},{"PortableHelipadLight_01_blue_F",{7,14,-0.6},{{1,0,0},{0,0,1}}}};
 };
 

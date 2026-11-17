@@ -41,6 +41,7 @@ _plane setpos [(getPos _plane select 0),(getPos _plane select 1),_flyHight];
 _plane setdir _heading;
 
 createVehicleCrew _plane;
+[_plane, _side] call MCCMK_fnc_crewFix;	//(MK) the faction of that side, not its vanilla pilots
 
 _plane flyInHeight _flyHight;
 _plane setcaptive _captive;

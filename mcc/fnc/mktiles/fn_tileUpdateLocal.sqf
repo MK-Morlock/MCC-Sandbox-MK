@@ -11,7 +11,7 @@ if (isNil "MCCMK_tilePending") then {MCCMK_tilePending = createHashMap};
 	} else {
 		if (_color != "") then {_name setMarkerColorLocal _color};
 		if (_alpha >= 0) then {
-			if (missionNamespace getVariable ["MCC_consoleTilesHidden", false]) then {MCC_consoleTilesShown set [_name, _alpha]} else {_name setMarkerAlphaLocal _alpha};
+			[_name, _alpha] call MCCMK_fnc_tileDraw;
 		};
 	};
 } forEach _list;

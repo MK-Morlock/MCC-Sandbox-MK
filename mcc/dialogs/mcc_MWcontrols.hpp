@@ -28,6 +28,8 @@
 #define MCC_MWContentIDC 6027
 #define MCC_MWCivContentIDC 6028
 #define MCC_MWSpreadIDC 6029
+#define MCC_MWDronesIDC 6040
+#define MCC_MWEnemySideIDC 6041
 
 class MCC_MWControls: MCC_RscControlsGroup
 {
@@ -35,7 +37,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 	x = 0.230729 * safezoneW + safezoneX;
 	y = 0.5 * safezoneH + safezoneY;
 	w = 0.538542 * safezoneW;
-	h = 0.33 * safezoneH;
+	h = 0.34 * safezoneH;
 
 	class Controls
 	{
@@ -46,17 +48,31 @@ class MCC_MWControls: MCC_RscControlsGroup
 			colorBackground[] = {0.11,0.12,0.13,0.96};
 
 			w = 0.538542 * safezoneW;
-			h = 0.32 * safezoneH;
+			h = 0.338 * safezoneH;
 		};
 
+		//(MK) Rival faction search: type to pick the first faction whose name matches (MCCMK_fnc_mwFactionSearch)
+		class MCCMK_MWFactionSearch: MCC_RscText
+		{
+			idc = 1090;
+			type = 2;
+			tooltip = "Type to find a rival faction";
+			onKeyUp = "[ctrlText (_this select 0), ctrlParent (_this select 0)] call MCCMK_fnc_mwFactionSearch";
+			x = 0.189063 * safezoneW;
+			y = 0.0164913 * safezoneH;
+			w = 0.0680 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
 		class MCC_MWTittle: MCC_RscText
 		{
 			idc = -1;
+			style = 2;	//(MK) centred above the Objective drop-downs
 
 			text = "Mission Generator"; //--- ToDo: Localize;
-			x = 0.189063 * safezoneW;
+			x = 0.2581 * safezoneW;	//(MK) centred over the drop-downs' text box, their arrow not counted
 			y = 0.0109958 * safezoneH;
-			w = 0.15 * safezoneW;
+			w = 0.0840 * safezoneW;
 			h = 0.0329871 * safezoneH;
 			colorText[] = {0.89,0.90,0.91,1};
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
@@ -79,8 +95,8 @@ class MCC_MWControls: MCC_RscControlsGroup
 			idc = MCC_MWContentIDC;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			onLBSelChanged = "if ((_this select 1) >= 0) then {profileNamespace setVariable ['MCC_MWContentIndex', _this select 1]}";
-			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Rival units: own faction, plus Creator DLC, or all mods'";
-			tooltip = "Rival units: own faction, plus Creator DLC, or all mods";
+			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Rival units: faction, DLC relatives, mods, or the whole side'";
+			tooltip = "Rival units: faction, DLC relatives, mods, or the whole side";
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 			x = 0.0802087 * safezoneW;
 			y = 0.0494784 * safezoneH;
@@ -103,8 +119,8 @@ class MCC_MWControls: MCC_RscControlsGroup
 			idc = MCC_MWCivContentIDC;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 			onLBSelChanged = "if ((_this select 1) >= 0) then {profileNamespace setVariable ['MCC_MWCivContentIndex', _this select 1]}";
-			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Civilian units: own faction, plus Creator DLC, or all mods'";
-			tooltip = "Civilian units: own faction, plus Creator DLC, or all mods";
+			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Civilian units: faction, DLC relatives, mods, or whole side'";
+			tooltip = "Civilian units: faction, DLC relatives, mods, or whole side";
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
 			x = 0.0802087 * safezoneW;
 			y = 0.1484397 * safezoneH;
@@ -126,7 +142,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 		{
 			idc = MCC_MWSpreadIDC;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
-			tooltip = "Where enemy forces start: Tight = near the centre, Normal = original MCC, Wide = evenly over the zone";
+			tooltip = "Where enemy forces start: Tight = near the centre, Normal =\noriginal MCC, Wide = evenly over the zone";
 			onLBSelChanged = "if ((_this select 1) >= 0) then {profileNamespace setVariable ['MCC_MWSpreadIndex', _this select 1]}";
 			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Where enemy forces start: Tight = near the centre, Normal = original MCC, Wide = evenly over the zone'";
 			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
@@ -221,7 +237,7 @@ class MCC_MWControls: MCC_RscControlsGroup
 
 		class MCC_MWPlayersCombo: MCC_RscSlider
 		{
-			tooltip = "About 2, 4 or 6 enemies per player (Easy/Medium/Hard): 40 players on Medium is about 160 enemies";
+			tooltip = "About 2, 4 or 6 enemies per player (Easy/Medium/Hard): 40\nplayers on Medium is about 160 enemies";
 			idc = MCC_MWPlayersIDC;
 			onSliderPosChanged = "(_this select 0) ctrlSetTooltip format ['%1 players: about %2 / %3 / %4 enemies (Easy / Medium / Hard)', floor (_this select 1), (floor (_this select 1)) * 2, (floor (_this select 1)) * 4, (floor (_this select 1)) * 6];(profileNamespace setVariable ['MCC_MWPlayersIndex',(_this select 1)]);MCC_MWPlayersSession = _this select 1;((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText format ['Players: %1 (more players = more enemies and a larger mission area)', floor (_this select 1)];";
 			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'More players = more enemies and larger mission area';";
@@ -296,6 +312,30 @@ class MCC_MWControls: MCC_RscControlsGroup
 		};
 
 		//Stealth
+		class MCC_MWEnemySideTittle: MCC_RscText
+		{
+			colorText[] = {0.62,0.65,0.68,1};
+			idc = -1;
+			text = "Rival Side";
+			x = 0.00572965 * safezoneW;
+			y = 0.3133752 * safezoneH;
+			w = 0.06875 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
+		};
+		class MCC_MWEnemySideCombo: MCC_RscCombo
+		{
+			idc = MCC_MWEnemySideIDC;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+			onLBSelChanged = "if ((_this select 1) >= 0) then {profileNamespace setVariable ['MCC_MWEnemySideIndex', _this select 1]}";
+			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Which side the rival faction fights for - use East, West or Independent to fight a faction from your own side'";
+			tooltip = "Which side the rival faction fights for - use East, West or\nIndependent to fight a faction from your own side";
+			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
+			x = 0.0802087 * safezoneW;
+			y = 0.3133752 * safezoneH;
+			w = 0.0859375 * safezoneW;
+			h = 0.0219914 * safezoneH;
+		};
 		class MCC_MWStealthTittle: MCC_RscText
 		{
 			colorText[] = {0.62,0.65,0.68,1};
@@ -858,6 +898,36 @@ class MCC_MWControls: MCC_RscControlsGroup
 			columns = 2;
 			rows = 1;
 			strings[] = {"Whole map","Current zone"};
+
+		class MCC_MWDronesText: MCC_RscText
+		{
+			idc = -1;
+
+			text = "AI Drones";
+			x = 0.372396 * safezoneW;
+			y = 0.3133752 * safezoneH;
+			w = 0.06875 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
+		};
+		class MCC_MWDronesCombo: MCC_CheckBoxes
+		{
+			idc = MCC_MWDronesIDC;
+			onCheckBoxesSelChanged = "[_this,2,'MCC_MWDronesIndex','profile'] spawn MCC_fnc_checkBox;";
+			onSetFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText 'Enemy UAV operators may launch the drones in their backpacks (needs the AI Drones setting in MCC GAIA)'";
+			onKillFocus = "((uiNamespace getVariable 'MCC_MWDialog') displayCtrl 0) ctrlSetText ''";
+
+			columns = 2;
+			rows = 1;
+			strings[] = {"Disabled","Enabled"};
+			checked_strings[] = {"Disabled","Enabled"};
+
+			x = 0.446875 * safezoneW;
+			y = 0.3133752 * safezoneH;
+			w = 0.0859375 * safezoneW;
+			h = 0.0219914 * safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
 			checked_strings[] =  {"Whole map","Current zone"};
 
 			x = 0.446875 * safezoneW;

@@ -113,8 +113,8 @@ class MCCDLG_NAME {
 				{
 					idc = 20;
 
-					x = 0.62 * safezoneW;	//2:1 like a flag (it was 3:1, stretched), a little up and to the right
-					y = 0.034 * safezoneH;
+					x = 0.62 * safezoneW;	//2:1 like a flag, a little up and to the right
+					y = 0.023 * safezoneH;
 					w = 0.05 * safezoneW;
 					h = 0.0444 * safezoneH;
 				};
@@ -125,7 +125,7 @@ class MCCDLG_NAME {
 					font = "RobotoCondensedBold";
 
 					x = 0.53625 * safezoneW;
-					y = 0.033 * safezoneH;
+					y = 0.022 * safezoneH;
 					w = 0.034375 * safezoneW;
 					h = 0.0219914 * safezoneH;
 					colorText[] = {0.89,0.90,0.91,1};
@@ -134,14 +134,14 @@ class MCCDLG_NAME {
 				class CP_side1Score: CP_RscText
 				{
 					idc = 22;
-					font = "RobotoCondensedBold";
+					font = "RobotoCondensed";
 					style = 2;
 
 					x = 0.53625 * safezoneW;
-					y = 0.055 * safezoneH;
+					y = 0.044 * safezoneH;
 					w = 0.034375 * safezoneW;
-					h = 0.0219914 * safezoneH;
-					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+					h = 0.033 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 				};
 				class CP_side2: CP_RscText
 				{
@@ -150,7 +150,7 @@ class MCCDLG_NAME {
 					font = "RobotoCondensedBold";
 
 					x = 0.5775 * safezoneW;
-					y = 0.033 * safezoneH;
+					y = 0.022 * safezoneH;
 					w = 0.034375 * safezoneW;
 					h = 0.0219914 * safezoneH;
 					colorText[] = {0.89,0.90,0.91,1};
@@ -159,14 +159,14 @@ class MCCDLG_NAME {
 				class CP_side2Score: CP_RscText
 				{
 					idc = 24;
-					font = "RobotoCondensedBold";
+					font = "RobotoCondensed";
 					style = 2;
 
 					x = 0.5775 * safezoneW;
-					y = 0.055 * safezoneH;
+					y = 0.044 * safezoneH;
 					w = 0.034375 * safezoneW;
-					h = 0.0219914 * safezoneH;
-					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+					h = 0.033 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 				};
 				class CP_side3: CP_RscText
 				{
@@ -175,7 +175,7 @@ class MCCDLG_NAME {
 					font = "RobotoCondensedBold";
 
 					x = 0.61875 * safezoneW;
-					y = 0.033 * safezoneH;
+					y = 0.022 * safezoneH;
 					w = 0.034375 * safezoneW;
 					h = 0.0219914 * safezoneH;
 					colorText[] = {0.89,0.90,0.91,1};
@@ -184,14 +184,14 @@ class MCCDLG_NAME {
 				class CP_side3Score: CP_RscText
 				{
 					idc = 26;
-					font = "RobotoCondensedBold";
+					font = "RobotoCondensed";
 					style = 2;
 
 					x = 0.61875 * safezoneW;
-					y = 0.055 * safezoneH;
+					y = 0.044 * safezoneH;
 					w = 0.034375 * safezoneW;
-					h = 0.0219914 * safezoneH;
-					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+					h = 0.033 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 				};
 
 				class MCC_ResourcesControlsGroup: MCC_RscControlsGroupNoScrollbars
@@ -207,7 +207,7 @@ class MCCDLG_NAME {
 						class MCC_AmmoText: MCC_RscText
 						{
 							idc = 81;
-							tooltip = "Ammo: your side's ammunition stock (used to build and buy in RTS mode)";
+							tooltip = "Ammo: your side's ammunition stock (used to build and buy in\nRTS mode)";
 							style = 2;
 							sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 
@@ -220,7 +220,7 @@ class MCCDLG_NAME {
 						class MCC_RepairText: MCC_RscText
 						{
 							idc = 82;
-							tooltip = "Supplies: your side's repair / building supplies (used to build and buy in RTS mode)";
+							tooltip = "Supplies: your side's repair / building supplies (used to\nbuild and buy in RTS mode)";
 							style = 2;
 							sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 
@@ -257,7 +257,7 @@ class MCCDLG_NAME {
 						class MCC_MedText: MCC_RscText
 						{
 							idc = 85;
-							tooltip = "Medical: your side's medical supplies (used to build and buy in RTS mode)";
+							tooltip = "Medical: your side's medical supplies (used to build and buy\nin RTS mode)";
 							style = 2;
 							sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 

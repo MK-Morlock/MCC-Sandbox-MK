@@ -135,5 +135,5 @@ if ((missionNamespace getVariable ["MCC_fnc_ambientFireInitEH",-1]) <=0) then {
 };
 
 
-//Add explosive rounds fire (JIP too - players joining later never got the handler)
+//Add explosive rounds fire (JIP too, so players joining later get the handler)
 [] remoteExec ["MCC_fnc_ambientFirePlayerFiredEH",0,"MCC_ambientFireFiredEH"];

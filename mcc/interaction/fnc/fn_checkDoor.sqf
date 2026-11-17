@@ -30,4 +30,4 @@ sleep 0.1;
 _object animate [_animation, 0];
 
 _object setVariable [format ["bis_disabled_%1_info",_door],true];
-hint (if ((_object getVariable [format ["bis_disabled_%1",_door],0])==0) then {"Unlocked"} else {"Locked"});
+[(if ((_object getVariable [format ["bis_disabled_%1",_door],0])==0) then {"Unlocked"} else {"Locked"})] call MCCMK_fnc_hint;

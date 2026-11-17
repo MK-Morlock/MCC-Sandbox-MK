@@ -95,7 +95,7 @@
 	waituntil {!dialog};
 	sleep 0.1;
 	_ok = createDialog ("CP_RESPAWNPANEL" call MCC_fnc_dialogName);
-	if !(_ok) exitWith { hint "createDialog failed"; if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log  "CP: create respawn Dialog failed"};};
+	if !(_ok) exitWith { ["createDialog failed"] call MCCMK_fnc_hint; if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log  "CP: create respawn Dialog failed"};};
 
 	waituntil {missionNameSpace getvariable ["playerDeploy",false]};
 

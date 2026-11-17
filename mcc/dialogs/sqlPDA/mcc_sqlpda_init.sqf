@@ -45,8 +45,8 @@ uiNamespace setVariable ["MCC_sqlpdaCloseLF", _disp displayCtrl 25];
 } foreach [MCC_sqlpdaMenu0,MCC_sqlpdaMenu1,MCC_sqlpdaMenu2,MCC_CONSOLEINFOLIVEFEED,MCC_CONSOLEINFOTEXT,MCC_sqlpdaCloseLF];
 
 //Three sizes (plus button), all the same shape: the frame picture is drawn 4:3, so its height is worked out from its
-//width in screen pixels and it is never stretched out of shape (the old picture was squashed, and stretched further at
-//each size). The bottom stays above the squad bar. Everything else is placed inside the frame by fractions of it.
+//width in screen pixels and it is never stretched out of shape. The bottom stays above the squad bar. Everything else
+//is placed inside the frame by fractions of it.
 private _sizeIdx = (player getvariable ["MCC_sqlPDAScale",0]) min 2 max 0;
 private _fw = [0.24, 0.34, 0.5] select _sizeIdx;		//frame width (part of the safe zone width)
 private _fwUI = _fw * safezoneW;
@@ -311,7 +311,7 @@ MCC_fnc_mapDrawWPPDA =
 	{
 		_leader = (leader _x);
 		_groupControl = if ((isplayer _leader) || (getText (configfile >> "CfgVehicles" >> typeOF vehicle _leader >> "vehicleClass")== "Autonomous")) then {true} else {_x getvariable ["MCC_canbecontrolled",false]};	//Can we control this group
-		_haveGPS =  if (vehicle _leader != _leader) then {true} else {("ItemGPS" in (assignedItems _leader) || "B_UavTerminal" in (assignedItems _leader) || "MCC_Console" in (assignedItems _leader))};
+		_haveGPS =  if (vehicle _leader != _leader) then {true} else {(((assignedItems _leader) findIf {(_x isKindOf ["ItemGPS", configFile >> "CfgWeapons"]) || {_x isKindOf ["UavTerminal_base", configFile >> "CfgWeapons"]}}) >= 0)};
 		if (isnil "_haveGPS") then {_haveGPS = false};
 		if ((side _leader == side player) && alive _leader && _groupControl && ((MCC_ConsoleOnlyShowUnitsWithGPS && _haveGPS) || !MCC_ConsoleOnlyShowUnitsWithGPS)) then
 		{
@@ -398,7 +398,7 @@ _disp call
 			_wpArray = waypoints (group _leader);
 			_behaviour = behaviour _leader;
 			_groupControl = if ((isplayer _leader) || (getText (configfile >> "CfgVehicles" >> typeOF vehicle _leader >> "vehicleClass")== "Autonomous")) then {true} else {_x getvariable ["MCC_canbecontrolled",false]};	//Can we control this group
-			_haveGPS =  if (vehicle _leader != _leader) then {true} else {("ItemGPS" in (assignedItems _leader) || "B_UavTerminal" in (assignedItems _leader) || "MCC_Console" in (assignedItems _leader))};
+			_haveGPS =  if (vehicle _leader != _leader) then {true} else {(((assignedItems _leader) findIf {(_x isKindOf ["ItemGPS", configFile >> "CfgWeapons"]) || {_x isKindOf ["UavTerminal_base", configFile >> "CfgWeapons"]}}) >= 0)};
 			if (isnil "_haveGPS") then {_haveGPS = false};
 			if ((side _leader == side player) && alive _leader && _groupControl && ((MCC_ConsoleOnlyShowUnitsWithGPS && _haveGPS) || !MCC_ConsoleOnlyShowUnitsWithGPS)) then
 				{

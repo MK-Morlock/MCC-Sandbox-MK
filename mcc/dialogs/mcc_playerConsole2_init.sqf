@@ -91,10 +91,10 @@ if ((str (finddisplay mcc_playerConsole2_IDD) != "no display") && (alive MCC_Con
 		MCC_fakeUAV camCommit 0;
 };
 	if (!isNil "MCC_fakeUAVCenter" && {!isNull MCC_fakeUAVCenter}) then {MCC_fakeUAVCenter setPos [(getPos MCC_ConolseUAV) select 0, (getPos MCC_ConolseUAV) select 1, 0]};
-	//Link the picture to the camera now that it exists (linked before it existed, the first feed showed no effects)
-	ctrlSetText [MCC_CONSOLE_UAVPIP, format ["#(argb,%1,%1,1)r2t(rendertarget9,1.0);", missionNamespace getVariable ["MCC_pipResolution", 1024]]];	//resolution: CBA Video feed resolution (was 512)
-	//First view of a session stayed black: bind the camera to the picture again a few times (only the binding: changing
-	//the picture each time made it flicker). Also covers a camera made before the picture was set.
+	//Link the picture to the camera now that it exists (linked before it exists, the feed shows no effects)
+	ctrlSetText [MCC_CONSOLE_UAVPIP, format ["#(argb,%1,%1,1)r2t(rendertarget9,1.0);", missionNamespace getVariable ["MCC_pipResolution", 1024]]];	//resolution: CBA Video feed resolution
+	//So the first view of a session isn't black: bind the camera to the picture again a few times (only the binding:
+	//changing the picture each time makes it flicker). Also covers a camera made before the picture was set.
 	[] spawn {
 		{
 			sleep _x;
@@ -212,7 +212,7 @@ if ((str (finddisplay mcc_playerConsole2_IDD) != "no display") && (alive MCC_Con
 						private _fd = vectorDirVisual _m;
 						(missionNamespace getVariable ["MCC_cruiseOrbit", [0, 0, 1]]) params [["_oy", 0], ["_op", 0], ["_oz", 1]];
 						private _hd = (_fd select 0) atan2 (_fd select 1);
-						private _az = _hd + 180 - 29 + _oy;	//(29 deg to the side, as the camera was: 18 m back, 10 m aside)
+						private _az = _hd + 180 - 29 + _oy;	//(29 deg to the side: 18 m back, 10 m aside)
 						private _el = ((19 + _op) max -60) min 80;	//(19 deg up: 7 m up)
 						private _dist = 21.8 * _oz;
 						private _cp = _mp vectorAdd [(sin _az) * (cos _el) * _dist, (cos _az) * (cos _el) * _dist, (sin _el) * _dist];

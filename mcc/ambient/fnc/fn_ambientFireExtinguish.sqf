@@ -1,7 +1,7 @@
 /*============================================================MCC_fnc_ambientFireExtinguish=======================================================================
 	Puts out MCC ambient fires and stops the ones still spreading.
 
-	Fire objects are not Zeus-editable, so they could not be deleted from Zeus and kept spreading. This deletes them
+	Fire objects are not Zeus-editable, so they cannot be deleted from Zeus. This deletes them
 	(the server-side fire objects; each client's light, smoke and sound end by themselves when their fire is gone)
 	and bumps MCC_ambientFireEpoch, which every running spread script checks before lighting anything new.
 

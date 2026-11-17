@@ -1,0 +1,15 @@
+params ["_map", ["_sel", []], ["_busy", false]];
+private _ch = uiNamespace getVariable "MCCMK_wpChain";
+if (isNil "_ch") exitWith {};
+private _groups = (_ch select 1) select {!isNull _x && {alive (leader _x)}};
+if (_busy || {_groups isEqualTo []} || {(_groups - _sel) isNotEqualTo []}) exitWith {["end"] call MCCMK_fnc_wpChain};
+private _m = _map ctrlMapScreenToWorld getMousePosition;
+private _end = [_groups select 0] call MCCMK_fnc_wpEnd;
+private _pend = uiNamespace getVariable ["MCCMK_wpChainPend", []];
+private _now = diag_tickTime;
+private _hit = _pend findIf {((_x select 0) distance2D _end) < 2};
+if (_hit >= 0) then {_pend deleteRange [0, _hit + 1]};
+while {_pend isNotEqualTo [] && {(_now - ((_pend select 0) select 1)) > 3}} do {_pend deleteAt 0};
+private _pts = (_pend apply {_x select 0}) + [[_m select 0, _m select 1]];
+{_map drawLine [[_x] call MCCMK_fnc_wpEnd, _pts select 0, [0, 0, 1, 1]]} forEach _groups;
+for "_i" from 1 to ((count _pts) - 1) do {_map drawLine [_pts select (_i - 1), _pts select _i, [0, 0, 1, 1]]};

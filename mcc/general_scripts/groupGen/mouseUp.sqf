@@ -20,12 +20,14 @@ _posY = _params select 3;
 _shift = _params select 4;
 _ctrlKey = _params select 5;
 _alt = _params select 6;
+if ((missionNamespace getVariable ["MCC_evacParaDrag", false]) && {_pressed == 0}) exitWith {["up", _ctrl, _posX, _posY] call MCC_fnc_evacParaLine};
 _mcc_XYmap = missionNamespace getVariable ["MCC_XYmap",[]];
 MCC_pointB = _ctrl ctrlmapscreentoworld [_posX,_posY];
 
 if (mcc_missionmaker != (name player)) exitWith {};
 
 MCC_GroupGenMouseButtonDown = false;	//Mouse state
+if (_pressed == 1 && {str _mcc_XYmap == format ["[%1,%2]", _posX, _posY]}) then {["end"] call MCCMK_fnc_wpChain};
 MCC_GroupGenMouseButtonUp = true;
 
 //Clear some markers
@@ -43,11 +45,11 @@ if (MCC_ambushPlacing && _pressed!=1) exitWith {
 	IEDDir = [MCC_pointA,MCC_pointB] call BIS_fnc_dirTo;
 
 	if (MCC_capture_state) then {
-		hint "Ambush Captured.";
+		["Ambush Captured."] call MCCMK_fnc_hint;
 		MCC_capture_var = MCC_capture_var
 				+ FORMAT ["[%1 , '%2' , '%3', %4, %5, %6, %7, %8] remoteExec ['MCC_fnc_ambushSingle', 0, false];", MCC_pointA, IEDAmbushspawnname, mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside];
 	} else  {
-		hint "Ambush Placed.";
+		["Ambush Placed."] call MCCMK_fnc_hint;
 		[MCC_pointA , IEDAmbushspawnname,mcc_sidename, IedName, IEDDir, MCC_pointB, MCC_IEDisSpotter, iedside] remoteExec ["MCC_fnc_ambushSingle", 2, false];
 	};
 

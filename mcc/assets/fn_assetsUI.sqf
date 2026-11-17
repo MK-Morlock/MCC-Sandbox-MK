@@ -28,6 +28,7 @@ if (_mode == "selectSlot" && {lbCurSel _ctrlSlots >= 0}) then {
 	_slotIndex = lbCurSel _ctrlSlots;
 	uiNamespace setVariable ["MCC_assetsCurrentSlot", _slotIndex];
 };
+if (_mode == "init") then {private _mkC = uiNamespace getVariable ["MCCMK_consolePanel", [0.11, 0.12, 0.13, 0.96]]; {(_d displayCtrl _x) ctrlSetTextColor _mkC} forEach [9500, 9580, 9581, 9582, 9583, 9584, 9585]};
 if (_mode == "init" && {isNil {uiNamespace getVariable "MCC_assetsCurrentSlot"}}) then {_slotIndex = 0};
 _slotIndex = (_slotIndex max 0) min (count _slots - 1);
 private _slot = _slots select _slotIndex;

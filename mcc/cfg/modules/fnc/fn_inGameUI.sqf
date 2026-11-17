@@ -138,7 +138,7 @@ if (typeName _mode == typeName objNull) then {
 		0 spawn MCC_fnc_helpersInit;
 	};
 
-	//Compass HUD - unticking now really turns it off (it used to only ever switch things on)
+	//Compass HUD - unticking turns it off
 	missionNamespace setVariable ["MCC_Settings_compassEnabled", [2, [0, 1] select _compassTeamMates] select _compass];
 	if (missionNamespace getVariable ["MCC_initCompassHUD",false]) then {
 		missionNamespace setVariable ["MCC_initCompassHUD",false];

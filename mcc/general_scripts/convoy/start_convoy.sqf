@@ -11,11 +11,11 @@ if !mcc_isloading then
 							,point4
 							,point5
 							,vip];
-		Hint "Action captured";
+		["Action captured"] call MCCMK_fnc_hint;
 	}
 	else
 	{
-		hint "Convoy is moving";
+		["Convoy is moving"] call MCCMK_fnc_hint;
 		[[point2,point3,point4,point5],vip select 0] remoteExec ["MCC_fnc_startConvoy", 0, false];
 	};
 };

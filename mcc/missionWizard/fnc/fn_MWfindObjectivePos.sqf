@@ -88,7 +88,7 @@ if (_farEnough || (count _objectivesMarkers == 0)) then {
 
 	_markerName = format ["Objective_%1",count _objectivesMarkers];
 
-	createmarkerlocal [_markerName,_availablePos];
+	createmarkerlocal [_markerName,_availablePos]; [_markerName] call MCCMK_fnc_genTag;
 	_markerName setmarkertypelocal "mil_box";
 	_markerName setMarkerTextLocal _markerName;
 	_markerName setmarkerColorlocal "ColorRed";

@@ -37,21 +37,21 @@ _attachPoint =switch (getnumber(configfile >> "CfgVehicles" >> typeof _truck >> 
 				};
 if (str _attachPoint == "[0,0,0]") exitWith {};
 
-_loadedCrates = _truck getVariable ["mcc_supplyTruckCurrentLoad",[]];
+_loadedCrates = ([_truck] call MCCMK_fnc_crateOnTruck) apply {typeOf _x};	//(MK) vehicle-in-vehicle and attached crates
+_truck setVariable ["mcc_supplyTruckCurrentLoad",_loadedCrates, true];
 
 _res = (missionNamespace getVariable format ["MCC_res%1",playerside]);
-_maxLoad =3;
+_maxLoad = [_truck] call MCCMK_fnc_crateSlots;	//(MK) the vehicle's own number of crates
 
 _fncLoadCrate = {
 	_crate = (_cratesType select _this) createVehicle [0,0,0];
 
 	//Set ammo count and helper
-	_crate setVariable ["ammoLeft",100,true];
 	[_crate, "Hold %1 to resupply"] remoteExec ["MCC_fnc_createHelper",0,true];
 	_crate setVariable ["MCC_loadedBy", getplayeruid player, true];
 
-	_attachPoint set [1, (_attachPoint select 1)- (count _loadedCrates*1.6)];
-	_crate attachTo [_truck, _attachPoint];
+	//(MK) vehicle-in-vehicle where the vehicle can take it, else a cargo truck's bed
+	if !([_truck, _crate, _attachPoint] call MCCMK_fnc_crateLoadOn) exitWith {deleteVehicle _crate; [9989,"No Room For Another Crate",5,true] call MCC_fnc_setIDCText};
 
 	_loadedCrates pushBack (typeof _crate);
 	_truck setVariable ["mcc_supplyTruckCurrentLoad",_loadedCrates, true];
@@ -101,15 +101,14 @@ switch (true) do
 		_nearByCrates = [];
 
 		{
-			if (isNull attachedTo _x) then {
+			if (isNull attachedTo _x && {isNull isVehicleCargo _x}) then {
 				_nearByCrates pushBack _x;
 			};
 		} foreach (nearestObjects [getposATL _truck, _cratesType ,50]);
 
 		if (count _nearByCrates >0) then {
 			_crate = _nearByCrates select 0;
-			_attachPoint set [1, (_attachPoint select 1)- (count _loadedCrates*1.6)];
-			_crate attachTo [_truck, _attachPoint];
+			if !([_truck, _crate, _attachPoint] call MCCMK_fnc_crateLoadOn) exitWith {[9989,"No Room For Another Crate",5,true] call MCC_fnc_setIDCText};
 			_loadedCrates pushBack (typeof _crate);
 			_truck setVariable ["mcc_supplyTruckCurrentLoad",_loadedCrates, true];
 		};

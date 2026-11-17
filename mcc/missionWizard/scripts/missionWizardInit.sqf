@@ -67,8 +67,8 @@ MCC_MWisGenerating = true;
 //Get params
 _playersNumber 		= round ((sliderPosition  MCC_MWPlayersIDC) + 1);
 _civFaction			= (U_FACTIONSCIV select (lbCurSel CIVILIANFACTIONCOMBO)) select 2;
-private _contentMode = ((profileNamespace getVariable ["MCC_MWContentIndex", 1]) max 0) min 2;
-private _civContentMode = ((profileNamespace getVariable ["MCC_MWCivContentIndex", 1]) max 0) min 2;
+private _contentMode = ((profileNamespace getVariable ["MCC_MWContentIndex", 1]) max 0) min 4;
+private _civContentMode = ((profileNamespace getVariable ["MCC_MWCivContentIndex", 1]) max 0) min 4;
 _playMusic			=  profileNamespace getVariable ["MCC_MWMusicIndex",0];
 _difficulty 		= ((profileNamespace getVariable ["MCC_MWDifficultyIndex",0])+1) * 2;		//each player == 3 enemy players multiply by difficulty
 _stealth 			= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profileNamespace getVariable ["MCC_MWStealthIndex",2]);
@@ -76,6 +76,10 @@ _isIED 				= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profi
 _isSB 				= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profileNamespace getVariable ["MCC_MWSBIndex",2]);
 _isAS 				= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profileNamespace getVariable ["MCC_MWArmedCiviliansIndex",2]);
 _isRoadblocks 		= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profileNamespace getVariable ["MCC_MWRoadBlockIndex",2]);
+missionNamespace setVariable ["MCC_MWDronesNext", (profileNamespace getVariable ["MCC_MWDronesIndex",1]) == 1];
+publicVariableServer "MCC_MWDronesNext";
+missionNamespace setVariable ["MCC_MWRewardNext", [_playersNumber, profileNamespace getVariable ["MCC_MWDifficultyIndex",0]]];
+publicVariableServer "MCC_MWRewardNext";
 _armor 				= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profileNamespace getVariable ["MCC_MWArmorIndex",2]);
 _vehicles 			= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profileNamespace getVariable ["MCC_MWVehiclesIndex",2]);
 _animals 			= [false,true,([true,false] call BIS_fnc_selectRandom)] select (profileNamespace getVariable ["MCC_MWAnimalsIndex",2]);
@@ -143,8 +147,16 @@ if (typeName _enemySide == "STRING") then
 	};
 };
 
+//Rival Side override (Mission Generator): fight the faction as East, West or Independent instead of its own side
+private _sideIdx = ((profileNamespace getVariable ["MCC_MWEnemySideIndex", 0]) max 0) min 3;
+if (_sideIdx > 0) then {_enemySide = [east, west, resistance] select (_sideIdx - 1)};
+if (_enemySide isEqualTo _sidePlayer) exitWith {
+	MCC_MWisGenerating = false;
+	["MCC: the rival faction is on your own side - choose a Rival Side (East, West or Independent) in the Mission Generator."] spawn MCC_fnc_halt;
+};
+
 //What faction are we fighiting?
-// (the old check was "isnil" on a getText result, which is never nil - an empty faction errored on "select 0" instead)
+// (a getText result is never nil, so an empty faction is checked by its text)
 _enemyfaction = "";
 if (_mwFaction != "") then {_enemyfaction = _mwFaction};
 if (_enemyfaction == "" && {(missionNamespace getVariable ["U_GEN_SOLDIER",[]]) isEqualType []} && {count U_GEN_SOLDIER > 0}) then {
@@ -191,7 +203,8 @@ while {dialog} do {closedialog 0; sleep 0.2};
 		private _string = "";
 		private _footer = [];
 		private _yPos = safezoneY + 0.22 * safezoneH;
-		while {missionNamespace getVariable ["MCC_MWisGenerating",false]} do
+		private _giveUp = diag_tickTime + 390;	//(MK) never longer than 6.5 minutes (the builder's watchdog stops at 6)
+		while {(missionNamespace getVariable ["MCC_MWisGenerating",false]) && {diag_tickTime < _giveUp}} do
 		{
 			for [{_x=1},{_x<=10},{_x=_x+1}]  do //Create progress bar
 			{

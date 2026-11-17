@@ -29,7 +29,7 @@ if (MCC_debug) then
 	private _marker = "";
 	private _name = "";
 	_name = FORMAT ["Rpdblock_%1", ["roadblockMarker",1] call bis_fnc_counter];
-	_marker = createMarkerLocal[_name, _pos];
+	_marker = createMarkerLocal[_name, _pos]; [_marker] call MCCMK_fnc_genTag;
 	_marker setMarkerTypeLocal "mil_dot";
 	_marker setMarkerColorLocal "ColorRed";
 	_marker setMarkerSizeLocal[0.4, 0.4];
@@ -44,8 +44,8 @@ _unitsArray 	= [[_faction,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_c
 
 if (count _unitsArray >= 4) then {
 	_type = _unitsArray select round (random 4);
-	_group = creategroup _side;
-	_unit = _group createUnit [_type select 0,(_dummyObject modeltoworld [0,-1,0]) ,[],0.5,"NONE"];
+	_group = creategroup _side; [_group] call MCCMK_fnc_genTag;
+	_unit = _group createUnit [_type select 0,(_dummyObject modeltoworld [0,-1,0]) ,[],0.5,"NONE"]; [_unit] call MCCMK_fnc_genTag;
 	sleep 0.5;
 	_unit setBehaviour "SAFE";
 	_unit setUnitPos "UP";

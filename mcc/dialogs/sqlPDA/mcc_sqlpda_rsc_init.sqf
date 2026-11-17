@@ -54,7 +54,7 @@ MCC_fnc_mapDrawWPPDA =
 	{
 		_leader = (leader _x);
 		_groupControl = if ((isplayer _leader) || (getText (configfile >> "CfgVehicles" >> typeOF vehicle _leader >> "vehicleClass")== "Autonomous")) then {true} else {_x getvariable ["MCC_canbecontrolled",false]};	//Can we control this group
-		_haveGPS =  if (vehicle _leader != _leader) then {true} else {("ItemGPS" in (assignedItems _leader) || "B_UavTerminal" in (assignedItems _leader) || "MCC_Console" in (assignedItems _leader))};
+		_haveGPS =  if (vehicle _leader != _leader) then {true} else {(((assignedItems _leader) findIf {(_x isKindOf ["ItemGPS", configFile >> "CfgWeapons"]) || {_x isKindOf ["UavTerminal_base", configFile >> "CfgWeapons"]}}) >= 0)};
 		if (isnil "_haveGPS") then {_haveGPS = false};
 		if ((side _leader == side player) && alive _leader && _groupControl && ((MCC_ConsoleOnlyShowUnitsWithGPS && _haveGPS) || !MCC_ConsoleOnlyShowUnitsWithGPS)) then
 		{
@@ -142,7 +142,7 @@ _disp call
 			_wpArray = waypoints (group _leader);
 			_behaviour = behaviour _leader;
 			_groupControl = if ((isplayer _leader) || (getText (configfile >> "CfgVehicles" >> typeOF vehicle _leader >> "vehicleClass")== "Autonomous")) then {true} else {_x getvariable ["MCC_canbecontrolled",false]};	//Can we control this group
-			_haveGPS =  if (vehicle _leader != _leader) then {true} else {("ItemGPS" in (assignedItems _leader) || "B_UavTerminal" in (assignedItems _leader) || "MCC_Console" in (assignedItems _leader))};
+			_haveGPS =  if (vehicle _leader != _leader) then {true} else {(((assignedItems _leader) findIf {(_x isKindOf ["ItemGPS", configFile >> "CfgWeapons"]) || {_x isKindOf ["UavTerminal_base", configFile >> "CfgWeapons"]}}) >= 0)};
 			if (isnil "_haveGPS") then {_haveGPS = false};
 			if ((side _leader == side player) && alive _leader && _groupControl && ((MCC_ConsoleOnlyShowUnitsWithGPS && _haveGPS) || !MCC_ConsoleOnlyShowUnitsWithGPS)) then
 				{

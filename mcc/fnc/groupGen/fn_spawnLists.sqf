@@ -16,11 +16,15 @@ private _typeRow = if (_mode == "type" && {_evIndex >= 0}) then {_evIndex} else 
 if (_mode == "type") then {["DEBUG", "fn_spawnLists", "Type changed: event row %1, list row %2 (%3)", [_evIndex, lbCurSel _cType, _cType lbText (lbCurSel _cType)]] call MCC_fnc_log};	//(debug logging)
 private _groups = _typeRow == 1;
 if (_mode == "type" && {_evIndex >= 0}) then {MCC_spawnTypeMem = _typeRow};
-private _singles = ["Infantry", "Vehicles", "Tracked/Static", "Motorcycle", "Helicopter", "Fixed-wing", "Ship", "Ammo"];
+private _singles = ["Infantry", "Vehicles", "Tracked/Static", "Motorcycle", "Helicopter", "Fixed-wing", "Boat", "Ammo"];
 private _faction = missionNamespace getVariable ["mcc_faction", ""];
 private _wanted = [["units", "groups"] select _groups, _faction];
 private _built = _cBranch getVariable ["MCC_spawnBranchFor", []];
 private _mismatch = !(_built isEqualTo _wanted) || {lbSize _cBranch == 0};
+
+//(MK) Start (aircraft): shown for Helicopter and Fixed-wing single units - set here too, before the "sync" early exit
+{(_d displayCtrl _x) ctrlShow (!_groups && {(lbCurSel _cBranch) in [4, 5]})} forEach [3091, 3092];
+(_d displayCtrl 3093) ctrlEnable (!_groups && {!((lbCurSel _cBranch) in [0, 7])});	//(MK) Garage: vehicles only
 
 //"sync": nothing to do while the lists belong to what is shown
 if (_mode == "sync" && {!_mismatch}) exitWith {};
@@ -90,6 +94,8 @@ if (_groups) then {
 	};
 	(_d displayCtrl 3016) ctrlShow false;	//Empty: single units only
 	(_d displayCtrl 3017) ctrlShow false;
+	{(_d displayCtrl _x) ctrlShow false} forEach [3091, 3092];	//(MK) Start: aircraft only
+	(_d displayCtrl 3093) ctrlEnable false;	//(MK) Garage: not for groups
 } else {
 	_mem set [0, _b];
 	MCC_class_index = _b;
@@ -101,7 +107,19 @@ if (_groups) then {
 	} forEach _list;
 	(_d displayCtrl 3016) ctrlShow !(_b in [0, 7]);	//Empty
 	(_d displayCtrl 3017) ctrlShow !(_b in [0, 7]);
+	{(_d displayCtrl _x) ctrlShow (_b in [4, 5])} forEach [3091, 3092];	//(MK) Start: Helicopter and Fixed-wing only
+	if (_b in [4, 5]) then {["panel"] spawn MCCMK_fnc_spawnStartRefresh};
+	(_d displayCtrl 3093) ctrlEnable !(_b in [0, 7]);	//(MK) Garage: vehicles only
 	if (_b == 7) then {MCC_isEmpty = true};
+};
+//(MK) each row carries its place in the full list (MCCMK_fnc_classRow reads it), then the class search narrows the list
+for "_r" from 0 to ((lbSize _cClass) - 1) do {_cClass lbSetValue [_r, _r]};
+_cClass setVariable ["MCCMK_classValues", true];
+private _flt = uiNamespace getVariable ["MCCMK_classFilter", ""];
+if (_flt != "") then {
+	for "_r" from ((lbSize _cClass) - 1) to 0 step -1 do {
+		if (((toLower (_cClass lbText _r)) find _flt) < 0) then {_cClass lbDelete _r};
+	};
 };
 missionNamespace setVariable ["MCC_spawnBranchMem", _mem];
 //its first row, e.g. after a spawn closed the panel). The memory is kept in missionNamespace as
@@ -113,14 +131,15 @@ if !(_cClass getVariable ["MCC_spawnClassEH", false]) then {
 	_cClass ctrlAddEventHandler ["LBSelChanged", {
 		params ["_c", "_i"];
 		if (_i >= 0 && {!(missionNamespace getVariable ["MCC_spawnListsBusy", false])}) then {
-			missionNamespace setVariable [_c getVariable ["MCC_spawnClassKey", "MCC_spawnClassMem_none"], _i];
+			missionNamespace setVariable [_c getVariable ["MCC_spawnClassKey", "MCC_spawnClassMem_none"], _c lbValue _i];
 		};
 	}];
 };
 MCC_spawnListsBusy = false;
-private _classRow = missionNamespace getVariable [_classKey, 0];
-if (_classRow < 0 || {_classRow >= lbSize _cClass}) then {_classRow = 0};
-_cClass lbSetCurSel _classRow;
+private _classWant = missionNamespace getVariable [_classKey, 0];
+private _classRow = 0;
+for "_r" from 0 to ((lbSize _cClass) - 1) do {if ((_cClass lbValue _r) == _classWant) exitWith {_classRow = _r}};
+if ((lbSize _cClass) > 0) then {_cClass lbSetCurSel _classRow};
 
 //Buttons that belong to Units (add to list, the list, save) or Groups
 {(_d displayCtrl _x) ctrlShow !_groups} forEach [3013, 3014, 3015, 3018, 3019, 3020, 9003];

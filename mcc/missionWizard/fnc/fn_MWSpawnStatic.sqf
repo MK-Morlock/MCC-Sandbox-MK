@@ -69,7 +69,7 @@ if (count _arrayUnits > 0) then {
 		MCC_MWStaticUsed = MCC_MWStaticUsed select {(_x isEqualType []) && {!isNull (_x select 1)} && {alive (_x select 1)}};
 		if ((MCC_MWStaticUsed findIf {((_x select 0) distance2D _pos) < 35}) >= 0) then {continue};
 		if (_artillery == 999) then {_vehicleClass = (selectRandom _arrayUnits) select 1};
-		_group = createGroup _side;
+		_group = createGroup _side; [_group] call MCCMK_fnc_genTag;
 
 		//Spawn the static pieces
 		for "_x" from 1 to _perSpawn step 1 do {
@@ -83,7 +83,7 @@ if (count _arrayUnits > 0) then {
 				sleep 0.1;
 			};
 
-			_vehicle = [_spawnPos, (random 360), _vehicleClass, _group] call MCC_fnc_spawnVehicle;
+			_vehicle = [_spawnPos, (random 360), _vehicleClass, _group, true, true, if (count _arrayUnits > 0) then {getText (configFile >> "CfgVehicles" >> ((_arrayUnits select 0) param [1, ""]) >> "faction")} else {""}] call MCC_fnc_spawnVehicle;
 			MCC_MWStaticUsed pushBack [_spawnPos, _vehicle select 0];
 			{_x addCuratorEditableObjects [[_vehicle select 0],true]} forEach allCurators;
 			(_vehicle select 2) setVariable ["GAIA_ZONE_INTEND",[str _zone,"NOFOLLOW"], true];
@@ -95,7 +95,7 @@ if (count _arrayUnits > 0) then {
 			private _markers = [];
 			private _range = 50 + (random 200);
 			_pos = (_pos getPos [_range,random 360]);
-			_marker = createMarker [format ["MCC_MWArtillery_%1",(["MCC_MWArtilleryMarkerCounter",1] call BIS_fnc_counter)],_pos];
+			_marker = createMarker [format ["MCC_MWArtillery_%1",(["MCC_MWArtilleryMarkerCounter",1] call BIS_fnc_counter)],_pos]; [_marker] call MCCMK_fnc_genTag;
 			_marker setMarkerShape "ICON";
 			_marker setMarkerType "mil_warning";
 			_marker setMarkerColor "ColorRed";
@@ -103,7 +103,7 @@ if (count _arrayUnits > 0) then {
 
 			_markers pushBack _marker;
 
-			_marker = createMarker [format ["MCC_MWArtillery_%1",(["MCC_MWArtilleryMarkerCounter",1] call BIS_fnc_counter)],_pos];
+			_marker = createMarker [format ["MCC_MWArtillery_%1",(["MCC_MWArtilleryMarkerCounter",1] call BIS_fnc_counter)],_pos]; [_marker] call MCCMK_fnc_genTag;
 			_marker setMarkerShape "ELLIPSE";
 			_marker setMarkerType "hd_marker";
 			_marker setMarkerColor "ColorRed";

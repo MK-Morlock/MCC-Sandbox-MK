@@ -44,9 +44,9 @@ MCC_MWcreateHostage =
 		["_type", "", [""]]
 	];
 
-	_group = creategroup _side;
+	_group = creategroup _side; [_group] call MCCMK_fnc_genTag;
 	_rank = ["PRIVATE","CORPORAL","SERGEANT","LIEUTENANT"] select (floor random 3);
-	_unit = _group createUnit [_type, _spawnPos,[],0.5,"NONE"];
+	_unit = _group createUnit [_type, _spawnPos,[],0.5,"NONE"]; [_unit] call MCCMK_fnc_genTag;
 	waituntil {alive _unit};
 	_unit setPos _spawnPos;
 	_unit setrank _rank;
@@ -71,12 +71,16 @@ _fnc_findHVTClass = {
 	//Random unit or from MCC_MWHVT variable
 	if (_random) then {
 		_unitsArray	= [[[_faction ,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry, _faction] call MCC_fnc_contentFilterList;
-		while {_hvtClass == ""} do {_hvtClass = (_unitsArray call BIS_fnc_selectRandom) select 0};
+		//(MK) one of its soldiers; none (a faction with no soldiers): a family faction's (its pools), then the side's
+		// vanilla officer.
+		if (_unitsArray isNotEqualTo []) then {_hvtClass = (selectRandom _unitsArray) select 0};
+		if (_hvtClass == "") then {private _pi = [_faction, "Inf"] call MCCMK_fnc_pool; if (_pi isNotEqualTo []) then {_hvtClass = selectRandom _pi}};
+		if (_hvtClass == "") then {_hvtClass = ["B_officer_F", "O_officer_F", "I_officer_F", "C_Nikos"] select (([west, east, resistance] find _side) max 0 min 3); if !(_side in [west, east, resistance]) then {_hvtClass = "C_Nikos"}};
 
 	} else {
 		_HVTClasses = missionNamespace getVariable ["MCC_MWHVT",["B_officer_F","O_officer_F","I_officer_F","C_Nikos"]];
 
-		//An officer of the faction (or its mod) first - the HVT was always a vanilla officer. Only while the HVT list is
+		//An officer of the faction (or its mod) first. Only while the HVT list is
 		//still the default one: a list set by the mission maker (CBA setting or module) is used as it is.
 		//A list chosen on the console Assets page: one of its entries at random
 		if (missionNamespace getVariable ["MCC_assetCustom_MCC_MWHVT", false]) then {_hvtClass = selectRandom _HVTClasses};
@@ -99,7 +103,11 @@ _fnc_findHVTClass = {
 		//Can't find - select random
 		if (_hvtClass == "") then {
 			_unitsArray	= [[[_faction ,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry, _faction] call MCC_fnc_contentFilterList;
-			while {_hvtClass == ""} do {_hvtClass = (_unitsArray call BIS_fnc_selectRandom) select 0};
+			//(MK) one of its soldiers; none (a faction with no soldiers): a family faction's (its pools), then the
+			// side's vanilla officer.
+		if (_unitsArray isNotEqualTo []) then {_hvtClass = (selectRandom _unitsArray) select 0};
+		if (_hvtClass == "") then {private _pi = [_faction, "Inf"] call MCCMK_fnc_pool; if (_pi isNotEqualTo []) then {_hvtClass = selectRandom _pi}};
+		if (_hvtClass == "") then {_hvtClass = ["B_officer_F", "O_officer_F", "I_officer_F", "C_Nikos"] select (([west, east, resistance] find _side) max 0 min 3); if !(_side in [west, east, resistance]) then {_hvtClass = "C_Nikos"}};
 		};
 	};
 
@@ -147,7 +155,7 @@ _unit setVariable ["MCC_homeSide", _side, true];
 			_unitPlaced = true;
 
 			//Lets spawn some body guards
-			[getpos _unit,30,0,2,_faction, _side] remoteExec ["MCC_fnc_garrison", 2,false];
+			(if (isServer) then {[[getpos _unit,30,0,2,_faction, _side], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_garrison"] spawn MCCMK_fnc_genRun} else {[getpos _unit,30,0,2,_faction, _side] remoteExec ["MCC_fnc_garrison", 2,false]});
 		};
 	};
 };
@@ -162,10 +170,10 @@ if (!_unitPlaced) then {
 
 	//Open area
 	_objPos = [_objPos] call MCC_fnc_buildRandomComposition;
-	[_objPos,30,0,4,_faction, _side] remoteExec ["MCC_fnc_garrison",2];
-	[_objPos, 30, 4, _faction, _side] remoteExec ["MCC_fnc_MWcampGuards", 2];
+	(if (isServer) then {[[_objPos,30,0,4,_faction, _side], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_garrison"] spawn MCCMK_fnc_genRun} else {[_objPos,30,0,4,_faction, _side] remoteExec ["MCC_fnc_garrison",2]});
+	(if (isServer) then {[[_objPos, 30, 4, _faction, _side], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_MWcampGuards"] spawn MCCMK_fnc_genRun} else {[_objPos, 30, 4, _faction, _side] remoteExec ["MCC_fnc_MWcampGuards", 2]});
 
-	_group = creategroup _side;
+	_group = creategroup _side; [_group] call MCCMK_fnc_genTag;
 
 	private _fnc_insidePos = {
 		private _res = [];
@@ -218,7 +226,7 @@ if (!_unitPlaced) then {
 		if (count _spawnPos == 0) then {_spawnPos = +_objPos};
 
 		if (_walking) then {
-			_unit = _group createUnit [_type ,_spawnPos,[],0.5,"NONE"];
+			_unit = _group createUnit [_type ,_spawnPos,[],0.5,"NONE"]; [_unit] call MCCMK_fnc_genTag;
 			waituntil {alive _unit};
 
 			//Add to zeus
@@ -250,7 +258,7 @@ _unit setVariable ["MCC_homeSide", _side, true];
 		_spawnPos = [getPos _unit, _type select 0, 32] call MCC_fnc_clearVehicleSpot;
 		if (count _spawnPos == 0) then {_spawnPos = (getpos _unit) findEmptyPosition [0,100,(_type select 0)]};
 		if (count _spawnPos == 0) then {_spawnPos = getpos _unit};
-		_unit = _group createUnit [_type select 0,_spawnPos,[],0.5,"NONE"];
+		_unit = _group createUnit [_type select 0,_spawnPos,[],0.5,"NONE"]; [_unit] call MCCMK_fnc_genTag;
 		waituntil {alive _unit};
 
 		//Add to zeus

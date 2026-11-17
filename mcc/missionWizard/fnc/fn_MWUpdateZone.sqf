@@ -25,7 +25,7 @@ missionNamespace setVariable ["MCC_zones_numbers",_zones];
 
 mcc_zone_pos  set [_zoneNumber, _pos];
 mcc_zone_size set [_zoneNumber,[_zone_marker_X,_zone_marker_Y]];
-mcc_zone_dir set [_zoneNumber,_dir];	//was always 0, so rotated zones (e.g. Front Lines) were drawn unrotated
+mcc_zone_dir set [_zoneNumber,_dir];	//the zone's rotation (e.g. Front Lines' rotated zones)
 mcc_zone_locations set [_zoneNumber,0];
 
 publicVariable "mcc_zone_pos";

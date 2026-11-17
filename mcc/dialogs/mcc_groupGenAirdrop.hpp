@@ -42,7 +42,7 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		class MCC_airdropFilterFaction: MCC_RscCheckbox
 		{
 			idc = 1039;
-			tooltip = "Ticked: only your faction's aircraft (and its variants). Unticked: every aircraft on your side";
+			tooltip = "Ticked: only your faction's aircraft (and its variants).\nUnticked: every aircraft on your side";
 			x = 0.033000* safezoneW;
 			y = 0.048000* safezoneH;
 			w = 0.010500* safezoneW;
@@ -53,7 +53,7 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		{
 			style = 1;
 			colorText[] = {0.62,0.65,0.68,1};
-			idc = -1;
+			idc = 1104;	//(MK) hidden for a Taru pod
 			text = "Faction";
 			x = 0.008000* safezoneW;
 			y = 0.046000* safezoneH;
@@ -75,7 +75,7 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		{
 			style = 1;
 			colorText[] = {0.62,0.65,0.68,1};
-			idc = -1;
+			idc = 1105;	//(MK) hidden for a Taru pod
 			text = "Helicopters";
 			x = 0.049500* safezoneW;
 			y = 0.046000* safezoneH;
@@ -97,7 +97,7 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		{
 			style = 1;
 			colorText[] = {0.62,0.65,0.68,1};
-			idc = -1;
+			idc = 1106;	//(MK) hidden for a Taru pod
 			text = "Planes";
 			x = 0.103000* safezoneW;
 			y = 0.046000* safezoneH;
@@ -107,7 +107,7 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		};
 		class MCC_airdropSearchClear: MCCBTN_S
 		{
-			idc = -1;
+			idc = 1107;	//(MK) hidden for a Taru pod
 			text = "Clear";
 			tooltip = "Clear the aircraft search";
 			x = 0.215429* safezoneW;
@@ -140,10 +140,10 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		class MCC_airdropInsertionType: MCC_RscToolbox
 		{
 			idc = 1037;
-			strings[] = {" Parachute "," Slingload "};
+			strings[] = {" Parachute "," Slingload "," Taru Pod "};	//(MK) Taru Pod: a supply pod, free for the mission maker
 			rows = 1;
-			columns = 2;
-			values[] = {0,1};
+			columns = 3;
+			values[] = {0,1,2};
 			onToolBoxSelChanged =  __EVAL("[3,(_this select 1)] execVM '"+MCCPATH+"mcc\general_scripts\cas\airdropReq.sqf'");
 
 			x = 0.008000* safezoneW;
@@ -153,6 +153,94 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
 		};
 
+		// (MK) Taru Pod (the third insertion choice): which pod, how it's delivered - MCCMK_fnc_airdropPodMode shows these (idc 1104-1115)
+		class MCCMK_airdropPodTitle: MCC_RscText
+		{
+			idc = 1111;
+			text = "Pod";
+			x = 0.008000* safezoneW;
+			y = 0.136000* safezoneH;
+			w = 0.040000* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCCMK_airdropPodCombo: MCC_RscCombo
+		{
+			idc = 1112;
+			tooltip = "Which supply pod the Taru brings";
+			onLBSelChanged = "if (isNil 'MCCMK_adMem') then {MCCMK_adMem = createHashMap}; MCCMK_adMem set ['podType', _this select 1]";
+			x = 0.008000* safezoneW;
+			y = 0.136000* safezoneH;
+			w = 0.099714* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+		};
+		class MCCMK_airdropPodMethodTitle: MCC_RscText
+		{
+			idc = 1113;
+			text = "Delivery";
+			x = 0.008000* safezoneW;
+			y = 0.166000* safezoneH;
+			w = 0.040000* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCCMK_airdropPodMethod: MCC_RscToolbox
+		{
+			idc = 1114;
+			strings[] = {" Parachute "," Winch "};
+			rows = 1;
+			columns = 2;
+			values[] = {0,1};
+			tooltip = "Parachute: dropped from the air. Winch: the Taru lowers it on\nits ropes";
+			onToolBoxSelChanged = "if (isNil 'MCCMK_adMem') then {MCCMK_adMem = createHashMap}; MCCMK_adMem set ['podMethod', _this select 1]; [true] call MCCMK_fnc_airdropPodMode";
+			x = 0.111714* safezoneW;
+			y = 0.136000* safezoneH;
+			w = 0.099714* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCCMK_airdropPodHeightText: MCC_RscText
+		{
+			idc = 1117;
+			text = "Height";
+			x = 0.008000* safezoneW;
+			y = 0.214000* safezoneH;
+			w = 0.099714* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
+		};
+		class MCCMK_airdropPodHeight: MCC_RscCombo
+		{
+			idc = 1118;
+			tooltip = "Flight height for the Taru's parachute drop";
+			onLBSelChanged = "if (isNil 'MCCMK_adMem') then {MCCMK_adMem = createHashMap}; MCCMK_adMem set ['podHeight', (_this select 0) lbValue (_this select 1)]";
+			x = 0.008000* safezoneW;
+			y = 0.232000* safezoneH;
+			w = 0.072000* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+		};
+		class MCCMK_airdropPodSmokeText: MCC_RscText
+		{
+			idc = 1115;
+			text = "Smoke";
+			x = 0.008000* safezoneW;
+			y = 0.196000* safezoneH;
+			w = 0.040000* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
+		class MCCMK_airdropPodSmoke: MCC_RscCheckbox
+		{
+			idc = 1116;
+			tooltip = "Ticked: the pod is marked with green smoke where it lands";
+			x = 0.082500* safezoneW;
+			y = 0.234000* safezoneH;
+			w = 0.010500* safezoneW;
+			h = 0.018000* safezoneH;
+			onCheckedChanged = "if (isNil 'MCCMK_adMem') then {MCCMK_adMem = createHashMap}; MCCMK_adMem set ['podSmoke', (_this select 1) == 1]";
+		};
 		class MCC_airdropTypeCombo: MCC_RscCombo
 		{
 			idc = MCC_AIRDROPTYPE;
@@ -216,6 +304,18 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 			tooltip = "Clear the current airdrop list"; //--- ToDo: Localize;
 			onButtonClick = __EVAL("[2] execVM '"+MCCPATH+"mcc\general_scripts\cas\airdropReq.sqf'");
 		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_airdropGarage: MCCBTN_S
+		{
+			idc = 1119;
+			text = "Garage";
+			tooltip = "Paint and parts for the chosen vehicle.\nKept in your profile, used whenever it is spawned here.\nCtrl + click: back to its own look.";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['airdrop', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.215429* safezoneW;
+			y = 0.208000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
+		};
 		class MCC_airdropCall: MCCBTN_S
 		{
 			idc = -1;
@@ -229,7 +329,7 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		};
 		class MCC_airdropHeliHeightTittle: MCC_RscText
 		{
-			idc = -1;
+			idc = 1108;	//(MK) hidden for a Taru pod
 
 			text = "Helicopters";
 			x = 0.008000* safezoneW;
@@ -252,7 +352,7 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		};
 		class MCC_airdropPlaneHeightTittle: MCC_RscText
 		{
-			idc = -1;
+			idc = 1109;	//(MK) hidden for a Taru pod
 
 			text = "Planes";
 			x = 0.111714* safezoneW;
@@ -315,7 +415,7 @@ class MCC_airdropDialogControls:MCC_RscControlsGroup
 		};
 		class MCC_airdropAddConsole: MCCBTN_S
 		{
-			idc = -1;
+			idc = 1110;	//(MK) hidden for a Taru pod
 
 			text = "Add Console"; //--- ToDo: Localize;
 			x = 0.154129* safezoneW;

@@ -45,7 +45,7 @@ switch (_case) do {
 			MCC_activeMarkers = MCC_activeMarkers - [_text];
 		};
 
-		createMarker [_text, _pos];
+		createMarker [_text, _pos]; [_text] call MCCMK_fnc_genTag;
 		_text setMarkerColor _color;
 		_text setMarkerType  _type;
 		_text setmarkertext _text;
@@ -60,7 +60,7 @@ switch (_case) do {
 			MCC_activeMarkers = MCC_activeMarkers - [_text];
 		};
 
-		createMarker [_text, _pos];
+		createMarker [_text, _pos]; [_text] call MCCMK_fnc_genTag;
 		_text setMarkerColor _color;
 		_text setMarkerSize _size;
 		_text setMarkerShape  _shape;

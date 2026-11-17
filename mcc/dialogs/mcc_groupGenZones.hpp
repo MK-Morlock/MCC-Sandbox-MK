@@ -1,7 +1,7 @@
 class MCC_zoneControls: MCC_RscControlsGroup
 {
-	idc = -1;
-	x = 0.198000 * safezoneW + safezoneX;
+	idc = 9303;
+	x = 0.211812 * safezoneW + safezoneX;
 	y = 0.603076 * safezoneH + safezoneY;
 	w = 0.155 * safezoneW;
 	h = 0.026000 * safezoneH;

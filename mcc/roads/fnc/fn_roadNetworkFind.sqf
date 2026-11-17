@@ -140,7 +140,7 @@ _info =  format [ "explored : %1\n\n
 			   Roads\n%5\n\n
 			   Time taken: %6", count( _results select 0 ), count( _results select 1 ), count( _results select 2 ), count ( _results select 3 ) , count ( _results select 4 ), time - _startTime];
 
-if (_debug) then {hint _info};
+if (_debug) then {[_info] call MCCMK_fnc_hint};
 
 
 _results params ["_explored","_ends","_loops","_junctions","_availableRoads"];

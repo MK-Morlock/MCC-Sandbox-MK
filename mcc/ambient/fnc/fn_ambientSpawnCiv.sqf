@@ -170,8 +170,16 @@ for "_i" from 1 to _counter do {
 
 			private _wpHouses = _nearHouses select {private _h = _x; !([getPosATL _h, side _civGroup] call MCCMK_fnc_inKeepOutZone) && {(_deniedZones findIf {_h distance _x < (_x getVariable ["radius", 100])}) < 0}};
 			if (count _wpHouses > 0) then {
+			private _prev = getPosATL _unit;
 			for "_i" from 0 to MAX_WP do {
-				_building = _wpHouses call bis_fnc_selectRandom;
+				private _pick = objNull;
+				for "_k" from 1 to 10 do {
+					private _hh = _wpHouses call bis_fnc_selectRandom;
+					if !([_prev, getPosATL _hh, side _civGroup] call MCCMK_fnc_crossesKeepOut) exitWith {_pick = _hh};
+				};
+				if (isNull _pick) exitWith {};
+				_building = _pick;
+				_prev = getPosATL _building;
 
 				_wp = _civGroup addWaypoint [(getPos _building), 0];
 				_wp setWaypointType "MOVE";

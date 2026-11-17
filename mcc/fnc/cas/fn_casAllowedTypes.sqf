@@ -73,5 +73,13 @@ private _ok = {
 	};
 };
 private _result = _all select {[_x] call _ok};
+//(MK) Air Patrol (MCCMK_fnc_airPatrol): an armed helicopter, combat jet or drone, loaded as chosen - Mixed needs both
+// air-to-air and ground weapons, Air air-to-air, Ground ground weapons (what its pylons and own weapons can take)
+if (_class isKindOf "Air" && {!(_class isKindOf "ParachuteBase")}) then {
+	([_class] call MCCMK_fnc_airPatrolCaps) params ["_apAA", "_apAG"];
+	if (_apAA && _apAG) then {_result pushBack "Air Patrol (Mixed)"};
+	if (_apAA) then {_result pushBack "Air Patrol (Air)"};
+	if (_apAG) then {_result pushBack "Air Patrol (Ground)"};
+};
 _cache set [toLower _class, _result];
 _result

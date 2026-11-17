@@ -4,8 +4,8 @@
 [
     "MCC_saveGearIndex",
     "CHECKBOX",
-    ["Save Gear","Players will respawn with the gear they had when they died"],
-    ["MCC Respawn","Respawn"],
+    ["Save Gear","Players will respawn with the gear they had when they\ndied"],
+    ["MCCMK Respawn", "Respawn"],
     false,
     true
 ] call CBA_Settings_fnc_init;
@@ -15,7 +15,7 @@
     "MCC_deletePlayersBody",
     "CHECKBOX",
     ["Delete players bodies","Automatically delete players bodies"],
-    ["MCC Respawn","Respawn"],
+    ["MCCMK Respawn", "Respawn"],
     false,
     true
 ] call CBA_Settings_fnc_init;
@@ -26,7 +26,7 @@
     "MCC_openRespawnMenu",
     "CHECKBOX",
     ["Respawn Menu","Custom MCC respawn menu"],
-    ["MCC Respawn","Respawn"],
+    ["MCCMK Respawn", "Respawn"],
     true,
     true
 ] call CBA_Settings_fnc_init;
@@ -36,7 +36,7 @@
     "MCC_respawnCinematic",
     "CHECKBOX",
     "Respawn Cinematic",
-    ["MCC Respawn","Respawn"],
+    ["MCCMK Respawn", "Respawn"],
     true,
     true
 ] call CBA_Settings_fnc_init;
@@ -45,8 +45,8 @@
 [
     "MCC_respawnOnGroupLeader",
     "CHECKBOX",
-    ["Respawn On Leader","Allow player to select to respawn on team leader from the MCC respawn menu"],
-    ["MCC Respawn","Respawn"],
+    ["Respawn On Leader","Allow player to select to respawn on team leader from\nthe MCC respawn menu"],
+    ["MCCMK Respawn", "Respawn"],
     false,
     true
 ] call CBA_Settings_fnc_init;

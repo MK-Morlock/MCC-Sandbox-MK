@@ -52,7 +52,7 @@ _sbspeed 	= ["LIMITED","NORMAL","FULL"];
 
 removeallweapons _sb;
 
-_dummy = MCC_dummy createVehicle (getpos _sb);
+_dummy = MCC_dummy createVehicle (getpos _sb); [_dummy] call MCCMK_fnc_genTag;
 _init = '_this hideobject true;';
 ["MCC_fnc_setVehicleInit", [[netid _dummy,_dummy], _init], 0, true] call MCC_fnc_secRemote;
 
@@ -68,7 +68,7 @@ _check = true;
 
 while {alive _sb && _check} do {
 	sleep 1;
-	_close = (getPos _sb) nearObjects 100;
+	_close = (getPos _sb) nearObjects (missionNamespace getVariable ["MCC_bomberReactDist", 100]);
 
 	if({side _x in _iedside} count _close > 0) then {
 
@@ -86,7 +86,7 @@ while {alive _sb && _check} do {
 						//Revel demo charges
 						private _exp = objNull;
 						{
-							_exp = MCC_MANAGESB_IED createVehicle position _sb;
+							_exp = MCC_MANAGESB_IED createVehicle position _sb; [_exp] call MCCMK_fnc_genTag;
 							_exp attachTo [_sb, (_x select 0), "Pelvis"];
 							_exp setVectorDirAndUp (_x select 1);
 						} forEach [ [[-0.1, 0.1, 0.15],[ [0.5, 0.5, 0], [-0.5, 0.5, 0] ]],

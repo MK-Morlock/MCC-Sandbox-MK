@@ -1,0 +1,40 @@
+params [["_s", objNull, [objNull]], ["_w", objNull, [objNull]], ["_kind", "gun", [""]], ["_tgt", [], [[]]], ["_laser", objNull, [objNull]], ["_u", objNull, [objNull]]];
+if (!isServer || {isNull _s} || {isNull _w} || {!alive _w} || {isNull _u} || {count _tgt < 2}) exitWith {};
+private _side = _s getVariable ["MCC_side", sideUnknown];
+private _name = _s getVariable ["MCC_LHDDisplayName", "Ship"];
+private _say = {params ["_m"]; [_m] remoteExec ["MCCMK_fnc_hint", _u]};
+if !([_u] call MCCMK_fnc_navalCan) exitWith {["Only the commander or a squad leader can call naval fire."] call _say};
+if !(_s getVariable [["MCCMK_navalVLS", "MCCMK_navalGuns"] select (_kind == "gun"), false]) exitWith {[format ["%1 isn't switched on for fire support (Ship status).", ["The VLS", "The gun"] select (_kind == "gun")]] call _say};
+private _cdVar = format ["MCCMK_navalCD_%1", _kind];
+if ((_s getVariable [_cdVar, 0]) > serverTime) exitWith {["That weapon isn't ready yet."] call _say};
+if (_kind == "vls" && {isNull _laser}) exitWith {["Missiles need a laser target."] call _say};
+([_kind] call MCCMK_fnc_navalCost) params ["_cost", "_cd"];
+private _var = format ["MCC_res%1", _side];
+private _r = +(missionNamespace getVariable [_var, [0, 0, 0, 0, 0]]);
+if ((_r select 0) < (_cost select 0) || {(_r select 2) < (_cost param [1, 0])}) exitWith {["Not enough resources for naval fire."] call _say};
+_r set [0, (_r select 0) - (_cost select 0)];
+_r set [2, (_r select 2) - (_cost param [1, 0])];
+missionNamespace setVariable [_var, _r];
+publicVariable _var;
+_s setVariable [_cdVar, serverTime + _cd, true];
+_s setVariable ["MCCMK_awareAdd", (_s getVariable ["MCCMK_awareAdd", 0]) + 10];
+private _tgtAGL = ASLToAGL _tgt;
+if (_kind == "gun") then {
+	private _mag = ((getArtilleryAmmo [_w]) select {"he" in toLower _x}) param [0, currentMagazine _w];
+	private _eta = round (_w getArtilleryETA [_tgtAGL, _mag]);
+	_w doArtilleryFire [_tgtAGL, _mag, 5];
+	[format ["%1: shot, 5 rounds, splash in about %2 s.", _name, _eta max 1]] call _say;
+	[_u, _name, _eta] spawn {params ["_u", "_name", "_eta"]; sleep (_eta max 1); [format ["%1: splash.", _name]] remoteExec ["MCCMK_fnc_hint", _u]};
+} else {
+	_w reveal [_laser, 4];
+	(gunner _w) doWatch _laser;
+	(gunner _w) doTarget _laser;
+	[_w, _laser, _u, _name] spawn {
+		params ["_w", "_laser", "_u", "_name"];
+		sleep 3;
+		_w fireAtTarget [_laser, currentWeapon _w];
+		private _eta = round ((_w distance _laser) / 250);
+		[format ["%1: missile away, about %2 s - keep the laser on the target.", _name, _eta max 5]] remoteExec ["MCCMK_fnc_hint", _u];
+	};
+};
+["INFO", "naval", "%1 called %2 from %3 on grid %4 (%5)", [name _u, _kind, _name, mapGridPosition _tgtAGL, _cost]] call MCC_fnc_log;

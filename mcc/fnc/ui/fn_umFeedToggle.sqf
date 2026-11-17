@@ -38,6 +38,7 @@ if (_on) then {
 	if (!isNil "MCC_PIPcam" && {!isNull MCC_PIPcam}) then {
 		MCC_PIPcam cameraEffect ["TERMINATE", "BACK"];
 		camDestroy MCC_PIPcam;
+		["restore"] call MCCMK_fnc_feedDist;
 	};
 	MCC_pipState = [];
 	(_d displayCtrl MCC_UM_PIC) ctrlSetText "";

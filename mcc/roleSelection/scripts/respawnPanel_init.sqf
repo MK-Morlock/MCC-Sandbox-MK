@@ -140,6 +140,9 @@ MCC_fnc_CPMapOpen_draw =
 			if (_x isKindOf "air" || _x isKindOf "car" || _x isKindOf "tank" || _x isKindOf "ship") then {
  				_title = format ["%1- %2",(_foreachIndex +1), getText (configfile >> "CfgVehicles" >> typeof _x >> "displayName")];
 			};
+			if (typeName _x != "GROUP" && {((_x getVariable ["MCCMK_repositionUntil", 0]) - serverTime) > 0}) then {
+				_title = _title + " (arriving " + ([((_x getVariable ["MCCMK_repositionUntil", 0]) - serverTime), "MM:SS"] call BIS_fnc_secondsToString) + ")";
+			};
 
 			_texture = format ["\A3\Ui_f\data\Map\GroupIcons\badge_rotate_%1_gs.paa",_textureAnimPhase];
 

@@ -16,7 +16,8 @@ private _group = [];
 private _unitsArray = [];
 private _type = "";
 private _unit = objNull;
-params ["_vehicle"];
+params ["_vehicle", ["_fac", "", [""]]];
+if (_fac == "") then {_fac = faction _vehicle};	//(MK) optional: the faction to fill it with (default: the vehicle's own)
 _pos = getPosATL _vehicle;
 
 //Define Stuff
@@ -39,7 +40,7 @@ if (_cargoNum > 2) then {
 			{
 				_convoyGroupArray set [count _convoyGroupArray, format ["%1", ( _x select 2)]];
 			};
-		} forEach ([side _vehicle, faction _vehicle, "Infantry", "LAND"] call mcc_make_array_grps);
+		} forEach ([side _vehicle, _fac, "Infantry", "LAND"] call mcc_make_array_grps);
 
 		While { true } do {
 
@@ -48,18 +49,15 @@ if (_cargoNum > 2) then {
 				sleep 0.1;
 			} else {
 				// no default groups found so let's build the faction custom unit's array
-				_unitsArray = [];
-
-				{
-					_unitsArray	set [ count _unitsArray, _x select 0];
-				} foreach ( [[faction _vehicle,"soldier"] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry );
+				//(MK) the faction's infantry pool (MCCMK_fnc_pools: own content, then official DLC, then all; none: a sibling
+				// faction's - never a vanilla soldier), picked by its weights (riflemen more often than specialists)
+				_unitsArray = [_fac, "InfMen"] call MCCMK_fnc_pool;	// ordinary soldiers, as the original
 
 
 				if !( (count _unitsArray) == 0 ) then {
 					_group = creategroup side _vehicle;
 					for [{_i=1},{_i<=_fillSlots},{_i=_i+1}] do {
-						// select random type soldier - assuming pilots, divers etc are above type #5 in the array
-						_type = _unitsArray select round (random (5 min (count _unitsArray-1)));
+						_type = selectRandom _unitsArray;
 						_unit = _group createUnit [_type, _locGr, [], 0.5, "NONE"];
 						sleep 0.1;
 					};

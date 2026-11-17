@@ -36,7 +36,7 @@ if (count _samPos == 0) then {_samPos = _center findEmptyPosition [40, (_radius 
 if (count _samPos == 0) exitWith {["INFO", "MCC_fnc_MWSpawnAirDefence", "no clear spot for the air-defence site near %1", [mapGridPosition _center]] call MCC_fnc_log};
 private _fnc_place = {
 	params ["_pos", "_class"];
-	private _v = [_pos, random 360, _class, _side] call MCC_fnc_spawnVehicle;
+	private _v = [_pos, random 360, _class, _side, true, true, if (count _arrayUnits > 0) then {getText (configFile >> "CfgVehicles" >> ((_arrayUnits select 0) param [1, ""]) >> "faction")} else {""}] call MCC_fnc_spawnVehicle;
 	(_v select 2) setVariable ["GAIA_ZONE_INTEND", [str _zone, "NOFOLLOW"], true];
 	{_x addCuratorEditableObjects [[_v select 0], true]} forEach allCurators;
 	MCC_MWStaticUsed pushBack [_pos, _v select 0];

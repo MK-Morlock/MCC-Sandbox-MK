@@ -44,7 +44,9 @@ _ctrl = _this select 4;
 _alt = _this select 5;
 _properCfg = 8; 		//if the cfg file is good then take from array number 8  else false - count on sim not vehicleClass take from array 5
 
+if (_button == 0 && {["active"] call MCCMK_fnc_wpChain}) exitWith {};
 if (isnil "MCC_GroupGenGroupSelected") then {MCC_GroupGenGroupSelected = []};
+MCC_UMFocus = false;
 
 if ((_button == 0) && (_ctrl)) then 													//multi-select
 	{

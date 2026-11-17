@@ -83,7 +83,7 @@ if (_stats) then {
 	_var = missionNameSpace getVariable [_varName,[]];
 
 	player setDamage (_var param [0,0]);
-	player setVariable ["MCC_valorPoints",(_var param [1,50]),true];
+	//(MK) Valor comes from the per-campaign record (MCCMK_fnc_creditRestore), not this map + mission one
 	player setVariable ["MCC_calories",(_var param [2,4000]),true];
 	player setVariable ["MCC_water",(_var param [3,200]),true];
 	player setVariable ["MCC_surviveIsSick",(_var param [4,false]),true];

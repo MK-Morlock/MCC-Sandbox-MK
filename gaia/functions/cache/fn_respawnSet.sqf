@@ -20,7 +20,7 @@ if (_respawnNumber > 0) then {
      _group setVariable ["MCC_GAIA_RESPAWN",_respawnNumber,true];
 
      if (alive leader _group) then {
-        _group setVariable ["MCC_GAIA_RESPAWN_POSITON",getPosASL (leader _group),true];	// ASL: it is restored with ASL commands (getpos is AGL and put respawned units underground on high ground)
+        _group setVariable ["MCC_GAIA_RESPAWN_POSITON",getPosASL (leader _group),true];	// ASL: it is restored with ASL commands (getpos is AGL, which would put respawned units underground on high ground)
      };
 };
 

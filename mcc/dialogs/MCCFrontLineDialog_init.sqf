@@ -16,6 +16,7 @@ private _missionTypeIcons = [];
 disableSerialization;
 
 uiNamespace setVariable ["MCC_FLDialog", _this select 0];
+[_this select 0, "MCCFrontLineDialog"] call MCC_fnc_themeButtons;	//(MK) Buttons look: 3D buttons
 params ["_mccdialog"];
 
 
@@ -43,6 +44,10 @@ _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWDifficultyIndex"
 _comboBox = _mccdialog displayCtrl MCC_MWVehiclesIDC;
 _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWVehiclesIndex",2]),true];
 
+//AI drones
+_comboBox = _mccdialog displayCtrl 6040;
+_comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWDronesIndex",1]),true];
+
 //Armor
 _comboBox = _mccdialog displayCtrl MCC_MWArmorIDC;
 _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWArmorIndex",2]),true];
@@ -64,7 +69,7 @@ _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWIEDIndex",2]),tr
 _comboBox = _mccdialog displayCtrl MCC_MWFortificationIDC;
 _comboBox ctrlSetChecked [(profileNamespace getVariable ["MCC_MWFortificationIDC",2]),true];
 
-//Minefield / fortification markers: show the saved choice (they always opened unticked)
+//Minefield / fortification markers: show the saved choice
 (_mccdialog displayCtrl 6013) ctrlSetChecked [(profileNamespace getVariable ["MCC_FLIEDmarkersTittleIndex",0]), true];
 (_mccdialog displayCtrl 6017) ctrlSetChecked [(profileNamespace getVariable ["MCC_FLFortificationsmarkersCombo",0]), true];
 

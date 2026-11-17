@@ -48,7 +48,7 @@ switch (_action) do
         if (_commander) then {
             //Do we have enough personal resources
             {
-                ctrlSetText [_ctrl, [_x] call MCC_fnc_formatNumber];
+                ctrlSetText [_ctrl, [_x, true] call MCC_fnc_formatNumber];
                 if (_x <= (_array select _foreachindex)) then {
                     (_mccdialog displayctrl _ctrl) ctrlSetTextColor [1,1,1,1];
                 } else {
@@ -62,7 +62,7 @@ switch (_action) do
              _ctrl = 1000;
 
             {
-                ctrlSetText [_ctrl,[_x] call MCC_fnc_formatNumber];
+                ctrlSetText [_ctrl,[_x, true] call MCC_fnc_formatNumber];
                 _ctrl = _ctrl +1;
             } forEach [0,0,0];
 
@@ -125,6 +125,12 @@ switch (_action) do
             _vehicle setdir getdir _spawnPad;
             _vehicle setVariable ["mcc_delete",false,true];
             _vehicle setVariable ["MCC_rtsObject",true,true];
+            [_vehicle] call MCCMK_fnc_spawnAnchor;
+            //(MK) what was paid, as the ship deck records it: a bought vehicle can be sold back (MCCMK_fnc_sellCheck) and its
+            // wreck refunds part of it when salvaged (MCCMK_fnc_salvageDone). Nothing recorded while resources are Free.
+            if !(call MCCMK_fnc_resFree) then {
+                _vehicle setVariable ["MCCMK_bought", [["cr", "res"] select _commander, if (_commander) then {[_costAmmo, _costRepair, _costFuel]} else {_costValor}, getPlayerUID player, playerSide, name player], true];
+            };
              if (missionNamespace getVariable ["CP_activated",false]) then {_vehicle disableTIEquipment true};
 
             //clear cargo

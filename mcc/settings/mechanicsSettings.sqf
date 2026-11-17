@@ -4,7 +4,7 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
         "MCC_quickWeaponChange",
         "CHECKBOX",
         ["Weapons Binds","Bind weapon to the 1 - 4 keys"],
-        "MCC Mechanics",
+        "MCCMK Mechanics",
         false,
         false
     ] call CBA_Settings_fnc_init;
@@ -13,21 +13,20 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
     [
         "MCC_arcadeTanks",
         "CHECKBOX",
-        ["One Man Tanks","Player can operate a tank by his own driving and shooting"],
-        "MCC Mechanics",
+        ["One Man Tanks","Player can operate a tank by his own driving and\nshooting"],
+        "MCCMK Mechanics",
         false,
         true
     ] call CBA_Settings_fnc_init;
 
     //Fatigue / stamina
-    // The checkbox means "stamina ON". It used to store its value in MCC_disableFatigue, which everywhere else in MCC
-    // means "stamina OFF" (Mechanics module, Zeus dialog, respawn) - so after every respawn the choice was applied
-    // backwards. It now has its own variable and keeps MCC_disableFatigue in the meaning the rest of MCC expects.
+    // The checkbox means "stamina ON" and has its own variable; MCC_disableFatigue keeps the meaning the rest of MCC gives
+    // it ("stamina OFF": Mechanics module, Zeus dialog, respawn), so the respawn applies the choice the right way round.
     [
         "MCC_fatigueEnabled",
         "CHECKBOX",
-        ["Fatigue / Stamina","Players get tired when running (stamina). Kept after respawn."],
-        "MCC Mechanics",
+        ["Fatigue / Stamina","Players get tired when running (stamina). Kept after\nrespawn."],
+        "MCCMK Mechanics",
         true,
         true,
         {
@@ -38,12 +37,50 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
         }
     ] call CBA_Settings_fnc_init;
 
+    //(MK) Dropped items cleanup (MCCMK_fnc_dropCleanup)
+    [
+        "MCCMK_dropCleanup",
+        "SLIDER",
+        ["Dropped items cleanup (minutes)", "Piles of dropped weapons and items (left by players,\nby dead units outside generated missions, or by a\nbroken-down crate) are removed this long after, once no\nplayer is within 50 m or looking.\nKept: anything near an HQ or F.O.B., and weapons beside\nenemy bodies - the mission cleanup removes those.\n0 = off."],
+        "MCCMK Mechanics",
+        [0, 120, 30, 0],
+        true
+    ] call CBA_Settings_fnc_init;
+
+    //(MK) Body cleanup (in the dropped-items cleanup's pass)
+    [
+        "MCCMK_bodyCleanup",
+        "SLIDER",
+        ["Body cleanup (minutes)", "Bodies no mission owns (enemy and friendly AI, at\nbases too) are removed this long after death, with\nthe weapons beside them, once no player is within 50 m\nor looking. Players' own bodies after twice the time.\n0 = off."],
+        "MCCMK Mechanics",
+        [0, 120, 30, 0],
+        true
+    ] call CBA_Settings_fnc_init;
+
+    //(MK) Wreck salvage
+    [
+        "MCCMK_salvageRewards",
+        "CHECKBOX",
+        ["Salvage rewards", "Salvaging an ENEMY wreck your side never bought or\ncrewed gives about 10% of its price (Supply, Ammo,\nFuel). Your own and civilian wrecks clear for nothing.\nNo reward when costs are Free."],
+        "MCCMK Mechanics",
+        true,
+        true
+    ] call CBA_Settings_fnc_init;
+    [
+        "MCCMK_salvageAutoBase",
+        "CHECKBOX",
+        ["Clear base wrecks automatically", "Wrecks within 300 m of an RTS HQ are removed two\nminutes after they're destroyed (no reward)."],
+        "MCCMK Mechanics",
+        false,
+        true
+    ] call CBA_Settings_fnc_init;
+
     //3DTagging
     [
         "MCC_allow3DSpotting",
         "CHECKBOX",
-        ["3D Tagging","Squad leader enemy tags and markers will be visible on HUD"],
-        "MCC Mechanics",
+        ["3D Tagging","Squad leader enemy tags and markers will be visible on\nHUD"],
+        "MCCMK Mechanics",
         true,
         true
     ] call CBA_Settings_fnc_init;
@@ -53,8 +90,8 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
     [
         "MCC_cover",
         "CHECKBOX",
-        ["Cover System","Players will automatically pop up or side out of cover while aiming down sights"],
-       ["MCC Mechanics","Cover"],
+        ["Cover System","Players will automatically pop up or side out of cover\nwhile aiming down sights"],
+       ["MCCMK Mechanics", "Cover"],
         false,
         false
     ] call CBA_Settings_fnc_init;
@@ -64,7 +101,7 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
         "MCC_coverUI",
         "CHECKBOX",
         ["Cover System UI","Show icons on HUD when in cover"],
-       	["MCC Mechanics","Cover"],
+       	["MCCMK Mechanics", "Cover"],
         false,
         false
     ] call CBA_Settings_fnc_init;
@@ -73,8 +110,8 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
     [
         "MCC_coverVault",
         "CHECKBOX",
-        ["Vault System","Allow players to vault over walls and obstacles - see CBA keybinds"],
-        ["MCC Mechanics","Cover"],
+        ["Vault System","Allow players to vault over walls and obstacles - see\nCBA keybinds"],
+        ["MCCMK Mechanics", "Cover"],
         false,
         false
     ] call CBA_Settings_fnc_init;
@@ -85,8 +122,8 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
     [
         "MCC_interaction",
         "CHECKBOX",
-        ["Interaction System","Players can interact with objects and themselves - see CBA keybinds"],
-       ["MCC Mechanics","Interaction"],
+        ["Interaction System","Players can interact with objects and themselves - see\nCBA keybinds"],
+       ["MCCMK Mechanics", "Interaction"],
         true,
         true
     ] call CBA_Settings_fnc_init;
@@ -96,7 +133,7 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
         "MCC_ingameUI",
         "CHECKBOX",
         ["Interaction System UI","Show icons on HUD when interaction is available"],
-       ["MCC Mechanics","Interaction"],
+       ["MCCMK Mechanics", "Interaction"],
         true,
         true
     ] call CBA_Settings_fnc_init;
@@ -108,7 +145,7 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
        "MCC_surviveModAllowSearch_index",
        "LIST",
        ["Survival Mode","Players can loot map objects and need to drink and eat"],
-       ["MCC Mechanics","Survival"],
+       ["MCCMK Mechanics", "Survival"],
        [[0,1,2],["Disabled","Enabled, with loot searching","Enabled, without loot searching"],0],
         true,
         {
@@ -121,8 +158,8 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
     [
         "MCC_aceSearchMenu",
         "LIST",
-        ["ACE: Search action in","Where survival mode's Search appears with ACE. Interaction menu only\nworks on objects with a class; many CUP/Arma 2 terrain props have\nnone, so Both is safest there."],
-        ["MCC Mechanics","Survival"],
+        ["ACE: Search action in","Where survival mode's Search appears with ACE.\nInteraction menu only works on objects with a class;\nmany CUP/Arma 2 terrain props have none, so Both is\nsafest there."],
+        ["MCCMK Mechanics", "Survival"],
         [[0,1,2],["Self-interaction","Interaction menu","Both"],0],
         true,
         {
@@ -136,7 +173,7 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
         "MCC_surviveModPlayerPos",
         "CHECKBOX",
         ["Load Player Position","Load last known player position on mission start"],
-        ["MCC Mechanics","Survival"],
+        ["MCCMK Mechanics", "Survival"],
         false,
         true
     ] call CBA_Settings_fnc_init;
@@ -146,17 +183,17 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
         "MCC_surviveModPlayerGear",
         "CHECKBOX",
         ["Load Player Gear","Load last known player gear on mission start"],
-        ["MCC Mechanics","Survival"],
+        ["MCCMK Mechanics", "Survival"],
         false,
         true
     ] call CBA_Settings_fnc_init;
 
-    //LLoad Player Stats
+    //Load Player Stats 
     [
-        "MCC_surviveModPlayerGear",
+        "MCC_surviveModPlayerStats",
         "CHECKBOX",
         ["Load Player Stats","Load last known player stats on mission start"],
-        ["MCC Mechanics","Survival"],
+        ["MCCMK Mechanics", "Survival"],
         false,
         true
     ] call CBA_Settings_fnc_init;
@@ -167,8 +204,8 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
     [
         "MCC_breacingAmmo",
         "EDITBOX",
-        ["Breaching Ammo","Shooting this ammo from less then 10 meters will unlock doors"],
-        ["MCC Mechanics","Ammo Type"],
+        ["Breaching Ammo","Shooting this ammo from less then 10 meters will unlock\ndoors"],
+        ["MCCMK Mechanics", "Ammo Type"],
         '["prpl_8Rnd_12Gauge_Slug","prpl_6Rnd_12Gauge_Slug","rhsusf_8Rnd_Slug","rhsusf_5Rnd_Slug"]',
         true,
         {
@@ -181,8 +218,8 @@ if (count (allMissionObjects "MCC_Module_settingsMechanics") == 0) then {
     [
         "MCC_nonLeathalAmmo",
         "EDITBOX",
-        ["Non Lethal Ammo","Shooting this ammo from less then 10 meters will unlock doors"],
-        ["MCC Mechanics","Ammo Type"],
+        ["Non Lethal Ammo","Shooting this ammo from less then 10 meters will unlock\ndoors"],
+        ["MCCMK Mechanics", "Ammo Type"],
         '["prpl_8Rnd_12Gauge_Slug","prpl_6Rnd_12Gauge_Slug","rhsusf_8Rnd_Slug","rhsusf_5Rnd_Slug"]',
         true,
         {

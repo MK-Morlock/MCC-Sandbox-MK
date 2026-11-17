@@ -90,13 +90,14 @@ waitUntil {sleep 0.25; !alive _lead || {((getPosATLVisual _lead) select 2) < _br
 //below him (read by MCC_fnc_paradrop as MCC_haloChuteAlt)
 private _all = _units select {alive _x};
 private _po = (_all param [0, objNull]) getVariable ["MCC_paraOpen", [0, 0]];
-private _hts = if ((_po select 0) == 1) then {_all apply {(_po select 1) + random 30}} else {_all apply {120 + random 50}};
+private _base = [_po param [1, 120], 120] select ((_po param [1, 0]) <= 0);
+private _hts = _all apply {_base + random 50};
 _hts sort false;
 private _byHeight = [_all, [], {(getPosASL _x) select 2}, "DESCEND"] call BIS_fnc_sortBy;
 {_x setVariable ["MCC_haloChuteAlt", _hts select _forEachIndex]} forEach _byHeight;
 //Starburst: each man pushed straight out from the CENTRE of the ring in his own direction (like the spokes of a wheel,
-//away from the men either side of him) at 18 m/s plus 4 m/s up; the leader too (he used to carry on without a push,
-//and the others were pushed away from him - a fan towards the far side of the ring). One by one, 0.2 s apart.
+//away from the men either side of him) at 18 m/s plus 4 m/s up, the leader too, so the ring opens evenly. One by one,
+//0.2 s apart.
 private _centre = AGLToASL (_lead modelToWorldVisual [0, _cDist, 0]);
 private _fnc_out = {
 	params ["_u", "_centre"];

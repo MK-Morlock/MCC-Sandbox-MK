@@ -114,7 +114,7 @@ class MCC_respawnDialogControls:MCC_RscControlsGroup
 			y = 0.112000* safezoneH;
 			w = 0.281917* safezoneW;
 			h = 0.022000* safezoneH;
-			tooltip = "If Role Selection is on, the position can be set as a FOB (optional respawn location)"; //--- ToDo: Localize;
+			tooltip = "If Role Selection is on, the position can be set as a FOB\n(optional respawn location)"; //--- ToDo: Localize;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";	//same text size as the Spawn panel
 		};
 
@@ -124,13 +124,24 @@ class MCC_respawnDialogControls:MCC_RscControlsGroup
 			onButtonClick = "closedialog 0;[] remoteExec ['MCC_fnc_startLocations',0]";
 
 			text = "Activate Respawn"; //--- ToDo: Localize;
-			tooltip = "Enable respawn and force dialog on all players if enabled in MCC settings";
+			tooltip = "Enable respawn and force dialog on all players if enabled in\nMCC settings";
 			x = 0.171317* safezoneW;
 			y = 0.196000* safezoneH;
 			w = 0.057300* safezoneW;
 			h = 0.022000* safezoneH;
 		};
 
+		class MCC_respawnDialogMakeHQ: MCCBTN_S
+		{
+			idc = -1;
+			onButtonClick = "['start', true] call MCCMK_fnc_makeHQPick";
+			text = "Make HQ";
+			tooltip = "Make an F.O.B. (or a ship) its side's HQ - click it on the\nmap; the old HQ becomes an F.O.B. Free for the mission maker";
+			x = 0.110000* safezoneW;
+			y = 0.196000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
+		};
 		class MCC_respawnDialogClose: MCCBTN_S
 		{
 			idc = -1;

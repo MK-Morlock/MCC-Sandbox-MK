@@ -20,9 +20,9 @@ private _mccdialog = controlNull;
 disableSerialization;
 if (mcc_missionmaker == (name player)) then 
 {
-	if (count mcc_zone_pos == 0) exitWith {hint "Create a zone first"};	//Failsafe incase we trying to spawn something without making a zone first
+	if (count mcc_zone_pos == 0) exitWith {["Create a zone first"] call MCCMK_fnc_hint};	//Failsafe incase we trying to spawn something without making a zone first
 	_zonePos = mcc_zone_pos param [["number"] call MCC_fnc_zoneList, nil];
-	if (isnil "_zonePos") exitWith {hint "Create a zone first"};	//Failsafe incase we trying to spawn something without making a zone first
+	if (isnil "_zonePos") exitWith {["Create a zone first"] call MCCMK_fnc_hint};	//Failsafe incase we trying to spawn something without making a zone first
 	//Group
 	if ((lbCurSel SPAWNTYPE) == 1) then 
 	{	
@@ -36,9 +36,9 @@ if (mcc_missionmaker == (name player)) then
 			
 			click = false;
 
-			hint parseText format["<br/>--------------------------<br/>	
+			[parseText format["<br/>--------------------------<br/>	
 			<br/><t size='1.2' color='#33CC00'>Left click on the map to set start location (direction) of reinforcement</t><br/>
-			<br/>--------------------------<br/>"]; 
+			<br/>--------------------------<br/>"]] call MCCMK_fnc_hint; 
 			
 			onMapSingleClick "mcc_spawn_dir = _pos;
 			click = true;

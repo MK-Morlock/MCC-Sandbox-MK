@@ -24,7 +24,7 @@ if (typeName (_module getVariable ["side",""]) == typeName 0) exitWith {
 	if (isServer) then {
 
 		_side = [(_module getVariable ["side",1])] call BIS_fnc_sideType;
-		_hq = _module getVariable ["hq",true];
+		_hq = _module getVariable ["hq",false];
 		_lhdType = _module getVariable ["lhdType",2];
 		_displayName = _module getVariable ["displayName",""];
 		_store = _module getVariable ["store",true];
@@ -46,7 +46,7 @@ if (isClass (configFile >> "CfgVehicles" >> "CUP_LHD_BASE")) then {_shipsTypes p
 
 _resualt = ["Spawn Static Ship",[
 				["Ship Side",["East","West","Resistance"],"",1],
-				["Respawn Position",false],
+				["Make HQ (start position)",false],
 				["Ship Type",_shipsTypes],
 				["Ship Name",""],
 				["Vehicles Purchasing",true],

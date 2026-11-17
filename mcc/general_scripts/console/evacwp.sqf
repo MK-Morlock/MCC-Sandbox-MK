@@ -22,7 +22,7 @@ private "_evacVehicles";
 params ["_type"];
 _evacVehicles = missionNamespace getvariable [format ["MCC_evacVehicles_%1",playerside],[]];
 
-if (count _evacVehicles == 0) exitwith {hint "No Evac is under your command"};
+if (count _evacVehicles == 0) exitwith {["No Evac is under your command"] call MCCMK_fnc_hint};
 if ((lbCurSel MCC_ConsoleEvacTypeText_IDD) < 0 || {(lbCurSel MCC_ConsoleEvacTypeText_IDD) >= count _evacVehicles}) exitWith {};
 [2030] call MCC_fnc_consoleFolderClose;
 _evac = _evacVehicles select (lbCurSel MCC_ConsoleEvacTypeText_IDD);
@@ -35,9 +35,18 @@ deletemarkerlocal "evac_marker1";
 deletemarkerlocal "evac_marker2";
 deletemarkerlocal "evac_marker3";
 
-_landing = lbCurSel MCC_ConsoleEvacApproachComboBox_IDD;
+_landing = [MCC_ConsoleEvacApproachComboBox_IDD] call MCCMK_fnc_evacLandingIndex;	//(MK) by its text: the lists differ
+[(findDisplay 2993) displayCtrl MCC_ConsoleEvacFlyHightComboBox_IDD, "MCC_ccEvacHeight", true] call MCC_fnc_consoleListMemory;
+[(findDisplay 2993) displayCtrl MCC_ConsoleEvacApproachComboBox_IDD, "MCC_ccEvacInsertion", true] call MCC_fnc_consoleListMemory;
+if (_landing == 7) exitWith {
+	if !(_evac isKindOf "Helicopter") exitWith {["Paradrop needs a helicopter"] call MCCMK_fnc_hint};
+	private _line = ["wait"] call MCC_fnc_evacParaLine;
+	if (count _line < 2) exitWith {["No drop line drawn"] call MCCMK_fnc_hint};
+	[_line, _flyInHight, 7, [netid _evac,_evac], [[0, 0], [1, -1]] select ((lbCurSel 9195) == 1)] remoteExec ["MCC_fnc_evacMove", _evac, false];
+	[(findDisplay 2993) displayCtrl 9120, _evac] spawn MCC_fnc_consoleMapFollow;
+};
 
-hint  "Left click on the map to add one WP";
+["Left click on the map to add one WP"] call MCCMK_fnc_hint;
 
 click = false;
 onMapSingleClick "point1 = _pos;
@@ -55,11 +64,11 @@ _convoy_wp1 setMarkerColorLocal "ColorBlue";
 _point1 =getmarkerpos "evac_marker1";
 
 if (_type == 0) then {														// 1 WP
-	//hint "Markers placed";
+	["Waypoint added"] call MCCMK_fnc_hint;	//(MK) the click is done
 	[[_point1], _flyInHight, _landing, [netid _evac,_evac]] remoteExec ["MCC_fnc_evacMove", _evac, false];
 	[(findDisplay 2993) displayCtrl 9120, _evac] spawn MCC_fnc_consoleMapFollow;	//the console map follows the helicopter until right-click
 	} else {																// 3 WP
-		hint  "Left click on the map to put 2nd WP";
+		["Left click on the map to put 2nd WP"] call MCCMK_fnc_hint;
 
 		onMapSingleClick "point2 = _pos;
 		click = true;
@@ -76,7 +85,7 @@ if (_type == 0) then {														// 1 WP
 		_point2 =getmarkerpos "evac_marker2";
 		sleep 0.5;
 
-		hint  "Left click on the map to put 3rd WP";
+		["Left click on the map to put 3rd WP"] call MCCMK_fnc_hint;
 
 		onMapSingleClick "point3 = _pos;
 		click = true;
@@ -93,7 +102,7 @@ if (_type == 0) then {														// 1 WP
 		_point3 =getmarkerpos "evac_marker3";
 		sleep 0.5;
 
-		hint "Markers placed";
+		["Waypoints added"] call MCCMK_fnc_hint;
 		[[_point1, _point2, _point3], _flyInHight, _landing, [netid _evac,_evac]] remoteExec ["MCC_fnc_evacMove", _evac, false];
 		[(findDisplay 2993) displayCtrl 9120, _evac] spawn MCC_fnc_consoleMapFollow;	//the console map follows the helicopter until right-click
 		};

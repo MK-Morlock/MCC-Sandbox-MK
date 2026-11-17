@@ -15,7 +15,7 @@
 
 //-----------------------------------------------------------------------------
 // Fonts
-#define MCCFontM "RobotoCondensed"	//(was PuristaMedium)
+#define MCCFontM "RobotoCondensed"
 #define MCCFontHTML "RobotoCondensed"
 //"CourierNewB64" "TahomaB" "Bitstream" "Zeppelin32"
 
@@ -303,6 +303,23 @@ class MCC_RscButton
   y = 0;
 };
 
+//(MK) RTS groups panel rows: transparent, left-aligned, the RTS panels' text size
+class MCCMK_RscRowItem: MCC_RscButton
+{
+	style = 0;
+	colorBackground[] = {0,0,0,0};
+	colorBackgroundActive[] = {1,1,1,0.08};
+	colorBackgroundDisabled[] = {0,0,0,0};
+	colorFocused[] = {0,0,0,0};
+	colorBackgroundFocused[] = {0,0,0,0};
+	colorBorder[] = {0,0,0,0};
+	colorText[] = {0.80,0.81,0.83,1};
+	offsetPressedX = 0;
+	offsetPressedY = 0;
+	soundClick[] = {"",0.07,1};
+	soundPush[] = {"",0.09,1};
+	sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+};
 class MCC_RscSideItem: MCC_RscButton
 {
 	style = 0;
@@ -437,7 +454,7 @@ class MCC_RscButtonMenu : MCC_RscButton
   style = 2;	//centred, like the other MCC buttons
   text = "";
   textureNoShortcut = "#(argb,8,8,3)color(0,0,0,0)";
-  type = 1;	//standard button (was a textured shortcut button: text left/top, a different look)
+  type = 1;	//standard button
   w = 0.095589;
   x = 0;
   y = 0;
@@ -570,6 +587,29 @@ class MCC_RscButtonRound
 	class TextPos {left = 0; top = "((0.0329871 * safezoneH - (((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)) / 2) max 0"; right = 0; bottom = 0;};
 	class Attributes {font = "RobotoCondensed"; color = "#E1E3E5"; align = "center"; shadow = 0;};
 	class AttributesImage {font = "RobotoCondensed"; color = "#E1E3E5"; align = "center";};
+};
+
+//(MK) An invisible area that only carries a tooltip (the faction box's group counts)
+class MCCMK_RscTipArea: MCC_RscButtonRound
+{
+	text = "";
+	animTextureNormal = "#(argb,8,8,3)color(0,0,0,0)";
+	animTextureDisabled = "#(argb,8,8,3)color(0,0,0,0)";
+	animTextureOver = "#(argb,8,8,3)color(0,0,0,0)";
+	animTextureFocused = "#(argb,8,8,3)color(0,0,0,0)";
+	animTexturePressed = "#(argb,8,8,3)color(0,0,0,0)";
+	animTextureDefault = "#(argb,8,8,3)color(0,0,0,0)";
+};
+//(MK) A row's click area in the MCC console's faction box: invisible, a faint highlight under the pointer
+class MCCMK_RscRowButton: MCC_RscButtonRound
+{
+	text = "";
+	animTextureNormal = "#(argb,8,8,3)color(0,0,0,0)";
+	animTextureDisabled = "#(argb,8,8,3)color(0,0,0,0)";
+	animTextureOver = "#(argb,8,8,3)color(1,1,1,0.07)";
+	animTextureFocused = "#(argb,8,8,3)color(0,0,0,0)";
+	animTexturePressed = "#(argb,8,8,3)color(1,1,1,0.14)";
+	animTextureDefault = "#(argb,8,8,3)color(0,0,0,0)";
 };
 
 //Rounded-corner button (main console): a picture button (CT_SHORTCUTBUTTON) with a white rounded texture, tinted by

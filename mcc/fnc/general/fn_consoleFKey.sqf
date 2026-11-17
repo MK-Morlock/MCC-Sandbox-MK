@@ -6,8 +6,8 @@ switch (_act) do {
 		if (_key == 2) then {MCC_ConolseUAV = _arg};
 		[_key] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf", MCC_path];
 	};
-	case "select": {hint "Several UAVs available - right-click one on the map to select it"};
-	case "none": {hint (([_key] call MCC_fnc_consoleFKeyState) select 2)};
+	case "select": {["Several UAVs available - right-click one on the map to select it"] call MCCMK_fnc_hint};
+	case "none": {[(([_key] call MCC_fnc_consoleFKeyState) select 2)] call MCCMK_fnc_hint};
 	case "deploy": {
 		if (isNull (findDisplay 2993)) then {
 			[1] execVM format ["%1mcc\general_scripts\console\conoleSwitchMenu.sqf", MCC_path];

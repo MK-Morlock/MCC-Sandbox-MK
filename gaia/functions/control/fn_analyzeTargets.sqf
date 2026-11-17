@@ -49,6 +49,8 @@ _NewTargetInfo	= [];
    			((side _x) == _HQ_side)
    			and
    			(count(units _x)>0)
+   			and
+   			!(_x getVariable ["MCC_droneGroup", false])
    		)
    then
    {

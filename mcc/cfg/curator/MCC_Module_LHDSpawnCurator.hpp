@@ -9,6 +9,11 @@ class MCC_Module_LHDSpawnCurator : MCC_Module_Base
 	icon = "a3\ui_f\data\IGUI\Cfg\simpleTasks\types\boat_ca.paa";
 	portrait = "a3\ui_f\data\IGUI\Cfg\simpleTasks\types\boat_ca.paa";
 	picture = "a3\ui_f\data\IGUI\Cfg\simpleTasks\types\boat_ca.paa";
+	class EventHandlers: EventHandlers
+	{
+		dragged3DEN = "params ['_e']; private _p = getPosWorld _e; if (surfaceIsWater _p) then {private _d = -(getTerrainHeightASL _p); if (abs (((getPosATL _e) select 2) - (_d + 3)) > 0.5) then {_e set3DENAttribute ['position', [_p select 0, _p select 1, _d + 3]]};};";
+		registeredToWorld3DEN = "params ['_e']; private _p = getPosWorld _e; if (surfaceIsWater _p) then {private _d = -(getTerrainHeightASL _p); if (abs (((getPosATL _e) select 2) - (_d + 3)) > 0.5) then {_e set3DENAttribute ['position', [_p select 0, _p select 1, _d + 3]]};};";
+	};
 
 
 	class Attributes : AttributesBase
@@ -43,10 +48,11 @@ class MCC_Module_LHDSpawnCurator : MCC_Module_Base
 
 		class hq : Checkbox
 		{
-			displayName = "Respawn Position";
-			description = "The carrier will act as a respawn position";
+			displayName = "Make HQ (start position)";
+			description = "Ticked: the ship becomes your side's HQ (start position) and your current HQ becomes an F.O.B. Unticked: the ship is an F.O.B. - a respawn point, with vehicle purchasing and rearm if ticked below";
 			typeName = "BOOL";
 			property = "MCC_Module_LHDSpawnCurator_hq";
+			defaultValue = "false";
 		};
 
 		class store : Checkbox

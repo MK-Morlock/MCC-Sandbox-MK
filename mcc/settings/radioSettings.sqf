@@ -3,7 +3,7 @@
     "MCC_VonRadio",
     "CHECKBOX",
    	["Enable MCC Radio System","Radio system uses default ArmA Voice Over IP"],
-    "MCC Radio",
+    "MCCMK Radio",
     false,
     true,
     {
@@ -16,7 +16,7 @@
     "MCC_vonRadioDistanceGlobal",
     "SLIDER",
    	"Global Radio Distance",
-    ["MCC Radio","Distance"],
+    ["MCCMK Radio", "Distance"],
     [1000, 5000, 2000, 0],
     true
 ] call CBA_Settings_fnc_init;
@@ -27,7 +27,7 @@
     "MCC_vonRadioDistanceSide",
     "SLIDER",
    	"Side Radio Distance",
-    ["MCC Radio","Distance"],
+    ["MCCMK Radio", "Distance"],
     [3000, 7000, 5000, 0],
     true
 ] call CBA_Settings_fnc_init;
@@ -37,7 +37,7 @@
     "MCC_vonRadioDistanceCommander",
     "SLIDER",
    	"Commander Radio Distance",
-    ["MCC Radio","Distance"],
+    ["MCCMK Radio", "Distance"],
     [8000, 20000, 12000, 0],
     true
 ] call CBA_Settings_fnc_init;
@@ -47,7 +47,7 @@
     "MCC_vonRadioDistanceGroup",
     "SLIDER",
    	"Group Radio Distance",
-    ["MCC Radio","Distance"],
+    ["MCCMK Radio", "Distance"],
     [300, 1000, 2500, 0],
     true
 ] call CBA_Settings_fnc_init;
@@ -57,17 +57,17 @@
     "MCC_vonRadioKickIdle",
     "CHECKBOX",
    	["Kick Hot Mic","Kicks a player with a hot mic after some time"],
-    ["MCC Radio","Anti-Abuse"],
+    ["MCCMK Radio", "Anti-Abuse"],
     false,
     true
 ] call CBA_Settings_fnc_init;
 
-//Group side distance
+//Hot mic: time before kick (MK: it used the group radio distance variable, so the two settings fought)
 [
-    "MCC_vonRadioDistanceGroup",
+    "MCC_vonRadioKickIdleTime",
     "SLIDER",
    	"Time Before Kick",
-    ["MCC Radio","Anti-Abuse"],
+    ["MCCMK Radio", "Anti-Abuse"],
     [5, 60, 30, 0],
     true
 ] call CBA_Settings_fnc_init;

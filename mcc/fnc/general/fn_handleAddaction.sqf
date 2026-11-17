@@ -23,6 +23,7 @@ _nul = ["MCC_interactionEH", "onEachFrame"] call BIS_fnc_removeStackedEventHandl
 _nul = ["MCC_interactionEH", "onEachFrame", {
 		if !(missionNameSpace getVariable ["MCC_ingameUI", true]) exitWith {};
 		_interactiveObjects = missionNameSpace getVariable ["MCC_interactionObjects",[]];
+		if (_interactiveObjects isEqualTo []) exitWith {};	//(MK) nothing to label
 		{
 			_obj 	= _x select 0;
 			_text 	= _x select 1;
@@ -56,7 +57,7 @@ if ((MCC_isACE) && MCC_isMode) then {
 	_key = ["ACE3 Common","ace_interact_menu_InteractKey"] call MCC_fnc_getKeyFromCBA;
 } else {
 	if (MCC_isCBA) then {
-		_key = ["MCC","interactionKey"] call CBA_fnc_getKeybind;
+		_key = ["MCCMK","interactionKey"] call CBA_fnc_getKeybind;
 		if (((_key select 5) select 1) select 0) then {_text = "Shift + "};
 		if (((_key select 5) select 1) select 1) then {_text = _text + "Ctrl + "};
 		if (((_key select 5) select 1) select 2) then {_text = _text + "Alt + "};

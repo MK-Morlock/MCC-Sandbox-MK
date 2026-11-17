@@ -190,20 +190,20 @@ if (_type in [5,6,7]) then
 		{
 			private _name = [ctrlText (_mccdialog displayCtrl 8504)] call BIS_fnc_trimString;
 			if (_name == "") then {_name = _selName};
-			if (_name == "") exitWith {hint "Type a preset name first"};
+			if (_name == "") exitWith {["Type a preset name first"] call MCCMK_fnc_hint};
 			private _data = [getWeaponCargo _target, getMagazineCargo _target, getItemCargo _target, getBackpackCargo _target];
 			private _i = _presets findIf {(_x select 0) == _name};
 			if (_i >= 0) then {_presets set [_i, [_name, _data]]} else {_presets pushBack [_name, _data]};
 			profileNamespace setVariable ["MCC_boxPresets", _presets];
 			saveProfileNamespace;
 			MCC_boxPresetSelected = _name;
-			hint format ["Cargo preset ""%1"" saved", _name];
+			[format ["Cargo preset ""%1"" saved", _name]] call MCCMK_fnc_hint;
 		};
 
 		case 6: //Load
 		{
 			private _i = _presets findIf {(_x select 0) == _selName};
-			if (_i < 0) exitWith {hint "Select a preset first"};
+			if (_i < 0) exitWith {["Select a preset first"] call MCCMK_fnc_hint};
 			((_presets select _i) select 1) params [["_w",[[],[]]],["_m",[[],[]]],["_it",[[],[]]],["_b",[[],[]]]];
 			clearMagazineCargo _target;
 			clearWeaponCargo _target;
@@ -227,9 +227,9 @@ if (_type in [5,6,7]) then
 			} forEach [[_w,["CfgWeapons"],0],[_m,["CfgMagazines"],1],[_it,["CfgWeapons","CfgGlasses","CfgVehicles"],2],[_b,["CfgVehicles"],3]];
 			MCC_boxPresetSelected = _selName;
 			if (count _skipped > 0) then {
-				hint format ["Preset ""%1"" loaded. Skipped (mod not loaded): %2", _selName, _skipped joinString ", "];
+				[format ["Preset ""%1"" loaded. Skipped (mod not loaded): %2", _selName, _skipped joinString ", "]] call MCCMK_fnc_hint;
 			} else {
-				hint format ["Preset ""%1"" loaded", _selName];
+				[format ["Preset ""%1"" loaded", _selName]] call MCCMK_fnc_hint;
 			};
 		};
 
@@ -241,7 +241,7 @@ if (_type in [5,6,7]) then
 			profileNamespace setVariable ["MCC_boxPresets", _presets];
 			saveProfileNamespace;
 			MCC_boxPresetSelected = "";
-			hint format ["Preset ""%1"" deleted", _selName];
+			[format ["Preset ""%1"" deleted", _selName]] call MCCMK_fnc_hint;
 		};
 	};
 

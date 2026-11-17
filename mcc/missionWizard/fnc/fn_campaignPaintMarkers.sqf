@@ -43,6 +43,9 @@ _ignoreSideColors = [];
 
 //Lets find all the markers around
 _markers = [_centerPos,_radius] call MCCMK_fnc_tilesInRadius;
+private _ownT = ([_centerPos, ((missionNamespace getVariable ["MCCMK_tileStep", 0]) * 0.75) max 1] call MCCMK_fnc_tilesInRadius) apply {[(markerPos _x) distance2D _centerPos, _x]};
+_ownT sort true;
+if (count _ownT > 0 && {!(((_ownT select 0) select 1) in _markers)}) then {_markers pushBack ((_ownT select 0) select 1)};
 
 if (count _markers <= 0) exitWith {if (missionNamespace getVariable ["MCC_debug", false]) then {diag_log "MCC_fnc_campaignPaintMarkers: Error - no markers found in the area"}};
 

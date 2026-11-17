@@ -1,13 +1,6 @@
 disableSerialization;
 params [["_i", nil]];
-private _themes = [
-	["Black",    [0.12,0.12,0.12], [0,0,0]],
-	["Gunmetal", [0.19,0.21,0.24], [0.10,0.11,0.13]],
-	["Olive",    [0.19,0.23,0.15], [0.10,0.12,0.08]],
-	["Navy",     [0.00,0.17,0.34], [0.00,0.09,0.17]],
-	["Burgundy", [0.47,0.00,0.00], [0.23,0.00,0.00]],
-	["Teal",     [0.00,0.25,0.25], [0.00,0.13,0.13]]
-];
+private _themes = call MCCMK_fnc_consoleThemes;	// one shared list (MCC_fnc_consoleAlpha paints from it too)
 if (isNil {profileNamespace getVariable "MCC_consoleThemeV2"}) then {
 	private _old = profileNamespace getVariable ["MCC_consoleTheme", 0];
 	profileNamespace setVariable ["MCC_consoleTheme", if (_old < 4) then {_old} else {if (_old == 4) then {0} else {_old - 1}}];

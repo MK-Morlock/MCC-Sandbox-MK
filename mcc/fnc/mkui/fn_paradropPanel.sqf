@@ -17,6 +17,7 @@ private _key = format ["MCCMK_pdAir_%1", _sideNow];
 private _all = missionNamespace getVariable [_key, []];
 if (count _all == 0) then {
 	private _sn = [east, west, resistance, civilian] find _sideNow;
+	isNil {	//(MK) aircraft only, in one go
 	{
 		private _cl = configName _x;
 		private _isPlane = _cl isKindOf "Plane";
@@ -26,7 +27,8 @@ if (count _all == 0) then {
 				_all pushBack [_cl, format ["%1 (%2)", getText (_x >> "displayName"), getText (configFile >> "CfgFactionClasses" >> getText (_x >> "faction") >> "displayName")], getText (_x >> "picture"), _isPlane, getText (_x >> "faction"), _seats];
 			};
 		};
-	} forEach (format ["getNumber (_x >> 'scope') == 2 && {getNumber (_x >> 'side') == %1}", _sn] configClasses (configFile >> "CfgVehicles"));
+	} forEach (format ["getNumber (_x >> 'scope') == 2 && {getNumber (_x >> 'side') == %1} && {(configName _x) isKindOf 'Air'}", _sn] configClasses (configFile >> "CfgVehicles"));
+	};
 	_all = [_all, [], {_x select 1}, "ASCEND"] call BIS_fnc_sortBy;
 	missionNamespace setVariable [_key, _all];
 };
@@ -51,7 +53,24 @@ if (_find != "") then {_base = _base select {((toLower (_x select 1)) find _find
 	};
 	private _c = _d displayCtrl _idc;
 	lbClear _c;
-	private _i0 = _c lbAdd "Automatic";
+	private _i0 = _c lbAdd (if (_idc == 1055) then {
+		private _sel = (missionNamespace getVariable ["MCC_selectedUnits", []]) select {!isNull _x};
+		private _first = _sel param [0, player];
+		private _ld = if (_first isEqualType grpNull) then {leader _first} else {_first};
+		private _men = 0;
+		{_men = _men + (if (_x isEqualType grpNull) then {count (units _x)} else {1})} forEach _sel;
+		[faction _ld, side group _ld, [_men, 8] select (_men == 0)] call MCC_fnc_haloAutoLabel
+	} else {
+		if (missionNamespace getVariable ["MCC_assetCustom_MCC_assetParadrop", false]) then {"Assets page choice (Auto)"} else {
+			private _sel = (missionNamespace getVariable ["MCC_selectedUnits", []]) select {!isNull _x};
+			private _first = _sel param [0, player];
+			private _ld = if (_first isEqualType grpNull) then {leader _first} else {_first};
+			private _men = 0;
+			{_men = _men + (if (_x isEqualType grpNull) then {count (units _x)} else {1})} forEach _sel;
+			private _pc = [faction _ld, side group _ld, ((16 min _men) max 1)] call MCC_fnc_paraAutoAircraft;
+			format ["%1 (Auto)", getText (configFile >> "CfgVehicles" >> _pc >> "displayName")]
+		}
+	});
 	_c lbSetData [_i0, ""];
 	_c lbSetValue [_i0, -1];
 	private _sel = 0;
@@ -78,3 +97,8 @@ if (lbSize _hc == 0) then {
 MCCMK_pdHeight = _h;
 [0] call MCCMK_fnc_paradropOpen;
 [1] call MCCMK_fnc_paradropOpen;
+MCCMK_pdHaloForm = MCCMK_pdMem getOrDefault ["haloForm", true];
+(_d displayCtrl 1066) cbSetChecked MCCMK_pdHaloForm;
+MCCMK_pdHaloLead = MCCMK_pdMem getOrDefault ["haloLead", true];
+(_d displayCtrl 1067) cbSetChecked MCCMK_pdHaloLead;
+(_d displayCtrl 1067) ctrlEnable !MCCMK_pdHaloForm;

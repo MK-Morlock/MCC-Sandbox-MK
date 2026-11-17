@@ -31,6 +31,7 @@ waituntil {({ropeLength _x < 1} count _ropes) > 0};
 {_pod ropeDetach _x} foreach _ropes; 
 _vehicle setMass [(getMass _vehicle)+ _podMass,0.5];
 _pod attachto [_vehicle,_attachPos];
+[_pod, _vehicle] remoteExecCall ["disableCollisionWith", 0, _pod];	//(MK) the pod can't bump the Taru while attached
 {ropeDestroy  _x} foreach _ropes; 
 
 _vehicle setVariable ["MCC_attachedPod",_pod,true];

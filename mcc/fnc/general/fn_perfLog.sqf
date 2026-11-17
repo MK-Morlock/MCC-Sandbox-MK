@@ -9,8 +9,10 @@ if (isNil "MCC_perfWrite") then {
 	};
 };
 
+// counting every mission object is expensive: only at the start of a generation (and in its summary)
 private _counts = {
-	[count allUnits, count allGroups, count vehicles, count (allMissionObjects "")]
+	params [["_withObjects", false]];
+	[count allUnits, count allGroups, count vehicles, if (_withObjects) then {count (allMissionObjects "")} else {-1}]
 };
 
 private _snapshot = {
@@ -31,7 +33,7 @@ private _snapshot = {
 switch (_mode) do {
 	case "genStart": {
 		_args params [["_label", "generation"]];
-		private _c = call _counts;
+		private _c = [true] call _counts;
 		missionNamespace setVariable ["MCC_perfGen", [diag_tickTime, diag_tickTime, _c, _label, 1000]];
 		["generation", "%1: START | %2", [_label, [true] call _snapshot]] call MCC_perfWrite;
 
@@ -46,15 +48,16 @@ switch (_mode) do {
 	};
 
 	case "genStage": {
-		_args params [["_stage", "stage"]];
-		private _g = missionNamespace getVariable ["MCC_perfGen", []];
+		_args params [["_stage", "stage"], ["_own", []]];
+		//(MK) a follow-up passes its own generation's tracker (the shared one may already be the next mission's)
+		private _g = if (_own isNotEqualTo []) then {_own} else {missionNamespace getVariable ["MCC_perfGen", []]};
 		if (_g isEqualTo []) exitWith {};
 		_g params ["_t0", "_tLast", "_c0", "_label"];
-		private _c = call _counts;
+		private _c = [false] call _counts;
 		["generation", "%1: %2 took %3 s (total %4 s) | created +%5 units +%6 groups +%7 vehicles +%8 objects | worst fps so far %9 | %10",
 			[_label, _stage, (diag_tickTime - _tLast) toFixed 2, (diag_tickTime - _t0) toFixed 1,
-			(_c select 0) - (_c0 select 0), (_c select 1) - (_c0 select 1), (_c select 2) - (_c0 select 2), (_c select 3) - (_c0 select 3),
-			round (missionNamespace getVariable ["MCC_perfGenWorst", 0]), [true] call _snapshot]] call MCC_perfWrite;
+			(_c select 0) - (_c0 select 0), (_c select 1) - (_c0 select 1), (_c select 2) - (_c0 select 2), if ((_c select 3) < 0) then {"?"} else {(_c select 3) - (_c0 select 3)},
+			round (missionNamespace getVariable ["MCC_perfGenWorst", 0]), [false] call _snapshot]] call MCC_perfWrite;
 		_g set [1, diag_tickTime];
 	};
 
@@ -73,12 +76,12 @@ switch (_mode) do {
 			for "_i" from 1 to 9 do {
 				uiSleep 10;
 				private _now = count allUnits;
-				["genStage", [format ["+%1 s after the generator (units +%2 in the last 10 s)", _i * 10, _now - _last]]] call MCC_fnc_perfLog;
+				["genStage", [format ["+%1 s after the generator (units +%2 in the last 10 s)", _i * 10, _now - _last], _g]] call MCC_fnc_perfLog;
 				_last = _now;
 			};
 			private _label = _g select 3;
 			["generation", "%1: DONE | total %2 s | worst fps %3 | %4 s under 15 fps", [_label, (diag_tickTime - (_g select 0)) toFixed 1, round (missionNamespace getVariable ["MCC_perfGenWorst", 0]), missionNamespace getVariable ["MCC_perfGenSlow", 0]]] call MCC_perfWrite;
-			missionNamespace setVariable ["MCC_perfGen", []];
+			if ((missionNamespace getVariable ["MCC_perfGen", []]) isEqualTo _g) then {missionNamespace setVariable ["MCC_perfGen", []]};	//(MK) not a newer one's
 		};
 	};
 

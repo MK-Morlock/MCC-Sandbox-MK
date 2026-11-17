@@ -1,10 +1,9 @@
 /*======================================================== MCC_fnc_respawnObjects ========================================================
 	BIS_fnc_getRespawnPositions, but every entry is an OBJECT or GROUP.
 
-	MCC's respawn/deploy panel only understood respawn positions that are objects (FOBs, tents, vehicles) or groups.
+	MCC's respawn/deploy panel only understands respawn positions that are objects (FOBs, tents, vehicles) or groups.
 	A respawn position added as a marker ("respawn_west", BIS_fnc_addRespawnPosition with a marker name) or as a plain
-	position made the panel throw errors, so nothing could be selected or deployed and the player was stuck on the
-	panel's map in MP. Markers and positions are now turned into an invisible local helper at that spot.
+	position is turned into an invisible local helper at that spot.
 
 	<IN>	0: OBJECT/SIDE/... - target for BIS_fnc_getRespawnPositions (default player)
 	<OUT>	ARRAY of OBJECT/GROUP

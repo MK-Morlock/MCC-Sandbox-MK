@@ -26,7 +26,7 @@ class MCC_rts_LoadResources
 
 	displayName = "Logistics Load";
 	descriptionShort = "Load Logistics crates";
-	condition = "typeOf _target in (missionNameSpace getVariable ['MCC_supplyTracks',[]]) && alive _target";
+	condition = "([_target] call MCCMK_fnc_isSupplyTruck) && alive _target";
 	dontShowDisabled = 1;
 	requiredBuildings[] = {};
 	needelectricity = 0;
@@ -43,7 +43,7 @@ class MCC_rts_LoadResourcesWithdrawAmmo
 
 	displayName = "Withdraw Ammo";
 	descriptionShort = "Withdraw Ammo crate from HQ";
-	condition = "typeOf _target in (missionNameSpace getVariable ['MCC_supplyTracks',[]]) && alive _target";
+	condition = "([_target] call MCCMK_fnc_isSupplyTruck) && alive _target";
 	dontShowDisabled = 0;
 	requiredBuildings[] = {{"hq",1}};
 	needelectricity = 0;
@@ -61,7 +61,7 @@ class MCC_rts_LoadResourcesWithdrawSupply
 
 	displayName = "Withdraw Supply";
 	descriptionShort = "Withdraw Supply crate from HQ";
-	condition = "typeOf _target in (missionNameSpace getVariable ['MCC_supplyTracks',[]]) && alive _target";
+	condition = "([_target] call MCCMK_fnc_isSupplyTruck) && alive _target";
 	dontShowDisabled = 0;
 	requiredBuildings[] = {{"hq",1}};
 	needelectricity = 0;
@@ -79,7 +79,7 @@ class MCC_rts_LoadResourcesWithdrawFuel
 
 	displayName = "Withdraw Fuel";
 	descriptionShort = "Withdraw Fuel crate from HQ";
-	condition = "typeOf _target in (missionNameSpace getVariable ['MCC_supplyTracks',[]]) && alive _target";
+	condition = "([_target] call MCCMK_fnc_isSupplyTruck) && alive _target";
 	dontShowDisabled = 0;
 	requiredBuildings[] = {{"hq",1}};
 	needelectricity = 0;
@@ -115,7 +115,7 @@ class MCC_rts_UnLoadResources
 
 	displayName = "Logistics Unload";
 	descriptionShort = "Unload Logistics crates";
-	condition = "typeOf _target in (missionNameSpace getVariable ['MCC_supplyTracks',[]]) && alive _target";
+	condition = "([_target] call MCCMK_fnc_isSupplyTruck) && alive _target";
 	dontShowDisabled = 1;
 	requiredBuildings[] = {};
 	needelectricity = 0;

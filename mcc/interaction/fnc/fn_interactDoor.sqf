@@ -154,16 +154,15 @@ switch (true) do {
 					private _vehiclePic = configNull;
 
 					_objectMass = (getMass _object) max 5;
-					_availableVehicles = (player nearObjects ["AllVehicles",10]) select {_x getVariable ["MCC_logisticsObjectMass",_x call MCC_fnc_logisticsCargoGetMass] >= _objectMass};
+					_availableVehicles = [_object] call MCCMK_fnc_cargoTargets;	//(MK) [[vehicle, vehicle-in-vehicle], ...]
 
 					_array = [["[(missionNamespace getVariable ['MCC_interactionLayer_0',[]]),1] spawn MCC_fnc_interactionsBuildInteractionUI","Back",format ["%1mcc\interaction\data\iconBack.paa",MCC_path]]];
 
 					{
-						if !(_x isEqualTo _object) then {
-							_vehicleName = (getText (configfile >> "CfgVehicles" >> typeof _x >> "displayName"));
-							_vehiclePic = (getText (configfile >> "CfgVehicles" >> typeof _x >> "picture"));
-							_array pushBack [format ["[%1, %2] spawn MCC_fnc_logisticsCargoLoad", str (_object call BIS_fnc_netId), str (_x call BIS_fnc_netId)],format ["Load into %1",_vehicleName],_vehiclePic];
-						};
+						_x params ["_veh", "_viv"];
+						_vehicleName = (getText (configfile >> "CfgVehicles" >> typeof _veh >> "displayName"));
+						_vehiclePic = [getText (configfile >> "CfgVehicles" >> typeof _veh >> "picture"), "\a3\ui_f\data\igui\cfg\simpletasks\types\car_ca.paa"] call MCCMK_fnc_safePic;
+						_array pushBack [format ["[%1, %2] %3", str (_object call BIS_fnc_netId), str (_veh call BIS_fnc_netId), ["spawn MCC_fnc_logisticsCargoLoad", "call {params ['_o','_v']; [_o call BIS_fnc_objectFromNetId, _v call BIS_fnc_objectFromNetId] call MCCMK_fnc_cargoViV}"] select _viv],format [["Load into %1 (cargo)", "Load onto %1"] select _viv,_vehicleName],_vehiclePic];
 					} forEach _availableVehicles;
 
 					[_array,1] call MCC_fnc_interactionsBuildInteractionUI;
@@ -188,7 +187,7 @@ switch (true) do {
 			//set options
 
 			_displayName = getText (configfile >> "CfgVehicles" >> typeof _object >> "displayName");
-			_pic		 = if (_object isKindof "ReammoBox_F") then {""} else {getText (configfile >> "CfgVehicles" >> typeof _object >> "picture")};
+			_pic		 = if (_object isKindof "ReammoBox_F") then {""} else {[getText (configfile >> "CfgVehicles" >> typeof _object >> "picture")] call MCCMK_fnc_safePic};
 			_array = [["closeDialog 0",_displayName,_pic]];
 
 			{
@@ -196,6 +195,11 @@ switch (true) do {
 					_array pushBack [format ["['%1'] spawn MCC_fnc_vehicleMenuClicked",_x],format ["Board %1 as %2",_displayName,if (_object isKindof "air" && _x == "driver") then {"pilot"} else {_x}],format ["\A3\ui_f\data\igui\cfg\actions\getin%1_ca.paa",_x]]
 				};
 			} foreach ["commander","driver","gunner","cargo"];
+
+			//(MK) Unload what the vehicle carries with vehicle-in-vehicle
+			{
+				_array pushBack [format ["[%1] call {[_this select 0 call BIS_fnc_objectFromNetId] call MCCMK_fnc_cargoViVUnload}", str (_x call BIS_fnc_netId)], format ["Unload %1", getText (configfile >> "CfgVehicles" >> typeof _x >> "displayName")], format ["%1mcc\logistics\data\unloadIcon.paa",MCC_path]];
+			} forEach (getVehicleCargo _object);
 
 			//Unload wounded
 			if (({_x getVariable ["MCC_medicUnconscious",false]} count (crew _object))>0) then
@@ -213,7 +217,7 @@ switch (true) do {
 
 				//Load into a vehicle
 				private _objectMass = (getMass _object) max 5;
-				 if ({_x  getVariable ["MCC_logisticsObjectMass",_x call MCC_fnc_logisticsCargoGetMass] >= _objectMass && !(_x isEqualTo _object)} count (player nearObjects ["AllVehicles",10]) >0) then {
+				 if (([_object] call MCCMK_fnc_cargoTargets) isNotEqualTo []) then {	//(MK) large: vehicle-in-vehicle only; small: cargo list
 				 		_array pushBack ["['logisticsLoad'] spawn MCC_fnc_vehicleMenuClicked",format ["Load %1",_displayName],format ["%1mcc\logistics\data\unloadIcon.paa",MCC_path]];
 				};
 			};
@@ -347,7 +351,7 @@ switch (true) do {
 
 			//Logistic
 			if (((_object call MCC_fnc_logisticsCargoGetMass)>10) && (missionNamespace getVariable ["MCC_allowlogistics",false])) then {
-				_array pushBack ["[] spawn MCC_fnc_logisticsCargoInit","Logistics",(getText (configfile >> "CfgVehicles" >> typeof _object >> "picture"))];
+				_array pushBack ["[] spawn MCC_fnc_logisticsCargoInit","Logistics",[getText (configfile >> "CfgVehicles" >> typeof _object >> "picture")] call MCCMK_fnc_safePic];
 			};
 
 			//Flip atv

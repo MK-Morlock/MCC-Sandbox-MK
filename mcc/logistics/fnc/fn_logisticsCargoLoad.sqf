@@ -25,9 +25,10 @@ if ( _vehicleMass >= _objectMass) then {
 	_cargoItems = _vehicle getVariable ["MCC_logisticsCargo",[]];
 
 	//If the object is a cargo container store the cargo too
-	_cargoItems pushBack [typeOf _object,[getweaponCargo _object, getMagazineCargo  _object, getitemCargo _object],damage _object, fuel _object];
+	_cargoItems pushBack [typeOf _object,[getweaponCargo _object, getMagazineCargo  _object, getitemCargo _object],damage _object, fuel _object, _object];
 
 	_vehicle setVariable ["MCC_logisticsCargo",_cargoItems,true];
 	_vehicle setVariable ["MCC_logisticsObjectMass",(_vehicleMass - _objectMass) max 0,true];
-	deleteVehicle _object;
+	//(MK) kept, hidden in the vehicle
+	[_object, _vehicle, true] call MCCMK_fnc_cargoStow;
 };

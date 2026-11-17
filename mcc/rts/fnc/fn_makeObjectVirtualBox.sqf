@@ -31,7 +31,7 @@ clearWeaponCargoGlobal _object;
 clearBackpackCargoGlobal _object;
 _object setVariable ["MCC_virtual_cargo",_boxArray,true];
 // The vault opened at this object is the side's shared virtual box (see MCC_fnc_mainBoxInit), not this object's real
-// cargo. Without this, items sold to the vault went into the objects real cargo and could be taken back for free
+// cargo. Without this, items sold to the vault would go into the object's real cargo and could be taken back for free
 // through the normal inventory, farming valor points.
 _object setVariable ["MCC_virtualBoxSide",_side,true];
-[_object,"Hold %1 to open"] remoteExec ["MCC_fnc_createHelper", 2, false];
+(if (isServer) then {[[_object,"Hold %1 to open"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_createHelper"] spawn MCCMK_fnc_genRun} else {[_object,"Hold %1 to open"] remoteExec ["MCC_fnc_createHelper", 2, false]});

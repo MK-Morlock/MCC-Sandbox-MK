@@ -6,7 +6,7 @@
 class MCC_UMDialogControls:MCC_RscControlsGroup
 {
 	idc = 519;
-	x = 0.372229 * safezoneW + safezoneX;
+	x = 0.415198 * safezoneW + safezoneX;
 	y = 0.642576 * safezoneH + safezoneY;
 	w = 0.464605 * safezoneW;
 	h = 0.173948 * safezoneH;
@@ -35,7 +35,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			y = 0.006000 * safezoneH;
 			w = 0.057292 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			tooltip = "Give the selected groups to GAIA control with the selected zone and behavior"; //--- ToDo: Localize;
+			tooltip = "Give the selected groups to GAIA control with the selected\nzone and behavior"; //--- ToDo: Localize;
 		};
 		class MCC_giveToPlayer: MCCBTN_S
 		{
@@ -47,7 +47,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			y = 0.033991 * safezoneH;
 			w = 0.057292 * safezoneW;
 			h = 0.0219914 * safezoneH;
-			tooltip = "Give the selected groups to the player's control with the commander console"; //--- ToDo: Localize;
+			tooltip = "Give the selected groups to the player's control with the\ncommander console"; //--- ToDo: Localize;
 		};
 		class MCC_cacheButton: MCCBTN_S
 		{
@@ -91,7 +91,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			style = 48;
 			text = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";
 			colorText[] = {1,1,1,1};
-			x = 0.069621 * safezoneW;
+			x = 0.115455 * safezoneW;
 			y = 0.006000 * safezoneH;
 			w = 0.033175 * safezoneW;
 			h = 0.0219914 * safezoneH;
@@ -102,7 +102,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			style = 48;
 			text = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";
 			colorText[] = {1,1,1,1};
-			x = 0.103996 * safezoneW;
+			x = 0.149830 * safezoneW;
 			y = 0.006000 * safezoneH;
 			w = 0.033175 * safezoneW;
 			h = 0.0219914 * safezoneH;
@@ -144,7 +144,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 		{
 			idc = -1;
 			style = 48;
-			text = "\mcc_sandbox_mod\data\btn_round_sq_n_ca.paa";
+			text = "\mcc_sandbox_mod\data\btn_round_half_n_ca.paa";
 			colorText[] = {1,1,1,1};
 			x = 0.435205 * safezoneW;
 			y = 0.006000 * safezoneH;
@@ -175,7 +175,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			text = "\mcc_sandbox_mod\data\btn_round_wide_n_ca.paa";
 			colorText[] = {1,1,1,0};
 			colorBackground[] = {0,0,0,0};
-			x = 0.069021 * safezoneW;
+			x = 0.114855 * safezoneW;
 			y = 0.006000 * safezoneH;
 			w = 0.034375 * safezoneW;
 			h = 0.0219914 * safezoneH;
@@ -193,7 +193,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			onToolBoxSelChanged = "[_this select 1] call MCC_fnc_umModeSwitch; [9134, _this select 1] call MCC_fnc_umToolboxHighlight;";
 			colorSelectedBg[] = {0,0,0,0};	//the rounded box under it (9136) marks the choice
 
-			x = 0.069021 * safezoneW;
+			x = 0.114855 * safezoneW;
 			y = 0.006000 * safezoneH;
 			w = 0.06875 * safezoneW;
 			h = 0.0219914 * safezoneH;
@@ -223,6 +223,17 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			w = 0.057292 * safezoneW;
 			h = 0.0219914 * safezoneH;
 			tooltip = "Broadcast the live feed to all players for 25 seconds"; //--- ToDo: Localize;
+		};
+		//(MK) 3D View: the full-screen 3D view on the selected unit or group's leader
+		class MCC_UMview3D: MCCBTN_S
+		{
+			idc = -1;
+			onButtonClick = "[] spawn MCCMK_fnc_view3D";
+			text = "3D View";
+			x = 0.235167 * safezoneW;
+			y = 0.145957 * safezoneH;
+			w = 0.057292 * safezoneW;
+			h = 0.0219914 * safezoneH;
 		};
 		class MCC_UMDelete: MCCBTN_S
 		{
@@ -296,7 +307,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			idc = MCC_UM_PIC;
 			colorBackground[] = { 0, 0, 0,1};
 			
-			text = "";	//blank (black background) until a unit is clicked: not the render target, which was asked for before a camera was bound to it (first feed stayed black), and not a static frame (it stayed on screen)
+			text = "";	//blank (black background) until a unit is clicked: not the render target (asked for before a camera is bound to it, the feed stays black), and not a static frame (it would stay on screen)
 			x = 0.298188 * safezoneW;
 			y = 0.033991 * safezoneH;
 			w = 0.160417 * safezoneW;
@@ -328,7 +339,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 		{
 			idc = 9138;	//rounded grey box under On (hidden when Off)
 			style = 48;
-			text = "\mcc_sandbox_mod\data\btn_round_sq_n_ca.paa";
+			text = "\mcc_sandbox_mod\data\btn_round_half_n_ca.paa";
 			colorText[] = {1,1,1,1};
 			colorBackground[] = {0,0,0,0};
 			x = 0.434605 * safezoneW;
@@ -345,7 +356,7 @@ class MCC_UMDialogControls:MCC_RscControlsGroup
 			rows = 1;
 			columns = 3;
 			values[] = {0,1,3};
-			style = 2;	//Regular where it was; the boxes spread so On / Off ends at the right edge of the camera picture
+			style = 2;	//the boxes spread so On / Off ends at the right edge of the camera picture
 			colorSelectedBg[] = {0,0,0,0};	//the rounded box under it (9137) marks the choice
 			onToolBoxSelChanged = "_this execVM ((missionNamespace getVariable ['MCC_path','\mcc_sandbox_mod\']) + 'mcc\general_scripts\unitManage\um_camView.sqf'); [9133, _this select 1] call MCC_fnc_umToolboxHighlight;";
 

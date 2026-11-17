@@ -36,8 +36,8 @@ switch (toLower _side) do	{
 	};
 		
 if (_action == 0 || _action == 1) then	{	//Garisson
-	if (_buildingscount < 1) exitwith {hint "No buildings found"};	//No available buildings? stop the script!
-	if (_groupUnits) then {_group = creategroup _side}; 
+	if (_buildingscount < 1) exitwith {["No buildings found"] call MCCMK_fnc_hint};	//No available buildings? stop the script!
+	if (_groupUnits) then {_group = creategroup _side; [_group] call MCCMK_fnc_genTag}; 
 	{
 		_buildingPos = _x call MCC_fnc_buildingPosCount;
 		if (_buildingPos > 0) then	{	//If the building have an interrior positions
@@ -46,8 +46,8 @@ if (_action == 0 || _action == 1) then	{	//Garisson
 				if (random 10 < _intanse/2) then	{	//Let's roll the dice 
 					if (count (nearestObjects [_spawnPos, ["Man"], 1])<1) then	{ 	//No other unit in the spawn position?
 						_type = _unitsArray select round (random 4); 
-						if !(_groupUnits) then {_group = creategroup _side}; 
-						_unit = _group createUnit [_type select 0,_spawnPos,[],0.5,"NONE"];
+						if !(_groupUnits) then {_group = creategroup _side; [_group] call MCCMK_fnc_genTag}; 
+						_unit = _group createUnit [_type select 0,_spawnPos,[],0.5,"NONE"]; [_unit] call MCCMK_fnc_genTag;
 						sleep 0.5;
 						_unit setBehaviour "SAFE";
 						_unit setUnitPos "UP";
@@ -64,14 +64,14 @@ if (_action == 0 || _action == 1) then	{	//Garisson
 if (_action == 1) then	{	//vehicles
 	_vehiclesNumber=round((_buildingscount*_intanse)/20);
 	_roads = _center nearRoads _radius;
-		hint format ["car: %1",_roads];
+		[format ["car: %1",_roads]] call MCCMK_fnc_hint;
 	   
 	  for "_i" from 1 to _vehiclesNumber do
 	  {        
 		_road = _roads select floor(random (count _roads));
 		_spawnPos = getpos _road;
 		_type = _vehiclesArray select (floor (random (_vehiclesCount)));
-		_vehicle= (_type select 0) createVehicle _spawnPos;
+		_vehicle= (_type select 0) createVehicle _spawnPos; [_vehicle] call MCCMK_fnc_genTag;
 		_vehicle setDir (direction _road)+ 90;
 		_spawnPos = _vehicle modelToWorld [3,0,0];
 		

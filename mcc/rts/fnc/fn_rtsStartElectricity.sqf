@@ -24,6 +24,7 @@ _varName = format ["MCC_rtsElecOn_%1", playerSide];
 _stat = !(missionNamespace getVariable [_varName,false]);
 missionNamespace setVariable [_varName,_stat];
 publicVariable _varName;
+["update", playerSide] remoteExec ["MCCMK_fnc_helipadLights", 0, format ["MCCMK_padLights_%1", playerSide]];	//(MK) lit helipads
 [MCC_ConsoleGroupSelected] spawn MCC_fnc_baseSelected;
 
 if (missionNamespace getVariable [_varName,false]) then {

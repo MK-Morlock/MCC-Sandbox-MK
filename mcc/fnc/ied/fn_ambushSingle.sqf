@@ -63,21 +63,21 @@ if (_isSpotter > 0) then
 	switch (_isSpotter) do {
 		case 1:			//Civilian
 		{
-			_group = creategroup civilian;
+			_group = creategroup civilian; [_group] call MCCMK_fnc_genTag;
 			_spotterArray = ["C_man_1","C_man_1_1_F","C_man_polo_2_F"];
 			_spotterClass = _spotterArray select (floor random (count _spotterArray));
 		};
 
 		case 2:			//Function
 		{
-			_group = creategroup civilian;
+			_group = creategroup civilian; [_group] call MCCMK_fnc_genTag;
 			_spotterArray = ["Assistant","Citizen1","Functionary1","Priest","Policeman","Profiteer3","RU_Villager1","RU_Rocker1"];
 			_spotterClass = _spotterArray select (floor random (count _spotterArray));
 		};
 
 		case 3:			//Camoflged
 		{
-			_group = creategroup _side;
+			_group = creategroup _side; [_group] call MCCMK_fnc_genTag;
 			_spotterClass = switch (_targetSide) do {				//case we have a happy camuflaged spotter
 								case west:
 								{
@@ -102,7 +102,7 @@ if (_isSpotter > 0) then
 		};
 	};
 
-	_spotter = _group createUnit [_spotterClass , (([_pos, 20, 15, 2] call MCC_fnc_landSpot) call {if (_this isEqualTo []) then {_pos} else {_this}}), [], 0, "NONE"];
+	_spotter = _group createUnit [_spotterClass , (([_pos, 20, 15, 2] call MCC_fnc_landSpot) call {if (_this isEqualTo []) then {_pos} else {_this}}), [], 0, "NONE"]; [_spotter] call MCCMK_fnc_genTag;
 	_spotter AddWeapon "Binocular";
 	{_x addCuratorEditableObjects [[_spotter],false]} forEach allCurators;
 }

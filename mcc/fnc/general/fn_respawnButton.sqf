@@ -8,8 +8,8 @@ private _b = _d displayCtrl 9140;
 _b ctrlEnable true;
 if (missionNamespace getVariable ["MCC_TRAINING", true]) then {
 	_b ctrlSetText "Disable Respawn";
-	_b ctrlSetTooltip "Switch respawn off for all players: players who die go to spectator mode";
+	_b ctrlSetTooltip "Switch respawn off for all players: players who die go to\nspectator mode";
 } else {
 	_b ctrlSetText "Enable Respawn";
-	_b ctrlSetTooltip "Switch respawn on again for all players: players in spectator mode return to their start location";
+	_b ctrlSetTooltip "Switch respawn on again for all players: players in spectator\nmode return to their start location";
 };

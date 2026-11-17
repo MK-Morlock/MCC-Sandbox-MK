@@ -38,7 +38,7 @@ if (_isCQB) then {
 
 //Lets populate it
 [_objPos,_range, 0, (if (_campaignMission) then {0.5} else {2}),_faction, _side] call MCC_fnc_garrison;
-[_objPos, 30, (if (_campaignMission) then {0.5} else {2}), _faction, _side] remoteExec ["MCC_fnc_MWcampGuards", 2];
+(if (isServer) then {[[_objPos, 30, (if (_campaignMission) then {0.5} else {2}), _faction, _side], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_MWcampGuards"] spawn MCCMK_fnc_genRun} else {[_objPos, 30, (if (_campaignMission) then {0.5} else {2}), _faction, _side] remoteExec ["MCC_fnc_MWcampGuards", 2]});
 
 sleep 2;
 

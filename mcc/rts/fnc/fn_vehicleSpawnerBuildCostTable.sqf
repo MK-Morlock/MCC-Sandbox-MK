@@ -69,7 +69,7 @@ switch (tolower _vehicleType) do {
 //Is there a user designed vehicle costs? (MCC_RTS_<type>_<side>, set by the mission maker)
 _vehicleArray = missionNamespace getVariable [format["MCC_RTS_%1_%2",tolower _vehicleType,_side],[]];
 
-//Built list, cached per type + side + faction (it used to be cached per side only, so the first player's faction decided the list for everyone)
+//Built list, cached per type + side + faction (each player's faction gets its own list)
 private _cacheKey = format ["MCC_RTS_cache_%1_%2_%3_%4", tolower _vehicleType, _side, _faction, _sideBuy];
 if (count _vehicleArray == 0) then {_vehicleArray = + (missionNamespace getVariable [_cacheKey, []])};
 

@@ -20,7 +20,7 @@ player setVariable ["MCC_forceCameraMode",_mode];
 
 	while {true} do {
 
-		waitUntil {cameraView == "External"};
+		waitUntil {sleep 0.1; cameraView == "External"};	//(MK) ten times a second
 
 		switch (player getVariable ["MCC_forceCameraMode",3]) do {
 

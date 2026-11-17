@@ -37,14 +37,21 @@ if (_object isKindOf "mcc_sandbox_modulevehicleSpawner" || _object isKindOf "MCC
 
     //No synced Objects?
     if (count _syncedObjects <2) then {
-        _billboard = MCC_billboard createVehicle (_object modelToWorld [0,5,0]);
-        _helipad = MCC_helipad createVehicle (_object modelToWorld [0,15,0]);
+        _billboard = MCC_billboard createVehicle (_object modelToWorld [0,5,0]); [_billboard] call MCCMK_fnc_genTag;
+        _helipad = MCC_helipad createVehicle (_object modelToWorld [0,15,0]); [_helipad] call MCCMK_fnc_genTag;
+        //(MK) the module's rotation, as its editor preview shows 
+        _billboard setDir (getDir _object);
+        _helipad setDir (getDir _object);
+        _billboard setPosATL ((_object modelToWorld [0,5,0]) vectorMultiply [1, 1, 0]);
+        _helipad setPosATL ((_object modelToWorld [0,15,0]) vectorMultiply [1, 1, 0]);
     } else {
         _billboard = _syncedObjects select 0;
         _helipad = _syncedObjects select 1;
     };
 
     _type = _object getVariable ["type","vehicle"];
+    MCCMK_vehicleShops = ((missionNamespace getVariable ["MCCMK_vehicleShops", []]) select {!isNull _x}) + [_billboard, _helipad];
+    publicVariable "MCCMK_vehicleShops";
     missionNamespace setVariable ["MCC_vehicleKioskBySide",(_object getVariable ["spawnFrom",0]) isEqualTo 1, true];
 
     //Add the objects to curator
@@ -96,7 +103,7 @@ switch (_action) do
                 "(alive _target) && (_target distance _this < 5)",
                 {},
                 {},
-                {[player, (_this select 3),"dialog"] spawn MCC_fnc_vehicleSpawnerInit},
+                {[[player, (_this select 3),"dialog"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_vehicleSpawnerInit}},
                 {},
                 _vars,
                 1,

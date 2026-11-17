@@ -284,13 +284,11 @@ switch (_task) do {
 private _group = grpNull;
 private _vehicle = objNull;
 
-// Objective modules go into MCCs own logic group. They used to join the group of whatever logic happened to be first
-// in allMissionObjects - often another module that deletes itself (Zeus/MCC modules do), so the group could be empty or
-// deleted and createUnit returned nothing: the objective spawned but had no task and no map marker, and when every
-// objective failed like that the mission reported "complete" at once.
+// Objective modules go into MCC's own logic group: another logic found in allMissionObjects can be a module that deletes
+// itself (Zeus/MCC modules do), leaving createUnit with no group - an objective with no task and no map marker.
 _group = missionNamespace getVariable ["MCC_MWObjectiveLogicGroup", grpNull];
 if (isNull _group) then {
-	_group = createGroup [sideLogic, false];
+	_group = createGroup [sideLogic, false]; [_group] call MCCMK_fnc_genTag;
 	missionNamespace setVariable ["MCC_MWObjectiveLogicGroup", _group];
 };
 
@@ -298,7 +296,8 @@ if (isNull _group) then {
 private _missionName = missionNamespace getVariable ["MCC_fnc_MWinitMission_missionName",""];
 
 if (_task == "clear_area") then {
-    _vehicle = _group createunit ["MCC_ModuleObjective_FCurator", _pos,[],0.5,"NONE"];
+    _vehicle = _group createunit ["MCC_ModuleObjective_FCurator", _pos,[],0.5,"NONE"]; [_vehicle] call MCCMK_fnc_genTag;
+    MCCMK_objModules = ((missionNamespace getVariable ["MCCMK_objModules", []]) select {!isNull _x}) + [_vehicle];	//(MK) the objective modules, so nothing has to scan the whole mission for them
     _vehicle setVariable ["BIS_fnc_initModules_disableAutoActivation", false,true];
     _vehicle setVariable ["MCC_customTask",true,true];	//counted by the mission-end check straight away (MCC_fnc_customTasks sets it again later)
     _vehicle setVariable ["MCC_MWMissionId", missionNamespace getVariable ["MCC_MWCurrentMissionId", ""]];
@@ -325,12 +324,13 @@ if (_task == "clear_area") then {
 
     {_x addCuratorEditableObjects [[_vehicle],false]} forEach allCurators;
     _vehicle setvariable ["updated",true,true];
-    //Start the task now. Left to the module framework, objective modules created in the same moment were sometimes never
-    [_vehicle, "init"] spawn MCC_fnc_ModuleObjective_F;
+    //Start the task now (left to the module framework, objective modules created in the same moment may not all start)
+    [[_vehicle, "init"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_ModuleObjective_F};
 } else {
   //spawn task for each side
   {
-    _vehicle = _group createunit ["MCC_ModuleObjective_FCurator", _pos,[],0.5,"NONE"];
+    _vehicle = _group createunit ["MCC_ModuleObjective_FCurator", _pos,[],0.5,"NONE"]; [_vehicle] call MCCMK_fnc_genTag;
+    MCCMK_objModules = ((missionNamespace getVariable ["MCCMK_objModules", []]) select {!isNull _x}) + [_vehicle];	//(MK) the objective modules, so nothing has to scan the whole mission for them
     if (_task == "Logistics") then {_vehicle setPos _objRealPos};
     _vehicle setVariable ["BIS_fnc_initModules_disableAutoActivation", false,true];
     _vehicle setVariable ["MCC_customTask",true,true];	//counted by the mission-end check straight away (MCC_fnc_customTasks sets it again later)
@@ -357,8 +357,8 @@ if (_task == "clear_area") then {
 
     {_x addCuratorEditableObjects [[_vehicle],false]} forEach allCurators;
     _vehicle setvariable ["updated",true,true];
-    //Start the task now. Left to the module framework, objective modules created in the same moment were sometimes never
-    [_vehicle, "init"] spawn MCC_fnc_ModuleObjective_F;
+    //Start the task now (left to the module framework, objective modules created in the same moment may not all start)
+    [[_vehicle, "init"], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_ModuleObjective_F};
   } foreach _sides;
 };
 

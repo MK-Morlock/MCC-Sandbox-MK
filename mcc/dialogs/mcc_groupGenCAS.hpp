@@ -50,7 +50,7 @@ class MCC_CASDialogControls:MCC_RscControlsGroup
 		class MCC_casFilterFaction: MCC_RscCheckbox
 		{
 			idc = 1070;
-			tooltip = "Ticked: only your faction's aircraft (and its variants). Unticked: every aircraft on your side";
+			tooltip = "Ticked: only your faction's aircraft (and its variants).\nUnticked: every aircraft on your side";
 			x = 0.033000* safezoneW;
 			y = 0.048000* safezoneH;
 			w = 0.010500* safezoneW;
@@ -168,6 +168,18 @@ class MCC_CASDialogControls:MCC_RscControlsGroup
 			w = 0.057300 * safezoneW;
 			h = 0.022000 * safezoneH;
 			tooltip = "Call CAS - drag and draw a line on the minimap to call CAS"; //--- ToDo: Localize;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle (MCCMK_fnc_garageButton); Ctrl + click: its own look again
+		class MCCMK_casGarage: MCCBTN_S
+		{
+			idc = 28;
+			text = "Garage";
+			tooltip = "Paint and parts for the chosen vehicle.\nKept in your profile, used whenever it is spawned here.\nCtrl + click: back to its own look.";
+			onMouseButtonClick = "if ((_this select 1) == 0) then {['cas', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.092829* safezoneW;
+			y = 0.160000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
 		};
 		class MCC_CASAdd: MCCBTN_S
 		{

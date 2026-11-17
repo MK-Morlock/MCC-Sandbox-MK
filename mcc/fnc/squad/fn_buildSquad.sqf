@@ -11,7 +11,7 @@ if (_src isEqualType "") then {
 	_classes = _classes arrayIntersect _classes;
 	private _facs = _classes apply {getText (configFile >> "CfgVehicles" >> _x >> "faction")};
 	private _best = 0;
-	{private _n = {_x == _y} count _facs; if (_n > _best) then {_best = _n; _fac = _x}} forEach (_facs arrayIntersect _facs);
+	{private _f = _x; private _n = {_x == _f} count _facs; if (_n > _best) then {_best = _n; _fac = _f}} forEach (_facs arrayIntersect _facs);
 };
 if (count _classes == 0) exitWith {[]};
 if (_type == "") then {_type = switch (true) do {case (_size <= 2): {"Sentry"}; case (_size <= 5): {"Fire Team"}; default {"Squad"}}};

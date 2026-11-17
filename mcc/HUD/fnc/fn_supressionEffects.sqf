@@ -9,9 +9,7 @@
   Blur, red tint and camera shake are only shown while "Suppression Effects" (MCC_suppressionOn) is on.
   The Arcade fire-direction indicator follows "Fire Direction indicator" (MCC_hitRadar) on its own.
 
-  This file used to start with "if (true) exitWith {}" (all effects disabled). Part of the reason: when suppression was
-  off, a colour-correction effect was still created and enabled on every near miss and never destroyed. Effects are now
-  only created when they are shown, and always destroyed.
+  Effects are only created when they are shown, and always destroyed.
 */
 params [["_ratio",0.5,[0]],["_dir",0,[0]]];
 

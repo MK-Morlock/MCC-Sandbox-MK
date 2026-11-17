@@ -217,11 +217,11 @@ my_pv_handler =
 						};
 						if (_p_mcc_spawnname in ["0","1","2","3","4","5","6","7","8"] || _p_mcc_spawnname in [0,1,2,3,4,5,6,7,8]) then
 						{
-							[[(_p_safepos select 0),(_p_safepos select 1),0],_p_mcc_grouptype,_p_mcc_spawnname,_p_mcc_zone_markername,_p_mcc_zone_behavior,_p_mcc_awareness,_p_mcc_spawnfaction,_p_mcc_spawn_dir] spawn MCC_fnc_paratroops;
+							[[(_p_safepos select 0),(_p_safepos select 1),0],_p_mcc_grouptype,_p_mcc_spawnname,_p_mcc_zone_markername,_p_mcc_zone_behavior,_p_mcc_awareness,_p_mcc_spawnfaction,_p_mcc_spawn_dir,["", _p_mcc_zone_markername] select (_pendIdx >= 0)] spawn MCC_fnc_paratroops;
 						}
 						else
 						{
-							[[(_p_safepos select 0),(_p_safepos select 1),0],_p_mcc_grouptype, _p_mcc_spawnname,_p_mcc_zone_markername,_p_mcc_spawnfaction,_p_mcc_spawn_dir] spawn MCC_fnc_reinforcement;
+							[[(_p_safepos select 0),(_p_safepos select 1),0],_p_mcc_grouptype, _p_mcc_spawnname,_p_mcc_zone_markername,_p_mcc_spawnfaction,_p_mcc_spawn_dir,["", _p_mcc_zone_markername] select (_pendIdx >= 0),_p_mcc_player] spawn MCC_fnc_reinforcement;	//(MK) a mission's QRF: its zone, for the mission's cleanup
 						};
 					};
 
@@ -295,20 +295,25 @@ my_pv_handler =
 								{
 									private _vehicleClass = tolower (gettext (configFile >> "CfgVehicles" >> _p_mcc_spawnname >> "vehicleClass"));
 									if (typeName _p_mcc_spawnfaction == "SIDE") then {_p_mcc_spawnfaction = str _p_mcc_spawnfaction};
+									// (MK) the faction chosen in the console crews it, whatever the vehicle (same side only)
+									private _mmFac = if (isNil "_p_mcc_player") then {""} else {_p_mcc_player getVariable ["MCCMK_faction", ""]};
+									if (_mmFac != "" && {(getNumber (configFile >> "CfgFactionClasses" >> _mmFac >> "side")) != ([1, 0, 2, 3] param [["WEST", "EAST", "GUER", "CIV"] find _p_mcc_spawnfaction, -1])}) then {_mmFac = ""};
 
 									if (_p_mcc_spawnfaction=="GUER") then
-										{_unitspawned 	=	[_p_safepos, _spawndirection, _p_mcc_spawnname, resistance] call MCC_fnc_spawnVehicle;};
+										{_unitspawned 	=	[_p_safepos, _spawndirection, _p_mcc_spawnname, resistance, true, true, _mmFac] call MCC_fnc_spawnVehicle;};
 									if (_p_mcc_spawnfaction=="WEST") then
-										{ _unitspawned 	=	[_p_safepos, _spawndirection, _p_mcc_spawnname, WEST] call MCC_fnc_spawnVehicle;};
+										{ _unitspawned 	=	[_p_safepos, _spawndirection, _p_mcc_spawnname, WEST, true, true, _mmFac] call MCC_fnc_spawnVehicle;};
 									if (_p_mcc_spawnfaction=="EAST") then
-										{ _unitspawned 	=	[_p_safepos, _spawndirection, _p_mcc_spawnname, EAST] call MCC_fnc_spawnVehicle;};
+										{ _unitspawned 	=	[_p_safepos, _spawndirection, _p_mcc_spawnname, EAST, true, true, _mmFac] call MCC_fnc_spawnVehicle;};
 									if (_p_mcc_spawnfaction=="CIV") then
 										{ _unitspawned 	=	[_p_safepos, _spawndirection, _p_mcc_spawnname, civilian] call MCC_fnc_spawnVehicle;};
 
+									if (!isNil "_unitspawned" && {_unitspawned isEqualType []}) then {[_unitspawned param [0, objNull]] call MCCMK_fnc_garageApply; [_unitspawned param [0, objNull]] call MCCMK_fnc_spawnAnchor};	//(MK) garage paint and parts, if any
 									//If UAV or UGV
 									if (_vehicleClass == "autonomous") then
 										{
 											createVehicleCrew (_unitspawned select 0);
+											[_unitspawned select 0, _mmFac] call MCCMK_fnc_crewFix;	//(MK) the chosen faction
 											if (_p_mcc_cmd) then {(group (_unitspawned select 0)) setvariable ["MCC_canbecontrolled",true,true]};
 										};
 
@@ -376,6 +381,7 @@ my_pv_handler =
 									_safepos     =[_p_mcc_zone_markposition,1,_p_maxrange,2,1,100,0,[],[[-500,-500,0],[-500,-500,0]]] call BIS_fnc_findSafePos;
 
 									_unitspawned 	= _p_mcc_spawnname createVehicle _p_safepos;
+									[_unitspawned] call MCCMK_fnc_garageApply; [_unitspawned] call MCCMK_fnc_spawnAnchor;	//(MK) garage paint and parts, if any
 
 									//Curator
 									{_x addCuratorEditableObjects [[_unitspawned],false]} forEach allCurators;

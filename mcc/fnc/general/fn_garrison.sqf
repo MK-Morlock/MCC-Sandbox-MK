@@ -87,12 +87,12 @@ if (count _unitsArray == 0) exitWith {
 	["WARN", "MCC_fnc_garrison", "faction %1 has no soldiers to garrison with", [_faction]] call MCC_fnc_log;
 };
 
-if (_buildingscount < 1) exitwith {hint "No buildings found"};	//No available buildings? stop the script!
+if (_buildingscount < 1) exitwith {["No buildings found"] call MCCMK_fnc_hint};	//No available buildings? stop the script!
 {
 	_buildingPos = _x call MCC_fnc_buildingPosCount;
 	if (_buildingPos > 0) then
 	{	//If the building have an interrior positions
-		if (_groupUnits) then {_group = creategroup _side};
+		if (_groupUnits) then {_group = creategroup _side; [_group] call MCCMK_fnc_genTag};
 
 		for [{_i=0},{_i<_buildingPos},{_i=_i+1}] do
 		{
@@ -102,11 +102,10 @@ if (_buildingscount < 1) exitwith {hint "No buildings found"};	//No available bu
 			if (random 30 < _intanse) then {
 				//No other unit in the spawn position?
 				if (count (nearestObjects [_spawnPos, ["Man"], 1])<1) then {
-					// (was "_unitsArray select round (random 4)": only the first 5 types, and nothing at all - plus a
-					//  script error - when the faction had fewer than 5)
+					// (any type in the faction's list)
 					_type = selectRandom _unitsArray;
-					if !(_groupUnits) then {_group = creategroup _side};
-					_unit = _group createUnit [_type select 0,_spawnPos,[],0.5,"NONE"];
+					if !(_groupUnits) then {_group = creategroup _side; [_group] call MCCMK_fnc_genTag};
+					_unit = _group createUnit [_type select 0,_spawnPos,[],0.5,"NONE"]; [_unit] call MCCMK_fnc_genTag;
 					if (isNull _unit) then {continue};
 					waituntil {alive _unit || isNull _unit};
 					_unit setpos _spawnPos;
@@ -148,6 +147,10 @@ if (_spawnVehicles) then	{
 
 	_vehiclesNumber=round((_buildingscount*_intanse)/12);
 	if (_vehiclesNumber > 8) then {_vehiclesNumber = 8};
+	//(MK) civilians' parked cars: at most the Mission Generator's "Parked civilian vehicles per task" (2 / 4 / 8)
+	if (_side isEqualTo civilian || {(_side isEqualType "") && {(toUpper _side) in ["CIV", "CIVILIAN"]}}) then {
+		_vehiclesNumber = _vehiclesNumber min (missionNamespace getVariable ["MCC_MWParkedCivMax", 4]);
+	};
 
 	_roads = _center nearRoads _radius;
 	if (count _roads < 5) exitWith {};
@@ -178,7 +181,7 @@ if (_spawnVehicles) then	{
 			if (_spawnPos isEqualTo []) then {_spawnPos = _roadPos findEmptyPosition [0.1, 40, _type]};
 			if (_spawnPos isEqualTo []) then {continue};
 
-			_vehicle= _type createVehicle _spawnPos;
+			_vehicle= _type createVehicle _spawnPos; [_vehicle] call MCCMK_fnc_genTag;
 			waituntil {alive _vehicle};
 			_vehicle allowDamage false;
 			_vehicle setpos _spawnPos;

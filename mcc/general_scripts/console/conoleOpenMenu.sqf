@@ -46,36 +46,8 @@ if (_type == 0) then {											//Opening the conole
 				};
 			player playMove _stance;
 		};
-	if (MCC_CASConsoleFirstTime) then
-	{
-		while {_time > time && dialog} do
-		{
-			_message = "";
-			_messageFinal = ["S","e","a","r","c","h","i","n","g"," ","S","a","t","e","l","l","i","t","e","s",".",".",".",".","."];
-			for "_i" from 0 to (count _messageFinal - 1) do {
-				_message = _message + (_messageFinal select _i);
-				ctrlSetText [9105, _message];
-				sleep 0.05;
-			};
-		};
-		MCC_CASConsoleFirstTime = false;
-	};
-
-	if (dialog) then
-	{
-		_time = time + random 1;
-		while {_time > time && dialog} do
-		{
-			_message = "";
-			_messageFinal = ["C","o","n","n","e","c","t","i","n","g",".",".",".",".","."];
-			for "_i" from 0 to (count _messageFinal - 1) do
-			{
-				_message = _message + (_messageFinal select _i);
-				ctrlSetText [9105, _message];
-				sleep 0.05;
-			};
-		};
-	};
+	//(MK) no "Searching Satellites / Connecting" animation: the console opens straight away
+	MCC_CASConsoleFirstTime = false;
 
 	_commander = ((MCC_server getVariable [format ["CP_commander%1",side player],""]) == getPlayerUID player) or ("MCC_itemConsole" in (assignedItems player));
 
@@ -90,7 +62,7 @@ if (_type == 0) then {											//Opening the conole
 	if (dialog && !_commander) then
 	{
 		ctrlSetText [9105, "Access denied: Not commander"];
-		sleep 2;
+		sleep 1.5;
 		closedialog 0;
 	};
 	};

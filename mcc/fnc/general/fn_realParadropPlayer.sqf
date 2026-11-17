@@ -1,3 +1,15 @@
+// (MK) The third-person camera set in its place behind a black frame, then first person again (see the cinematic's end)
+if (isNil "MCCMK_dropViewPrime") then {
+	MCCMK_dropViewPrime = {
+		params ["_u"];
+		cutText ["", "BLACK FADED", 0];
+		_u switchCamera "EXTERNAL";
+		private _f = diag_frameNo;
+		waitUntil {diag_frameNo > _f + 2};
+		_u switchCamera "INTERNAL";
+		cutText ["", "BLACK IN", 0.15];
+	};
+};
 private _positions = [];
 private _dir = 0;
 private _isHalo = 0;
@@ -19,7 +31,7 @@ _positions 	= [[-0.5,-2.5,-2.23],[0.5,-2.5,-2.23],[-0.5,-1,-2.23],[0.5,-1,-2.23]
 
 //set the units looking the ramp
 _dir			= 180;
-_unitPosition 	= _positions select _unitNumber;
+_unitPosition 	= _positions select (_unitNumber min 11);
 
 //correct hight for the new airplane
 if (typeOf _plane == "B_T_VTOL_01_infantry_F") then {
@@ -35,7 +47,7 @@ if (isNull _unit) exitwith {};
 
 if (!local _unit || !alive _plane) exitwith {};
 
-if (isplayer _unit) then {
+if (isplayer _unit && {!(_plane getVariable ["MCCMK_pickupDrop", false])}) then {	//(MK) picked up and flown in: no fade
 	titleText ["","BLACK FADED",5];
 };
 
@@ -74,7 +86,7 @@ if (isplayer _unit) then {
 
 
 	//Cinametic
-	if !(missionNamespace getVariable ["MCC_dropCutscene", true]) exitWith {titleText ["","BLACK IN",1]};
+	if (!(missionNamespace getVariable ["MCC_dropCutscene", true]) || {_plane getVariable ["MCCMK_pickupDrop", false]}) exitWith {titleText ["","BLACK IN",1]};	//(MK) picked up: no cut-scene
 	if (!alive _unit || !alive _plane) exitWith {};
 	private _viewBefore = ["INTERNAL", "EXTERNAL"] select (cameraView == "EXTERNAL");
 	["INFO", "paradrop", "cut-scene: %1 is in %2, view %3 (camera view %4)", [name _unit, typeOf (vehicle _unit), _viewBefore, cameraView]] call MCC_fnc_log;
@@ -214,6 +226,13 @@ if (isplayer _unit) then {
 						_cam cameraEffect ["TERMINATE", "BACK"];
 						_u switchCamera "INTERNAL";
 					} else {
+						// (MK) first person to the chase view: its angle and zoom snapped to where they should be, so it
+						// appears in place at once (it eased there from its last angle and zoom - a drift)
+						if (count MCC_dropChase > 8) then {
+							MCC_dropChase set [5, MCC_dropChase select 2];
+							MCC_dropChase set [6, MCC_dropChase select 3];
+							MCC_dropChase set [8, MCC_dropChase select 7];
+						};
 						_cam cameraEffect ["INTERNAL", "BACK"];
 					};
 				};
@@ -241,6 +260,10 @@ if (isplayer _unit) then {
 			_cam cameraEffect ["TERMINATE", "BACK"];
 			camDestroy _cam;
 			_u switchCamera (["EXTERNAL", "INTERNAL"] select _fp);
+			// (MK) Handed back in first person: the third-person camera still holds where it was before the cinematic, so
+			// the first switch to it glides from there - through the helicopter. It's set in its place first (behind a
+			// black frame), then first person again, so that switch is instant.
+			if (_fp && {alive _u}) then {[_u] spawn MCCMK_dropViewPrime};
 			(findDisplay 46) displayRemoveEventHandler ["MouseButtonDown", missionNamespace getVariable ["MCC_dropCutSkipEH", -1]];
 		};
 	} else {
@@ -248,6 +271,7 @@ if (isplayer _unit) then {
 		camdestroy _camera;
 		_camera = nil;
 		_unit switchCamera _viewBefore;
+		if (_viewBefore == "INTERNAL" && {alive _unit}) then {[_unit] spawn MCCMK_dropViewPrime};	// (MK) as above
 		(findDisplay 46) displayRemoveEventHandler ["MouseButtonDown", missionNamespace getVariable ["MCC_dropCutSkipEH", -1]];
 	};
 };
@@ -417,9 +441,9 @@ if (_isHalo == 0) then {
 	};
 };
 
-//along the drawn drop line is what puts them on the line. MCC_fnc_paraGuide is no longer called.)
+//along the drawn drop line is what puts them on the line.
 
-if (_isHalo == 2 && {_unitNumber == 0} && {missionNamespace getVariable ["MCC_haloFormation", true]}) then {
+if (_isHalo == 2 && {_unitNumber == 0} && {_plane getVariable ["MCC_haloFormOn", true]} && {missionNamespace getVariable ["MCC_haloFormation", true]}) then {
 	private _stick = _plane getVariable ["MCC_haloStick", []];
 	if ((_stick findIf {isPlayer _x}) >= 0) then {[_stick] spawn MCC_fnc_haloFormationPlayer} else {[_stick] spawn MCC_fnc_haloFormation};
 };
@@ -447,7 +471,7 @@ sleep 4;
 
 if (_isHalo == 2) then {
 	waituntil  {isPlayer _unit || ((position _unit) select 2) < 200};
-	_unit addBackpack "B_Parachute";
+	if (isPlayer _unit || {_unit getVariable ["MCC_haloFormMember", false]}) then {_unit addBackpack "B_Parachute"};
 } else {
 	_vehicle = createVehicle ["Steerable_Parachute_F", [-5000, -5000, 0], [], ((_dir)-3+(random 6)), 'NONE'];
 

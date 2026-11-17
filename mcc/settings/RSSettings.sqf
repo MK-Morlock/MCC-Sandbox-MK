@@ -4,8 +4,8 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
     [
         "CP_activated",
         "CHECKBOX",
-        ["Enable Role Selection","Enable role selection menu allows player to gain XP and unlock new\nweapons and items"],
-        "MCC Role Selection",
+        ["Enable Role Selection","Enable role selection menu allows player to gain XP and\nunlock new weapons and items"],
+        "MCCMK Role Selection",
         false,
         true
     ] call CBA_Settings_fnc_init;
@@ -16,7 +16,7 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
         "MCC_rsAllWeapons",
         "CHECKBOX",
         ["Unlock All Weapons","Unlock All Weapons ignoring the player level"],
-        "MCC Role Selection",
+        "MCCMK Role Selection",
         false,
         true
     ] call CBA_Settings_fnc_init;
@@ -26,7 +26,7 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
         "MCC_allowChangingKits",
         "CHECKBOX",
         ["Role Change","Players can change roles in HQ"],
-        "MCC Role Selection",
+        "MCCMK Role Selection",
         true,
         true
     ] call CBA_Settings_fnc_init;
@@ -35,8 +35,8 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
     [
         "MCC_rsEnableRoleWeapons",
         "CHECKBOX",
-        ["Restrict Weapons","Players using weapons outside of their role (eg rifleman using sniper\nrifle) will get penalty by increased weapon sway"],
-        "MCC Role Selection",
+        ["Restrict Weapons","Players using weapons outside of their role (eg\nrifleman using sniper rifle) will get penalty by\nincreased weapon sway"],
+        "MCCMK Role Selection",
         false,
         true
     ] call CBA_Settings_fnc_init;
@@ -45,8 +45,8 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
     [
         "MCC_rsEnableDriversPilots",
         "CHECKBOX",
-        ["Restrict Vehicles","Players can't use vehicles outside of their role (eg rifleman driving\na tank) except light vehicles"],
-        "MCC Role Selection",
+        ["Restrict Vehicles","Players can't use vehicles outside of their role (eg\nrifleman driving a tank) except light vehicles"],
+        "MCCMK Role Selection",
         false,
         true
     ] call CBA_Settings_fnc_init;
@@ -56,7 +56,7 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
         "CP_defaultGroups",
         "EDITBOX",
         ["Group Callsigns","Default group callsigns"],
-        "MCC Role Selection",
+        "MCCMK Role Selection",
         '["Alpha","Bravo","Charlie","Delta"]',
         true,
         {
@@ -71,8 +71,8 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
     [
         "CP_gainXP",
         "CHECKBOX",
-        ["Gain XP automatically","Players will gain XP by killing and doing role's actions"],
-        ["MCC Role Selection","Experience Points"],
+        ["Gain XP automatically","Players will gain XP by killing and doing role's\nactions"],
+        ["MCCMK Role Selection", "Experience Points"],
         true,
         true
     ] call CBA_Settings_fnc_init;
@@ -82,7 +82,7 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
         "CP_expNotifications",
         "CHECKBOX",
         ["Gain XP notifications","Players will get notifications when gaining XP"],
-        ["MCC Role Selection","Experience Points"],
+        ["MCCMK Role Selection", "Experience Points"],
         true,
         true
     ] call CBA_Settings_fnc_init;
@@ -91,8 +91,8 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
     [
         "CP_XPperLevel",
         "SLIDER",
-        ["Base Xp","Base Xp needed for each level, Exp will raise by 5% each level"],
-        ["MCC Role Selection","Experience Points"],
+        ["Base Xp","Base Xp needed for each level, Exp will raise by 5%\neach level"],
+        ["MCCMK Role Selection", "Experience Points"],
         [1000, 10000, 4000, 0],
         true
     ] call CBA_Settings_fnc_init;
@@ -103,7 +103,7 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
         "CP_flagWest",
         "EDITBOX",
         ["Flag west","Default flag for west side"],
-        ["MCC Role Selection","Flags"],
+        ["MCCMK Role Selection", "Flags"],
         '"\a3\Data_f\Flags\flag_nato_co.paa"',
         true,
         {
@@ -117,7 +117,7 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
         "CP_flagEast",
         "EDITBOX",
         ["Flag east","Default flag for east side"],
-        ["MCC Role Selection","Flags"],
+        ["MCCMK Role Selection", "Flags"],
         '"\a3\Data_f\Flags\flag_CSAT_co.paa"',
         true,
         {
@@ -131,7 +131,7 @@ if (count (allMissionObjects "MCC_Module_settingsRS") == 0) then {
         "CP_flagGUER",
         "EDITBOX",
         ["Flag resistance","Default flag for resistance side"],
-        ["MCC Role Selection","Flags"],
+        ["MCCMK Role Selection", "Flags"],
         '"\a3\Data_f\Flags\flag_AAF_co.paa"',
         true,
         {

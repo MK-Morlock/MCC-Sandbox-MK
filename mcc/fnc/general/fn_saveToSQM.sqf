@@ -634,7 +634,7 @@ _mission = _mission
 		+ "    class Intel {}; " + _br
 		+ "};" + _br;
 
-// List the addons the saved classes come from (it used to be empty, so Eden could not tell which mods the file needs)
+// List the addons the saved classes come from, so Eden can tell which mods the file needs
 private _addonList = (_addons apply {str _x}) joinString ",";
 {
 	private _i = _mission find "MCC_ADDONS_PLACEHOLDER";

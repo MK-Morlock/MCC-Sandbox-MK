@@ -31,14 +31,18 @@ _this params [
 	["_type","",[""]],
 	["_param4",sideEnemy,[sideEnemy,grpNull]],
 	["_precisePosition",true,[true]],
-	["_randomAnimations",true,[true]]
+	["_randomAnimations",true,[true]],
+	["_crewFaction","",[""]],	// (MK) the chosen faction: its own soldiers crew the vehicle, whatever vehicle it is
+	["_landed",false,[false,0]]	// (MK) Start: false / 0 flying; true / 1 landed; 2 on the water (afloat) - engine off, held until its first order
 ];
+private _start = if (_landed isEqualType 0) then {_landed} else {[0, 1] select _landed};
+_landed = _start > 0;
 
 //Determine if an actual group was passed or a new one should be created.
 if ((typeName _param4) == (typeName sideEnemy)) then
 {
 	_side = _param4;
-	_grp = createGroup _side;
+	_grp = createGroup _side; [_grp] call MCCMK_fnc_genTag;
 	_newGrp = true;
 }
 else
@@ -61,18 +65,29 @@ _sim = getText(configFile >> "CfgVehicles" >> _type >> "simulation");
 
 switch (tolower _sim) do {
 	case "soldier": {
-		_veh = _grp createunit [_type,_pos,[],0,"none"];
+		_veh = _grp createunit [_type,_pos,[],0,"none"]; [_veh] call MCCMK_fnc_genTag;
 	};
 	case "airplanex";
 	case "helicopterrtd";
 	case "helicopterx": {
-		//Make sure aircraft start at a reasonable height.
 		if (count _pos == 2) then {_pos set [2,0];};
-		_pos set [2,(_pos select 2) max 50];
-		_veh = createVehicle [_type,_pos,[],0,"FLY"];
+		if (_landed) then {
+			//(MK) Start: Landed - on the ground where it was put; On water - afloat on the sea there (Floatary floats it)
+			_pos set [2, 0];
+			_veh = createVehicle [_type,_pos,[],0,"CAN_COLLIDE"]; [_veh] call MCCMK_fnc_genTag;
+			if (_start == 2 && {surfaceIsWater _pos}) then {
+				_veh setVariable ["MCCMK_waterLanding", true, true];
+				_veh setPosASL [_pos select 0, _pos select 1, 0.3];
+				_precisePosition = false;
+			};
+		} else {
+			//Make sure aircraft start at a reasonable height.
+			_pos set [2,(_pos select 2) max 50];
+			_veh = createVehicle [_type,_pos,[],0,"FLY"]; [_veh] call MCCMK_fnc_genTag;
+		};
 	};
 	default {
-		_veh = createvehicle [_type,_pos,[],0,"none"];
+		_veh = createvehicle [_type,_pos,[],0,"none"]; [_veh] call MCCMK_fnc_genTag;
 	};
 };
 
@@ -87,7 +102,7 @@ if (_precisePosition) then
 };
 
 //Set a good velocity in the correct direction.
-if (_sim == "airplanex") then {
+if (_sim == "airplanex" && {!_landed}) then {
 	_veh setVelocity [100 * (sin _azi), 100 * (cos _azi), 0];
 };
 
@@ -96,6 +111,11 @@ createvehiclecrew _veh;
 _crew = crew _veh;
 _crew joinsilent _grp;
 _grp addVehicle _veh;
+//(MK) crewed by the chosen faction; with none given, by the vehicle's own faction (its configured crew can be another
+// faction's, or the side's vanilla soldiers)
+if (_crewFaction == "") then {_crewFaction = getText (configFile >> "CfgVehicles" >> _type >> "faction")};
+[_veh, _crewFaction] call MCCMK_fnc_factionCrew;
+_crew = crew _veh;
 if !(toLower _sim in ["soldier", "airplanex", "helicopterrtd", "helicopterx"]) then {
 	_veh allowDamage false;
 	{_x allowDamage false} forEach _crew;
@@ -119,4 +139,14 @@ if (_randomAnimations) then {
 	[_veh] spawn MCC_fnc_vehicleRandomAnimation;
 };
 
+if (_landed && {toLower _sim in ["airplanex", "helicopterrtd", "helicopterx"]}) then {
+	[_veh] call MCCMK_fnc_airLandedHold;
+	//(MK) afloat: its water-landing mark (watertight) kept until it is 5 m up
+	if (_veh getVariable ["MCCMK_waterLanding", false]) then {
+		["INFO", "waterLand", "%1 spawned afloat at %2, engine off", [_type, mapGridPosition _veh]] call MCC_fnc_log;
+		[_veh] call MCCMK_fnc_heliWaterCrew;
+		[_veh] spawn {params ["_v"]; waitUntil {sleep 2; !alive _v || {((getPosATL _v) select 2) > 5}}; if (alive _v) then {_v setVariable ["MCCMK_waterLanding", nil, true]}};
+	};
+};
+[_veh, "spawnVehicle"] call MCCMK_fnc_airTrack;	//(MK) debug: AI aircraft logged when destroyed or removed (callers name themselves)
 [_veh, _crew, _grp]

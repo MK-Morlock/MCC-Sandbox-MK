@@ -123,8 +123,7 @@ _ctrls = [];
     //If the option is boolean
     if (typeName _options == typeName true) then {
         //combo
-        //Standard Arma checkbox (the editor one), kept square: the old one was stretched to a wide box, which made its
-        //picture blurry
+        //Standard Arma checkbox (the editor one), kept square so its picture stays sharp
         _control = _display ctrlCreate ["ctrlCheckbox", IDC_BASE + _forEachIndex,_ctrlContent];
         if (isNull _control) then {_control = _display ctrlCreate ["RscCheckbox", IDC_BASE + _forEachIndex,_ctrlContent]};
         private _cbH = DEFAULT_HEIGHT;

@@ -289,7 +289,7 @@ class MCC_IEDDialogControls:MCC_RscControlsGroup
 			y = 0.350000* safezoneH;
 			w = 0.057300* safezoneW;
 			h = 0.022000* safezoneH;
-			tooltip = "Place an ambush group on the map (hold Shift and drag a line between a group and an IED to sync them) "; //--- ToDo: Localize;
+			tooltip = "Place an ambush group on the map (hold Shift and drag a line\nbetween a group and an IED to sync them) "; //--- ToDo: Localize;
 		};
 		class MCC_trapsExplainTittle: MCC_RscText
 		{

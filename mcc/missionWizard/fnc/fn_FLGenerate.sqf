@@ -1,6 +1,6 @@
 /*================================================================== MCC_fnc_FLGenerate ==================================================================
 	Front Lines generator - SERVER.
-	MCC 4s Front Lines dialog was never finished by its author (it drew the line and stopped). This builds the enemy defensive
+	MCC 4s Front Lines dialog was never finished by its author. This builds the enemy defensive
 	line the dialogs options describe, using MCCs existing pieces:
 		compositions (MCC_fnc_objectMapper), group spawning (MCC_fnc_spawnGroup / MCC_fnc_spawnVehicle), roadblocks
 		(MCC_fnc_buildRoadblock), garrisons (MCC_fnc_garrison), minefields (MCC_fnc_mineSingle), artillery (MCC_fnc_MWSpawnStatic)
@@ -131,7 +131,7 @@ private _spawnInf = {
 };
 private _marker = {
 	params ["_p", "_type", "_text", ["_shape","ICON"], ["_size",[1,1]], ["_dir",0]];
-	private _m = createMarker [format ["MCC_FL_%1", ["MCC_FLMarkerCounter",1] call BIS_fnc_counter], _p];
+	private _m = createMarker [format ["MCC_FL_%1", ["MCC_FLMarkerCounter",1] call BIS_fnc_counter], _p]; [_m] call MCCMK_fnc_genTag;
 	_m setMarkerShape _shape;
 	if (_shape == "ICON") then {_m setMarkerType _type} else {_m setMarkerBrush "DiagGrid"; _m setMarkerSize _size; _m setMarkerDir _dir};
 	_m setMarkerColor "ColorRed";
@@ -145,6 +145,13 @@ private _marker = {
 //Record what is created so it can be deleted again ("Delete Missions")
 private _registryId = format ["FL_%1", ["MCC_generatedMissionCounter",1] call BIS_fnc_counter];
 ["start", [_registryId]] call MCC_fnc_generatedMissions;
+private _MCCMK_gen = _registryId;	//(MK) what Front Lines creates is marked as this mission's (MCCMK_fnc_genTag)
+if !(missionNamespace getVariable ["MCC_MWDronesNext", true]) then {
+	private _noDrones = missionNamespace getVariable ["MCC_MWnoDroneMissions", []];
+	_noDrones pushBackUnique _registryId;
+	missionNamespace setVariable ["MCC_MWnoDroneMissions", _noDrones];
+};
+missionNamespace setVariable ["MCC_MWDronesNext", true];
 ["genStart", [_registryId]] call MCC_fnc_perfLog;
 private _taskIds = [];
 
@@ -184,7 +191,7 @@ if (_fortify) then {
 			{
 				private _q = (_mid vectorAdd (_u vectorMultiply _x)) vectorAdd (_front vectorMultiply _ahead);
 				if (!surfaceIsWater _q && {count (_q nearRoads 6) == 0} && {count (nearestTerrainObjects [_q, ["House","Building"], 6]) == 0}) then {
-					private _o = createVehicle [_class, _q, [], 0, "CAN_COLLIDE"];
+					private _o = createVehicle [_class, _q, [], 0, "CAN_COLLIDE"]; [_o] call MCCMK_fnc_genTag;
 					_o setDir (_lineDir - 90);
 					_o setVectorUp surfaceNormal _q;
 					{_x addCuratorEditableObjects [[_o], false]} forEach allCurators;
@@ -245,7 +252,7 @@ private _spawnVeh = {
 			if (!isNull _grp) then {
 				[_grp] call _skill;
 				{_x addCuratorEditableObjects [[_v select 0], true]} forEach allCurators;
-				//Hold position. (They were GAIA NOFOLLOW groups in the lines zone; GAIA moved them all over the rear area.)
+				//Hold position. (Not GAIA groups: GAIA would move them all over the rear area.)
 				_grp setBehaviour "AWARE";
 				{doStop _x} forEach units _grp;
 			};
@@ -271,7 +278,8 @@ for "_k" from 1 to _reserves do {
 	private _p = [[_len * (_k - 0.5) / _reserves, _supportEnd + random (_depth - _supportEnd)] call _at, 100] call _land;
 	if !(_p isEqualTo []) then {
 		private _grp = [_p, _defSide, _infGroups, _infUnits] call _spawnInf;
-		//Patrol 150 m around their own spot. (They were GAIA "MOVE" groups; GAIA sent them to far-off waypoints across the zone.)
+		//Patrol 150 m around their own spot. (Not GAIA "MOVE" groups: GAIA would send them to far-off waypoints across
+		//the zone.)
 		if (!isNull _grp) then {[_grp, _p, 150] call BIS_fnc_taskPatrol};
 	};
 	sleep 0.2;
@@ -358,8 +366,8 @@ if (_reinforcement in [1,2,3]) then {
 	private _end = [0,0,0,0,0,0,0,1,1,1,2] call BIS_fnc_selectRandom;
 	for "_k" from 1 to _end do {_cond set [_k, (_cond select (_k - 1)) + 0.3]};
 	private _estimate = ((count _strongpoints) + _reserves + _fallback) * 6;
-	[_reinforcement, _defSide, [_A, _len / 2, _depth / 2] call _at, [(_len / 2) + 50, _depth / 2, _lineDir - 90, true], _cond, _zoneNumber, _faction,
-		(missionNamespace getVariable ["MCC_reinforcementWarning",true]), _estimate, _C getDir (_C vectorAdd (_back vectorMultiply 100)), _reinfWait == 0] spawn MCC_fnc_MWreinforcement;
+	[[_reinforcement, _defSide, [_A, _len / 2, _depth / 2] call _at, [(_len / 2) + 50, _depth / 2, _lineDir - 90, true], _cond, _zoneNumber, _faction,
+		(missionNamespace getVariable ["MCC_reinforcementWarning",true]), _estimate, _C getDir (_C vectorAdd (_back vectorMultiply 100)), _reinfWait == 0], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen})] spawn {private _MCCMK_gen = _this select 1; (_this select 0) call MCC_fnc_MWreinforcement};
 };
 
 //------------------------------------------------------------ Task ------------------------------------------------------------
@@ -375,8 +383,8 @@ if (_taskOpt == 1 && {count _strongpoints > 0}) then {
 		_C, "CREATED", 0, true, "attack"
 	] call BIS_fnc_taskCreate;
 
-	[_taskId, _strongpoints, _need, _defSide] spawn {
-		params ["_taskId", "_strongpoints", "_need", "_defSide"];
+	[_taskId, _strongpoints, _need, _defSide, _owners, _diff] spawn {
+		params ["_taskId", "_strongpoints", "_need", "_defSide", "_owners", "_diff"];
 		waitUntil {
 			sleep 10;
 			if !(_taskId call BIS_fnc_taskExists) exitWith {true};	//deleted
@@ -389,6 +397,15 @@ if (_taskOpt == 1 && {count _strongpoints > 0}) then {
 		if !(_taskId call BIS_fnc_taskExists) exitWith {};
 		[_taskId, "SUCCEEDED"] call BIS_fnc_taskSetState;
 		["INFO", "MCC_fnc_FLGenerate", "front line task %1 succeeded", [_taskId]] call MCC_fnc_log;
+		if (call MCCMK_fnc_resRewards) then {
+			{
+				private _side = _x;
+				private _players = [_side] call MCC_fnc_forceCount;
+				if (({side group _x == _side} count allPlayers) > 0) then {
+					["Main", 1, 0, _side, _players + 1, [10, 20, 40] select ((_diff max 0) min 2), 60, [0.2,0.4,0.2,0.15,0.05]] spawn MCC_fnc_missionDone;
+				};
+			} forEach _owners;
+		};
 	};
 };
 

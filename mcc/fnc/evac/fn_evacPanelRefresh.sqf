@@ -6,7 +6,7 @@ private _c = _d displayCtrl 42;
 private _sel = missionNamespace getVariable ["MCC_evacSelectedObj", objNull];
 lbClear _c;
 {
-	_c lbAdd (if (alive _x) then {format ["%1, %2%3", _x, getText (configFile >> "CfgVehicles" >> typeOf _x >> "displayName"), ["", " (no driver)"] select !(alive (driver _x))]} else {"N/A"});
+	_c lbAdd ([_x] call MCCMK_fnc_evacLabel);	//(MK) "Alpha 2-3 - CH-67 Huron"
 } forEach _list;
 private _i = _list find _sel;
 if (_i < 0 && {count _list > 0}) then {_i = (count _list) - 1};

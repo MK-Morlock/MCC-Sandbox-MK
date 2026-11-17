@@ -86,8 +86,9 @@ if (_halo) then {
 		removeUniform _unit;
 		removeBackpack _unit;
 
-		_unit addHeadgear "H_CrewHelmetHeli_B";
-		_unit forceAddUniform  "U_B_HeliPilotCoveralls";
+		private _kit = [faction _unit, side group _unit] call MCC_fnc_haloGear;
+		_unit addHeadgear (_kit select 0);
+		_unit forceAddUniform (_kit select 1);
 
 		call
 		{
@@ -99,7 +100,7 @@ if (_halo) then {
 				_packHolder setVectorDirAndUp [[0,1,0],[0,0,-1]]; //set the vector and direction of the empty holder
 			};
 
-			_unit addBackpack "B_Parachute";
+			if (isPlayer _unit || {_unit getVariable ["MCC_haloFormMember", false]}) then {_unit addBackpack "B_Parachute"};
 		};
 
 		//wait until outside
@@ -127,8 +128,24 @@ if (_halo) then {
 		sleep 2;
 
 		if ( isPlayer _unit ) then {
-			cutText ["","BLACK IN",1];
+			if (_transition) then {cutText ["","BLACK IN",1]};
+			if (!_transition) then {
+				private _pv = velocity _unit;
+				if ((vectorMagnitude [_pv select 0, _pv select 1, 0]) > 5) then {
+					_unit setDir (((_pv select 0) atan2 (_pv select 1) + 360) mod 360);
+					_unit setVelocity _pv;
+				};
+			};
 			playmusic "";
+			private _pob = _unit getVariable ["MCC_paraOpen", [0, 0]];
+			if (!_transition && {(_pob select 0) != 1}) then {
+				[_unit, _pob] spawn {
+					params ["_p", "_po"];
+					private _own = ([_po param [1, 120], 120] select ((_po param [1, 0]) <= 0)) + 10 + random 30;
+					waitUntil {sleep 0.1; !alive _p || {vehicle _p != _p} || {((getPosATL _p) select 2) < (_p getVariable ["MCC_haloChuteAlt", _own])}};
+					if (alive _p && {vehicle _p == _p}) then {_p action ["OpenParachute", _p]};
+				};
+			};
 
 			while { alive _unit && (vehicle _unit == _unit) } do {playmusic "mcc_wind"; sleep 4.6};
 
@@ -155,7 +172,8 @@ if (_halo) then {
 			//A little before the chute: animation control back on (as ROS does), then the non-steerable chute is created in
 			//the air where he is ("FLY") and he is put in it - no turning of the jumper or the canopy, nothing touched after.
 			private _ros = _unit getVariable ["MCC_haloFormationChute", false];
-			private _chuteAlt = [180, 120 + random 50] select _ros;
+			private _pob = (_unit getVariable ["MCC_paraOpen", [0, 0]]) param [1, 0];
+			private _chuteAlt = ([_pob, 120] select (_pob <= 0)) + random 50;
 			waitUntil {sleep 0.5; !(alive _unit) || {((getPosATL _unit) select 2) < ([_chuteAlt + 50, 300] select _ros)}};
 			waitUntil {sleep 0.1; !(alive _unit) || {isNull (attachedTo _unit)}};
 			_unit enableAI "ANIM"; _unit enableAI "MOVE"; _unit enableAI "PATH"; _unit enableAI "FSM";
@@ -180,6 +198,7 @@ if (_halo) then {
 
 		while {alive _unit && (((getpos _unit) select 2)> 1) && !isTouchingGround _unit} do {sleep 1};
 		[_unit, "landed"] call _fnc_dropLog;
+		if (isPlayer _unit && {leader group _unit == _unit}) then {(group _unit) setFormDir (getDir _unit)};
 		if (!isPlayer _unit) then {unassignVehicle _unit; [_unit, _parachute] spawn MCC_fnc_paraOffRoof}; if (!isPlayer _unit && {side group _unit != ([east, west, independent, civilian] param [getNumber (configFile >> "CfgVehicles" >> typeOf _unit >> "side"), civilian])}) then {["WARN", "paradrop", "%1 landed with his group on side %2 (his own side %3; captive %4, rating %5)", [name _unit, side group _unit, [east, west, independent, civilian] param [getNumber (configFile >> "CfgVehicles" >> typeOf _unit >> "side"), civilian], captive _unit, rating _unit]] call MCC_fnc_log};
 		if (!isPlayer _unit) then {_unit enableAI "MOVE"; _unit enableAI "PATH"; _unit enableAI "FSM"};
 
@@ -202,7 +221,7 @@ if (_halo) then {
 		}
 		else
 		{
-			//AI: own uniform and its items back (they went to the player before), and the backpack back on with its load
+			//AI: own uniform and its items back, and the backpack back on with its load
 			{if (typeOf _x == "GroundWeaponHolder") then {detach _x; deleteVehicle _x}} forEach attachedObjects _unit;
 			if (_headgear != "") then { removeHeadgear _unit; _unit addHeadgear _headgear };
 			if (_uniform != "") then { removeUniform _unit; _unit forceAddUniform  _uniform };
@@ -225,7 +244,7 @@ if (_halo) then {
 				if (backpack _unit == "B_Parachute") then {removeBackpack _unit};
 			};
 
-			_unit setBehaviour "AWARE";
+			if !(isPlayer (leader group _unit)) then {_unit setBehaviour "AWARE"};
 		};
 } else {
 
@@ -286,14 +305,14 @@ if (_halo) then {
 	};
 
 	if !(isPlayer _unit) then {
-		private _aiOpen = if (_manual) then {if ((_po select 1) < 0) then {99999} else {(_po select 1) + random 30}} else {110 + random 30};
+		private _aiOpen = ([_po select 1, 120] select ((_po select 1) <= 0)) + random 50;
 		waitUntil { (((getPosATL _unit) select 2) < _aiOpen) || !(alive _unit) };
 		_chute = "NonSteerable_Parachute_F";
 
 		_dir = direction (leader _unit);
 		_unit setDir _dir;
 	} else {
-		cutText ["","BLACK IN",1];
+		if (_transition) then {cutText ["","BLACK IN",1]};
 		playmusic "";
 		_chute = "Steerable_Parachute_F";
 
@@ -412,11 +431,12 @@ if (_halo) then {
 
 	while { (alive _unit) && (((getpos _unit) select 2)> 1) && !(isTouchingGround _unit) } do {sleep 1};
 	[_unit, "landed"] call _fnc_dropLog;
+		if (isPlayer _unit && {leader group _unit == _unit}) then {(group _unit) setFormDir (getDir _unit)};
 	if (!isPlayer _unit) then {if (missionNamespace getVariable ["MCC_debug", false]) then {["DEBUG", "getout", "MOVEOUT by landing (unassign) | %1 from %2 at %3 m", [name _unit, typeOf (vehicle _unit), round ((getPosATL _unit) select 2)]] call MCC_fnc_log}; unassignVehicle _unit; if (!isNull _parachute && {_parachute != _unit}) then {(group _unit) leaveVehicle _parachute}; [_unit, _parachute] spawn MCC_fnc_paraOffRoof};
 	if (!isNil {_unit getVariable "MCC_goEH"}) then {_unit removeEventHandler ["GetOutMan", _unit getVariable "MCC_goEH"]; _unit setVariable ["MCC_goEH", nil]}; if (!isPlayer _unit && {side group _unit != ([east, west, independent, civilian] param [getNumber (configFile >> "CfgVehicles" >> typeOf _unit >> "side"), civilian])}) then {["WARN", "paradrop", "%1 landed with his group on side %2 (his own side %3; captive %4, rating %5)", [name _unit, side group _unit, [east, west, independent, civilian] param [getNumber (configFile >> "CfgVehicles" >> typeOf _unit >> "side"), civilian], captive _unit, rating _unit]] call MCC_fnc_log};
 
 	//The backpack shown on the parachute is only a copy (the unit keeps its real backpack): remove it for everyone on
-	//landing - it was only removed for players, so AI left backpacks hanging in the air / lying on the ground - and also
+	//landing, AI included (otherwise it stays hanging in the air / lying on the ground) - and also
 	//when the jumper died on the way down
 	if (!isnil "_packHolder") then {
 		detach _packHolder;

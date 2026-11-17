@@ -9,13 +9,134 @@ class MCCDLG_NAME
 	{
 		class Background: MCC_RscText
 		{
+			idc = 9500;
+			style = 48;
+			text = "#(argb,8,8,3)color(1,1,1,1)";
+			colorText[] = {0.11,0.12,0.13,0.96};
+			colorBackground[] = {0,0,0,0};
+			moving = 0;
+			x = 0.135800 * safezoneW + safezoneX;
+			y = 0.120000 * safezoneH + safezoneY;
+			w = 0.728400 * safezoneW;
+			h = 0.700000 * safezoneH;
+		};
+		class BackgroundLeft: MCC_RscText
+		{
+			idc = 9580;
+			style = 48;
+			text = "#(argb,8,8,3)color(1,1,1,1)";
+			colorText[] = {0.11,0.12,0.13,0.96};
+			colorBackground[] = {0,0,0,0};
+			moving = 0;
+			x = 0.130000 * safezoneW + safezoneX;
+			y = 0.130300 * safezoneH + safezoneY;
+			w = 0.005800 * safezoneW;
+			h = 0.679400 * safezoneH;
+		};
+		class BackgroundRight: MCC_RscText
+		{
+			idc = 9581;
+			style = 48;
+			text = "#(argb,8,8,3)color(1,1,1,1)";
+			colorText[] = {0.11,0.12,0.13,0.96};
+			colorBackground[] = {0,0,0,0};
+			moving = 0;
+			x = 0.864200 * safezoneW + safezoneX;
+			y = 0.130300 * safezoneH + safezoneY;
+			w = 0.005800 * safezoneW;
+			h = 0.679400 * safezoneH;
+		};
+		class BackgroundCorner0: MCC_RscControlsGroupNoScrollbars
+		{
 			idc = -1;
-			colorBackground[] = {0.11,0.12,0.13,0.96};
-			moving = 0;	//the window moves by its title only (dragging in the preview moved the whole window)
-			x = 0.1300 * safezoneW + safezoneX;
-			y = 0.1200 * safezoneH + safezoneY;
-			w = 0.7400 * safezoneW;
-			h = 0.7000 * safezoneH;
+			x = 0.130000 * safezoneW + safezoneX;
+			y = 0.120000 * safezoneH + safezoneY;
+			w = 0.005800 * safezoneW;
+			h = 0.010300 * safezoneH;
+			class Controls
+			{
+				class Piece: MCC_RscText
+				{
+					idc = 9582;
+					style = 48;
+					text = "\mcc_sandbox_mod\data\panel_round_ca.paa";
+					colorText[] = {0.11,0.12,0.13,0.96};
+					colorBackground[] = {0,0,0,0};
+					x = 0.000000 * safezoneW;
+					y = 0.000000 * safezoneH;
+					w = 0.269964 * safezoneW;
+					h = 0.239709 * safezoneH;
+				};
+			};
+		};
+		class BackgroundCorner1: MCC_RscControlsGroupNoScrollbars
+		{
+			idc = -1;
+			x = 0.864200 * safezoneW + safezoneX;
+			y = 0.120000 * safezoneH + safezoneY;
+			w = 0.005800 * safezoneW;
+			h = 0.010300 * safezoneH;
+			class Controls
+			{
+				class Piece: MCC_RscText
+				{
+					idc = 9583;
+					style = 48;
+					text = "\mcc_sandbox_mod\data\panel_round_ca.paa";
+					colorText[] = {0.11,0.12,0.13,0.96};
+					colorBackground[] = {0,0,0,0};
+					x = -0.264164 * safezoneW;
+					y = 0.000000 * safezoneH;
+					w = 0.269964 * safezoneW;
+					h = 0.239709 * safezoneH;
+				};
+			};
+		};
+		class BackgroundCorner2: MCC_RscControlsGroupNoScrollbars
+		{
+			idc = -1;
+			x = 0.130000 * safezoneW + safezoneX;
+			y = 0.809700 * safezoneH + safezoneY;
+			w = 0.005800 * safezoneW;
+			h = 0.010300 * safezoneH;
+			class Controls
+			{
+				class Piece: MCC_RscText
+				{
+					idc = 9584;
+					style = 48;
+					text = "\mcc_sandbox_mod\data\panel_round_ca.paa";
+					colorText[] = {0.11,0.12,0.13,0.96};
+					colorBackground[] = {0,0,0,0};
+					x = 0.000000 * safezoneW;
+					y = -0.229409 * safezoneH;
+					w = 0.269964 * safezoneW;
+					h = 0.239709 * safezoneH;
+				};
+			};
+		};
+		class BackgroundCorner3: MCC_RscControlsGroupNoScrollbars
+		{
+			idc = -1;
+			x = 0.864200 * safezoneW + safezoneX;
+			y = 0.809700 * safezoneH + safezoneY;
+			w = 0.005800 * safezoneW;
+			h = 0.010300 * safezoneH;
+			class Controls
+			{
+				class Piece: MCC_RscText
+				{
+					idc = 9585;
+					style = 48;
+					text = "\mcc_sandbox_mod\data\panel_round_ca.paa";
+					colorText[] = {0.11,0.12,0.13,0.96};
+					colorBackground[] = {0,0,0,0};
+					x = -0.264164 * safezoneW;
+					y = -0.229409 * safezoneH;
+					w = 0.269964 * safezoneW;
+					h = 0.239709 * safezoneH;
+				};
+			};
 		};
 		class Title: MCC_RscText
 		{
@@ -43,7 +164,7 @@ class MCCDLG_NAME
 		class Faction: MCC_RscCombo
 		{
 			idc = 9520;
-			tooltip = "The Mission Generator enemy faction: your choices below are saved for it and used for its tasks and support. The console faction (your side) is not changed.";
+			tooltip = "The Mission Generator enemy faction: your choices below are\nsaved for it and used for its tasks and support. The console\nfaction (your side) is not changed.";
 			onLBSelChanged = "['faction'] spawn MCC_fnc_assetsUI";
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 			x = 0.2150 * safezoneW + safezoneX;
@@ -162,7 +283,7 @@ class MCCDLG_NAME
 		{
 			idc = 9508;
 			text = "Show all mods: Off";
-			tooltip = "Off: the enemy and your faction and their mods. On: every loaded mod";
+			tooltip = "Off: the enemy and your faction and their mods. On: every\nloaded mod";
 			onButtonClick = "['showAll'] spawn MCC_fnc_assetsUI";
 			x = 0.3700 * safezoneW + safezoneX;
 			y = 0.6500 * safezoneH + safezoneY;

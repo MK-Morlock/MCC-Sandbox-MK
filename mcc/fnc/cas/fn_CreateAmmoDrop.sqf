@@ -21,6 +21,7 @@ _pilot = param [2,objNull,[missionNamespace,objNull]];
 _spawnCrew = param [3,false,[false]];
 private _keepVel = param [4, false, [false]];
 private _smokeOn = param [5, true, [false]];
+if !(missionNamespace getVariable ["MCCMK_dropSmoke", true]) then {_smokeOn = false};	//(MK) the Airdrop panel's Smoke tick box
 private _info = param [6, [], [[]]];
 private _given = _spawnkind isEqualType objNull;
 
@@ -64,6 +65,7 @@ if (!_keepVel) then {_para setvelocity [0,0,-1]};
 //spaw crew
 if (_spawnCrew || isAutonomous _drop) then {
 	createVehicleCrew _drop;
+	[_drop, [getNumber (configOf _drop >> "side")] call BIS_fnc_sideType] call MCCMK_fnc_crewFix;	//(MK) that side's faction
 };
 
 0 = [_drop, _paras, _smokeOn, _info] spawn
@@ -71,10 +73,12 @@ if (_spawnCrew || isAutonomous _drop) then {
 	private _veh = _this select 0;
 	private _smokeOn = _this select 2;
 	waitUntil {getPos _veh select 2 < 4};
-	(_this select 3) params [["_tgt", []], ["_dir", 0], ["_carry", 0], ["_sp", 0], ["_h", 0]];
+	(_this select 3) params [["_tgt", []], ["_dir", 0], ["_carry", 0], ["_sp", 0], ["_h", 0], ["_t0", -1]];
+	//(MK) the no-aircraft drops: how long it took to come down (refines MCCMK_dropFallTime, the wind allowance)
+	if (_t0 >= 0) then {["INFO", "supplyDrop", "%1 came down in %2 s (wind allowance assumed %3 s)", [typeOf _veh, round (time - _t0), missionNamespace getVariable ["MCCMK_dropFallTime", 32]]] call MCC_fnc_log};
 	if (count _tgt > 1) then {
 		private _o = (getPos _veh) vectorDiff [_tgt select 0, _tgt select 1, (getPos _veh) select 2];
-		["DEBUG", "supplyDrop", "%1 landed | along %2 m, side %3 m from the target | released at %4 km/h, %5 m above the target | carry allowed %6 m", [typeOf _veh, round (_o vectorDotProduct [sin _dir, cos _dir, 0]), round (_o vectorDotProduct [cos _dir, -(sin _dir), 0]), round (_sp * 3.6), round _h, round _carry]] call MCC_fnc_log;
+		["INFO", "supplyDrop", "%1 landed | along %2 m, side %3 m from the target | released at %4 km/h, %5 m above the target | carry allowed %6 m", [typeOf _veh, round (_o vectorDotProduct [sin _dir, cos _dir, 0]), round (_o vectorDotProduct [cos _dir, -(sin _dir), 0]), round (_sp * 3.6), round _h, round _carry]] call MCC_fnc_log;
 	};
 	_vel = velocity _veh;
 	detach _veh;

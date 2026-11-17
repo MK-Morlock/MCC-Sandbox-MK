@@ -15,7 +15,7 @@ if !mcc_isloading then
 	MCC_evacFlyInHight_index = lbCurSel FLY_HIGHT;
 	
 	_point1 = getmarkerpos "pos4";
-	hint "Returning to LHD";
+	["Returning to LHD"] call MCCMK_fnc_hint;
 	if (MCC_capture_state) then
 		{
 		MCC_capture_var = MCC_capture_var + FORMAT ['

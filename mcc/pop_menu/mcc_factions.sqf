@@ -17,9 +17,13 @@ for "_i" from 0 to ((count _mcc_config) - 1) do
 
   _unitCfg = (_mcc_CONFIG select _i);
 
-	// Factions without a "side" entry used to read as 0 = EAST (e.g. some USMC mod factions); MCC_fnc_factionSide
+	// Factions without a "side" entry would read as 0 = EAST (e.g. some USMC mod factions); MCC_fnc_factionSide
 	// falls back to the side of the factions units. Factions with no number side and no units are still skipped.
 	_side = if (isClass _unitCfg && {getText (_unitCfg >> "displayName") != ""}) then {[configName _unitCfg, true] call MCC_fnc_factionSide} else {-1};
+	//(MK) Arma's catch-all factions "Default" (shown as "Other") and "Interactive_F" ("Other (Interactive)"): props and
+	// interactive objects, not real factions - left out of every list unless one actually holds public soldiers (so it
+	// can't be picked by mistake as the civilians, where Civilians is the real one). "Virtual" (VR) stays.
+	if (_side >= 0 && {(toLower configName _unitCfg) in ["default", "interactive_f"]} && {(format ["getNumber (_x >> 'scope') == 2 && {(toLower getText (_x >> 'faction')) == '%1'} && {(configName _x) isKindOf 'CAManBase'}", toLower configName _unitCfg] configClasses (configFile >> "CfgVehicles")) isEqualTo []}) then {_side = -1};
 	if (_side >= 0) then
 	{
 	   _cfgname        = (configName(_unitcfg));

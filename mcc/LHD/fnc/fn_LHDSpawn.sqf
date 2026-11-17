@@ -59,6 +59,7 @@ if ( !isNull(findDisplay 312) ) then {(findDisplay 312) closeDisplay 1};
 
 _markers = [];
 
+["INFO", "LHDSpawn", "start: type %1 at %2 dir %3, side %4, make HQ %5, store %6, rearm %7", [_LHDType, if (_pos isEqualType objNull) then {getPos _pos} else {_pos}, round _dir, _side, _hq, _store, _rearm]] call MCC_fnc_log;
 //If pos is an object
 if (typeName _pos isEqualTo typeName objNull) then {
 	_dummy = _pos;
@@ -91,7 +92,7 @@ switch (_LHDType) do
 
 	case 2: //Submarine
 	{
-		_ship = "Submarine_01_F" createVehicle _pos;
+		_ship = createSimpleObject ["Submarine_01_F", AGLToASL _pos];
 		_storePos = [10,0,1];
 	};
 
@@ -107,6 +108,7 @@ switch (_LHDType) do
 _ship setPosaslw _pos;
 _ship setDir _dir;
 _shipPos = getPosASL _ship;
+["INFO", "LHDSpawn", "hull: %1 %2 at %3 (asked for %4)", [if (isNull _ship) then {"NOT CREATED"} else {"created"}, typeOf _ship, _shipPos apply {round _x}, _pos apply {round _x}]] call MCC_fnc_log;
 
 //{_x addCuratorEditableObjects [[_ship],false]} forEach allCurators;
 
@@ -148,12 +150,21 @@ _fnc_spawnWeapons = {
 	{
 		_dummy =([[0,0,0], 0, (_x select 0), _side] call bis_fnc_spawnvehicle) select 0;
 		_dummy allowDamage false;
-		_dummy setDir (_x select 2);
+		_dummy setDir ((getDir _ship) + (_x select 2));
 		_dummy attachTo [_ship,(_x select 1)];
 		//{_x addCuratorEditableObjects [[_dummy],false]} forEach allCurators;
 		detach _dummy;
-		_dummy setDir (_x select 2);
-		_dummy spawn {waitUntil {isTouchingGround _this}; _this allowDamage true};
+		_ship setVariable ["MCCMK_shipObjects", (_ship getVariable ["MCCMK_shipObjects", []]) + [_dummy]];
+		_dummy setDir ((getDir _ship) + (_x select 2));
+		_dummy spawn {sleep 20; _this allowDamage true};
+		if (_dummy isKindOf "AllVehicles") then {
+			_dummy setVariable ["MCCMK_shipWeapon", true, true];
+			_dummy setVariable ["MCCMK_weaponShip", _ship, true];
+			_ship setVariable ["MCCMK_weaponSpecs", (_ship getVariable ["MCCMK_weaponSpecs", []]) + [[_x select 0, _x select 1, _x select 2, _x param [3, ""]]], true];
+			_ship setVariable ["MCCMK_weapons", (_ship getVariable ["MCCMK_weapons", []]) + [_dummy], true];
+			_dummy addEventHandler ["Fired", {(_this select 0) setVariable ["MCCMK_lastBusy", time]}];
+			_dummy addEventHandler ["Hit", {(_this select 0) setVariable ["MCCMK_lastBusy", time]}];
+		};
 
 		//If there is a script
 		if (count _x > 3) then {
@@ -191,7 +202,6 @@ switch (_LHDType) do
 	{
 		[_ship] call BIS_fnc_Carrier01PosUpdate;
 		sleep 5;
-		_ship remoteExec ["BIS_fnc_Carrier01Init",0];
 
 		//spawn mobile defense
 		[_ship, _side,[
@@ -268,7 +278,6 @@ switch (_LHDType) do
 			_ship setVariable ["CUP_WaterVehicles_heliPads",_heliPads];
 
 			// Init CUP virtual vehicle cargo
-			[_ship,"init"] call CUP_fnc_virtualVehicleCargo;
 
 			// Move in cargo position
 			_cargoPos = AGLToASL (_ship modelToWorld (_ship selectionPosition "player_cargo_pos"));
@@ -304,15 +313,8 @@ switch (_LHDType) do
 		_trg setTriggerArea [15, 10, 0, false];
 		_trg setTriggerActivation ["ANYPLAYER", "PRESENT", true];
 		_trg setTriggerStatements ["this", "{[thisTrigger, _x] remoteExec ['MCC_fnc_arrestingGear',_x]} forEach thisList;", ""];
+		_ship setVariable ["MCCMK_shipObjects", (_ship getVariable ["MCCMK_shipObjects", []]) + [_trg, missionNamespace getVariable ["MCC_cables", objNull]]];
 
-		//Arresting Gear marker
-		_dummy = createmarker ["gear",_temp_pos];
-		_dummy setMarkerShape "RECTANGLE";
-		_dummy setMarkerSize [15, 10];
-		_dummy setMarkerBrush "Solid";
-		_dummy setMarkerColor "ColorRed";
-
-		_markers pushBack _dummy;
 
 		private _vehicle = objNull;
 
@@ -357,26 +359,14 @@ switch (_LHDType) do
 		_dummy setVariable ["MCC_runwaySide",-1,true];
 		_dummy setVariable ["MCC_runwayCircles",true,true];
 		_dummy setVariable ["MCC_runwayAG",(missionNamespace getVariable ["MCC_cables",objNull]),true];
+		_ship setVariable ["MCCMK_shipObjects", (_ship getVariable ["MCCMK_shipObjects", []]) + [_dummy]];
 
-		//Create Markers
-		_dummy = createmarker ["MCC_LHD",_shipPos];
-		_dummy setMarkerShape "RECTANGLE";
-		_dummy setMarkerSize [20, 130];
-		_dummy setMarkerBrush "Solid";
-		_dummy setMarkerColor "ColorBlue";
-		_markers pushBack _dummy;
-
-		_dummy = createmarker ["MCC_LHD_NAME",(_ship modeltoworld [0,100,0])];
-		_dummy setMarkerText "LHD";
-		_dummy setMarkerColor "ColorBlack";
-		_dummy setMarkerShape "ICON";
-		_dummy setMarkerType "mil_dot";
-		_markers pushBack _dummy;
 
 		_ship setVariable ["MCC_LHDMarkers",_markers,true];
 	};
 };
 
+["INFO", "LHDSpawn", "%1: parts and weapons done", [typeOf _ship]] call MCC_fnc_log;
 //Set Ships as a service centers
 if (_rearm) then {
 	_ship setVariable ["MCC_fnc_pylonsChangeSource",true,true];
@@ -421,22 +411,27 @@ _ship setVariable ["MCC_side",_side,true];
 _ship setVariable ["MCC_LHDDisplayName",if (_displayName isEqualTo "") then {_defualtName} else {_displayName}];
 
 //Open dialog
-if (_hq) then {
-	_pos = getposasl _ship;
-	_pos = _pos vectorAdd [0,0,17];
-	_startLocationName = format ["MCC_START_%1", _side];
-	missionNamespace setVariable [_startLocationName,_pos];
-	publicVariable _startLocationName;
-};
 
 _ships = missionNamespace getVariable ["MCC_staticShips",[]];
 _ships pushBack _ship;
 missionNamespace setVariable ["MCC_staticShips",_ships];
 publicVariable "MCC_staticShips";
+if (isServer) then {[] call MCCMK_fnc_threatsInit};	//(MK) naval threats run only while a ship exists
 
 //spawn store
-if (_store) then {
+private _board = objNull;
+if (_LHDType == 2) then {
+	_board = "Land_HelipadEmpty_F" createVehicle [0, 0, 0];
+	_board allowDamage false;
+	_board setPosASL ((getPosASL _ship) vectorAdd [0, 0, 1]);
+	_ship setVariable ["MCCMK_shipObjects", (_ship getVariable ["MCCMK_shipObjects", []]) + [_board]];
+	if (_store) then {
+		[_board, ["<t color=""#ff1111"">Ship Control</t>", format ["[0,%1,2] spawn MCC_fnc_LHDspawnMenuInit", _ships find _ship], [], 1.5, true, true, "", "true", 40]] remoteExec ["addAction", 0, true];
+	};
+};
+if (_store && {_LHDType != 2}) then {
 	_dummy = MCC_billboard createVehicle (_ship modelToWorld [0,0,100]);
+	_board = _dummy;
 	_dummy attachTo [_ship,_storePos];
 	_dummy allowDamage false;
 	_dummy enableSimulationGlobal false;
@@ -448,21 +443,62 @@ if (_store) then {
 };
 
 //Create box
-_storePos set [1, (_storePos select 1) + 2] ;
-_storePos set [2, (_storePos select 2) + 1] ;
-_dummy = MCC_ANCHOR createvehicle (_ship modelToWorld [0,0,100]);
-_dummy allowDamage false;
-_dummy setVariable ["mcc_delete",false,true];
-_dummy setVariable ["mcc_mainBoxSide",_side,true];
-_dummy setVariable ["MCC_kitSelect",["all"],true];
-_dummy attachTo [_ship,_storePos];
-0 = [_side, _dummy] spawn MCC_fnc_makeObjectVirtualBox;
+if (_LHDType != 2) then {
+	_storePos set [1, (_storePos select 1) + 2] ;
+	_storePos set [2, (_storePos select 2) + ([1, 0] select (_LHDType == 1))] ;
+	_dummy = MCC_ANCHOR createvehicle (_ship modelToWorld [0,0,100]);
+	_dummy allowDamage false;
+	_dummy setVariable ["mcc_delete",false,true];
+	_dummy setVariable ["mcc_mainBoxSide",_side,true];
+	_dummy setVariable ["MCC_kitSelect",["all"],true];
+	_dummy attachTo [_ship,_storePos];
+	0 = [_side, _dummy] spawn MCC_fnc_makeObjectVirtualBox;
+};
 
 sleep 1;
 
 //Create start location
 //[_ship, direction _ship, _side, "FOB",false,false] spawn MCC_fnc_buildSpawnPoint;
-[_side,_ship] call BIS_fnc_addRespawnPosition;
+_ship setVariable ["MCCMK_respawnId", [_side,_ship] call BIS_fnc_addRespawnPosition];
+["INFO", "LHDSpawn", "%1 (%2): setup complete at grid %3", [_ship getVariable ["MCC_LHDDisplayName", typeOf _ship], typeOf _ship, mapGridPosition _ship]] call MCC_fnc_log;
+MCCMK_spawnPointList = ((missionNamespace getVariable ["MCCMK_spawnPointList", []]) select {!isNull _x}) + [_ship];
+publicVariable "MCCMK_spawnPointList";
+if (isNull _board) then {[_ship, 40] remoteExec ["MCCMK_fnc_hqActionLocal", 0, _ship]} else {_board setVariable ["MCCMK_hqTarget", _ship, true]; [_board, [5, 40] select (_LHDType == 2)] remoteExec ["MCCMK_fnc_hqActionLocal", 0, _board]};
+_ship setVariable ["MCCMK_showMarker", missionNamespace getVariable ["MCCMK_shipMarkerDefault", false], true];
+_ship setVariable ["MCCMK_hull", 1, true];
+_ship setVariable ["MCCMK_radarOn", missionNamespace getVariable ["MCCMK_shipRadarDefault", false], true];
+[_ship] spawn {
+	params ["_ship"];
+	sleep 12;
+	[_ship, _ship getVariable ["MCCMK_radarOn", false]] call MCCMK_fnc_shipRadar;
+	[_ship] spawn MCCMK_fnc_shipMaintLoop;
+	if (missionNamespace getVariable ["MCCMK_shipsCanBeLost", true]) then {[_ship] remoteExec ["MCCMK_fnc_hullHitInit", 0, _ship]};
+};
+[_ship, _LHDType] spawn {
+	params ["_ship", "_t"];
+	sleep 8;
+	private _parts = switch (_t) do {
+		case 2: {[_ship]};
+		case 3: {_ship getVariable ["CUP_WaterVehicles_shipParts", []]};
+		default {(nearestObjects [_ship, [], 260]) select {private _c = toLower typeOf _x; (_c find (["land_destroyer_01_", "land_carrier_01_"] select (_t == 1))) == 0 && {!(_x isKindOf "AllVehicles")}}};
+	};
+	private _d = getDir _ship;
+	private _o = getPosWorld _ship;
+	private _xs = [];
+	private _ys = [];
+	{
+		private _p = _x;
+		(boundingBoxReal _p) params ["_a", "_b"];
+		{
+			private _w = (_p modelToWorldWorld _x) vectorDiff _o;
+			_xs pushBack ((_w select 0) * (cos _d) - (_w select 1) * (sin _d));
+			_ys pushBack ((_w select 0) * (sin _d) + (_w select 1) * (cos _d));
+		} forEach [[_a select 0, _a select 1, 0], [_b select 0, _a select 1, 0], [_a select 0, _b select 1, 0], [_b select 0, _b select 1, 0]];
+	} forEach _parts;
+	if (_xs isEqualTo []) exitWith {};
+	["INFO", "LHDSpawn", "hull measured (%1 parts): x %2 to %3, y %4 to %5 - width %6 m, length %7 m (table: %8)", [count _parts, round selectMin _xs, round selectMax _xs, round selectMin _ys, round selectMax _ys, round ((selectMax _xs) - (selectMin _xs)), round ((selectMax _ys) - (selectMin _ys)), (([_t] call MCCMK_fnc_shipCfg) select 3) apply {_x * 2}]] call MCC_fnc_log;
+};
+if (_hq) then {[_ship, objNull, true] call MCCMK_fnc_makeHQ} else {[_ship] call MCCMK_fnc_campaignProtect};
 
 
 

@@ -20,6 +20,7 @@ private _availableMagazines = [];
 _suspect 		= param [0,objNull];
 _side 			= param [1,sideEnemy];
 _rad  			= param [2,25];
+if (_rad == 25) then {_rad = missionNamespace getVariable ["MCC_armedCivReactDist", 25]};
 
 if (typeName _side == "STRING") then {
 	_side = switch (tolower _side) do
@@ -62,7 +63,7 @@ removeallweapons _suspect;
 _suspect setbehaviour "CARELESS";
 _suspect allowfleeing 0;
 
-_dummy = MCC_dummy createVehicle (getpos _suspect);
+_dummy = MCC_dummy createVehicle (getpos _suspect); [_dummy] call MCCMK_fnc_genTag;
 _dummy setVariable ["fakeIed",_suspect];
 _dummy hideobjectGlobal true;
 _dummy attachto [_suspect,[0,0,0]];
@@ -116,7 +117,7 @@ while {alive _suspect && _check} do {
 							_check = _suspect getvariable ["armed",true];
 							_rand = random 100;
 
-							if (((_suspect distance _enemy ) <=_rad) &&  (alive _enemy) && (_rand < 15)) then {
+							if (((_suspect distance _enemy ) <=_rad) &&  (alive _enemy) && (_rand < (missionNamespace getVariable ["MCC_armedCivDrawChance", 15]))) then {
 
 								_suspect setbehaviour "COMBAT";
 								if (alive _suspect) then {
@@ -131,14 +132,14 @@ while {alive _suspect && _check} do {
 
 									if (!(_suspect hasweapon _weapon)) then {
 
-										if (_home != sideUnknown && {_home != civilian} && {_home != (side _enemy)}) then {_grp = createGroup _home} else {
+										if (_home != sideUnknown && {_home != civilian} && {_home != (side _enemy)}) then {_grp = createGroup _home; [_grp] call MCCMK_fnc_genTag} else {
 										switch (side _enemy) do {
-											case west: {_grp = createGroup east};
-											case east: {_grp = createGroup west};
+											case west: {_grp = createGroup east; [_grp] call MCCMK_fnc_genTag};
+											case east: {_grp = createGroup west; [_grp] call MCCMK_fnc_genTag};
 											case resistance:
-											{if ((west getFriend resistance)>0.5)then {_grp = createGroup east} else {_grp = createGroup west}};
-											case civilian: {if ((west getFriend civilian)>0.5) then {_grp = createGroup east} else {_grp = createGroup west}};
-											default {_grp = createGroup east};
+											{if ((west getFriend resistance)>0.5)then {_grp = createGroup east; [_grp] call MCCMK_fnc_genTag} else {_grp = createGroup west; [_grp] call MCCMK_fnc_genTag}};
+											case civilian: {if ((west getFriend civilian)>0.5) then {_grp = createGroup east; [_grp] call MCCMK_fnc_genTag} else {_grp = createGroup west; [_grp] call MCCMK_fnc_genTag}};
+											default {_grp = createGroup east; [_grp] call MCCMK_fnc_genTag};
 										};
 										};
 

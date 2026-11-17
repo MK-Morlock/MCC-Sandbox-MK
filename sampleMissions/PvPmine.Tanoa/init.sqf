@@ -50,7 +50,7 @@ if (!isDedicated && hasInterface) then {
 					<br/><br/>Do you want to disable this message in the future?","Mission","Yes","No"] call BIS_fnc_guiMessage;
 
 		waituntil {!isnil "_answer"};
-		// remember the answer ("Yes" = do not show again) - it was never saved before
+		// remember the answer ("Yes" = do not show again)
 		profileNamespace setVariable ["MCC_PRtutorialPR", !_answer];
 	};
 };

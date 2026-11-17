@@ -26,7 +26,7 @@ if ((missionNameSpace getvariable ["MCC_evacVehicles_index",0]) !=_index && (cou
 	_type = _evacVehicles select (lbCurSel MCC_ConsoleEvacTypeText_IDD);
 	_pos = [(getpos _type) select 0, (getpos _type) select 1];
 
-	_insetionArray = ["Move (engine on)","Move (engine off)"];
+	_insetionArray = ["Move (engine on)","Move (engine off)","RTB"];
 	ctrlShow [MCC_ConsoleEvacFlyHightComboBox_IDD,false];
 	_markerType = "b_inf";
 	if (_type iskindof "Car") then {_markerType = "b_mech_inf";};
@@ -36,7 +36,7 @@ if ((missionNameSpace getvariable ["MCC_evacVehicles_index",0]) !=_index && (cou
 	if (_type iskindof "helicopter") then
 	{
 		_markerType = "b_air";
-		_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing"];
+		_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing","Paradrop","Rope extraction","Water landing (engine on)","Water landing (engine off)","RTB"];
 		ctrlShow [MCC_ConsoleEvacFlyHightComboBox_IDD,true];
 		_comboBox = _mccdialog displayCtrl MCC_ConsoleEvacFlyHightComboBox_IDD;		//fill combobox Fly in Hight
 		lbClear _comboBox;
@@ -44,7 +44,7 @@ if ((missionNameSpace getvariable ["MCC_evacVehicles_index",0]) !=_index && (cou
 			_displayname = format ["%1",_x  select 0];
 			_index = _comboBox lbAdd _displayname;
 		} foreach MCC_evacFlyInHight_array;
-		_comboBox lbSetCurSel 0;
+		[_comboBox, "MCC_ccEvacHeight"] call MCC_fnc_consoleListMemory;
 	};
 
 	createMarkerLocal ["currentEvacSelected",_pos];	//Create group's marker
@@ -61,5 +61,5 @@ if ((missionNameSpace getvariable ["MCC_evacVehicles_index",0]) !=_index && (cou
 		_displayname = _x;
 		_index = _comboBox lbAdd _displayname;
 	} foreach _insetionArray;
-	_comboBox lbSetCurSel 0;
+	[_comboBox, "MCC_ccEvacInsertion"] call MCC_fnc_consoleListMemory;
 	};

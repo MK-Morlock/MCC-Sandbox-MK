@@ -104,8 +104,16 @@ for "_i" from 1 to _counter do {
 		_nearRoads = _nearRoads select {private _r = _x; !([getPosATL _r, side _carGroup] call MCCMK_fnc_inKeepOutZone) && {(_deniedZones findIf {_r distance _x < (_x getVariable ["radius", 100])}) < 0}};
 
 		if (count _nearRoads > 0) then {
+		private _prev = getPosATL _car;
 		for "_i" from 0 to MAX_WP do {
-			_road = _nearRoads call bis_fnc_selectRandom;
+			private _pick = objNull;
+			for "_k" from 1 to 10 do {
+				private _r = _nearRoads call bis_fnc_selectRandom;
+				if !([_prev, getPosATL _r, side _carGroup] call MCCMK_fnc_crossesKeepOut) exitWith {_pick = _r};
+			};
+			if (isNull _pick) exitWith {};
+			_road = _pick;
+			_prev = getPosATL _road;
 			_pos = getPosASL _road;
 			_wp = _carGroup addWaypoint [(getPos _road), 0];
 			_wp setWaypointType "MOVE";

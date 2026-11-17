@@ -17,7 +17,7 @@ class survive {
 	class getSurvivalPlaceHolders {};
 	class aceSearchActionInit {description = "ACE: Search in the interaction menu";};
 	class survivalObjectType {description = "Survival loot category of an object (case-insensitive model/class match)";};
-	// loadGear now lives in mcc\fnc\general (fixed version, registered there) - not registered twice
+	// loadGear is registered in mcc\fnc\general
 	class surviveItemClicked {};
 	class handleInventoryClick {};
 	class foodWaterConsumption {};

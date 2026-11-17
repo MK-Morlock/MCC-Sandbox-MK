@@ -1,0 +1,507 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ID="Arma3">
+	<Package ID="MCCMK_Taru_Pod_Mod">
+		<Container ID="Langages">
+			<!-- UserActions/Ace3-->
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_ACE_Settings_Category">
+				<Original>Taru Pod Mod</Original>
+				<English>Taru Pod Mod</English>
+				<French>Taru Pod Mod</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_ACE_Settings_DisplayName">
+				<Original>Taru Pod Mod : Interaction by ACE3</Original>
+				<English>Taru Pod Mod : Interaction by ACE3</English>
+				<French>Taru Pod Mod : Interaction par ACE3</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_ACE_Settings_Description">
+				<Original>Use the interaction menu (self-interaction) for the mod actions. Default: activated.</Original>
+				<English>Use the interaction menu (self-interaction) for the mod actions. Default: activated.</English>
+				<French>Utilise le menu d'interaction (interaction-personnel) d'ACE3 pour les actions du mod. Défaut : activé.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_UserAction_Deployer_Parachute_Principal">
+				<Original>Deploy the main chute</Original>
+				<English>Deploy the main chute</English>
+				<French>Déployer le parachute principal</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_UserAction_Deployer_Parachute_Secours">
+				<Original>Deploy the emergency chute</Original>
+				<English>Deploy the emergency chute</English>
+				<French>Déployer le parachute secondaire</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_UserAction_Couper_Parachute">
+				<Original>Cut the parachute</Original>
+				<English>Cut the parachute</English>
+				<French>Détacher le parachute</French>
+			</Key>
+			<!-- Actions-->
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Action_Arrimer">
+				<Original>Attach the Pod (0m)</Original>
+				<English>Attach the Pod (0m)</English>
+				<French>Arrimer la nacelle (0m)</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Action_Desarrimer">
+				<Original>Detach the Pod (10m)</Original>
+				<English>Detach the Pod (10m)</English>
+				<French>Désarrimer la nacelle (10m)</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Action_Desarrimage_Assaut">
+				<Original>Assault Detaching</Original>
+				<English>Assault Detaching</English>
+				<French>Désarrimage d'assaut</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Action_Decrocher">
+				<Original>Drop the Pod</Original>
+				<English>Drop the Pod</English>
+				<French>Décrocher la nacelle</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Action_Parachuter">
+				<Original>Parachute the Pod</Original>
+				<English>Parachute the Pod</English>
+				<French>Parachuter la nacelle</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Action_Raccourcir_Max">
+				<Original>Shorten ropes to 10m</Original>
+				<English>Shorten ropes to 10m</English>
+				<French>Raccourcir les cordes à 10m</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Action_Raccourcir">
+				<Original>Shorten the ropes by 10m</Original>
+				<English>Shorten the ropes by 10m</English>
+				<French>Raccourcir les cordes de 10m</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Allonger">
+				<Original>Lengthen the ropes to 10m</Original>
+				<English>Lengthen the ropes to 10m</English>
+				<French>Allonger les cordes de 10m</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Allonger_Max">
+				<Original>Lengthen ropes to 100m</Original>
+				<English>Lengthen ropes to 100m</English>
+				<French>Allonger les cordes à 100m</French>
+			</Key>
+			<!-- Module Zeus-->
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Module_Zeus_Allonger">
+				<Original>Ropes (+ 10m)</Original>
+				<English>Ropes (+ 10m)</English>
+				<French>Cordes (+ 10m)</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Module_Zeus_Allonger_Max">
+				<Original>Ropes (100m)</Original>
+				<English>Ropes (100m)</English>
+				<French>Cordes (100m)</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Module_Zeus_Raccourcir">
+				<Original>Ropes (- 10m)</Original>
+				<English>Ropes (- 10m)</English>
+				<French>Cordes (- 10m)</French>
+				</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Module_Zeus_Raccourcir_Max">
+				<Original>Ropes (10m)</Original>
+				<English>Ropes (10m)</English>
+				<French>Cordes (10m)</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Module_Zeus_Arrimer">
+				<Original>Pod (Attach)</Original>
+				<English>Pod (Attach)</English>
+				<French>Nacelle (Arrimer)</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Module_Zeus_Desarrimer">
+				<Original>Pod (Detach)</Original>
+				<English>Pod (Detach)</English>
+				<French>Nacelle (Désarrimer)</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Module_Zeus_Decrocher_Parachuter">
+				<Original>Pod (Drop/Parachute)</Original>
+				<English>Pod (Drop/Parachute)</English>
+				<French>Nacelle (Décrocher/Parachuter)</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Module_Zeus_Accrocher">
+				<Original>Pod (Hook)</Original>
+				<English>Pod (Hook)</English>
+				<French>Nacelle (Accrocher)</French>
+			</Key>
+			<!-- Mot/Chat véhicule -->
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Arrimee">
+				<Original>Attached</Original>
+				<English>Attached</English>
+				<French>Arrimée</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Desarrimee">
+				<Original>Detached</Original>
+				<English>Detached</English>
+				<French>Désarrimée</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Decrochee">
+				<Original>Unhooked</Original>
+				<English>Unhooked</English>
+				<French>Décrochée</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Parachutee">
+				<Original>Parachuted</Original>
+				<English>Parachuted</English>
+				<French>Parachutée</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Accrochee">
+				<Original>Hooked</Original>
+				<English>Hooked</English>
+				<French>Accrochée</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Longueur_De_Corde">
+				<Original>Rope lenght:</Original>
+				<English>Rope lenght:</English>
+				<French>Longueur de corde :</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Raccourcissement_Corde">
+				<Original>Shortening of ropes until</Original>
+				<English>Shortening of ropes until</English>
+				<French>Raccourcissement des cordes à</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Allongement_Corde">
+				<Original>Extension of ropes until</Original>
+				<English>Extension of ropes until</English>
+				<French>Allongement des cordes à</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Desarrimage_Assaut_Descente_Nacelle">
+				<Original>Assault detaching: Pod lowered</Original>
+				<English>Assault detaching: Pod lowered</English>
+				<French>Désarrimage d'assaut : Descente de la nacelle</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Desarrimage_Assaut_Nacelle_Sol">
+				<Original>Assault detaching: Pod on the ground</Original>
+				<English>Assault detaching: Pod on the ground</English>
+				<French>Désarrimage d'assaut : Nacelle au sol</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Desarrimage_Assaut_Nacelle_Vide_Arrimage">
+				<Original>Assault detaching: Empty pod, attaching...</Original>
+				<English>Assault detaching: Empty pod, attaching...</English>
+				<French>Désarrimage d'assaut : Nacelle vide, arrimage en cours...</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Desarrimage_Assaut_Nacelle_Vide">
+				<Original>Assault detaching: Empty pod</Original>
+				<English>Assault detaching: Empty pod</English>
+				<French>Désarrimage d'assaut : Nacelle vide</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Desarrimage_Assaut_Nacelle_Vide_Arrimee">
+				<Original>Assault detaching: Pod attached</Original>
+				<English>Assault detaching: Pod attached</English>
+				<French>Désarrimage d'assaut : Nacelle arrimée</French>
+			</Key>
+			<!-- Chat Zeus-->
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Deja">
+				<Original>already</Original>
+				<English>already</English>
+				<French>déjà</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Aucun_Heli_Ou_Objet">
+				<Original>No helicopter or object at range</Original>
+				<English>No helicopter or object at range</English>
+				<French>Aucun hélicoptère ou objet à portée</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Heli_A_Portee_Aucun_Objet">
+				<Original>Helicopter at range but no object</Original>
+				<English>Helicopter at range but no object</English>
+				<French>Hélicoptère à portée mais aucun objet</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Objet_A_Portee_Aucun_Heli">
+				<Original>Object at range but no helicopter</Original>
+				<English>Object at range but no helicopter</English>
+				<French>Objet à portée mais aucun hélicoptère</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Decrochage">
+				<Original>Impossible unhooking, place the module within reach of a helicopter AND an object attached or hooked</Original>
+				<English>Impossible unhooking, place the module within reach of a helicopter AND an object attached or hooked</English>
+				<French>Decrochage impossible, placer le module à portée d'un hélicoptère et d'un objet arrimé ou accroché</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Desarrimage_Impossible">
+				<Original>Impossible detaching, place the module within reach of a helicopter AND an attached pod</Original>
+				<English>Impossible detaching, place the module within reach of a helicopter AND an attached pod</English>
+				<French>Désarrimage impossible, placer le module à portée d'un hélicoptère et d'une nacelle arrimée</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Desarrimage_Impossible_Trop_Haut">
+				<Original>Impossible assault detaching, altitude of the helicopter is to high</Original>
+				<English>Impossible assault detaching, altitude of the helicopter is to high</English>
+				<French>Désarrimage d'assaut impossible, l'hélicoptère est à plus de 100m de hauteur</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Arrimage">
+				<Original>Impossible attaching, place the module within reach of a helicopter AND a pod able to attach</Original>
+				<English>Impossible attaching, place the module within reach of a helicopter AND a pod able to attach</English>
+				<French>Arrimage impossible, placer le module à portée d'un hélicoptère et d'une nacelle arrimable</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Accrochage">
+				<Original>Impossible hooking, place the module within reach of a helicopter AND an object able to hook</Original>
+				<English>Impossible hooking, place the module within reach of a helicopter AND an object able to hook</English>
+				<French>Accrochage impossible, placer le module à portée d'un hélicoptère et un objet accrochable valide</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Pas_Allonger">
+				<Original>You cannot lengthen ropes</Original>
+				<English>You cannot lengthen ropes</English>
+				<French>Vous ne pouvez pas allonger les cordes</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Pas_Accroché">
+				<Original>Pod is not slingloaded</Original>
+				<English>Pod is not slingloaded</English>
+				<French>La nacelle n'est pas accroché...</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Pas_Raccourcir">
+				<Original>You cannot shorten ropes</Original>
+				<English>You cannot shorten ropes</English>
+				<French>Vous ne pouvez pas raccourcir les cordes</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Mot_Arrimage">
+				<Original>Attaching</Original>
+				<English>Attaching</English>
+				<French>Arrimage</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Mot_Desarrimage">
+				<Original>Detaching</Original>
+				<English>Detaching</English>
+				<French>Désarrimage</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Mot_Desarrimage_Assaut">
+				<Original>Assault detaching</Original>
+				<English>Assault detaching</English>
+				<French>Désarrimage d'assaut</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Mot_Desarrimage_Assaut_Nacelle_Descente">
+				<Original>Assault detaching : Descent of the Pod</Original>
+				<English>Assault detaching : Descent of the Pod</English>
+				<French>Désarrimage d'assaut : Descente de la nacelle</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Mot_Desarrimage_Assaut_Arrimage_Nacelle">
+				<Original>Assault detaching : Attaching Pod</Original>
+				<English>Assault detaching : Attaching Pod</English>
+				<French>Désarrimage d'assaut : Arrimage de la nacelle</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Mot_Desarrimage_Assaut_Nacelle_Arrimee">
+				<Original>Assault detaching : Pod attached</Original>
+				<English>Assault detaching : Pod attached </English>
+				<French>Désarrimage d'assaut : Nacelle arrimée</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Mot_Decrochage">
+				<Original>Unhooking</Original>
+				<English>Unhooking</English>
+				<French>Décrochage</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Chat_Zeus_Mot_Parachutage">
+				<Original>Parachuting</Original>
+				<English>Parachuting</English>
+				<French>Parachutage</French>
+			</Key>
+			<!-- Corrections traduction Taru-->			
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Taru_Nacelle_medevac">
+				<Original>Taru Medical Pod </Original>
+				<English>Taru Medical Pod </English>
+				<Czech>Taru – Lékařský modul </Czech>
+				<French>Taru - Nacelle médicale </French>
+				<German>Taru Medizinische Vorrichtung </German>
+				<Italian>Taru Modulo medico </Italian>
+				<Polish>Kapsuła medyczna Taru </Polish>
+				<Portuguese>Plataforma médica do Taru </Portuguese>
+				<Russian>Медицинский модуль Taru </Russian>
+				<Spanish>Unidad médica del Taru </Spanish>
+			</Key>			
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Corde_Allonger_A">
+				<Original>Extension of ropes to</Original>
+				<English>Extension of ropes to</English>
+				<French>Corde allongé à</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Corde_Raccourcis_A">
+				<Original>Rope shortened to</Original>
+				<English>Rope shortened to</English>
+				<French>Corde raccourcis à</French>
+			</Key>			
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_1_Deploiement_Auto">
+				<Original>The pod is equipped with a main and secondary parachute.</Original>
+				<English>The pod is equipped with a main and secondary parachute.</English>
+				<French>La nacelle est équipée d'un parachute principal et secondaire.</French>
+			</Key>	
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_2_Deploiement_Auto">
+				<Original>The pod will automatically deploy the main parachute when it is close to the ground.</Original>
+				<English>The pod will automatically deploy the main parachute when it is close to the ground.</English>
+				<French>La nacelle déploiera automatiquement le parachute principal lorsqu'elle sera proche du sol.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_3_Deploiement_Auto">
+				<Original>You can also deploy the parachutes manually but this will disable the automatic opening.</Original>
+				<English>You can also deploy the parachutes manually but this will disable the automatic opening.</English>
+				<French>Vous pouvez aussi déployer manuellement les parachutes mais cela désactivera l'ouverture automatique.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_4_Deploiement_Auto">
+				<Original>You can detach the main and secondary parachute but once the secondary is detached you will not be able to deploy any more.</Original>
+				<English>You can detach the main and secondary parachute but once the secondary is detached you will not be able to deploy any more.</English>
+				<French>Vous pouvez détacher le parachute principal et le secondaire mais une fois le secondaire détaché vous ne pourrez plus en déployer.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_Ouverture_Auto">
+				<Original>Automatic deployment of the main parachute.</Original>
+				<English>Automatic deployment of the main parachute.</English>
+				<French>Déploiement automatique du parachute principal.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_Nacelle_Endommager">
+				<Original>Pod too damaged for the automatic opening of the parachute.</Original>
+				<English>Pod too damaged for the automatic opening of the parachute.</English>
+				<French>Nacelle trop endommagée pour l'ouverture automatique du parachute.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_1_Deployer_Principal">
+				<Original>Main parachute deployed manually, deactivation of the automatic opening of the parachute.</Original>
+				<English>Main parachute deployed manually, deactivation of the automatic opening of the parachute.</English>
+				<French>Parachute principal déployé manuellement, désactivation de l'ouverture automatique du parachute.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_2_Deployer_Principal">
+				<Original>Main parachute detachment and secondary parachute opening available.</Original>
+				<English>Main parachute detachment and secondary parachute opening available.</English>
+				<French>Détachage du parachute principal et ouverture du parachute secondaire disponible.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_1_Detacher_Principal">
+				<Original>Detached main parachute</Original>
+				<English>Detached main parachute</English>
+				<French>Parachute principal détaché</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_2_Detacher_Principal">
+				<Original>Secondary parachute deployment available</Original>
+				<English>Secondary parachute deployment available</English>
+				<French>Déploiement du parachute secondaire disponible</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_1_Deployer_Secondaire">
+				<Original>Secondary parachute deployed, no more parachute available.</Original>
+				<English>Secondary parachute deployed, no more parachute available.</English>
+				<French>Parachute secondaire déployé, plus de parachute disponible.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_2_Deployer_Secondaire">
+				<Original>Secondary parachute detachment available.</Original>
+				<English>Secondary parachute detachment available.</English>
+				<French>Détachage du parachute secondaire disponible.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_Message_Détacher_Secondaire">
+				<Original>Detached secondary parachute, no more parachute available.</Original>
+				<English>Detached secondary parachute, no more parachute available.</English>
+				<French>Parachute secondaire détaché, plus de parachute disponible.</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_VehicleChat_Detacher_Principal">
+				<Original>detached the main parachute</Original>
+				<English>detached the main parachute</English>
+				<French>a détaché le parachute principal</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_VehicleChat_Detacher_Secondaire">
+				<Original>detached the secondary parachute</Original>
+				<English>detached the secondary parachute</English>
+				<French>a détaché le parachute secondaire</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_VehicleChat_Systemchat_Deployer_Principal">
+				<Original>deployed the main parachute</Original>
+				<English>deployed the main parachute</English>
+				<French>a déployé le parachute principal</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Nacelle_VehicleChat_Systemchat_Deployer_Secondaire">
+				<Original>deployed the secondary parachute</Original>
+				<English>deployed the secondary parachute</English>
+				<French>a déployé le parachute secondaire</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Vehiclechat_Objet_Detruit">
+				<Original>object attached destroyed and automatically released</Original>
+				<English>Enable/disable the pilot's parachuting action of the pod</English>
+				<French>Objet arrimé détruit et largué automatiquement</French>
+			</Key>	
+			
+			<!-- Option des addons CBA -->
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Interaction_Ace">
+				<Original>Interaction by ACE </Original>
+				<English>Interaction by ACE </English>
+				<French>Interaction par ACE </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Interaction_Ace_Toolbox">
+				<Original>Enable/disable interactions through ACE</Original>
+				<English>Enable/disable interactions through ACE</English>
+				<French>Active/désactive les interactions par ACE</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Arrimage">
+				<Original>Attaching </Original>
+				<English>Attaching </English>
+				<French>Arrimage </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Arrimage_Toolbox">
+				<Original>Enable/disable the attaching action</Original>
+				<English>Enable/disable the attaching action</English>
+				<French>Active/désactive l'action d'arrimage</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Desarrimage">
+				<Original>Attaching </Original>
+				<English>Attaching </English>
+				<French>Désarrimage </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Desarrimage_Toolbox">
+				<Original>Enable/disable the attaching action</Original>
+				<English>Enable/disable the attaching action</English>
+				<French>Active/désactive l'action de désarrimage</French>
+			</Key>			
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Desarrimage_Assaut">
+				<Original>Attaching </Original>
+				<English>Attaching </English>
+				<French>Désarrimage d'assaut </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Desarrimage_Assaut_Toolbox">
+				<Original>Enable/disable the assault detaching action</Original>
+				<English>Enable/disable the assault detaching action</English>
+				<French>Active/désactive l'action de désarrimage d'assaut</French>
+			</Key>			
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Allongement_Plus_10">
+				<Original>Extend by 10m </Original>
+				<English>Extend by 10m </English>
+				<French>Allonger de 10m </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Allongement_Plus_10_Toolbox">
+				<Original>Enables/disable the 10m rope lengthening action</Original>
+				<English>Enable/disable the 10m rope lengthening action</English>
+				<French>Active/désactive l'action d'allongement de corde de 10m</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Allongement_A_100">
+				<Original>Extend to 100m </Original>
+				<English>Extend to 100m </English>
+				<French>Allonger à 100m </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Allongement_A_100_Toolbox">
+				<Original>Enable/disable the rope lengthening action at 100m</Original>
+				<English>Enable/disable the rope lengthening action at 100m</English>
+				<French>Active/désactive l'action d'allongement de corde à 100m</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Raccourcissement_De_10">
+				<Original>Shorten by 10m </Original>
+				<English>Shorten by 10m </English>
+				<French>Raccourcir de 10m </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Raccourcissement_De_10_Toolbox">
+				<Original>Enable/disable the 10m rope shortening action</Original>
+				<English>Enable/disable the 10m rope shortening action</English>
+				<French>Active/désactive l'action de raccourcissement de corde de 10m</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Raccourcissement_A_10">
+				<Original>Shorten to 10m </Original>
+				<English>Shorten to 10m </English>
+				<French>Raccourcir à 10m </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Raccourcissement_A_10_Toolbox">
+				<Original>Enable/disable the rope shortening action at 10m</Original>
+				<English>Enable/disable the rope shortening action at 10m</English>
+				<French>Active/désactive l'action de raccourcissement de corde à 10m</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Ouverture_Parachute_Nacelle">
+				<Original>Manual parachute opening in pod </Original>
+				<English>Manual parachute opening in pod </English>
+				<French>Ouverture parachute manuel dans nacelle </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Ouverture_Parachute_Nacelle_Toolbox">
+				<Original>Enable/disable the parachute opening action by the occupants of the pod</Original>
+				<English>Enable/disable the parachute opening action by the occupants of the pod</English>
+				<French>Active/désactive l'action d'ouverture de parachute par les occupants de la nacelle</French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Parachutage_Nacelle_Pilote">
+				<Original>Parachuting the pod </Original>
+				<English>Parachuting the pod </English>
+				<French>Parachuter la nacelle </French>
+			</Key>
+			<Key ID="STR_MCCMK_Taru_Pod_Mod_Option_CBA_Intituler_Action_Parachutage_Nacelle_Pilote_Toolbox">
+				<Original>Enable/disable the pilot's parachuting action of the pod</Original>
+				<English>Enable/disable the pilot's parachuting action of the pod</English>
+				<French>Active/désactive l'action de parachutage de la nacelle par le pilote</French>
+			</Key>	
+		</Container>
+	</Package>
+</Project>

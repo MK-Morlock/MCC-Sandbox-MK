@@ -19,8 +19,7 @@ if (isNull _module) exitWith {};
 _pos = getpos _module;
 
 //did we get here from the 2d editor?
-// (it used to test for a class "MCC_Module_createShop" that does not exist, so a shop placed in Eden never did anything;
-//  an Eden-placed module carries its attribute values, a Zeus-placed one does not)
+// (an Eden-placed module carries its attribute values, a Zeus-placed one does not)
 if (!isNil {_module getVariable "tittle"} || {count (synchronizedObjects _module) > 0 && {isNull curatorcamera}}) then {
 
 	if (isServer) then {
@@ -50,7 +49,7 @@ if (!isNil {_module getVariable "tittle"} || {count (synchronizedObjects _module
 		_box allowDamage false;
 		_box setVariable ["MCC_vaultNoInventory",true,true];	//stock is bought/sold through the shop dialog only
 
-		// Synced only to the ammo box: the box itself is the shop (it used to be hidden with nothing to open it).
+		// Synced only to the ammo box: the box itself is the shop.
 		// Synced to other objects too (a table, a unit...): those open the shop and the box stays hidden as its stock.
 		if (count _objects == 0) then {
 			_objects = [_box];

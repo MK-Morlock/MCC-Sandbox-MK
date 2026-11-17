@@ -3,6 +3,7 @@ private _comboBox = controlNull;
 private _displayname = "";
 private _x = 0;
 disableSerialization;
+[_this select 0, "mcc_loginDialog"] call MCC_fnc_themeButtons;	//(MK) Buttons look: 3D buttons
 MCC_GUI1initDone = false;
 
 #define MCCVIEWDISTANCE 1006

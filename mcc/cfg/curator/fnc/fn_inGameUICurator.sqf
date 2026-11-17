@@ -12,7 +12,7 @@ if !(local _module) exitWith {};
 
 _pos = getpos _module;
 
-// The dialog opens on the CURRENT settings (it used to open with everything ticked, so pressing OK switched everything on)
+// The dialog opens on the CURRENT settings, so OK keeps whatever isn't changed
 private _ns = missionNamespace;
 private _compassMode = _ns getVariable ["MCC_Settings_compassEnabled", [2, 0] select (_ns getVariable ["MCC_initCompassHUD", false])];
 private _cam = player getVariable ["MCC_forceCameraMode", _ns getVariable ["MCC_Settings_forceCamera", 3]];

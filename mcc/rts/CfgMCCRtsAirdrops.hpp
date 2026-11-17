@@ -63,6 +63,8 @@ class WEST
 			className = "";
 			resources[] = {{"ammo",500},{"fuel",200}};
 		};
+
+		//(MK) Air Patrol: one entry per aircraft of the commander's faction, added by the console (MCCMK_fnc_airPatrolList)
 	};
 };
 
@@ -131,6 +133,8 @@ class EAST
 			className = "";
 			resources[] = {{"ammo",500},{"fuel",200}};
 		};
+
+		//(MK) Air Patrol: one entry per aircraft of the commander's faction, added by the console (MCCMK_fnc_airPatrolList)
 	};
 };
 
@@ -199,5 +203,7 @@ class GUER
 			className = "";
 			resources[] = {{"ammo",500},{"fuel",200}};
 		};
+
+		//(MK) Air Patrol: one entry per aircraft of the commander's faction, added by the console (MCCMK_fnc_airPatrolList)
 	};
 };

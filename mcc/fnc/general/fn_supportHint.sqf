@@ -1,5 +1,8 @@
 params [["_kind", "", ["", []]]];
-private _k = toLower (if (_kind isEqualType []) then {_kind param [0, ""]} else {_kind});
+// (airdrops pass a list of lists: dig down to the first name)
+private _k = _kind;
+while {_k isEqualType []} do {_k = _k param [0, ""]};
+_k = toLower (if (_k isEqualType "") then {_k} else {""});
 private _extra = if (_k == "ac-130") then {"Right click to toggle gun control"} else {
 	if (_k in ["uav", "uav armed", "controllable"]) then {"Right click to toggle camera control"} else {""}
 };

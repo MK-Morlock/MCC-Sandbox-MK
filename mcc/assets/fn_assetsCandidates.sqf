@@ -14,7 +14,7 @@ private _cached = uiNamespace getVariable _key;
 if (!isNil "_cached") exitWith {+_cached};
 
 private _modOf = {
-	private _m = configSourceMod _this;
+	private _m = [_this] call MCCMK_fnc_classSource;
 	if (_m == "") then {"Arma 3"} else {_m}
 };
 private _classes = [];
@@ -25,8 +25,8 @@ if (_isObject) then {
 		uiNamespace setVariable ["MCC_assetObjectPool", _pool];
 	};
 	private _mods = [""];
-	{_mods pushBackUnique toLower configSourceMod (configFile >> "CfgFactionClasses" >> _x)} forEach _factions;
-	_classes = _pool select {(_showAll || {toLower configSourceMod _x in _mods}) && {[_x, _role] call MCC_fnc_assetRoleMatch}};
+	{_mods pushBackUnique toLower ([configFile >> "CfgFactionClasses" >> _x] call MCCMK_fnc_classSource)} forEach _factions;
+	_classes = _pool select {(_showAll || {toLower ([_x] call MCCMK_fnc_classSource) in _mods}) && {[_x, _role] call MCC_fnc_assetRoleMatch}};
 } else {
 	if (_showAll) then {
 		private _pool = uiNamespace getVariable "MCC_assetVehiclePool";

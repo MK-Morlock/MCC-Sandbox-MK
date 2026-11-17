@@ -164,7 +164,7 @@ if(alive player && vehicle player == player && (missionNamespace getVariable ["M
 
 			if ((player getVariable ["MCC_wallAhead", ""])!="") then {
 				if (MCC_isCBA) then {
-						_string = _string + format ["<br/><t font='puristaMedium' size='0.4' align='left'> Press %1 to climb",["MCC","vaultOver"] call MCC_fnc_getKeyFromCBA];
+						_string = _string + format ["<br/><t font='puristaMedium' size='0.4' align='left'> Press %1 to climb",["MCCMK","vaultOver"] call MCC_fnc_getKeyFromCBA];
 					} else {
 						_string = _string + format ["<br/><t font='puristaMedium' size='0.4' align='left'> Press %1 to climb",keyName ((actionKeys "GetOver") select 0)];
 					};

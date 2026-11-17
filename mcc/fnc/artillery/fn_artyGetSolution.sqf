@@ -75,4 +75,4 @@ while {(_cannon == vehicle player) && alive player && (_counter == (player getVa
 	sleep 1; 
 };
 
-hint "";
+[""] call MCCMK_fnc_hint;

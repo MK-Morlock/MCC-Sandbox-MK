@@ -56,7 +56,7 @@ MCC_functionName_keyDown =
 };
 
 _display = ctrlParent ((_this select 0) select 0);
-hint "Press any key or key combination with Alt, Shift or Ctrl to bind";
+["Press any key or key combination with Alt, Shift or Ctrl to bind"] call MCCMK_fnc_hint;
 
 _ctrl = _display displayCtrl (8415 + _type);
 _keyDown = _ctrl ctrlAddEventHandler ["KeyUp",  format ["[_this,%1] call MCC_functionName_keyDown",_type]];

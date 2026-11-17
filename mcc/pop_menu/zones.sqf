@@ -78,7 +78,9 @@ if (_type == 0) then {
 	if (!isNull _mwMap && {markerShape mcc_zone_markername != ""}) then {
 		private _zs = getMarkerSize mcc_zone_markername;
 		private _zr = ((_zs select 0) max (_zs select 1)) max 150;
-		_mwMap ctrlMapAnimAdd [0.4, (((_zr * 6) / worldSize) max 0.02) min 1, getMarkerPos mcc_zone_markername];
-		ctrlMapAnimCommit _mwMap;
+		{
+			private _mm = (findDisplay 2989) displayCtrl _x;
+			if (!isNull _mm) then {_mm ctrlMapAnimAdd [0.4, (((_zr * 6) / worldSize) max 0.02) min 1, getMarkerPos mcc_zone_markername]; ctrlMapAnimCommit _mm};
+		} forEach [9000, 9010];
 	};
 };

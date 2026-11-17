@@ -90,7 +90,7 @@ class MCC_3dDOCControls:MCC_RscControlsGroup
 			y = 0.340867 * safezoneH;
 			w = 0.103125 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			tooltip = "Save the composition (the player as the anchor point, 200 m radius) to the profile namespace - choose a slot from the list above first"; //--- ToDo: Localize;
+			tooltip = "Save the composition (the player as the anchor point, 200 m\nradius) to the profile namespace - choose a slot from the list\nabove first"; //--- ToDo: Localize;
 		};
 		class MCC_3DComploadUIButton: MCCBTN_R
 		{
@@ -102,7 +102,7 @@ class MCC_3dDOCControls:MCC_RscControlsGroup
 			y = 0.340867 * safezoneH;
 			w = 0.0973958 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			tooltip = "Load a composition from the profile namespace into the init line of the chosen vehicle - choose a slot from the list above first"; //--- ToDo: Localize;
+			tooltip = "Load a composition from the profile namespace into the init\nline of the chosen vehicle - choose a slot from the list above\nfirst"; //--- ToDo: Localize;
 		};
 	};
 };

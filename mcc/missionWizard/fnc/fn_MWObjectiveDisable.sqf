@@ -51,7 +51,7 @@ if (_isCQB) then {
 		//No other unit in the spawn position?
 		if ((count (nearestObjects [_spawnPos, ["Man"], 1])<1) && {!surfaceIsWater _spawnPos}) then {
 			//Spawn the intel
-			_dummyObject = MCC_SMALL_IEDDEVICE_TABLE createvehicle _spawnPos;
+			_dummyObject = MCC_SMALL_IEDDEVICE_TABLE createvehicle _spawnPos; [_dummyObject] call MCCMK_fnc_genTag;
 			_dummyObject setPos _spawnPos;
 			_object = [_objPos,_objectType,"large",0,8,false,4,15,_sidePlayer,_name,random 360,true,_side,_faction] call MCC_fnc_trapSingle;
 			_object setPos (_dummyObject modelToWorld [0,0,0.43]);
@@ -59,7 +59,7 @@ if (_isCQB) then {
 			_unitPlaced = true;
 
 			//Lets spawn some body guards
-			[getpos _object,30,0,2,_faction, _side] remoteExec ["MCC_fnc_garrison", 2,false];
+			(if (isServer) then {[[getpos _object,30,0,2,_faction, _side], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_garrison"] spawn MCCMK_fnc_genRun} else {[getpos _object,30,0,2,_faction, _side] remoteExec ["MCC_fnc_garrison", 2,false]});
 		};
 	};
 };

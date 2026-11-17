@@ -6,7 +6,9 @@ params [
 ];
 
 _level = toUpper _level;
-if (!(missionNamespace getVariable ["MCC_debug", false]) && {!(_level in ["BUILD", "CAMPAIGN"])}) exitWith {};
+if (!(missionNamespace getVariable ["MCC_debug", false]) && {_level != "BUILD"}) exitWith {};	//(MK) without debug: only the version line
+// (MK) DEBUG traces: silent even with debug on (MCC_logVerbose = true in the debug console brings them back)
+if (_level == "DEBUG" && {!(missionNamespace getVariable ["MCC_logVerbose", false])}) exitWith {};
 
 private _text = if (count _args > 0) then {format ([_message] + _args)} else {_message};
 

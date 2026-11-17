@@ -164,6 +164,18 @@ class MCCDLG_NAME
 			w = 0.0802083 * safezoneW;
 			h = 0.033 * safezoneH;
 		};
+		//(MK) Adjust crates: move the crates MCC placed on a cargo truck's bed (MCCMK_fnc_crateAdjust); shown only when there are some
+		class MCCMK_loadTruckAdjust: MCCBTN_R
+		{
+			idc = 9320;
+			action = "['open'] call MCCMK_fnc_crateAdjust;";
+			text = "Adjust crates";
+			tooltip = "Move the crates on the truck bed";
+			x = 0.56 * safezoneW + safezoneX;
+			y = 0.676 * safezoneH + safezoneY;
+			w = 0.1 * safezoneW;
+			h = 0.033 * safezoneH;
+		};
 		class MCC_loadTruckOutpot: MCCBTN_R
 		{
 			idc = 4;

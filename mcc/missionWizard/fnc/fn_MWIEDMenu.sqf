@@ -16,7 +16,7 @@ switch (_choice) do {
 		if (isNull _fake) exitWith {};
 		private _key = (actionKeysNames ["Action", 1]) splitString """" joinString "";
 		if (_key == "") then {_key = "the action key"};
-		if ((player getVariable ["MCC_MWIEDSafeTarget", objNull]) isEqualTo _fake) exitWith {hint format ["Hold %1 at the IED to disarm it", _key]};
+		if ((player getVariable ["MCC_MWIEDSafeTarget", objNull]) isEqualTo _fake) exitWith {[format ["Hold %1 at the IED to disarm it", _key]] call MCCMK_fnc_hint};
 		player setVariable ["MCC_MWIEDSafeTarget", _fake];
 		[
 			_fake,
@@ -33,7 +33,7 @@ switch (_choice) do {
 				private _real = _target getVariable ["realIed", objNull];
 				if (!isNull _real && {_real getVariable ["armed", false]}) then {
 					_real setVariable ["armed", false, true];
-					hint "IED disarmed";
+					["IED disarmed"] call MCCMK_fnc_hint;
 				};
 			},
 			{},
@@ -43,7 +43,7 @@ switch (_choice) do {
 			true,
 			false
 		] call BIS_fnc_holdActionAdd;
-		hint format ["Hold %1 at the IED to disarm it", _key];
+		[format ["Hold %1 at the IED to disarm it", _key]] call MCCMK_fnc_hint;
 	};
 
 	case "random": {
@@ -52,7 +52,7 @@ switch (_choice) do {
 	};
 
 	case "charge": {
-		if (({_x == MCC_CHARGE} count magazines player) == 0) exitWith {hint "You have no demo charge"};
+		if (({_x == MCC_CHARGE} count magazines player) == 0) exitWith {["You have no demo charge"] call MCCMK_fnc_hint};
 		player removeMagazine MCC_CHARGE;
 		["Placing Charge", 10] call MCC_fnc_interactProgress;
 		private _c4 = "DemoCharge_Remote_Ammo_Scripted" createVehicle position player;

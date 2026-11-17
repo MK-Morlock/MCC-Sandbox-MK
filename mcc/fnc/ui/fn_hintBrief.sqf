@@ -7,7 +7,7 @@
 			1: NUMBER seconds (default 6)
 ==============================================================================================================================================================*/
 params [["_text", ""], ["_secs", 6]];
-if (_text isEqualType "") then {hint _text} else {hint _text};
+if (_text isEqualType "") then {[_text] call MCCMK_fnc_hint} else {[_text] call MCCMK_fnc_hint};
 private _token = (missionNamespace getVariable ["MCC_hintBriefToken", 0]) + 1;
 missionNamespace setVariable ["MCC_hintBriefToken", _token];
 [_token, _secs] spawn {

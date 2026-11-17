@@ -14,14 +14,8 @@ if (isNil "_faction") exitWith {};
 
 //If the faction has been inited once don't do it again
 if (missionNamespace getVariable ["MCC_faction_initilized_units",false]) exitWith {
-	U_GEN_SOLDIER = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_SOLDIER", _faction],[]]);
-	U_GEN_CAR = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_CAR", _faction],[]]);
-	U_GEN_MOTORCYCLE = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_MOTORCYCLE", _faction],[]]);
-	U_GEN_TANK = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_TANK", _faction],[]]);
-	U_GEN_HELICOPTER = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_HELICOPTER", _faction],[]]);
-	U_GEN_AIRPLANE = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_AIRPLANE", _faction],[]]);
-	U_GEN_SHIP = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_SHIP", _faction],[]]);
-	U_AMMO = (missionNamespace getVariable ["MCC_factions_U_AMMO",[]]);
+	[_faction] call MCCMK_fnc_spawnScopeLists;
+	U_AMMO = (missionNamespace getVariable ["MCC_factions_U_AMMO",[]]); U_AMMO = U_AMMO + ([] call MCCMK_fnc_podSpawnList);	//(MK) the Taru pods, free for the mission maker
 };
 
 
@@ -36,7 +30,6 @@ for "_i" from 1 to (count _CfgVehicles - 1) do {
 	//Keep going when it is a public entry
 	private _mdl = toLower (getText (_CfgVehicle >> "model"));
 	private _invisible = ((["TargetSoldierBase", "TargetBase", "Target_Base_F", "InvisibleTarget_Base_F"] findIf {(configName _CfgVehicle) isKindOf _x}) >= 0) || {_mdl in ["\a3\weapons_f\empty.p3d", "a3\weapons_f\empty.p3d", "\a3\weapons_f\empty", "a3\weapons_f\empty"]} || {(_mdl find "invisible") >= 0};
-	if (_invisible && {getNumber (_CfgVehicle >> "scope") == 2} && {missionNamespace getVariable ["MCC_debug", false]}) then {diag_log format ["MCC [DEBUG] spawn lists | invisible target left out: %1 (%2)", configName _CfgVehicle, getText (_CfgVehicle >> "displayName")]};
 	private _lcn = toLower (configName _CfgVehicle);
 	private _template = ((_lcn select [((count _lcn) - 5) max 0]) == "_base") || {(_lcn find "_base_") >= 0};
 	if (_template && {getNumber (_CfgVehicle >> "scope") == 2}) then {["DEBUG", "spawn lists", "template class left out: %1", [configName _CfgVehicle]] call MCC_fnc_log};
@@ -126,13 +119,7 @@ for "_i" from 1 to (count _CfgVehicles - 1) do {
 
 missionNamespace setVariable ["MCC_faction_initilized_units",true];
 
-U_GEN_SOLDIER = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_SOLDIER", _faction],[]]);
-U_GEN_CAR = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_CAR", _faction],[]]);
-U_GEN_MOTORCYCLE = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_MOTORCYCLE", _faction],[]]);
-U_GEN_TANK = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_TANK", _faction],[]]);
-U_GEN_HELICOPTER = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_HELICOPTER", _faction],[]]);
-U_GEN_AIRPLANE = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_AIRPLANE", _faction],[]]);
-U_GEN_SHIP = (missionNamespace getVariable [format ["MCC_faction_%1_U_GEN_SHIP", _faction],[]]);
-U_AMMO = (missionNamespace getVariable ["MCC_factions_U_AMMO",[]]);
+[_faction] call MCCMK_fnc_spawnScopeLists;
+U_AMMO = (missionNamespace getVariable ["MCC_factions_U_AMMO",[]]); U_AMMO = U_AMMO + ([] call MCCMK_fnc_podSpawnList);	//(MK) the Taru pods, free for the mission maker
 
 MCC_unit_array_ready=true; 	//let dialog know we are ready

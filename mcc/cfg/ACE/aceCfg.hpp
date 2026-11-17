@@ -7,7 +7,7 @@
 	    };\
 	    class logistics {\
 			displayName = "Logistics";\
-			condition = " ((typeof (vehicle _player) in MCC_supplyTracks || ((vehicle _player) isKindOf 'helicopter' && ((getpos (vehicle _player)) select 2) > 15)) && (_player == driver (vehicle _player)) && (speed (vehicle _player) < 10) && (missionNamespace getVariable ['MCC_allowlogistics',true]))";\
+			condition = " (([vehicle _player] call MCCMK_fnc_isSupplyTruck || ((vehicle _player) isKindOf 'helicopter' && ((getpos (vehicle _player)) select 2) > 15)) && (_player == driver (vehicle _player)) && (speed (vehicle _player) < 10) && (missionNamespace getVariable ['MCC_allowlogistics',true]))";\
 			statement = "[_player] spawn MCC_fnc_loadTruckUI;";\
 			icon = "\a3\ui_f\data\IGUI\Cfg\Actions\reammo_ca.paa";\
 	    };\
@@ -146,7 +146,7 @@ class ReammoBox_F: thingX {
         class ACE_MCC_supplyBox {
                 displayName = "Resupply";
                 distance = 5;
-                condition = "(typeof _target in ['MCC_ammoBox','MCC_crateAmmo','MCC_crateAmmoBigWest','MCC_crateAmmoBigEast','Box_NATO_AmmoVeh_F','B_Slingload_01_Ammo_F','Land_Pod_Heli_Transport_04_ammo_F'])";
+                condition = "(typeof _target in ['MCC_ammoBox','MCC_crateAmmo','MCC_crateAmmoBigWest','MCC_crateAmmoBigEast','MCC_crateAmmoBigEast_black','Box_NATO_AmmoVeh_F','B_Slingload_01_Ammo_F','Land_Pod_Heli_Transport_04_ammo_F','Land_Pod_Heli_Transport_04_ammo_black_F'])";
                 statement =  "[_target] call MCC_fnc_resupply;";
                 icon = "\a3\ui_f\data\IGUI\Cfg\Actions\reload_ca.paa";
                 showDisabled = 0;

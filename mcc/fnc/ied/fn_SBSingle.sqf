@@ -17,8 +17,8 @@ private _sb = objNull;
 
 params ["_pos", "_trapkind", "_trapvolume", "_IEDExplosionType", "_iedside"];
 
-_group = creategroup civilian;
-_sb	= _group createunit [_trapkind, _pos, [], 0, "NONE"];
+_group = creategroup civilian; [_group] call MCCMK_fnc_genTag;
+_sb	= _group createunit [_trapkind, _pos, [], 0, "NONE"]; [_sb] call MCCMK_fnc_genTag;
 
 _init = FORMAT [";[_this,%1,'%2',%3] spawn MCC_fnc_manageSB;"
 				, str ((if (_iedside isEqualType []) then {_iedside} else {[_iedside]}) apply {if (_x isEqualType "") then {_x} else {str _x}})

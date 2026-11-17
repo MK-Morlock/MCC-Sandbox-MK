@@ -130,7 +130,7 @@ switch (true) do {
 			{
 				_x params ["_type", "_pos", "_odir"];
 				if (isClass (configFile >> "CfgVehicles" >> _type)) then {
-					private _o = createVehicle [_type, [_pos select 0, _pos select 1, 0], [], 0, "CAN_COLLIDE"];
+					private _o = createVehicle [_type, [_pos select 0, _pos select 1, 0], [], 0, "CAN_COLLIDE"]; [_o] call MCCMK_fnc_genTag;
 					_o setDir _odir;
 					_o setVectorUp (surfaceNormal _pos);
 					_o allowDamage false;
@@ -169,7 +169,7 @@ switch (true) do {
 				_extractionMarker = format ["MCC_extraction_%1", ["MCC_extractionCounter",1] call BIS_fnc_counter];
 				["call", [[_extractionMarker, _extraction, [_owners select 0, true] call BIS_fnc_sideColor], {
 					params ["_mk", "_p", "_c"];
-					private _m = createMarkerLocal [_mk, _p];
+					private _m = createMarkerLocal [_mk, _p]; [_m] call MCCMK_fnc_genTag;
 					_m setMarkerTypeLocal "mil_pickup";
 					_m setMarkerColorLocal _c;
 					_m setMarkerTextLocal "Extraction";

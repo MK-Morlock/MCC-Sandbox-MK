@@ -22,7 +22,7 @@ private "_vehicle";
 private _pos = [];
 _side = param [0, sideLogic, [sideLogic]];
 _factionEnemy = param [1,"OPF_F",[""]];
-_enemySide = ([_factionEnemy] call MCC_fnc_factionSide) call BIS_fnc_sideType;
+_enemySide = if ((toLower _factionEnemy) == toLower (missionNamespace getVariable ["MCC_campaignEnemyFaction", ""]) && {!isNil "MCC_campaignEnemySide"}) then {MCC_campaignEnemySide} else {([_factionEnemy] call MCC_fnc_factionSide) call BIS_fnc_sideType};
 
 _startLocation = missionNamespace getVariable [format ["MCC_START_%1",_side],[0,0,0]];
 
@@ -86,11 +86,11 @@ for "_i" from 0 to _strength step 5 do {
 		} else {
 			private _cls = ([[_unitsArray, "patrol"] call MCCMK_fnc_pickVehicle] apply {if (_x == "") then {(_unitsArray call BIS_fnc_selectRandom) select 0} else {_x}}) select 0;
 			_spawnPos = [_spawnPos, _cls] call MCC_fnc_safeSpawnPos;
-			([_spawnPos, 200, _cls, _enemySide] call MCC_fnc_spawnVehicle) params [
-					["_vehicle",objNull,[objNull]],
-					["_units",[],[[]]],
-					["_grp",grpNull,[grpNull]]
-				];
+			private _sv = [_spawnPos, 200, _cls, _enemySide, true, true, _factionEnemy] call MCC_fnc_spawnVehicle;	//(MK) the enemy faction's crew
+			private _vehicle = _sv param [0, objNull];
+			// (MK) the vehicle's group into the outer _grp (params made a separate private one here, so the attack order
+			// below went to the previous wave's group - vehicles in a base attack never got it)
+			_grp = _sv param [2, grpNull];
 
 			//Populate vehicle
 			[_vehicle] call MCC_fnc_populateVehicle;

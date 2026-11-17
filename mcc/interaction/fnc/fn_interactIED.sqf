@@ -92,7 +92,7 @@ if (_men distance _ied <4) then {
 	//If it is a bomb expert ;)
 	if (_isEngineer) then {
 		if (_rand > 0.20) then {
-			hint "disarmed";
+			["disarmed"] call MCCMK_fnc_hint;
 			[[netid _men,_men], format ["disarm%1", (floor random 7)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 
 			sleep 1;
@@ -102,11 +102,11 @@ if (_men distance _ied <4) then {
 			_ied setVariable ["MCC_isInteracted",false,true];
 		} else {
 			if (_rand >0.05) then {
-				hint "Fail to disarm";
+				["Fail to disarm"] call MCCMK_fnc_hint;
 
 				[[netid _men,_men], format ["disarmfail%1", (floor random 3)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 			} else {
-				hint "Critical fail - start running";
+				["Critical fail - start running"] call MCCMK_fnc_hint;
 
 				[[netid _men,_men], format ["disarmcrit%1", (floor random 2)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 
@@ -120,17 +120,17 @@ if (_men distance _ied <4) then {
 	} else {
 		//If it isn't a bomb expert <*Kaboom*>
 		if (_rand > 0.70) then {
-			hint "disarmed";
+			["disarmed"] call MCCMK_fnc_hint;
 			[[netid _men,_men], format ["disarm%1", (floor random 7)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 
 			sleep 1;
 			_ied setvariable ["armed",false,true];
 		} else {
-			hint "Fail to disarm";
+			["Fail to disarm"] call MCCMK_fnc_hint;
 			if (_rand >0.3) then {
 				[[netid _men,_men], format ["disarmfail%1", (floor random 3)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 			} else {
-				hint "Critical fail - start running";
+				["Critical fail - start running"] call MCCMK_fnc_hint;
 
 				[[netid _men,_men], format ["disarmcrit%1", (floor random 2)+1]] remoteExec ["MCC_fnc_globalSay3D", 0, false];
 
@@ -146,7 +146,7 @@ if (_men distance _ied <4) then {
 	player setVariable ["MCC_interactionActive",false];
 	_ied setVariable ["MCC_isInteracted",false,true];
 }
-else {hint "To far to disarm"};
+else {["To far to disarm"] call MCCMK_fnc_hint};
 _ied setVariable ["MCC_isInteracted",false,true];
 sleep _waitTime;
 player setVariable ["MCC_interactionActive",false];

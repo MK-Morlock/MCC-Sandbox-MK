@@ -55,15 +55,27 @@ _p_mcc_zone_behavior	= _this select 4;
 _p_mcc_awareness		= _this select 5;
 _p_mcc_spawnfaction		= _this select 6;
 _startPosDir			= _this select 7;
+private _mwZone = param [8, "", [""]];	//(MK) a generated mission's QRF: its zone (the mission's cleanup removes it all)
 
-if ( isNil "_startPosDir" ) then {
-	_spawn = [(_pos select 0)+1000,_pos select 1,(_pos select 2) + 100];
-	_away  = [(_pos select 0)-2000,_pos select 1,(_pos select 2) + 100];
-} else {
-	_spawndir = [_pos, _startPosDir] call BIS_fnc_dirTo;
-	_spawn = [_pos,2000,_spawndir] call BIS_fnc_relpos;
-	_away  = [_pos,2000,_spawndir - 180] call BIS_fnc_relpos;
-};
+// (MK) The helicopter starts 4.5 km from the drop point (out of sight at today's view distances), in the
+// direction given, or the nearest other direction with no player within 1.5 km of the start (else the one furthest
+// from every player). A paradrop leaves the same distance out on the other side; a drop-off goes back the way it came.
+private _qrfPlayers = (allPlayers - (entities "HeadlessClient_F")) select {alive _x};
+private _baseDir = if (isNil "_startPosDir") then {90} else {[_pos, _startPosDir] call BIS_fnc_dirTo};
+private _spawndir = _baseDir;
+private _bestFar = -1;
+{
+	private _d = _baseDir + _x;
+	private _p = _pos getPos [4500, _d];
+	private _near = 1e9;
+	{_near = _near min (_x distance2D _p)} forEach _qrfPlayers;
+	if (_near >= 1500) exitWith {_spawndir = _d; _bestFar = _near};
+	if (_near > _bestFar) then {_bestFar = _near; _spawndir = _d};
+} forEach [0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180];
+_spawn = _pos getPos [4500, _spawndir];
+_spawn set [2, (_pos param [2, 0]) + 100];
+_away = _pos getPos [4500, _spawndir - 180];
+_away set [2, (_pos param [2, 0]) + 100];
 
 //id sent a string
 if (typeName _paraSide isEqualTo typeName sideLogic) then {
@@ -90,12 +102,9 @@ if ( (count _paraGroupArray) == 0 ) then {
 	_unitsArray = [];
 
 	//Let's build the faction unit's array
-	{
-		_unitsArray	pushBack (_x select 0);
-	} foreach ([[_p_mcc_spawnfaction,"soldier","",false] call MCC_fnc_makeUnitsArray] call MCC_fnc_combatInfantry);
-
-	//diag_log format ["MCC paradrop custom array: %1", _unitsArray];
-
+	//(MK) the faction's infantry pool (MCCMK_fnc_pools: own content, then official DLC, then all; none: a sibling
+	// faction's - never a vanilla soldier)
+	_unitsArray = [_p_mcc_spawnfaction, "InfMen"] call MCCMK_fnc_pool;	// ordinary soldiers, as the original
 	if ( (count _unitsArray) == 0 ) exitWith {};
 
 	_paraGroupArray set [0, _unitsArray];
@@ -209,19 +218,29 @@ if (count _vehiclesTypesArray < 2) then {
 _vehiclesTypesArray = _vehiclesTypesArray + ([_p_mcc_spawnfaction,"helicopterX"] call MCC_fnc_makeUnitsArray);
 
 private _defHeli = _helitype;
-_newHeliClassesArray = [];
-
-for "_i" from 0 to (count _vehiclesTypesArray)-1 step 1 do {
-	_vehicleClass = (_vehiclesTypesArray select _i) select 0;
-    _availableSpaces = [_vehicleClass, "allCargo"] call MCC_fnc_crewCount;
-
-	//if enogh cargo space add it
-	if ( _availableSpaces >= _minSpaces) then {
-		_newHeliClassesArray pushBack [_availableSpaces, _vehicleClass]
-	};
+// (MK) Helicopters with enough seats, through the content filter like the generator's lists (the faction's own content,
+// then official DLC, then all); none: a sibling faction's (same mod); the side's vanilla helicopter only as a last resort
+private _seatOK = {
+	params ["_list"];
+	private _out = [];
+	{
+		private _c = _x param [0, ""];
+		private _n = [_c, "allCargo"] call MCC_fnc_crewCount;
+		if (_n >= _minSpaces) then {_out pushBack [_c, _n]};
+	} forEach _list;
+	_out
 };
-
+//(MK) from the faction's pools (MCCMK_fnc_pools: own content, then official DLC, then all; none: a sibling faction's;
+// none at all: the side's vanilla helicopter) - its transport helicopters with enough seats
+private _hp = ([_p_mcc_spawnfaction, "HeliTransport"] call MCCMK_fnc_pool) + ([_p_mcc_spawnfaction, "Heli"] call MCCMK_fnc_pool);
+_newHeliClassesArray = [(_hp arrayIntersect _hp) apply {[_x]}] call _seatOK;
+//(MK) the faction (and its siblings) has no helicopter with enough seats, and the "Vanilla vehicle fallback" setting is off:
+// no helicopter QRF (it would have come in the side's vanilla helicopter)
+if (count _newHeliClassesArray == 0 && {!(missionNamespace getVariable ["MCCMK_vanillaFallback", true])}) exitWith {
+	["INFO", "MCC_fnc_paratroops", "%1 has no transport helicopter (vanilla fallback off) - no helicopter QRF", [_p_mcc_spawnfaction]] call MCC_fnc_log;
+};
 if (count _newHeliClassesArray > 0) then {
+	_newHeliClassesArray = _newHeliClassesArray apply {[_x select 1, _x select 0]};
 	_newHeliClassesArray sort true;
 	_helitype = (_newHeliClassesArray select 0) select 1;
 };
@@ -252,6 +271,8 @@ if ( _paraType < 3 ) then {
 
 _heli 				= [_helitype, _spawn, _pos, _flyHeight, false, _side] call MCC_fnc_createPlane;
 _heliCrew			= group _heli;
+[_heli, "helicopter QRF"] call MCCMK_fnc_airTrack;	//(MK) debug
+if (_mwZone != "") then {_heli setVariable ["MCC_MWReinforceZone", _mwZone]; _heliCrew setVariable ["MCC_MWReinforceZone", _mwZone]};
 _heliPilot			= driver _heli;
 crew _heli joinSilent _heliCrew;
 
@@ -332,6 +353,9 @@ if (_cargoNum > 0) then {
 		};
 
 		_cargoGroups pushBack _unitspawned;
+		if (_mwZone != "") then {_unitspawned setVariable ["MCC_MWReinforceZone", _mwZone]};	//(MK) the mission's cleanup
+		// (MK) the helicopter's crew: the paratroopers' own faction
+		if (count _cargoGroups == 1 && {!isNull leader _unitspawned}) then {[_heli, faction leader _unitspawned] call MCCMK_fnc_factionCrew};
 		_cargoNum = _cargoNum - (count units _unitspawned);
 
 		{
@@ -619,8 +643,17 @@ if (_p_mcc_zone_behavior in ["bis", "bisd","bisp"]) then {
 	} foreach _cargoGroups;
 };
 
-_timeOut = time + 80; // if chopper is still around after 1.2 minute just delete it
-waituntil { sleep 1; ( ((_heli distance _away) < ((getPosATL _heli select 2) + 350)) || (time > _timeOut) ); };
+// (MK) Removed once it is 4.5 km from every player - out of sight - or after 4 minutes at most. Reaching its exit point
+// with a player still within 4.5 km, it carries on further out. Shot down: the wreck is left (the wreck cleanup).
+//(MK) out past the EDGE of the map, straight on away from the drop; removed once beyond it (12 minutes at most)
+if (alive _heli) then {
+	_away = [getPosATL _heli, _pos getDir _heli] call MCCMK_fnc_mapEdgeExit;
+	_away set [2, 100];
+	_heliPilot doMove _away;
+};
+_timeOut = time + 720;
+waitUntil {sleep 2; !alive _heli || {((((getPosATL _heli) select 0) < 0) || {((getPosATL _heli) select 1) < 0} || {((getPosATL _heli) select 0) > worldSize} || {((getPosATL _heli) select 1) > worldSize})} || {time > _timeOut}};
+if (!alive _heli) exitWith {};
 
 {deleteVehicle _x} forEach (crew _heli);
 deletegroup (group _heli);	//case we want to delete the whole shabang

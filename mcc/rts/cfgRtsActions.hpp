@@ -122,6 +122,7 @@ class MCC_rts_scanResourcesCancel
 	requiredBuildings[] = {{"hq",1}};
 	needelectricity = 0;
 	actionFNC = "MCC_fnc_rtsScanResourcesCancel";
+	dontShowDisabled = 1;	//(MK) only shown while there is a mission to abort
 	resources[] = {};
 };
 
@@ -300,6 +301,25 @@ class MCC_rts_rtsBuildUIContainerBack
 	actionFNC = "MCC_fnc_rtsBuildUIContainerBack";
 	resources[] = {};
 };
+//(MK) Helipads menu on the HQ (its helipads[] list), opened like the Fortifications menu
+class MCC_rts_rtsHelipadUIContainer
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipad.paa";
+	#else
+	picture = "mcc\rts\data\helipad.paa";
+	#endif
+
+	displayName = "Helipads";
+	descriptionShort = "Build a helipad: square, circle, civil or rescue (lit or not), or an invisible landing spot";
+	condition = "";
+	requiredBuildings[] = {};
+	needelectricity = 0;
+	actionFNC = "MCC_fnc_rtsBuildUIContainer";
+	variables[] = {"cfgRtsBuildings","helipads","cfgRtsActions"};
+	resources[] = {};
+};
+
 class MCC_rts_rtsFortUIContainerBack
 {
 	#ifdef MCCMODE
@@ -349,6 +369,105 @@ class MCC_rts_addArtilleryAmmo
 	needelectricity = 1;
 	actionFNC = "MCC_fnc_rtsaddArtilleryAmmo";
 	resources[] = {{"ammo",50}};
+};
+
+class MCC_rts_buyShip
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\boat.paa";
+	#else
+	picture = "mcc\rts\data\boat.paa";
+	#endif
+	displayName = "Buy Ship";
+	descriptionShort = "Buy a destroyer, aircraft carrier, submarine or LHD, and choose where it arrives";
+	condition = "true";
+	requiredBuildings[] = {{"hq",2},{"storage",2}};
+	needelectricity = 0;
+	actionFNC = "MCCMK_fnc_shipBuyMenu";
+	resources[] = {};
+};
+
+//(MK) Buy Boat (on the Naval Workshop): click a spot on the water, then the vehicle shop for boats - the side's resources
+class MCC_rts_buyBoat
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\boatBuy.paa";
+	#else
+	picture = "mcc\rts\data\boatBuy.paa";
+	#endif
+	displayName = "Buy Boat";
+	descriptionShort = "Buy a boat with the side's resources, and choose where on the water it's delivered";
+	condition = "true";
+	requiredBuildings[] = {{"hq",2},{"storage",2}};
+	needelectricity = 0;
+	actionFNC = "MCCMK_fnc_boatBuyMenu";
+	resources[] = {};
+};
+
+//(MK) Clear wrecks (on the HQ): every wreck within 300 m of the HQ removed, free
+class MCC_rts_clearWrecks
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\clearWrecks.paa";
+	#else
+	picture = "mcc\rts\data\clearWrecks.paa";
+	#endif
+	displayName = "Clear wrecks";
+	descriptionShort = "Remove every wreck within 300 m of the HQ (salvage enemy vehicles by hand for resources)";
+	condition = "true";
+	requiredBuildings[] = {};
+	needelectricity = 0;
+	actionFNC = "MCCMK_fnc_rtsClearWrecks";
+	resources[] = {};
+};
+
+//(MK) Clear bodies (on the HQ, beside Clear wrecks): every body within 300 m of the HQ removed with the weapons beside
+// it - not players' own (the body cleanup takes those later, so their kit can be recovered)
+class MCC_rts_clearBodies
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\clearBodies.paa";
+	#else
+	picture = "mcc\rts\data\clearBodies.paa";
+	#endif
+	displayName = "Clear bodies";
+	descriptionShort = "Remove every body within 300 m of the HQ, with the weapons beside it (not players' own)";
+	condition = "true";
+	requiredBuildings[] = {};
+	needelectricity = 0;
+	actionFNC = "MCCMK_fnc_rtsClearBodies";
+	resources[] = {};
+};
+
+//(MK) an empty slot in a building's buttons (hidden, but it takes its place - to group buttons)
+class MCC_rts_spacer
+{
+	picture = "";
+	displayName = "";
+	descriptionShort = "";
+	condition = "false";
+	dontShowDisabled = 1;
+	requiredBuildings[] = {};
+	needelectricity = 0;
+	actionFNC = "";
+	resources[] = {};
+};
+
+//(MK) Taru pods placed in the base (the Aerial Workshop): costs as calling the pod by airdrop, less the Taru's fuel
+class MCC_rts_taruPods
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\taruPod.paa";
+	#else
+	picture = "mcc\rts\data\taruPod.paa";
+	#endif
+	displayName = "Taru pods";
+	descriptionShort = "Place a Taru pod in the base: medical, repair, ammunition, fuel, logistics, bench or transport";
+	condition = "true";
+	requiredBuildings[] = {{"hq",3}};
+	needelectricity = 0;
+	actionFNC = "MCCMK_fnc_rtsPodMenu";
+	resources[] = {};
 };
 
 class MCC_rts_evacHelicopterBuy

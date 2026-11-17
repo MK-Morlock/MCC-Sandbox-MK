@@ -34,6 +34,7 @@ private _sling = false;
 #define mcc_playerConsole_IDD 2993
 
 params ["_ammount"];
+private _ddDrop = param [7, [], [[]]];	//(MK) the drop id [id, owner]: its green dot goes once the drop is complete
 _spawnkind				= _this select 1 select 0;
 _pos					= _this select 2;
 _planeType				= _this select 3 select 0;
@@ -48,11 +49,21 @@ _isParachute			= param [6,0,[0]];
 if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 
 	//If parachute from thin air exit here:
+	//(MK) Centred on the mark - spread 20 m apart along the line, the middle one on the mark - and each spawned upwind
+	//by the distance the wind carries it while it comes down (an
+	// estimated fall time from 300 m, MCCMK_dropFallTime, refined from the logged drops).
 	if (_isParachute >= 2) exitWith {
-		_pos = [_pos select 0,_pos select 1, (_pos select 2) + 300];
-		for [{_x=0},{_x < count _spawnkind},{_x=_x+1}] do {
-			_pos = [_pos, [_pos,_away] call BIS_fnc_dirTo,20] call BIS_fnc_relPos;
-			[_pos, _spawnkind select _x, objNull,_isParachute == 3] spawn MCC_fnc_CreateAmmoDrop;
+		private _tgt = [_pos select 0, _pos select 1, 0];
+		private _dirL = if (_away isEqualType [] && {count _away > 1} && {(_tgt distance2D _away) > 1}) then {_tgt getDir _away} else {0};
+		private _n = count _spawnkind;
+		private _fall = missionNamespace getVariable ["MCCMK_dropFallTime", 32];
+		private _w = wind;
+		private _drift = [(_w select 0) * _fall, (_w select 1) * _fall];
+		for "_i" from 0 to (_n - 1) do {
+			private _land = _tgt getPos [(_i - ((_n - 1) / 2)) * 20, _dirL];
+			private _sp = [(_land select 0) - (_drift select 0), (_land select 1) - (_drift select 1), 300];
+			["INFO", "supplyDrop", "%1 (no aircraft) placed for its spot %2 m along the line from the mark | wind %3 m/s towards %4 deg | spawned %5 m upwind, 300 m up", [_spawnkind select _i, round ((_i - ((_n - 1) / 2)) * 20), (vectorMagnitude [_w select 0, _w select 1, 0]) toFixed 1, round ((_w select 0) atan2 (_w select 1)), round (vectorMagnitude [_drift select 0, _drift select 1, 0])]] call MCC_fnc_log;
+			[_sp, _spawnkind select _i, objNull, _isParachute == 3, false, true, [_land, _dirL, 0, 0, 300, time]] spawn MCC_fnc_CreateAmmoDrop;
 			sleep (3 + random 3);
 		};
 	};
@@ -67,8 +78,9 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 	["DEBUG", "supplyDrop", "aircraft %1 (%2) | %3 | %4 item(s)", [_planeClasss, ["automatic", "chosen in the panel"] select (_planeClasss == _chosenAir), ["parachute", "slingload"] select (_isParachute == 1), count _spawnkind]] call MCC_fnc_log;
 
 	private _flyH = missionNamespace getVariable [["MCCMK_adHeightHeli", "MCCMK_adHeightPlane"] select _isPlaneAir, 75];
-	private _smokeOn = missionNamespace getVariable [["MCCMK_adSmokeHeli", "MCCMK_adSmokePlane"] select _isPlaneAir, true];
-	private _smokeVeh = missionNamespace getVariable [["MCCMK_adSmokeHeliVeh", "MCCMK_adSmokePlaneVeh"] select _isPlaneAir, true];
+	//(MK) the Airdrop panel's Smoke tick box (MCCMK_dropSmoke) switches it off for every drop
+	private _smokeOn = (missionNamespace getVariable [["MCCMK_adSmokeHeli", "MCCMK_adSmokePlane"] select _isPlaneAir, true]) && (missionNamespace getVariable ["MCCMK_dropSmoke", true]);
+	private _smokeVeh = (missionNamespace getVariable [["MCCMK_adSmokeHeliVeh", "MCCMK_adSmokePlaneVeh"] select _isPlaneAir, true]) && (missionNamespace getVariable ["MCCMK_dropSmoke", true]);
 	if (isNil "MCCMK_dropAir") then {MCCMK_dropAir = []};
 	MCCMK_dropAir = MCCMK_dropAir select {alive _x && {!(_x getVariable ["MCCMK_dropDone", false])}};
 	private _dropPos = +_pos;
@@ -85,12 +97,15 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		["DEBUG", "supplyDrop", "%1 other supply aircraft inbound to this area: spawning %2 m out", [count _near, round (_pos distance2D _spawn)]] call MCC_fnc_log;
 	};
 	_plane1 			= [_planeClasss, _spawn, _pos, _flyH, true] call MCC_fnc_createPlane;		//Spawn plane 1
+	if (hasInterface) then {[_plane1, faction player] call MCCMK_fnc_factionCrew};	//(MK) the caller's faction flies it
 	_pilotGroup1		= group _plane1;
 	MCCMK_dropAir pushBack _plane1;
 	_plane1 setVariable ["MCCMK_dropTgt", _dropPos];
 	_plane1 setVariable ["MCCMK_dropSling", _isParachute == 1];
 	_pilot1				= driver _plane1;
 	_pilotGroup1 setVariable ["MCC_dropFor", switch (toLower _planeType) do {case "east": {east}; case "guer": {resistance}; case "civ": {civilian}; default {west}}, true];
+	//(MK) the "Support aircraft" options, for the side it is dropping for (it is created civilian)
+	if (isServer) then {[_plane1, _pilotGroup1 getVariable ["MCC_dropFor", civilian], "Airdrop plane"] call MCCMK_fnc_supportAir};
 	if (_isPlaneAir) then {
 		_plane1 setVelocityModelSpace [0, ((getNumber (configFile >> "CfgVehicles" >> _planeClasss >> "maxSpeed")) * 0.6 max 250) / 3.6, 0];
 	};
@@ -113,6 +128,11 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 	if (_isParachute == 1) then {
 		_object = (_spawnkind select 0) createvehicle [10,10,500];
 		_object setpos (_plane1 modeltoworld [0,0,-15]);
+		//(MK) heavier than this helicopter can sling (the Taru fuel pod, 13.3 t): lightened while it hangs, as the winch
+		// does - its own weight comes back once it's on the ground
+		private _slMax = getNumber (configOf _plane1 >> "slingLoadMaxCargoMass");
+		private _om = getMass _object;
+		if (_slMax > 0 && {_om > _slMax}) then {_object setVariable ["MCCMK_origMass", _om]; _object setMass (_slMax * 0.8)};
 		_sling = _plane1 setSlingload _object;
 
 		_wp = (group _plane1) addWaypoint [[_pos select 0, _pos select 1, 0], 0];	//Add WP
@@ -134,6 +154,9 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 			_this allowDamage false;
 
 			waituntil {((isNull attachedTo _this) && ((getpos _this) select 2) < 2) || isTouchingGround _this};
+			sleep 2;
+			private _om = _this getVariable ["MCCMK_origMass", -1];
+			if (_om > 0) then {_this setMass _om};	//(MK) its own weight back on the ground
 
 			_this allowDamage true;
 			/*
@@ -151,6 +174,19 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		//Start precise landing
 		_pos = (AGLToASL _pos) vectorAdd [0,0,15];
 		[_plane1, _pos] call MCC_fnc_heliPreciseLanding;
+
+		//(MK) the ropes as they are (vanilla): from 15 m it keeps descending until the cargo's underside (not its centre)
+		// is about 1 m off the ground, then cuts it loose - never lower than 6 m, 20 s at most
+		private _sd0 = time;
+		private _under = 99;
+		while {alive _plane1 && {alive _object} && {!isNull (getSlingLoad _plane1)} && {(time - _sd0) < 20}} do {
+			_under = (_object modelToWorld [0, 0, ((boundingBoxReal _object) select 0) select 2]) select 2;
+			if (_under <= 1.2 || {((getPosATL _plane1) select 2) <= 6}) exitWith {};
+			private _hp = getPosASL _plane1;
+			_plane1 setVelocity [((_pos select 0) - (_hp select 0)) * 0.5, ((_pos select 1) - (_hp select 1)) * 0.5, -((((_under - 1) * 0.6) min 2) max 0.4)];
+			sleep 0.05;
+		};
+		["INFO", "airDrop", "slingload released | cargo underside %1 m above the ground | helicopter %2 m up", [(round (_under * 10)) / 10, round ((getPosATL _plane1) select 2)]] call MCC_fnc_log;
 
 		_plane1 setSlingLoad objNull;
 		_plane1 setVariable ["MCCMK_dropDone", true];
@@ -233,7 +269,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 			};
 		} forEach _spawnkind;
 		if (count _left > 0) then {
-			hint format ["Left out of the %1 drop:\n%2", getText (configFile >> "CfgVehicles" >> _planeClasss >> "displayName"), _left joinString "\n"];
+			[format ["Left out of the %1 drop:\n%2", getText (configFile >> "CfgVehicles" >> _planeClasss >> "displayName"), _left joinString "\n"]] call MCCMK_fnc_hint;
 		};
 		private _bayLate = missionNamespace getVariable ["MCCMK_bayPushback", 30];
 		waitUntil {sleep 0.5; ((_plane1 distance2D _tgt) < ([600, 2000] select _isPlaneAir)) || (!alive _plane1)};
@@ -276,7 +312,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 			if (missionNamespace getVariable ["MCC_debug", false]) then {
 				private _f = [sin _lineDir, cos _lineDir, 0];
 				private _o = [(_planepos select 0) - (_tgt select 0), (_planepos select 1) - (_tgt select 1), 0];
-				["DEBUG", "supplyDrop", "item %1 of %2 (%3, %4) released | along %5 m, side %6 m from the target | height %7 m | speed %8 km/h | heading %9 deg off the line | carry allowed %10 m", [_k + 1, _n, _cl, ["crate", ["vehicle", "vehicle from the bay"] select (!isNull _veh)] select _isVeh, round (_o vectorDotProduct _f), round (_o vectorDotProduct [_f select 1, -(_f select 0), 0]), round _h, round (speed _plane1), round ((((getDir _plane1) - _lineDir) + 540) mod 360 - 180), round _carry]] call MCC_fnc_log;
+				["INFO", "supplyDrop", "item %1 of %2 (%3, %4) released | along %5 m, side %6 m from the target | height %7 m | speed %8 km/h | heading %9 deg off the line | carry allowed %10 m", [_k + 1, _n, _cl, ["crate", ["vehicle", "vehicle from the bay"] select (!isNull _veh)] select _isVeh, round (_o vectorDotProduct _f), round (_o vectorDotProduct [_f select 1, -(_f select 0), 0]), round _h, round (speed _plane1), round ((((getDir _plane1) - _lineDir) + 540) mod 360 - 180), round _carry]] call MCC_fnc_log;
 			};
 			if (!isNull _veh) then {
 				objNull setVehicleCargo _veh;
@@ -289,11 +325,13 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 					if (_smk) then {"SmokeShellGreen" createVehicle (getPos _veh)};
 					_info params ["_tgt", "_dir", "_carry", "_sp", "_h"];
 					private _o = (getPos _veh) vectorDiff [_tgt select 0, _tgt select 1, (getPos _veh) select 2];
-					["DEBUG", "supplyDrop", "%1 landed | along %2 m, side %3 m from the target | released at %4 km/h, %5 m above the target | carry allowed %6 m", [typeOf _veh, round (_o vectorDotProduct [sin _dir, cos _dir, 0]), round (_o vectorDotProduct [cos _dir, -(sin _dir), 0]), round (_sp * 3.6), round _h, round _carry]] call MCC_fnc_log;
+					["INFO", "supplyDrop", "%1 landed | along %2 m, side %3 m from the target | released at %4 km/h, %5 m above the target | carry allowed %6 m", [typeOf _veh, round (_o vectorDotProduct [sin _dir, cos _dir, 0]), round (_o vectorDotProduct [cos _dir, -(sin _dir), 0]), round (_sp * 3.6), round _h, round _carry]] call MCC_fnc_log;
 				};
 			} else {[_planepos, _cl, _pilot1, false, false, [_smokeOn, _smokeVeh] select _isVeh, _info] spawn MCC_fnc_CreateAmmoDrop};
 		};
 		_plane1 setVariable ["MCCMK_dropDone", true];
+		//(MK) the drop complete a minute after the last item is out (the chutes down): its green dot goes
+		[_ddDrop] spawn {params ["_dd"]; sleep 60; [_dd, -1] call MCCMK_fnc_dropDone};
 		sleep 2;
 		[_plane1, false] call MCCMK_fnc_aircraftRamp;
 		_plane1 setVariable ["MCC_exitFull", true];
@@ -308,8 +346,8 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		//disable mouse control at start
 		MCC_ConsoleUAVMouseButtonDown = false;
 
-		//Arma's own cruise missile (the destroyer VLS missile: heavy warhead, explodes on impact); the GBU-12 bomb used
-		//before was created in mid-air and pushed at 80 m/s, and did very little damage. GBU-12 if the class is missing.
+		//Arma's own cruise missile (the destroyer VLS missile: heavy warhead, explodes on impact). GBU-12 if the class
+		//is missing.
 		private _cmClass = ["Bo_GBU12_LGB", "ammo_Missile_Cruise_01"] select (isClass (configFile >> "CfgAmmo" >> "ammo_Missile_Cruise_01"));
 		_missile = _cmClass createVehicle [_pos select 0, _pos select 1, 600];
 		waituntil {alive _missile};
@@ -319,7 +357,7 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		missionNamespace setVariable ["MCC_ConsoleUAVCameraMod", profileNamespace getVariable ["MCC_feedVision_uav", 0]];
 		//Cruise mode for the console: chase camera behind the missile, mouse does not move the aim
 		MCC_consoleCruise = true;
-		//Fixed aim point at the target: the missile used to home on the console's aim sphere, which the mouse moves
+		//Fixed aim point at the target (the console's aim sphere moves with the mouse)
 		private _cmAim = "Land_HelipadEmpty_F" createVehicle [_pos select 0, _pos select 1, 0];
 		[_missile, _cmAim] spawn {
 			params ["_m", "_aim"];
@@ -588,6 +626,8 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 		_planeArray = [_planePos,_dir,_planeType,_planeSide] call MCC_fnc_spawnVehicle;
 		_plane1 = _planeArray select 0;
 		_plane1 setposasl _planePos;
+		//(MK) a bombing / rocket run: armed for the most air-to-ground it can carry (MCCMK_fnc_casMaxLoad)
+		if (_spawnkind in ["Bombing-run", "Rockets-run"]) then {[_plane1, ["bomb", "rocket"] select (_spawnkind == "Rockets-run")] call MCCMK_fnc_casMaxLoad};
 		_pilotGroup1 = group _plane1;
 		_pilot1		= driver _plane1;
 
@@ -677,17 +717,19 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 			case "Bombing-run":	//Bombing run
 			{
 				[_plane1, [_pos select 0, _pos select 1, 0]] call MCC_fnc_casReleaseWait;
-				[_plane1, [_pos select 0, _pos select 1, 0], 15, 4 + (_ammount * 0.5)] call MCC_fnc_casGuideArm;
-				[_plane1, "bomb", [], _ammount * 2, 0.25] call MCC_fnc_casRealFire;
+				//(MK) the line's strength (1-4) is a share of the bombs it carries: a quarter .. all of them
+				[_plane1, [_pos select 0, _pos select 1, 0], 15, 4 + 0.3 * (_plane1 getVariable ["MCCMK_casLoad", 8])] call MCC_fnc_casGuideArm;
+				[_plane1, "bomb", [], 1, 0.25, (_ammount min 4) / 4] call MCC_fnc_casRealFire;
 			};
 
 			case "Rockets-run":	//Rockets run
 			{
 				waitUntil {((_plane1 distance2D _pos) < 1200) || (!alive _plane1)};
 				if (!alive _plane1) exitWith {};
-				if !([_plane1, "rocket", [], _ammount * 2, 0.15] call MCC_fnc_casRealFire) then {
+				//(MK) the line's strength (1-4) is a share of the rockets (or guided missiles) it carries: a quarter .. all
+				if !([_plane1, "rocket", [], 1, 0.15, (_ammount min 4) / 4] call MCC_fnc_casRealFire) then {
 					private _lt = createVehicle [(["LaserTargetE", "LaserTargetW"] select (((side _plane1) getFriend west) > 0.6)), [_pos select 0, _pos select 1, 0], [], 0, "CAN_COLLIDE"];
-					[_plane1, "agm", [_lt], _ammount * 2, 0.6] call MCC_fnc_casRealFire;
+					[_plane1, "agm", [_lt], 1, 0.6, (_ammount min 4) / 4] call MCC_fnc_casRealFire;
 					[_lt] spawn {sleep 60; deleteVehicle (_this select 0)};
 				};
 				sleep 1;
@@ -899,7 +941,14 @@ if (tolower _planeType in ["west","east","guer","civ","logic"]) then  {
 			};
 		} foreach [_plane1];
 
-		[_pilotGroup1, _pilot1, _plane1, _away] call MCC_fnc_deletePlane;
+		//(MK) away off the EDGE of the map along its heading - removed 2 km beyond it, never in mid-air in view
+		private _hd = if ((_pos distance2D _away) > 1) then {_pos getDir _away} else {getDir _plane1};
+		private _dx = sin _hd;
+		private _dy = cos _hd;
+		private _edge = {params ["_p", "_d"]; if (_d > 0.001) exitWith {(worldSize - _p) / _d}; if (_d < -0.001) exitWith {(0 - _p) / _d}; 1e9};
+		private _tE = ([_pos select 0, _dx] call _edge) min ([_pos select 1, _dy] call _edge);
+		private _exit = [(_pos select 0) + _dx * (_tE + 2000), (_pos select 1) + _dy * (_tE + 2000), 0];
+		[_pilotGroup1, _pilot1, _plane1, _exit] call MCC_fnc_deletePlane;
 		//[_pilotGroup2, _pilot2, _plane2, _away] call MCC_fnc_deletePlane;
 	};
 };

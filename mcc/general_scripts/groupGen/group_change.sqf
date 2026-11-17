@@ -225,7 +225,7 @@ if (_action == 1) then
 {			
 	_type = lbCurSel UNIT_TYPE;
 	
-	if (_type in [7,8,-1]) exitWith {hint "Cannot add static object to a group"};
+	if (_type in [7,8,-1]) exitWith {["Cannot add static object to a group"] call MCCMK_fnc_hint};
 	
 	if ((lbCurSel UNIT_CLASS) == -1) exitWith {};
 	
@@ -273,7 +273,7 @@ if (_action == 1) then
 					ctrlShow [MCC_GGUNIT_EMPTYTITLE,false];
 				};
 		};
-	_dummy = (_groupArray select (lbCurSel UNIT_CLASS)) select 1;
+	_dummy = (_groupArray select (call MCCMK_fnc_classRow)) select 1;
 	
 	//Reset MCC_groupGenCurrenGroupArray if it is not an array
 	if (TypeName MCC_groupGenCurrenGroupArray != "ARRAY") then {MCC_groupGenCurrenGroupArray = []};
@@ -312,11 +312,11 @@ if ((_action ==3)&& (MCC_type_index != lbCurSel MCC_GGUNIT_TYPE)) exitWIth						
 		{
 			_displayname =  _x;
 			_index = _comboBox lbAdd _displayname;
-		} foreach ["Infantry", "Vehicles", "Tracked/Static", "Motorcycle", "Helicopter", "Fixed-wing", "Ship", "Ammo"];
+		} foreach ["Infantry", "Vehicles", "Tracked/Static", "Motorcycle", "Helicopter", "Fixed-wing", "Boat", "Ammo"];
 		_comboBox lbSetCurSel 0; //MCC_class_index;	
 	};
 	//Refill the class list for the new type list now: selecting the first entry again is not seen as a change, so the
-	//class list kept the single units after switching to Groups until the type was chosen again
+	//class list would otherwise keep the single units after switching to Groups
 	[0] call (missionNamespace getVariable ["MCC_groupChangeCode", {}]);
 };	
 
@@ -340,7 +340,7 @@ if (_action ==4) exitWIth
 			saveProfileNamespace;
 		};
 		
-		isNil {["branch"] call MCC_fnc_spawnLists};	//refill the Custom list (the old path here rebuilt it by row number)
+		isNil {["branch"] call MCC_fnc_spawnLists};	//refill the Custom list
 	}
 	else	//Save
 	{

@@ -12,7 +12,7 @@ click = false;
 {deleteMarkerLocal _x} forEach ["marker1", "marker2", "marker3", "marker4", "marker5"];
 
 private _vehicles = (missionNamespace getVariable ["MCC_convoyVehicles", []]) select {!isNull _x};
-if (_vehicles isEqualTo []) exitWith {hint "No convoy to remove.\nPress Spawn to place one."};
+if (_vehicles isEqualTo []) exitWith {["No convoy to remove.\nPress Spawn to place one."] call MCCMK_fnc_hint};
 
 //On the server (the convoy is made there)
 ["MCC_fnc_globalExecute", [1, {
@@ -26,4 +26,4 @@ if (_vehicles isEqualTo []) exitWith {hint "No convoy to remove.\nPress Spawn to
 	missionNamespace setVariable ["MCC_convoyVehicles", [], true];
 }], 2, false] call MCC_fnc_secRemote;
 
-hint format ["Convoy removed (%1 vehicles).\nPress Spawn to place a new convoy.", count _vehicles];
+[format ["Convoy removed (%1 vehicles).\nPress Spawn to place a new convoy.", count _vehicles]] call MCCMK_fnc_hint;

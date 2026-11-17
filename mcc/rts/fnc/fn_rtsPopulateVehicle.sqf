@@ -44,6 +44,7 @@ if ((_units + _emptyPos)> _unitsSpace) exitWith {
 
 
 createVehicleCrew _obj;
+if (hasInterface) then {[_obj, faction player] call MCCMK_fnc_factionCrew};	//(MK) crewed by the player's own faction
 
 (group _obj) setVariable ["MCC_canbecontrolled",true,true];
 {_x addCuratorEditableObjects [[_obj],true]} forEach allCurators;

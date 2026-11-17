@@ -156,6 +156,8 @@ if (_action==3) exitWith 				//Changed insertion
 {
 	_insertionType = _this select 1;
 	_sel = -1;
+	if (_insertionType == 2) exitWith {[true] call MCCMK_fnc_airdropPodMode};	//(MK) Taru Pod
+	[false] call MCCMK_fnc_airdropPodMode;
 
 	if (_insertionType == 0) then {
 
@@ -167,6 +169,17 @@ if (_action==3) exitWith 				//Changed insertion
 		//Slingload
 		missionNamespace setVariable ["MCC_airdropIsParachute",1];
 		for "_i" from 1033 to 1036 do {ctrlshow [_i, false]};
+	};
+
+	//(MK) Taru Pods in the type list only with Slingload chosen (it moves to Vehicles under Parachute)
+	private _tc = _mccdialog displayCtrl 1031;
+	if (_insertionType == 1) then {
+		if (lbSize _tc < 6) then {_tc lbAdd "Taru Pods"};
+	} else {
+		if (lbSize _tc > 5) then {
+			if (lbCurSel _tc == 5) then {_tc lbSetCurSel 0};
+			_tc lbDelete 5;
+		};
 	};
 
 	[] call MCCMK_fnc_airdropAirList;

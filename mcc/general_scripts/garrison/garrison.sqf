@@ -34,7 +34,7 @@ switch (toLower _side) do	{
 	};
 		
 if (_action == 0 || _action == 1) then	{	//Garisson
-	if (_buildingscount < 1) exitwith {hint "No buildings found"};	//No available buildings? stop the script!
+	if (_buildingscount < 1) exitwith {["No buildings found"] call MCCMK_fnc_hint};	//No available buildings? stop the script!
 	{
 		_buildingPos = _x call MCC_fnc_buildingPosCount;
 		if (_buildingPos > 0) then	{	//If the building have an interrior positions
@@ -61,7 +61,7 @@ if (_action == 0 || _action == 1) then	{	//Garisson
 if (_action == 1) then	{	//vehicles
 	_vehiclesNumber=round((_buildingscount*_intanse)/20);
 	_roads = _center nearRoads _radius;
-		hint format ["car: %1",_roads];
+		[format ["car: %1",_roads]] call MCCMK_fnc_hint;
 	   
 	  for "_i" from 1 to _vehiclesNumber do
 	  {        

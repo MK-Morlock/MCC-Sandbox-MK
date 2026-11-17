@@ -50,6 +50,6 @@ if (alive _heliObject && !(canMove _heliObject && alive driver _heliObject)) the
 waitUntil {isNull _heliObject};
 sleep 1;
 
-[_heliClass, _pos, true, _dir] remoteExec ["MCC_fnc_evacSpawn",2];
+[_heliClass, _pos, true, _dir, side group player, faction player] remoteExec ["MCC_fnc_evacSpawn",2];
 
 [9989,"Evac helicopter spawned",5,true] spawn MCC_fnc_setIDCText;

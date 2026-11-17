@@ -4,6 +4,7 @@
 #define FACTIONCOMBO 1001
 #define MCC_MWDifficultyIDC 6006
 #define MCC_MWVehiclesIDC 6010
+#define MCC_MWDronesIDC 6040
 #define MCC_MWArmorIDC 6011
 #define MCC_MWIEDIDC 6012
 #define MCC_MWIEDMARKERSIDC 6013
@@ -82,7 +83,7 @@ class MCCFrontLineDialog
 			y = 0.83 * safezoneH + safezoneY;
 			w = 0.085 * safezoneW;
 			h = 0.0329871 * safezoneH;
-			tooltip = "Draw the line on the map, then click the side the attack comes from"; //--- ToDo: Localize;
+			tooltip = "Draw the line on the map, then click the side the attack comes\nfrom"; //--- ToDo: Localize;
 		};
 
 		class MCC_mapBackground : MCC_RscText
@@ -475,7 +476,7 @@ class MCCFrontLineDialog
 				{
 					idc = MCC_FLDepthIDC;
 					onLBSelChanged = "profileNamespace setVariable ['MCC_FLDepthIndex',_this select 1]";
-					tooltip = "How far behind the line the defence reaches: Shallow 600 m, Standard 1.5 km, Deep 3 km (adds a fallback line)";
+					tooltip = "How far behind the line the defence reaches: Shallow 600 m,\nStandard 1.5 km, Deep 3 km (adds a fallback line)";
 					x = 0.263542 * safezoneW;
 					y = 0.120953 * safezoneH;
 					w = 0.0859375 * safezoneW;
@@ -497,7 +498,7 @@ class MCCFrontLineDialog
 				{
 					idc = MCC_FLTaskIDC;
 					onLBSelChanged = "profileNamespace setVariable ['MCC_FLTaskIndex',_this select 1]";
-					tooltip = "Break through task for the attacking side(s): done when 80% of the strongpoints are cleared";
+					tooltip = "Break through task for the attacking side(s): done when 80% of\nthe strongpoints are cleared";
 					x = 0.263542 * safezoneW;
 					y = 0.15394 * safezoneH;
 					w = 0.0859375 * safezoneW;
@@ -519,7 +520,7 @@ class MCCFrontLineDialog
 				{
 					idc = MCC_FLAttackerIDC;
 					onLBSelChanged = "";
-					tooltip = "Optional AI force that assaults the line - see Attack starts. None = defenders only";
+					tooltip = "Optional AI force that assaults the line - see Attack starts.\nNone = defenders only";
 					x = 0.263542 * safezoneW;
 					y = 0.186927 * safezoneH;
 					w = 0.0859375 * safezoneW;
@@ -541,7 +542,7 @@ class MCCFrontLineDialog
 				{
 					idc = MCC_FLAttackStartIDC;
 					onLBSelChanged = "profileNamespace setVariable ['MCC_FLAttackStartIndex',_this select 1]";
-					tooltip = "When the Attacker force advances: when a player comes within 1.5 km of the line (at most 15 min), immediately, or after a fixed time";
+					tooltip = "When the Attacker force advances: when a player comes within\n1.5 km of the line (at most 15 min), immediately, or after a\nfixed time";
 					x = 0.263542 * safezoneW;
 					y = 0.219914 * safezoneH;
 					w = 0.0859375 * safezoneW;
@@ -563,7 +564,7 @@ class MCCFrontLineDialog
 				{
 					idc = MCC_FLReinforcementIDC;
 					onLBSelChanged = "profileNamespace setVariable ['MCC_FLReinforcementIndex',_this select 1]";
-					tooltip = "Defender reinforcements from behind the line when the defence is worn down (as in the Mission Generator)";
+					tooltip = "Defender reinforcements from behind the line when the defence\nis worn down (as in the Mission Generator)";
 					x = 0.263542 * safezoneW;
 					y = 0.252902 * safezoneH;
 					w = 0.0859375 * safezoneW;
@@ -585,9 +586,40 @@ class MCCFrontLineDialog
 				{
 					idc = MCC_FLReinforcementWaitIDC;
 					onLBSelChanged = "profileNamespace setVariable ['MCC_FLReinforcementWaitIndex',_this select 1]";
-					tooltip = "Players are near: reinforcements only start once a player comes near the line (MCC default, saves performance). Always: also in an AI vs AI fight with no player nearby";
+					tooltip = "Players are near: reinforcements only start once a player\ncomes near the line (MCC default, saves performance). Always:\nalso in an AI vs AI fight with no player nearby";
 					x = 0.263542 * safezoneW;
 					y = 0.28589 * safezoneH;
+					w = 0.0859375 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+
+				class MCC_FLDronesTittle: MCC_RscText
+				{
+					idc = -1;
+
+					text = "AI Drones:";
+					x = 0.372396 * safezoneW;
+					y = 0.0549788 * safezoneH;
+					w = 0.06875 * safezoneW;
+					h = 0.0219914 * safezoneH;
+					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+				};
+
+				class MCC_FLDronesCombo: MCC_CheckBoxes
+				{
+					idc = MCC_MWDronesIDC;
+					onCheckBoxesSelChanged = "[_this,2,'MCC_MWDronesIndex','profile'] spawn MCC_fnc_checkBox;";
+					onSetFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText 'Enemy UAV operators may launch the drones in their backpacks (needs the AI Drones setting in MCC GAIA)'";
+					onKillFocus = "((uiNamespace getVariable 'MCC_FLDialog') displayCtrl 0) ctrlSetText ''";
+
+					columns = 2;
+					rows = 1;
+					strings[] = {"Disabled","Enabled"};
+					checked_strings[] = {"Disabled","Enabled"};
+
+					x = 0.446875 * safezoneW;
+					y = 0.0549788 * safezoneH;
 					w = 0.0859375 * safezoneW;
 					h = 0.0219914 * safezoneH;
 					sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";

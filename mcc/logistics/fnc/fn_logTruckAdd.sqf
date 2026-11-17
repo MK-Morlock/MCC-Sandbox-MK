@@ -34,8 +34,11 @@ private _costFactor = 0;
 params ["_add", "_startLoad"];
 _ctrl		= (_this select 2) select 0;
 _isHeli		= _this select 3;
+private _slotIdx = _this param [4, -1];	//(MK) the slot clicked in the window (-1: the last crate)
 _unload		= false;
 _maxLoad = if (_isHeli) then {1} else {3};
+//(MK) the vehicle's own number of slots (a vehicle-in-vehicle carrier's from its cargo bay)
+if (!_isHeli) then {_maxLoad = [vehicle player] call MCCMK_fnc_crateSlots};
 
 if (uiNameSpace getVariable ["MCC_logisticLoadingPressed", false]) exitWith {};
 uiNameSpace setVariable ["MCC_logisticLoadingPressed", true];
@@ -56,8 +59,9 @@ _attachPoint = switch (getnumber(configfile >> "CfgVehicles" >> typeof _truck >>
 _loadedCrates = if (_isHeli) then {
 					if !(isnull getSlingLoad _truck) then {[getSlingLoad _truck]} else {[]};
 				} else {
-					_truck getVariable ["mcc_supplyTruckCurrentLoad",[]];
+					([_truck] call MCCMK_fnc_crateOnTruck) apply {typeOf _x};	//(MK) vehicle-in-vehicle and attached crates
 				};
+if (!_isHeli) then {_truck setVariable ["mcc_supplyTruckCurrentLoad", _loadedCrates, true]};
 
 _array = (missionNamespace getVariable format ["MCC_res%1",playerside]);
 
@@ -132,7 +136,6 @@ if (_add) then {
 					_crate = _crateType createVehicle [0,0,0];
 
 					//Set ammo count and helper
-					_crate setVariable ["ammoLeft",100,true];
 					[_crate, "Hold %1 to resupply"] remoteExec ["MCC_fnc_createHelper", 2, false];
 
 					_crate setVariable ["MCC_loadedBy", getplayeruid player, true];
@@ -140,23 +143,26 @@ if (_add) then {
 					//Change mass
 					if (_costFactor == 1) then {_crate setMass 500};
 
-					_attachPoint set [1, (_attachPoint select 1)- (count _loadedCrates*1.6)];
-					_crate attachTo [_truck, _attachPoint];
+					//(MK) vehicle-in-vehicle where the vehicle can take it, else a cargo truck's bed
+					if ([_truck, _crate, _attachPoint] call MCCMK_fnc_crateLoadOn) then {
+						_loadedCrates set [count _loadedCrates, _crateType];
+						_truck setVariable ["mcc_supplyTruckCurrentLoad",_loadedCrates, true];
 
-					_loadedCrates set [count _loadedCrates, _crateType];
-					_truck setVariable ["mcc_supplyTruckCurrentLoad",_loadedCrates, true];
-
-					//reduce cost
-					_array set [_index, _resLevel - CRATE_COST];
-					missionNamespace setVariable [format ["MCC_res%1",playerside],_array];
-					publicVariable format ["MCC_res%1",playerside];
+						//reduce cost
+						_array set [_index, _resLevel - CRATE_COST];
+						missionNamespace setVariable [format ["MCC_res%1",playerside],_array];
+						publicVariable format ["MCC_res%1",playerside];
+					} else {
+						deleteVehicle _crate;
+						systemChat "There's no room for another crate on this vehicle.";
+					};
 				};
 			}
 			else
 			{
 				_nearByCrates = [];
 				{
-					if (isNull attachedTo _x) then
+					if (isNull attachedTo _x && {isNull isVehicleCargo _x}) then
 					{
 						_nearByCrates set [count _nearByCrates, _x];
 					};
@@ -165,10 +171,12 @@ if (_add) then {
 				if (count _nearByCrates >0) then
 				{
 					_crate = _nearByCrates select 0;
-					_attachPoint set [1, (_attachPoint select 1)- (count _loadedCrates*1.6)];
-					_crate attachTo [_truck, _attachPoint];
-					_loadedCrates set [count _loadedCrates, typeof _crate];
-					_truck setVariable ["mcc_supplyTruckCurrentLoad",_loadedCrates, true];
+					if ([_truck, _crate, _attachPoint] call MCCMK_fnc_crateLoadOn) then {
+						_loadedCrates set [count _loadedCrates, typeof _crate];
+						_truck setVariable ["mcc_supplyTruckCurrentLoad",_loadedCrates, true];
+					} else {
+						systemChat "There's no room for another crate on this vehicle.";
+					};
 				}
 				else
 				{
@@ -210,6 +218,7 @@ else
 							};
 						}
 						else {1};
+			_factor = _factor * ([_crate] call MCCMK_fnc_crateFrac);	//(MK) only what the crate still holds
 			deleteVehicle _crate;
 
 			//refund cost
@@ -222,15 +231,14 @@ else
 	{
 		if (count _loadedCrates >0) then
 		{
+			//(MK) the crate in the slot clicked (or the last one), from the vehicle itself
+			_attachedObjects = [_truck] call MCCMK_fnc_crateOnTruck;
+			_crate = if (_slotIdx >= 0 && {_slotIdx < count _attachedObjects}) then {_attachedObjects select _slotIdx} else {_attachedObjects select ((count _attachedObjects) - 1)};
+
 			//get type of crate and resources
-			_crateType = _loadedCrates select (count _loadedCrates -1);
+			_crateType = typeOf _crate;
 			_index = MCC_logisticsCrates_Types find _crateType;
 			_resLevel = _array select _index;
-
-
-			//remove from truck
-			_attachedObjects = attachedObjects _truck;
-			_crate =  (_attachedObjects select (count _attachedObjects)-1);
 			_crate disableCollisionWith _truck;
 
 			if (_startLoad) then
@@ -246,11 +254,14 @@ else
 								};
 							}
 							else {1};
+				_factor = _factor * ([_crate] call MCCMK_fnc_crateFrac);	//(MK) only what the crate still holds
 				deleteVehicle _crate;
 				_unload		= true;
 			}
 			else
 			{
+				//(MK) vehicle-in-vehicle cargo: Arma unloads it
+				if (!isNull isVehicleCargo _crate) exitWith {objNull setVehicleCargo _crate; _unload = true};
 				_position = ATLtoASL(_truck modelToworld [0,(-12 + (count _loadedCrates*1.6)),0]);
 
 				while {!lineIntersects [_position, [_position select 0, _position select 1, (_position select 2) + 1]] && _position select 2 > getTerrainHeightASL _position} do
@@ -286,10 +297,8 @@ else
 
 			if (_unload) then
 			{
-				if !(_isheli) then {waituntil {count ( attachedObjects _truck) != count _attachedObjects}};
 
-				_loadedCrates set [(count _loadedCrates)-1, -1];
-				_loadedCrates = _loadedCrates - [-1];
+				_loadedCrates = (([_truck] call MCCMK_fnc_crateOnTruck) - [_crate]) apply {typeOf _x};	//(MK) what's left on the vehicle
 				_truck setVariable ["mcc_supplyTruckCurrentLoad",_loadedCrates, true];
 
 				if (_startLoad) then

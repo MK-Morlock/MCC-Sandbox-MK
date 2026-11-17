@@ -40,7 +40,25 @@ isNil {
 		case 1: {missionNamespace getVariable ["U_GEN_TANK", []]};
 		case 2: {missionNamespace getVariable ["U_GEN_MOTORCYCLE", []]};
 		case 3: {missionNamespace getVariable ["U_GEN_SHIP", []]};
-		default {missionNamespace getVariable ["U_AMMO", []]};
+		case 5: {	//(MK) Taru pods - slingload only (Arma's own sling loading), in the livery set for the side; no livery in the
+			// names (one per side), and no pictures (the pods' config picture is broken: "picturething not found")
+			if (_mode != 1) then {[]} else {	// (not listed under Parachute)
+				private _sd = switch (toLower _sideS) do {case "east": {east}; case "guer": {resistance}; default {west}};
+				((["box", "ammo", "fuel", "repair", "medevac", "bench", "covered"] apply {([_sd, _x] call MCCMK_fnc_podClasses) select 1}) select {isClass (configFile >> "CfgVehicles" >> _x)}) apply {
+					["", _x, "", [trim (((getText (configFile >> "CfgVehicles" >> _x >> "displayName")) splitString "(") select 0), ""]]
+				}
+			};
+		};
+		//(MK) Ammo: real supply containers only - the Spawn panel's Ammo list also has single weapons, items, tents and the
+		// Taru pods. Parachute: boxes and crates (ReammoBox_F); Slingload: those and the large slingload containers.
+		default {
+			(missionNamespace getVariable ["U_AMMO", []]) select {
+				private _cl = _x param [1, ""];
+				(_cl != "") && {!(_cl isKindOf "Pod_Heli_Transport_04_base_F")} && {!(_cl isKindOf "WeaponHolder")} && {
+					(_cl isKindOf "ReammoBox_F") || {_mode == 1 && {_cl isKindOf "Slingload_base_F"}}
+				}
+			}
+		};
 	};
 	private _kind = ["Car", "Tank", "", "Ship", ""] param [_type, ""];
 	if (_kind != "") then {_arr = _arr select {(_x isEqualType []) && {(_x select 1) isEqualType ""} && {(_x select 1) isKindOf _kind}}};
@@ -78,7 +96,7 @@ isNil {
 		private _maxSling = if (_carrier isKindOf "Helicopter") then {getNumber (_cfgCar >> "slingLoadMaxCargoMass")} else {0};
 		_arr = if (_maxSling <= 0) then {[]} else {
 			_arr select {
-				(_x isEqualType []) && {count (getArray (configFile >> "CfgVehicles" >> (_x select 1) >> "slingLoadCargoMemoryPoints")) > 0} && {([_x select 1] call _fnc_mass) <= _maxSling}
+				(_x isEqualType []) && {count (getArray (configFile >> "CfgVehicles" >> (_x select 1) >> "slingLoadCargoMemoryPoints")) > 0} && {_type == 5 || {([_x select 1] call _fnc_mass) <= _maxSling}}	//(MK) Taru pods: any (lightened while slung)
 			}
 		};
 	};
@@ -94,5 +112,5 @@ isNil {
 	_c lbSetCurSel _pick;
 	_c setVariable ["MCC_airdropSig", _sig];
 	[] call MCCMK_fnc_airdropLive;
-	["DEBUG", "supplyDrop", "class list filled: %1 | %2 | aircraft %3 | %4 items", [["Vehicles", "Tracked", "Motorcycles", "Ships", "Ammo"] param [_type, "?"], ["parachute", "slingload"] select (_mode == 1), [_carrier + " (automatic)", _carrier] select (_air != ""), count _arr]] call MCC_fnc_log;
+	["DEBUG", "supplyDrop", "class list filled: %1 | %2 | aircraft %3 | %4 items", [["Vehicles", "Tracked", "Motorcycles", "Ships", "Ammo", "Taru Pods"] param [_type, "?"], ["parachute", "slingload"] select (_mode == 1), [_carrier + " (automatic)", _carrier] select (_air != ""), count _arr]] call MCC_fnc_log;
 };

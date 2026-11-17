@@ -26,13 +26,13 @@ if ((lbCurSel MCC_EVAC_SELECTED) >= 0 && {(lbCurSel MCC_EVAC_SELECTED) < count _
 	_type = _evacVehicles select (lbCurSel MCC_EVAC_SELECTED);
 	_pos = [(getpos _type) select 0, (getpos _type) select 1];
 
-	_insetionArray = ["Move (engine on)","Move (engine off)"];
+	_insetionArray = ["Move (engine on)","Move (engine off)","RTB"];
 	ctrlShow [MCC_EVAC_FLIGHTHIGHT,false];
 
 	//Case we choose aircrft
 	if (_type iskindof "helicopter") then
 	{
-		_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing"];
+		_insetionArray = ["Free Landing (engine on)","Free Landing (engine off)","Hover","Helocasting(Water)","Smoke Signal","Fast-Rope","Precise Landing","Paradrop","Water landing (engine on)","Water landing (engine off)","RTB"];
 		ctrlShow [MCC_EVAC_FLIGHTHIGHT,true];
 	};
 

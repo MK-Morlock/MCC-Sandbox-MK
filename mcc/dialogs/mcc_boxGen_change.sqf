@@ -201,7 +201,7 @@ _comboBox lbSetCurSel 0;
 if (_type == 4) then //Generate
 	{
 	closedialog 0; 
-	hint "click on map"; 
+	["click on map"] call MCCMK_fnc_hint; 
 	onMapSingleClick "_nul=[""B_supplyCrate_F"",_pos] call MCC_3D_PLACER;closeDialog 0;onMapSingleClick """";";	
 	MCC3DRuning = true;
 	while {MCC3DRuning} do

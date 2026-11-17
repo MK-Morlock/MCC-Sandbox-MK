@@ -32,12 +32,14 @@ _idx      			= 0;
 _unitsArray			=[];
 
 //Result kept for the game session (same faction, simulation, category and armed rule = same list)
-private _resultKey = format ["MCC_unitsArray_%1_%2_%3_%4", _faction, _simTypesUnits, _classType, _notArmed];
+private _mkSc = (missionNamespace getVariable ["MCC_MWContentModes", createHashMap]) getOrDefault [_faction, 2];
+private _mkFacs = if (_faction == "all") then {["all"]} else {([_faction, _mkSc] call MCCMK_fnc_scopeFactions) apply {toLower _x}};
+private _resultKey = format ["MCC_unitsArray_%1_%2_%3_%4_%5", _faction, _simTypesUnits, _classType, _notArmed, count _mkFacs];
 private _cachedResult = uiNamespace getVariable _resultKey;
 if (!isNil "_cachedResult") exitWith {+_cachedResult};
 
 //Only the faction public classes, picked by the engine (MCC_fnc_factionClasses) instead of walking every class
-_CfgVehicles = [_faction] call MCC_fnc_factionClasses;
+_CfgVehicles = if ((count _mkFacs) > 1) then {[_faction, _mkSc] call MCCMK_fnc_scopeClasses} else {[_faction] call MCC_fnc_factionClasses};
 
 _simTypesUnits = [_simTypesUnits, _simTypesUnits + "x"];
 
@@ -60,7 +62,7 @@ for "_i" from 0 to (count _CfgVehicles - 1) do
 			|| {((toLower _cfgclass) find "targetsoldier") >= 0} || {((toLower _cfgclass) find "target_vehicle") >= 0}
 			|| {((toLower _cfgclass) find "targetvehicle") >= 0}
 			|| {((toLower _cfgclass) select [((count _cfgclass) - 5) max 0]) == "_base"} || {((toLower _cfgclass) find "_base_") >= 0};
-		if (_faction in [_cfgFaction,"all"] && !(_dlc in ["kart"]) && !_invisibleTarget) then
+		if ((_faction == "all" || {_cfgFaction in _mkFacs}) && !(_dlc in ["kart"]) && !_invisibleTarget) then
 		{
 			_vehicleClass = [_CfgVehicle] call MCC_fnc_unitCategory;	//mod vehicleClass names mapped to MCCs (GitHub #48)
 			if (toLower(_simulation) in _simTypesUnits && !(gettext(_CfgVehicle >> "DLC") in ["Kart"])) then {

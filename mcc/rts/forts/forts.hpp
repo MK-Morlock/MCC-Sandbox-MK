@@ -433,3 +433,194 @@ class MCC_rts_target3
 	actionFNC = "MCC_fnc_buildFort";
 	resources[] = {{"repair",50}};
 };
+
+//(MK) Helipads (the HQ's Helipads menu): built like fortifications; the lit ones get green edge lights that follow the base power
+
+class MCC_rts_helipadSquare
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadSquare.paa";
+	#else
+	picture = "mcc\rts\data\helipadSquare.paa";
+	#endif
+
+	displayName = "Helipad (Square)";
+	descriptionShort = "A square helipad";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadSquare_F";
+	classWest = "Land_HelipadSquare_F";
+	classGuer = "Land_HelipadSquare_F";
+	padLights = 0;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",50}};
+};
+
+class MCC_rts_helipadCircle
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadCircle.paa";
+	#else
+	picture = "mcc\rts\data\helipadCircle.paa";
+	#endif
+
+	displayName = "Helipad (Circle)";
+	descriptionShort = "A circle helipad";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadCircle_F";
+	classWest = "Land_HelipadCircle_F";
+	classGuer = "Land_HelipadCircle_F";
+	padLights = 0;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",50}};
+};
+
+class MCC_rts_helipadCivil
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadCivil.paa";
+	#else
+	picture = "mcc\rts\data\helipadCivil.paa";
+	#endif
+
+	displayName = "Helipad (Civil)";
+	descriptionShort = "A civil helipad";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadCivil_F";
+	classWest = "Land_HelipadCivil_F";
+	classGuer = "Land_HelipadCivil_F";
+	padLights = 0;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",50}};
+};
+
+class MCC_rts_helipadRescue
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadRescue.paa";
+	#else
+	picture = "mcc\rts\data\helipadRescue.paa";
+	#endif
+
+	displayName = "Helipad (Rescue)";
+	descriptionShort = "A rescue helipad";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadRescue_F";
+	classWest = "Land_HelipadRescue_F";
+	classGuer = "Land_HelipadRescue_F";
+	padLights = 0;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",50}};
+};
+
+class MCC_rts_helipadSquareLit
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadSquareLit.paa";
+	#else
+	picture = "mcc\rts\data\helipadSquareLit.paa";
+	#endif
+
+	displayName = "Helipad (Square, lit)";
+	descriptionShort = "A square helipad with green edge lights (on while the base has power)";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadSquare_F";
+	classWest = "Land_HelipadSquare_F";
+	classGuer = "Land_HelipadSquare_F";
+	padLights = 1;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",80}};
+};
+
+class MCC_rts_helipadCircleLit
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadCircleLit.paa";
+	#else
+	picture = "mcc\rts\data\helipadCircleLit.paa";
+	#endif
+
+	displayName = "Helipad (Circle, lit)";
+	descriptionShort = "A circle helipad with green edge lights (on while the base has power)";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadCircle_F";
+	classWest = "Land_HelipadCircle_F";
+	classGuer = "Land_HelipadCircle_F";
+	padLights = 1;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",80}};
+};
+
+class MCC_rts_helipadCivilLit
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadCivilLit.paa";
+	#else
+	picture = "mcc\rts\data\helipadCivilLit.paa";
+	#endif
+
+	displayName = "Helipad (Civil, lit)";
+	descriptionShort = "A civil helipad with green edge lights (on while the base has power)";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadCivil_F";
+	classWest = "Land_HelipadCivil_F";
+	classGuer = "Land_HelipadCivil_F";
+	padLights = 1;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",80}};
+};
+
+class MCC_rts_helipadRescueLit
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadRescueLit.paa";
+	#else
+	picture = "mcc\rts\data\helipadRescueLit.paa";
+	#endif
+
+	displayName = "Helipad (Rescue, lit)";
+	descriptionShort = "A rescue helipad with green edge lights (on while the base has power)";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadRescue_F";
+	classWest = "Land_HelipadRescue_F";
+	classGuer = "Land_HelipadRescue_F";
+	padLights = 1;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",80}};
+};
+
+class MCC_rts_helipadInvisible
+{
+	#ifdef MCCMODE
+	picture = "\mcc_sandbox_mod\mcc\rts\data\helipadInvisible.paa";
+	#else
+	picture = "mcc\rts\data\helipadInvisible.paa";
+	#endif
+
+	displayName = "Helipad (invisible)";
+	descriptionShort = "An invisible landing spot for AI helicopters";
+	condition = "";
+	requiredBuildings[] = {{"hq",1}};
+	needelectricity = 0;
+	classEast = "Land_HelipadEmpty_F";
+	classWest = "Land_HelipadEmpty_F";
+	classGuer = "Land_HelipadEmpty_F";
+	padLights = 0;
+	actionFNC = "MCC_fnc_buildFort";
+	resources[] = {{"repair",10}};
+};

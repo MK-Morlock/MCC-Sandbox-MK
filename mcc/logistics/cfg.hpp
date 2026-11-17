@@ -26,3 +26,4 @@
 #undef MCCDLG_NAME
 #undef MCCBTN_S
 #undef MCCBTN_R
+#include "dialogs\mcc_crateAdjust.hpp"

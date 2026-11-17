@@ -17,8 +17,8 @@
 ==============================================================================================================================================================*/
 #define IDC_PREVIEW 9530
 params [["_mode", "", [""]], ["_args", []]];
-//Show runs in one go: two shows started at the same moment (picking a row also selects a suggestion) both created an
-//object and only one was remembered, so the other was never deleted
+//Show runs in one go: two shows started at the same moment (picking a row also selects a suggestion) would each create
+//an object, and only one would be remembered and deleted
 if (_mode == "show" && {canSuspend}) exitWith {isNil {["show", _args] call MCC_fnc_assetsPreview}};
 private _state = missionNamespace getVariable ["MCC_assetPrev", []];
 private _log = {	//only with MCC debug on (it confirmed the preview works)

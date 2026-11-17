@@ -86,9 +86,8 @@ else
 	} forEach  MCC_GroupGenGroupSelected;
 };
 
-//Keep the selection: the list is rebuilt every few seconds, which used to drop the highlight while the selection
-//stayed in MCC_selectedUnits (or the other way round) - HALO then said "no group selected". The rows of what is
-//selected are highlighted again; whatever is no longer in the list is dropped from the selection.
+//Keep the selection: the list is rebuilt every few seconds, so the rows of what is selected (MCC_selectedUnits) are
+//highlighted again; whatever is no longer in the list is dropped from the selection.
 private _rowsOf = [MCC_UMunitsNames, UMgroupNames] select (MCC_UMUnit != 0);
 private _keep = (missionNamespace getVariable ["MCC_selectedUnits", []]) select {(_rowsOf find _x) >= 0};
 MCC_selectedUnits = _keep;

@@ -2,7 +2,7 @@
 disableSerialization;
 private "_dlg";
 private _string = controlNull;
-hint "Diary updated";
+["Diary updated"] call MCCMK_fnc_hint;
 
 params ["_type"];
 

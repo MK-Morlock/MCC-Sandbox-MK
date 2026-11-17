@@ -19,7 +19,7 @@ private "_data";
 #define BASE_ANCHOR "UserTexture10m_F"
 #define ANCHOR_ITEM "Land_TreeBin_F"
 
-params ["_pos", "_anchorDir", "_cfgClass", "_BuildTime", "_side"];
+params ["_pos", "_anchorDir", "_cfgClass", "_BuildTime", "_side", ["_noMarker", false, [false]]];	//(MK) _noMarker: at an F.O.B. start location, whose own marker names it
 
 _instant = if (_BuildTime <=0) then {true} else {false};
 
@@ -64,7 +64,7 @@ if (isnil "_constType") exitWith {};
 if (isNil "MCC_dummyLogicGroup") then {MCC_dummyLogicGroup = createGroup sideLogic};
 _module = MCC_dummyLogicGroup createunit ["Logic", _pos,[],0.5,"NONE"];
 */
-_module = BASE_ANCHOR createVehicle _pos;
+_module = BASE_ANCHOR createVehicle _pos; [_module] call MCCMK_fnc_genTag;
 
 _module setVariable ["mcc_constructionItemType",_constType,true];
 _module setVariable ["mcc_constructionItemTypeLevel",_level,true];
@@ -76,11 +76,11 @@ _module setVariable ["mcc_delete",false,true];
 _markerName = format ["ConstCounter_%1",["MCC_ConstCounter_",1] call bis_fnc_counter];
 _module setVariable ["mcc_markerName",_markerName,true];
 
-[[_markerName], _pos, "colorGreen", "loc_Bunker",_displayName,false] remoteExec ["BIS_fnc_markerCreate", _side, false];
+if (!_noMarker) then {[[_markerName], _pos, "colorGreen", "loc_Bunker",_displayName,false] remoteExec ["BIS_fnc_markerCreate", _side, false]};
 
 //Building anim
 if !(_instant) then {
-	_anchor = ANCHOR_ITEM createVehicle _pos;
+	_anchor = ANCHOR_ITEM createVehicle _pos; [_anchor] call MCCMK_fnc_genTag;
 	waituntil {!isnil "_anchor"};
 	_anchor enableSimulation false;
 	_builtArray = [_anchor];
@@ -89,7 +89,7 @@ if !(_instant) then {
 	for "_i" from 0 to ((count _buildingObjs) - 1) do
 	{
 		_object = nil;
-		_object = ((_buildingObjs select _i) select  0) createVehicle [0,0,0];
+		_object = ((_buildingObjs select _i) select  0) createVehicle [0,0,0]; [_object] call MCCMK_fnc_genTag;
 		waituntil {!isnil "_object"};
 		_object attachTo [_anchor,((_buildingObjs select _i) select  1)];
 		_object setdir ((getdir _anchor) + ((_buildingObjs select _i) select 2));
@@ -105,7 +105,7 @@ if !(_instant) then {
 };
 
 //Build object
-_anchor = _anchorType createVehicle _pos;
+_anchor = _anchorType createVehicle _pos; [_anchor] call MCCMK_fnc_genTag;
 waituntil {!isnil "_anchor"};
 _anchor setdir _anchorDir;
 _anchor setVariable ["mcc_side",_side,true];
@@ -146,7 +146,7 @@ private _made = [];
 for "_i" from 0 to ((count _objs) - 1) do {
 	_data = _objs select _i;
 	_object = nil;
-	_object = (_data select  0) createVehicle [0,0,0];
+	_object = (_data select  0) createVehicle [0,0,0]; [_object] call MCCMK_fnc_genTag;
 	waituntil {!isnil "_object"};
 	_made pushBack [_object, _data select 1];
 };
@@ -160,6 +160,8 @@ for "_i" from 0 to ((count _objs) - 1) do {
 		_object attachTo [_anchor,_offs select _i];
 		_object setVectorDirAndUp  (_data select  2);
 	};
+	//(MK) a camouflage net lies along the slope, so all its poles reach the ground
+	if (((toLower (typeOf _object)) find "camonet") >= 0) then {[_object, _anchor, _data select 2, true] call MCCMK_fnc_rtsNetTilt};
 	_object setVariable ["mcc_delete",false,true];
 	_object AddEventHandler ["HandleDamage", {}];
 
@@ -176,5 +178,5 @@ if (_constType == "hq") then {
 };
 
 if (_constType in ["workshop","barracks"]) then {
-	[_side, _module,_constType] remoteExec ["MCC_fnc_initWorkshop",2];
+	(if (isServer) then {[[_side, _module,_constType], (if (isNil "_MCCMK_gen") then {""} else {_MCCMK_gen}), "MCC_fnc_initWorkshop"] spawn MCCMK_fnc_genRun} else {[_side, _module,_constType] remoteExec ["MCC_fnc_initWorkshop",2]});
 };

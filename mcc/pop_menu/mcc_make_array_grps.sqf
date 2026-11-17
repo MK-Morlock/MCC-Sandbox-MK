@@ -27,6 +27,7 @@ for "_i" from 0 to ((count _cfg) - 1) do
 
 #define CONFIG (configFile >> "CfgGroups" )
 
+isNil {	//(MK) in one go, not stretched over many frames as a background script
 for "_i" from 0 to ((count CONFIG) - 1)  do
 {
     _Cfgside = (CONFIG select _i);
@@ -53,8 +54,7 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 							   if (isClass(_cfgclasstype)) then
 							   {
 									// Same rule the group-type list uses (mcc_faction_choice.sqf): the group's own faction, or - for mods such as S.O.G. Prairie Fire
-									// whose groups have no "faction" entry - the CfgGroups faction class it sits in. Before, those types were listed but always empty,
-									// so spawning showed "Cannot spawn an empty group".
+									// whose groups have no "faction" entry - the CfgGroups faction class it sits in (so those types are never empty).
 									private _grpFaction = getText(_cfgclasstype >> "faction");
 									if (_grpFaction == _faction || {_grpFaction == "" && {configName _Cfgfaction == _faction}}) then
 									{
@@ -93,5 +93,6 @@ for "_i" from 0 to ((count CONFIG) - 1)  do
 			};
 		 };
     };
+};
 };
 _grp_array

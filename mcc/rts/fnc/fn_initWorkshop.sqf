@@ -62,12 +62,12 @@ if (tolower _constType isEqualTo "barracks") then {
 
 
 if (_class != "") then {
-	_billboard = MCC_RTS_WORKSHOPSIGHN createVehicle (_anchor modelToWorld [0,5,0]);
+	_billboard = MCC_RTS_WORKSHOPSIGHN createVehicle (_anchor modelToWorld [0,5,0]); [_billboard] call MCCMK_fnc_genTag;
 
 	if (tolower _constType isEqualTo "barracks") then {
-		_helipad = MCC_RTS_BARRACKSHOPHELIPAD createVehicle (_anchor modelToWorld [0,15,0]);
+		_helipad = MCC_RTS_BARRACKSHOPHELIPAD createVehicle (_anchor modelToWorld [0,15,0]); [_helipad] call MCCMK_fnc_genTag;
 	} else {
-		_helipad = MCC_RTS_WORKSHOPHELIPAD createVehicle (_anchor modelToWorld [0,15,0]);
+		_helipad = MCC_RTS_WORKSHOPHELIPAD createVehicle (_anchor modelToWorld [0,15,0]); [_helipad] call MCCMK_fnc_genTag;
 	};
 
 
@@ -85,7 +85,7 @@ if (_constType == "barracks") exitWith {};
 
 //Start repair shop
 if (isNull _trg) then {
-	_trg = createTrigger ["EmptyDetector", getPos _anchor];
+	_trg = createTrigger ["EmptyDetector", getPos _anchor]; [_trg] call MCCMK_fnc_genTag;
 	_trg setTriggerArea [20, 20, 0, false];
 	_trg setTriggerActivation ["ANY", "PRESENT", true];
 	_module setVariable ["mcc_construction_trigger",_trg,true];

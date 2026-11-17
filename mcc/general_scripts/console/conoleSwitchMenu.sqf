@@ -23,5 +23,5 @@ switch (_type) do
 		};
 	};
 
-if (!_ok) then {hint "Failed to open dialog"};
+if (!_ok) then {["Failed to open dialog"] call MCCMK_fnc_hint};
 	

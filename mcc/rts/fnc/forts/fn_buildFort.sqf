@@ -29,6 +29,8 @@ MCC_CONST_PLACEHOLDER setdir (missionNamespace getVariable ["MCC_rtsFortDir",0])
 MCC_CONST_PLACEHOLDER setVariable ["MCC_baseBuildingToBuild",_class];
 MCC_CONST_PLACEHOLDER setVariable ["MCC_baseBuildingIsFort",true];
 MCC_CONST_PLACEHOLDER setVariable ["MCC_baseBuildingRes",_res];
+MCC_CONST_PLACEHOLDER setVariable ["MCCMK_padLights", (getNumber (_cfg >> "padLights")) == 1];	//(MK) a lit helipad
+if (_class == "Land_HelipadEmpty_F") then {[MCC_CONST_PLACEHOLDER] call MCCMK_fnc_padPreview};	//(MK) the invisible helipad's area shown while placing
 [] call MCC_fnc_rtsPreviewClear;
 if (!isNil "MCC_CONST_CAM") then {MCC_CONST_CAM camCommand "manual off"};
 [getText (_cfg >> "displayName"), true] call MCC_fnc_rtsPlacePrompt;

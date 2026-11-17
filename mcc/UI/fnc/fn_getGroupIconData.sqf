@@ -100,13 +100,16 @@ if (_unitsCount select 7 > 0) then {_markerType = _markerAutonomous; _unitsSize 
 
 if (isnil "_markerType") then
 {
-	_unitsCount = [group _leader] call MCC_fnc_countGroup; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
+	_unitsCount = [_group] call MCC_fnc_countGroup; if (isNil "_unitsCount" || {!(_unitsCount isEqualType [])}) then {_unitsCount = [0,0,0,0,0,0,0,0]};
 	if (_unitsCount select 0 > 0) then {_markerType = _markerInf; _unitsSize = _unitsSize + (1*(_unitsCount select 0))};
 	if (_unitsCount select 1 > 0) then {_markerType = _markerMech; _unitsSize = _unitsSize + (3*(_unitsCount select 1))};
 	if (_unitsCount select 2 > 0) then {_markerType = _markerArmor; _unitsSize = _unitsSize + (3*(_unitsCount select 2))};
 	if (_unitsCount select 3 > 0) then {_markerType = _markerAir; _unitsSize = _unitsSize + (3*(_unitsCount select 3))};
 	if (_unitsCount select 4 > 0) then {_markerType = _markerNaval; _unitsSize = _unitsSize + (3*(_unitsCount select 4))};
 };
+
+//(MK) still unknown (e.g. a ship's weapon group): an infantry symbol, so there's always a valid icon
+if (isNil "_markerType" || {_markerType isEqualTo ""}) then {_markerType = _markerInf};
 
 //How big is the squad
 _unitsSize = floor (_unitsSize/4);

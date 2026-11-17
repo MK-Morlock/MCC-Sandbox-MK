@@ -65,7 +65,7 @@ if (isnil "_locations") exitWith {["WARN", "fn_MWbuildLocations", "no type of lo
 	_locationsArray pushBack [_x,_name];
 	if (missionNamespace getVariable ["MCC_debug",false]) then
 	{
-		createmarkerlocal [_name ,getpos _x];
+		createmarkerlocal [_name ,getpos _x]; [_name] call MCCMK_fnc_genTag;
 		if (isNil "MCCMK_debugMarkers") then {MCCMK_debugMarkers = []};
 		MCCMK_debugMarkers pushBackUnique _name;
 		_name setmarkertypelocal "mil_box";

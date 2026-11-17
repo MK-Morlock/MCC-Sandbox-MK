@@ -1,6 +1,7 @@
 class Logic;
 class Module_F: Logic
 {
+	class EventHandlers;
 	class AttributesBase
 	{
 		class Default;
@@ -136,6 +137,25 @@ class MCC_podBench_black : Land_Pod_Heli_Transport_04_bench_black_F
 	author = "MCC Sandbox MK";
 };
 
+class Land_Pod_Heli_Transport_04_covered_F;
+class MCC_podCovered : Land_Pod_Heli_Transport_04_covered_F
+{
+	scope = 1;
+	scopeCurator = 0;
+	displayName = "(MCC) Transport Pod";
+	extCameraPosition[] = {0, 3.2, -20};
+	author = "MCC Sandbox MK";
+};
+class Land_Pod_Heli_Transport_04_covered_black_F;
+class MCC_podCovered_black : Land_Pod_Heli_Transport_04_covered_black_F
+{
+	scope = 1;
+	scopeCurator = 0;
+	displayName = "(MCC) Transport Pod (Black)";
+	extCameraPosition[] = {0, 3.2, -20};
+	author = "MCC Sandbox MK";
+};
+
 class Land_Pod_Heli_Transport_04_fuel_F;
 class MCC_crateFuelBigEast : Land_Pod_Heli_Transport_04_fuel_F
 {
@@ -145,3 +165,41 @@ class MCC_crateFuelBigEast : Land_Pod_Heli_Transport_04_fuel_F
 	transportFuel = 500*4;
 	author = "MCC-Team";
 };
+//(MK) the same service pods in black, to match the black (NATO) Taru pods - four times the normal capacity, as above
+class Land_Pod_Heli_Transport_04_ammo_black_F;
+class MCC_crateAmmoBigEast_black : Land_Pod_Heli_Transport_04_ammo_black_F
+{
+	scope = 2;
+	scopeCurator = 2;
+	side = 3;
+	displayName = "(MCC)Ammo Pod (Black)";
+	maximumLoad = 600*4;
+	transportAmmo = 12000*4;
+	author = "MCC Sandbox MK";
+};
+class Land_Pod_Heli_Transport_04_repair_black_F;
+class MCC_crateSupplyBigEast_black : Land_Pod_Heli_Transport_04_repair_black_F
+{
+	scope = 2;
+	scopeCurator = 2;
+	side = 3;
+	displayName = "(MCC)Supply Pod (Black)";
+	maximumLoad = 600*4;
+	transportAmmo = 0;
+	transportRepair = 90000*4;
+	author = "MCC Sandbox MK";
+};
+class Land_Pod_Heli_Transport_04_fuel_black_F;
+class MCC_crateFuelBigEast_black : Land_Pod_Heli_Transport_04_fuel_black_F
+{
+	scope = 2;
+	scopeCurator = 2;
+	side = 3;
+	displayName = "(MCC)Fuel Pod (Black)";
+	maximumLoad = 600*4;
+	transportAmmo = 0;
+	transportFuel = 500*4;
+	author = "MCC Sandbox MK";
+};
+
+#include "floatDepth.hpp"

@@ -24,5 +24,5 @@ MCC_campaignTileAlphaMap set [_marker, _alpha];
 
 private _transparency = ((missionNamespace getVariable ["MCC_campaignTileTransparency", 0]) max 0) min 1;
 private _drawn = _alpha * (1 - _transparency);
-if (hasInterface && {missionNamespace getVariable ["MCC_consoleTilesHidden", false]}) then {MCC_consoleTilesShown set [_marker, _drawn]} else {_marker setMarkerAlphaLocal _drawn};
+if (hasInterface) then {[_marker, _drawn] call MCCMK_fnc_tileDraw} else {_marker setMarkerAlphaLocal _drawn};
 [_marker, "", _drawn] call MCCMK_fnc_tileQueue;

@@ -95,6 +95,7 @@ while {true} do {
 				if (_resArray select 2 <=0) then {
 					missionNamespace setvariable [_elecVar,false];
 					publicVariable _elecVar;
+					["update", _side] remoteExec ["MCCMK_fnc_helipadLights", 0, format ["MCCMK_padLights_%1", _side]];	//(MK) lit helipads
 					_CompleteText = _CompleteText + format ["<img image='%1data\IconFuel.paa'/> The Diesel Generator is out of fuel<br/><br/>", MCC_path];
 					_showText = true;
 				};

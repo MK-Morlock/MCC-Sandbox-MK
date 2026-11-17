@@ -127,7 +127,7 @@ class MCC_debugDialogControls:MCC_RscControlsGroup
 			y = 0.146000* safezoneH;
 			w = 0.051791* safezoneW;
 			h = 0.022000* safezoneH;
-			tooltip = "Execute the command line phrase only on the mission maker's computer"; //--- ToDo: Localize;
+			tooltip = "Execute the command line phrase only on the mission maker's\ncomputer"; //--- ToDo: Localize;
 		};
 		class MCC_commandlineGlobal: MCCBTN_S
 		{

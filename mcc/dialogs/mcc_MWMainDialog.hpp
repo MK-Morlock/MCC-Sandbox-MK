@@ -42,30 +42,30 @@ class MCCDLG_NAME
 			h = 0.0549786 * safezoneH;
 		};
 
-		class MCCMWDialogClose: MCCBTN_R
+		class MCCMWDialogClose: MCCBTN_S
 		{
 			idc = -1;
 			text = "Close"; //--- ToDo: Localize;
 			action = "MCC_mcc_screen = 2;closeDialog 0;";
 
 			x = 0.233000 * safezoneW + safezoneX;
-			y = 0.83 * safezoneH + safezoneY;
-			w = 0.0744792 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			y = 0.8455 * safezoneH + safezoneY;	//(MK) the console's Logout size, clear of the window's bottom edge
+			w = 0.06875 * safezoneW;
+			h = 0.021991 * safezoneH;
 		};
 
 
 		//Generate
-		class MCC_MWGenerate: MCCBTN_R
+		class MCC_MWGenerate: MCCBTN_S
 		{
 			idc = -1;
 			onButtonClick = __EVAL("[0] execVM '"+MCCPATH+"mcc\missionWizard\scripts\missionWizardInit.sqf'");
 			text = "Generate Mission"; //--- ToDo: Localize;
 
-			x = 0.682000 * safezoneW + safezoneX;
-			y = 0.83 * safezoneH + safezoneY;
-			w = 0.085 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			x = 0.69825 * safezoneW + safezoneX;	//(MK) right edge where it was
+			y = 0.8455 * safezoneH + safezoneY;
+			w = 0.06875 * safezoneW;
+			h = 0.021991 * safezoneH;
 			tooltip = "Generate a mission "; //--- ToDo: Localize;
 		};
 
@@ -98,6 +98,55 @@ class MCCDLG_NAME
 			onMouseButtonDblClick = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\mouseDblClick.sqf'");
 			onMouseMoving = __EVAL("[_this] execVM '"+MCCPATH+"mcc\general_scripts\groupGen\mouseMoving.sqf'");
 		};
+		class MCC_mapContour : MCC_map
+		{
+			idc = 9010;
+			maxSatelliteAlpha = 0;
+			colorOutside[] = {0.718,0.794,0.900,1};
+			colorBackground[] = {0.969,0.957,0.949,1};
+		};
+		class MCC_mapLayersRound: MCC_RscText
+		{
+			idc = 9011;
+			style = 48;
+			text = "\mcc_sandbox_mod\data\btn_round_sq_n_ca.paa";
+			colorText[] = {1,1,1,1};
+			x = 0.746354 * safezoneW + safezoneX;
+			y = 0.127987 * safezoneH + safezoneY;
+			w = 0.020625 * safezoneW;
+			h = 0.033 * safezoneH;
+		};
+		class MCC_mapLayersIcon: MCC_RscText
+		{
+			idc = 9012;
+			style = 2096;
+			text = "\mcc_sandbox_mod\data\mk_maplayers_ca.paa";
+			colorText[] = {0.88,0.89,0.90,1};
+			x = 0.749354 * safezoneW + safezoneX;
+			y = 0.132487 * safezoneH + safezoneY;
+			w = 0.014625 * safezoneW;
+			h = 0.024 * safezoneH;
+		};
+		class MCC_mapLayersBtn: MCC_RscButton
+		{
+			idc = 9013;
+			text = "";
+			tooltip = "Map Layers";
+			colorBackground[] = {0,0,0,0};
+			colorBackgroundActive[] = {1,1,1,0.15};
+			colorBackgroundDisabled[] = {0,0,0,0};
+			colorFocused[] = {0,0,0,0};
+			colorBackgroundFocused[] = {0,0,0,0};
+			colorBorder[] = {0,0,0,0};
+			colorShadow[] = {0,0,0,0};
+			offsetPressedX = 0;
+			offsetPressedY = 0;
+			action = "['toggle', 'mw'] call MCC_fnc_consoleMapLayers";
+			x = 0.746354 * safezoneW + safezoneX;
+			y = 0.127987 * safezoneH + safezoneY;
+			w = 0.020625 * safezoneW;
+			h = 0.033 * safezoneH;
+		};
 
 		class MCCMWZoneTittle: MCC_RscText
 		{
@@ -124,7 +173,7 @@ class MCCDLG_NAME
 			h = 0.0219914 * safezoneH;
 		};
 
-		class MCCMWZoneUpdateButton: MCCBTN_R
+		class MCCMWZoneUpdateButton: MCCBTN_S
 		{
 			idc = -1;
 			text = "Update Zone";
@@ -132,9 +181,9 @@ class MCCDLG_NAME
 			onButtonClick = "if (mcc_missionmaker == (name player)) then {MCC_zone_drawing= true;} else {player globalchat 'Access Denied'};";
 
 			x = 0.700521 * safezoneW + safezoneX;
-			y = 0.456017 * safezoneH + safezoneY;
+			y = 0.456017 * safezoneH + safezoneY;	//(MK) the Zone drop-down's row and height
 			w = 0.06875 * safezoneW;
-			h = 0.0329871 * safezoneH;
+			h = 0.0219914 * safezoneH;
 		};
 
 		#include "mcc_MWcontrols.hpp"

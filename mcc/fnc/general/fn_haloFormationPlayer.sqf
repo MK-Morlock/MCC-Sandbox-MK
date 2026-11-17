@@ -37,14 +37,10 @@ private _fnc_faceC = {params ["_pos"]; ((0 - (_pos select 0)) atan2 (_cDist - (_
 waitUntil {sleep 0.05; !alive _player || {vehicle _player == _player}};
 if (!alive _player) exitWith {};
 ["INFO", "haloFormation", "ROS player formation on %1 with %2 AI at %3 m", [name _player, count _ai, round ((getPosATL _player) select 2)]] call MCC_fnc_log;
-private _v0 = velocity _player;
-if ((vectorMagnitude [_v0 select 0, _v0 select 1, 0]) > 5) then {
-	["haloAlign", [((_v0 select 0) atan2 (_v0 select 1) + 360) mod 360, _v0]] remoteExec ["MCC_fnc_secAction", _player, false];
-};
 
 if (((_player getVariable ["MCC_paraOpen", [0, 0]]) select 0) != 1) then {[_player] spawn {
 	params ["_p"];
-	waitUntil {sleep 0.1; !alive _p || {vehicle _p != _p} || {((getPosATL _p) select 2) < 240}};
+	waitUntil {sleep 0.1; !alive _p || {vehicle _p != _p} || {((getPosATL _p) select 2) < (_p getVariable ["MCC_haloChuteAlt", 145])}};
 	if (alive _p && {vehicle _p == _p}) then {[_p, ["OpenParachute", _p]] remoteExec ["action", _p]};
 }};
 
@@ -107,15 +103,22 @@ _order = _order call BIS_fnc_arrayShuffle;
 {_x setVariable ["MCC_haloRingDone", true]} forEach _ai;
 ["INFO", "haloFormation", "player ring formed at %1 m (%2 of %3 AI held round %4)", [round ((getPosATL _player) select 2), {alive _x && {(attachedTo _x) == _player}} count _ai, count _ai, name _player]] call MCC_fnc_log;
 
-private _breakAlt = 156 + 68 * (2.3 + 0.1 * (count _ai));
+private _breakAlt = 170 + 85 + (count _ai) * 0.2 * 68;
 waitUntil {sleep 0.1; !alive _player || {vehicle _player != _player} || {((getPosATLVisual _player) select 2) < _breakAlt}};
 ["INFO", "haloFormation", "player ring break off at %1 m", [round ((getPosATL _player) select 2)]] call MCC_fnc_log;
 private _held = _ai select {alive _x && {(attachedTo _x) == _player}};
 private _po = _player getVariable ["MCC_paraOpen", [0, 0]];
-private _hts = if ((_po select 0) == 1) then {_held apply {(_po select 1) + random 30}} else {_held apply {145 + random 8}};
+private _base = [_po param [1, 120], 120] select ((_po param [1, 0]) <= 0);
+private _auto = (_po select 0) != 1;
+private _hts = _held apply {_base + random 40};
+if (_auto) then {_hts pushBack (_base + 10 + random 30)};
 _hts sort false;
-private _byHeight = [_held, [], {(getPosASL _x) select 2}, "DESCEND"] call BIS_fnc_sortBy;
-{_x setVariable ["MCC_haloChuteAlt", _hts select _forEachIndex]} forEach _byHeight;
+private _byHeight = [_held + ([[], [_player]] select _auto), [], {(getPosASL _x) select 2}, "DESCEND"] call BIS_fnc_sortBy;
+{
+	private _h = _hts select _forEachIndex;
+	if (_x == _player) then {_h = _h max (_base + 10)};
+	_x setVariable ["MCC_haloChuteAlt", _h];
+} forEach _byHeight;
 private _centre = AGLToASL (_player modelToWorldVisual [0, _cDist, 0]);
 private _lv = velocity _player;
 private _pDir = getDir _player;

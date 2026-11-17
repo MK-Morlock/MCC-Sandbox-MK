@@ -51,7 +51,13 @@ if ((_list findIf {(_x select 0) == _auto}) < 0 && {isClass _cfgA} && {isClass (
 	_list = [_list, [], {_x select 1}, "ASCEND"] call BIS_fnc_sortBy;
 };
 _list = _list select {[_heli, _plane] select (_x select 3)};
-if ((missionNamespace getVariable ["MCC_airdropIsParachute", 0]) == 1) then {_list = _list select {_x param [5, false]}};
+if ((missionNamespace getVariable ["MCC_airdropIsParachute", 0]) == 1) then {_list = _list select {_x param [5, false]}} else {
+	//(MK) Parachute: only aircraft with room inside (a vehicle bay or passenger seats) - the Taru without a pod has neither
+	_list = _list select {
+		private _ac = configFile >> "CfgVehicles" >> (_x select 0);
+		isClass (_ac >> "VehicleTransport" >> "Carrier") || {getNumber (_ac >> "transportSoldier") > 0}
+	};
+};
 private _find = toLower (trim (ctrlText (_d displayCtrl 1040)));
 if (_find != "") then {_list = _list select {((toLower (_x select 1)) find _find) >= 0}};
 private _want = MCCMK_adMem getOrDefault ["air", ""];

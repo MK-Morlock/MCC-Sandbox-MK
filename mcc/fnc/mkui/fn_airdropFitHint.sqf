@@ -11,8 +11,8 @@ private _fmt = {
 	_o
 };
 private _nm = getText (configFile >> "CfgVehicles" >> _carrier >> "displayName");
-hint (if ((_fit param [3, 0]) > 0) then {
+[(if ((_fit param [3, 0]) > 0) then {
 	format ["Does not fit in the %1: %2 (%3 of %4 kg used)", _nm, _fit select 1, (_fit select 2) call _fmt, (_fit select 3) call _fmt]
 } else {
 	format ["Does not fit in the %1: %2", _nm, _fit param [1, ""]]
-});
+})] call MCCMK_fnc_hint;

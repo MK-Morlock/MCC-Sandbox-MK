@@ -19,6 +19,7 @@ private _crewGrp = grpNull;
 			_o setVectorDirAndUp [_vd, _vu];
 			if (!_isMan && {_hasCrew}) then {
 				createVehicleCrew _o;
+				[_o] call MCCMK_fnc_crewFix;
 				_crewAll append (crew _o);
 				_crewGrp = group (effectiveCommander _o);
 			};

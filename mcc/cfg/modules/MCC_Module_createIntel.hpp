@@ -6,8 +6,8 @@ class MCC_Module_createIntel : Module_F
 	scope = 2;
 	isGlobal = 0;
 
-	// Attribute "property" names must be unique across Eden. They were plain "text", "marker", "delete"... which other
-	// attributes also use, so the intel text reset to "Text" on reload (GitHub #64). The module variables keep their names.
+	// Attribute "property" names must be unique across Eden. Plain "text", "marker", "delete"... are also used by other
+	// attributes (GitHub #64). The module variables keep their names.
 	class Attributes : AttributesBase
 	{
 		class shared : Combo

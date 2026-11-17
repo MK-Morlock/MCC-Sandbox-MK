@@ -18,7 +18,7 @@ private "_currentWP";
 params ["_uav"];
 
 //--- UAV ID
-if (isnil "MCC_uav_lastID") then {MCC_uav_lastID = -1};	// was checking a misspelt name, so the first UAV always hit "undefined variable"
+if (isnil "MCC_uav_lastID") then {MCC_uav_lastID = -1};
 MCC_uav_lastID = MCC_uav_lastID + 1;
 MCC_uav = _uav;
 _uav setvehiclevarname "MCC_uav";

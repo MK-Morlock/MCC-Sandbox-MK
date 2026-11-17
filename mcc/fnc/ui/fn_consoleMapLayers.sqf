@@ -4,6 +4,7 @@ params [["_mode", "init", [""]], ["_screen", "console", [""]]];
 private _cfg = switch (_screen) do {
 	case "cc": {[findDisplay 2993, 9120, 9130, [-1, -1, 9133], "MCC_ccMapContour", ["_this call MCC_fnc_mapDrawWPConsole;"]]};
 	case "pda": {[uiNamespace getVariable ["MCC_SQLPDA", displayNull], 9120, 9130, [9131, 9132, 9133], "MCC_pdaMapContour", ["_this call MCC_fnc_mapDrawWPPDA;"]]};
+	case "mw": {[uiNamespace getVariable ["MCC_MWDialog", displayNull], 9000, 9010, [9011, 9012, 9013], "MCC_mwMapContour", []]};
 	case "pdaRsc": {[uiNamespace getVariable ["MCC_SQLPDA_rscDisp", displayNull], 9120, 9130, [], "MCC_pdaMapContour", ["_this call MCC_fnc_mapDrawWPPDA;"]]};
 	default {[uiNamespace getVariable ["MCC_groupGen_Dialog", displayNull], 9000, 9010, [9011, 9012, 9013], "MCC_consoleMapContour", ["_this call MCC_fnc_mapDrawWP;"]]};
 };
@@ -31,8 +32,8 @@ if (_mode == "init") then {
 	_topo ctrlSetPosition (ctrlPosition _map);
 	_topo ctrlCommit 0;
 	{_topo ctrlAddEventHandler ["Draw", _x]} forEach _draws;
-	//Track units (MCC console): only while the console's Track units button has it on, as on the terrain map (um.sqf adds /
-	//removes it on both maps) - it was added for good by mistake and drew editor-style unit icons and leader lines
+	//Track units (MCC console): only while the console's Track units button has it on, as on the terrain map (um.sqf
+	//adds / removes it on both maps)
 	if (_screen == "console" && {missionNamespace getVariable ["MCC_trackMarker", false]}) then {
 		MCC_trackMarkerHandlerC = _topo ctrlAddEventHandler ["Draw", "_this call MCC_fnc_trackUnits;"];
 	};
@@ -80,11 +81,16 @@ if (count _carry == 2) then {
 			[_c, [_v select 0, _newAim]] call _f;
 			uiNamespace setVariable [_offKey, (_newAim vectorDiff (_v select 1)) vectorMultiply (1 / ((_v select 0) max 0.0001))];
 		};
-		//Debug logging (only with MCC debug on): the map moving when switching
-		uiSleep 0.25;
-		if (isNull _c) exitWith {};
-		private _now = [ctrlMapScale _c, _c ctrlMapScreenToWorld [_x + _w / 2, _y + _h / 2]];
-		["DEBUG", "mapLayers", "%1 switch | carried centre %2 | now centre %3 | moved %4 m | corrected on this switch: %5", [_scr, (_v select 1) apply {round _x}, (_now select 1) apply {round _x}, round ((_v select 1) distance2D (_now select 1)), (vectorMagnitude [_miss select 0, _miss select 1, 0]) > 1]] call MCC_fnc_log;
+	};
+};
+//(MK) a map following something (an Evac helicopter, UAV, gunship, missile): the other map carries on following it 
+if (_mode == "toggle") then {
+	private _from = [_topo, _map] select _contour;
+	private _to = [_map, _topo] select _contour;
+	private _t = _from getVariable ["MCC_followTarget", objNull];
+	if (!isNull _t && {alive _t} && {!(missionNamespace getVariable ["MCC_mapFollowStopped", false])}) then {
+		_from setVariable ["MCC_followTarget", objNull];
+		[_to, _t] call MCC_fnc_consoleMapFollow;
 	};
 };
 //the PDA pinned to the screen shows the PDA's choice

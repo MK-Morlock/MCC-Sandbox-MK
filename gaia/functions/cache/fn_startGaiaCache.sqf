@@ -11,6 +11,8 @@ while {true} do
 			   			(count(units _x)>0)
 			   			and
 			   			(alive (leader _x))
+				and
+				!(_x getVariable ["MCC_droneGroup", false])
 					)
 			then
 				{
@@ -126,5 +128,6 @@ while {true} do
 
 
 	 //We checked allgroups so we need a break
-	 sleep GAIA_CACHE_SLEEP;
+	 //(MK) no group set to be cached: look again in 5 s instead of twice a second
+	 sleep ([5, GAIA_CACHE_SLEEP] select ((allGroups findIf {_x getVariable ["mcc_gaia_cache", false]}) >= 0));
 };

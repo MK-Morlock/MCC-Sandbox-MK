@@ -15,7 +15,7 @@ _pos = getpos _module;
 if (typeName (_module getVariable ["side",true]) == typeName 0) exitWith {
 
 	_iedside =  [(_module getVariable ["side",1])] call BIS_fnc_sideType;
-	// "Random Patrol" = Yes means the unit moves around, so it is NOT static (this was inverted and never applied)
+	// "Random Patrol" = Yes means the unit moves around, so it is NOT static
 	_static = (_module getVariable ["patrol",1]) == 0;
 	private _weapon = _module getVariable ["weapon",""];
 

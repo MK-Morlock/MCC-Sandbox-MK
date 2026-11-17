@@ -20,7 +20,11 @@ params ["_type"];
 
 _mccdialog = findDisplay groupGen_IDD;
 MCC_groupBroadcast = [];
-MCC_isEmpty = if (ctrlShown (_mccdialog displayCtrl MCC_GGUNIT_EMPTY) && (lbCurSel MCC_GGUNIT_EMPTY == 1) && (count MCC_groupGenCurrenGroupArray == 0)) then {true} else {false};
+//(MK) Empty "Yes" read from the console window's own control: "lbCurSel <number>" / ctrlShow follow whichever window
+// Arma treats as active, which with MK's console isn't always this one.
+private _emptyCtrl = _mccdialog displayCtrl MCC_GGUNIT_EMPTY;
+MCC_isEmpty = (!isNull _emptyCtrl) && {(lbCurSel _emptyCtrl) == 1} && {(count MCC_groupGenCurrenGroupArray) == 0};
+["INFO", "spawn_request", "Empty: %1 (box %2, unit list %3 entries)", [MCC_isEmpty, if (isNull _emptyCtrl) then {"not found"} else {lbCurSel _emptyCtrl}, count MCC_groupGenCurrenGroupArray]] call MCC_fnc_log;
 
 //If we got here while loading a mission break it
 if mcc_isloading exitWith {};
@@ -30,7 +34,6 @@ mcc_delayed_spawn = if (cbChecked  (_mccdialog displayctrl 3022)) then {true} el
 mcc_caching = if (cbChecked  (_mccdialog displayctrl 3023)) then {true} else {false};
 
 //Group category of the Branch row, by its config name (MCC_fnc_spawnLists stores it on the row); "" for single units.
-//It was looked up by row number in MCC_groupTypes, also with Units chosen (an error for rows past the group list).
 private _gTypeName = "";
 if ((lbCurSel MCC_GGUNIT_TYPE) == 1) then {
 	private _bRow = lbCurSel UNIT_TYPE;
@@ -45,21 +48,21 @@ if ((lbCurSel MCC_GGUNIT_TYPE) == 1) then
 	if ((_gTypeName =="Reinforcement") && !(_type==0)) exitWith
 	{
 		//Check if zone exists before trying to spawn paratroopers without making a zone first
-		if (count mcc_zone_pos == 0) exitWith {hint "Create a zone first"};
+		if (count mcc_zone_pos == 0) exitWith {["Create a zone first"] call MCCMK_fnc_hint};
 
 		_selectedZoneNr = ["number"] call MCC_fnc_zoneList;
 		_zonePos = mcc_zone_pos select _selectedZoneNr;
-		if ( (count mcc_zone_pos <= _selectedZoneNr ) || { isnil "_zonePos" } ) exitWith {hint "Create a zone first"};
-		mcc_spawnname = (lbCurSel UNIT_CLASS);    //MCCR14 remove
+		if ( (count mcc_zone_pos <= _selectedZoneNr ) || { isnil "_zonePos" } ) exitWith {["Create a zone first"] call MCCMK_fnc_hint};
+		mcc_spawnname = (call MCCMK_fnc_classRow);    //MCCR14 remove
 		mcc_spawntype="Reinforcement";
 		mcc_classtype = "Reinforcement";
 		mcc_spawnfaction = mcc_faction;
 
 		click = false;
 
-		hint parseText format["<br/>--------------------------<br/>
+		[parseText format["<br/>--------------------------<br/>
 		<br/><t size='1.2' color='#33CC00'>Left click on the map to set start location (direction) of reinforcement</t><br/>
-		<br/>--------------------------<br/>"];
+		<br/>--------------------------<br/>"]] call MCCMK_fnc_hint;
 
 		onMapSingleClick "mcc_spawn_dir = _pos;
 		click = true;
@@ -80,13 +83,13 @@ if ((lbCurSel MCC_GGUNIT_TYPE) == 1) then
 		private _faction = "";
 
 		//Failsafe incase we trying to spawn something without making a zone first
-		if (count mcc_zone_pos == 0) exitWith {hint "Create a zone first"};
+		if (count mcc_zone_pos == 0) exitWith {["Create a zone first"] call MCCMK_fnc_hint};
 
 		_center = (mcc_zone_pos select (mcc_zone_number));
 		_radius = (((mcc_zone_size select (mcc_zone_number))select 0) + ((mcc_zone_size select (mcc_zone_number)) select 1))/2;
 		_faction = getText (configFile >> "CfgVehicles" >> (U_GEN_SOLDIER select 0 select 1) >> "faction");
 
-		switch (lbCurSel UNIT_CLASS) do
+		switch (call MCCMK_fnc_classRow) do
 		{
 			case 0:	//Light
 			{
@@ -162,16 +165,16 @@ if ((lbCurSel MCC_GGUNIT_TYPE) == 1) then
 	else
 	{
 		//Find the chosen group in the group list by its name. The list is built when the group type changes, so after a
-		//faction change or with a remembered choice it could be missing or belong to another list (Error 14 elements
-		//provided, 57 expected); it is then built again for the current faction and type.
-		private _gSel = lbCurSel UNIT_CLASS;
-		private _gTxt = lbText [UNIT_CLASS, _gSel];
+		//faction change or with a remembered choice it can be missing or belong to another list; it is then built again
+		//for the current faction and type.
+		private _gSel = call MCCMK_fnc_classRow;	//(MK) its place in the full list (the list can be narrowed by the search)
+		private _gTxt = lbText [UNIT_CLASS, lbCurSel UNIT_CLASS];
 		if (isNil "MCC_groupArray" || {_gSel >= count MCC_groupArray} || {(format ["%1 (%2 Units)", (MCC_groupArray select _gSel) param [3, ""], (MCC_groupArray select _gSel) param [4, ""]]) != _gTxt}) then {
 			MCC_groupArray = [mcc_sidename,mcc_faction, _gTypeName,"LAND"] call mcc_make_array_grps;
 		};
 		private _gi = MCC_groupArray findIf {(format ["%1 (%2 Units)", _x param [3, ""], _x param [4, ""]]) == _gTxt};
 		if (_gi < 0) then {_gi = _gSel};
-		if (_gi < 0 || {_gi >= count MCC_groupArray}) exitWith {hint "Choose the group again in the Spawn panel"};
+		if (_gi < 0 || {_gi >= count MCC_groupArray}) exitWith {["Choose the group again in the Spawn panel"] call MCCMK_fnc_hint};
 		_classtype	= (MCC_groupArray select _gi) select 2;
 		if (isnil "_classtype") exitWIth {};
 
@@ -242,13 +245,13 @@ else		//Case we are spawning a unit
 
 		if ((lbCurSel UNIT_CLASS) != -1) then
 		{
-			_classtype	= (_groupArray select (lbCurSel UNIT_CLASS)) select 1;
+			_classtype	= (_groupArray select (call MCCMK_fnc_classRow)) select 1;
 			MCC_groupBroadcast = [_classtype];
 
-			mcc_classtype = (_groupArray select (lbCurSel UNIT_CLASS)) select 0;
-			mcc_spawnname = (_groupArray select (lbCurSel UNIT_CLASS)) select 1;
-			mcc_spawnfaction = (_groupArray select (lbCurSel UNIT_CLASS)) select 2;
-			mcc_spawndisplayname = (_groupArray select (lbCurSel UNIT_CLASS)) select 3;
+			mcc_classtype = (_groupArray select (call MCCMK_fnc_classRow)) select 0;
+			mcc_spawnname = (_groupArray select (call MCCMK_fnc_classRow)) select 1;
+			mcc_spawnfaction = (_groupArray select (call MCCMK_fnc_classRow)) select 2;
+			mcc_spawndisplayname = (_groupArray select (call MCCMK_fnc_classRow)) select 3;
 		};
 	}
 	else
@@ -267,7 +270,7 @@ if ((_type==0) && ((!(_gTypeName in ["Reinforcement","Garrison"]) && (lbCurSel M
 
 	mcc_spawnbehavior = (MCC_spawn_behaviors select ((lbCurSel MCC_GGUNIT_BEHAVIOR) max 0)) select 1;
 	MCC_behavior_index = (lbCurSel MCC_GGUNIT_BEHAVIOR) max 0;
-	hint (if ((toLower mcc_spawnbehavior) in ["bis", "bisd", "bisp"]) then {"click map to spawn - Hold Ctrl for multiple times"} else {"click map to spawn - Hold Ctrl for multiple times" + toString [10] + "(Aggressive, Defensive and Fortify only apply to Spawn in zone: placed by click, the group behaves as None)"});
+	[(if ((toLower mcc_spawnbehavior) in ["bis", "bisd", "bisp"]) then {"click map to spawn - Hold Ctrl for multiple times"} else {"click map to spawn - Hold Ctrl for multiple times" + toString [10] + "(Aggressive, Defensive and Fortify only apply to Spawn in zone: placed by click, the group behaves as None)"})] call MCCMK_fnc_hint;
 	missionNameSpace setVariable ["MCC_spawnEnabled",true];
 }
 //Spawn to zone
@@ -277,15 +280,15 @@ else
 	if ((lbCurSel UNIT_CLASS) == -1) exitWith {systemchat "Cannot spawn an empty group"};
 
 	//Failsafe incase we trying to spawn something without making a zone first
-	if (count mcc_zone_pos == 0) exitWith {hint "Create a zone first"};
+	if (count mcc_zone_pos == 0) exitWith {["Create a zone first"] call MCCMK_fnc_hint};
 
 	//Failsafe in case we trying to spawn something without making a zone first
 	_selectedZoneNr = ["number"] call MCC_fnc_zoneList;
 	_zonePos = mcc_zone_pos select _selectedZoneNr;
-	if ( (count mcc_zone_pos <= _selectedZoneNr ) || { isnil "_zonePos" } ) exitWith {hint "Create a zone first"};
+	if ( (count mcc_zone_pos <= _selectedZoneNr ) || { isnil "_zonePos" } ) exitWith {["Create a zone first"] call MCCMK_fnc_hint};
 
-	mcc_spawnwithcrew = (MCC_spawn_empty select (lbCurSel MCC_GGUNIT_EMPTY)) select 1;	//let's add the behavior/awerness
-	MCC_empty_index = (lbCurSel MCC_GGUNIT_EMPTY);
+	mcc_spawnwithcrew = (MCC_spawn_empty select (((lbCurSel ((findDisplay groupGen_IDD) displayCtrl MCC_GGUNIT_EMPTY)) max 0) min 1)) select 1;	//let's add the behavior/awerness (MK: from the console window's own control)
+	MCC_empty_index = (((lbCurSel ((findDisplay groupGen_IDD) displayCtrl MCC_GGUNIT_EMPTY)) max 0) min 1);
 
 	mcc_spawnbehavior = (MCC_spawn_behaviors select (lbCurSel MCC_GGUNIT_BEHAVIOR)) select 1;
 	MCC_behavior_index = (lbCurSel MCC_GGUNIT_BEHAVIOR);

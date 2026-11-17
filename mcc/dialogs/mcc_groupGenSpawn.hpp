@@ -48,10 +48,9 @@ class MCC_spawnDialogControls:MCC_RscControlsGroup
 			
 			x = 0.008000* safezoneW;
 			y =0.008000* safezoneH;
-			w = 0.344938* safezoneW;
+			w = 0.168469* safezoneW;
 			h = 0.030000* safezoneH;
 		};
-
 		class mcc_groupGen_typeTittle: MCC_RscText
 		{
 			colorText[] = {0.62,0.65,0.68,1};
@@ -110,6 +109,19 @@ class MCC_spawnDialogControls:MCC_RscControlsGroup
 			h = 0.018000* safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
+		//(MK) class search: narrows the Class list to names containing the text (MCCMK_fnc_classSearch)
+		class MCCMK_classSearch: MCC_RscText
+		{
+			idc = 9270;
+			type = 2;
+			tooltip = "Type to narrow the Class list";
+			onKeyUp = "[ctrlText (_this select 0)] call MCCMK_fnc_classSearch";
+			x = 0.085620* safezoneW;
+			y = 0.138000* safezoneH;
+			w = 0.078469* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.7)";
+		};
 		class mcc_groupGen_classComboBox: MCC_RscCombo
 		{
 			idc = UNIT_CLASS;
@@ -150,7 +162,7 @@ class MCC_spawnDialogControls:MCC_RscControlsGroup
 			text = "Empty"; //--- ToDo: Localize;
 			x = 0.008000* safezoneW;
 			y = 0.238000* safezoneH;
-			w = 0.168469* safezoneW;
+			w = 0.081000* safezoneW;
 			h = 0.018000* safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
 		};
@@ -160,7 +172,30 @@ class MCC_spawnDialogControls:MCC_RscControlsGroup
 
 			x = 0.008000* safezoneW;
 			y = 0.256000* safezoneH;
-			w = 0.168469* safezoneW;
+			w = 0.081000* safezoneW;
+			h = 0.022000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
+		};
+		//(MK) Start: Flying / Landed - helicopters and fixed-wing only (MCC_fnc_spawnLists shows it)
+		class MCCMK_spawnStartTitle: MCC_RscText
+		{
+			colorText[] = {0.62,0.65,0.68,1};
+			idc = 3092;
+			text = "Start";
+			x = 0.095469* safezoneW;
+			y = 0.238000* safezoneH;
+			w = 0.081000* safezoneW;
+			h = 0.018000* safezoneH;
+			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.72)";
+		};
+		class MCCMK_spawnStart: MCC_RscCombo
+		{
+			idc = 3091;
+			tooltip = "Flying: crewed aircraft start in the air (as before). Landed:\non the ground, engine off, crew aboard - held there until the\ngroup's first order (a waypoint from either console, or a High\nCommand order), then it starts up and takes off. A plane taxis\nto take off: put it on a runway (the 3D Editor places it\nexactly). On water: afloat on the sea where you click, engine\noff, held the same way (only an aircraft Floatary floats - a\nlarge one, with 'Floating aircraft' on - stays up). Spawn in\nzone always starts flying.";
+			onLBSelChanged = "MCCMK_spawnStart = _this select 1; MCCMK_spawnLanded = ((_this select 1) == 1);";
+			x = 0.095469* safezoneW;
+			y = 0.256000* safezoneH;
+			w = 0.081000* safezoneW;
 			h = 0.022000* safezoneH;
 			sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 0.8)";
 		};
@@ -243,7 +278,20 @@ class MCC_spawnDialogControls:MCC_RscControlsGroup
 			y = 0.368000* safezoneH;
 			w = 0.057300* safezoneW;
 			h = 0.022000* safezoneH;
-			tooltip = "Click on the map to create the group/unit - hold Ctrl to spawn several"; //--- ToDo: Localize;
+			tooltip = "Click on the map to create the group/unit - hold Ctrl to spawn\nseveral"; //--- ToDo: Localize;
+		};
+		//(MK) the Virtual Garage for the chosen vehicle class: paint and parts only (MCCMK_fnc_garageButton) - greyed for infantry,
+		// groups and ammo (MCC_fnc_spawnLists); Ctrl + click: its own look again
+		class MCCMK_spawnGarage: MCCBTN_S
+		{
+			idc = 3093;
+			text = "Garage";
+			tooltip = "Paint and parts for the chosen vehicle.\nKept in your profile, used whenever it is spawned here.\nCtrl + click: back to its own look.";
+			onMouseButtonClick = "if ((_this select 1) == 0 && {ctrlEnabled (_this select 0)}) then {['spawn', _this select 5] call MCCMK_fnc_garageButton}";
+			x = 0.173038* safezoneW;
+			y = 0.368000* safezoneH;
+			w = 0.057300* safezoneW;
+			h = 0.022000* safezoneH;
 		};
 		class mcc_groupGen_groupListBoxAddToZoneButton: MCCBTN_S
 		{
@@ -295,7 +343,7 @@ class MCC_spawnDialogControls:MCC_RscControlsGroup
 		class MCC_spawnCommandable: MCC_RscCombo
 		{
 			idc = 3078;
-			tooltip = "Yes: can be commanded from the Commander Console and RTS, and counts towards food and bunks. Ignored for GAIA behaviours in a zone (GAIA controls them).";
+			tooltip = "Yes: can be commanded from the Commander Console and RTS, and\ncounts towards food and bunks. Ignored for GAIA behaviours in\na zone (GAIA controls them).";
 			onLBSelChanged = "MCC_spawnCommandable = ((_this select 1) == 1);";
 
 			x = 0.184000* safezoneW;

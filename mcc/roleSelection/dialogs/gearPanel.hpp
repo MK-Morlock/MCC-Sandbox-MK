@@ -113,7 +113,7 @@ class MCCDLG_NAME {
 				{
 					idc = 20;
 
-					x = 0.62 * safezoneW;	//2:1 like a flag (it was 3:1, stretched), a little up and to the right
+					x = 0.62 * safezoneW;	//2:1 like a flag, a little up and to the right
 					y = 0.034 * safezoneH;
 					w = 0.05 * safezoneW;
 					h = 0.0444 * safezoneH;

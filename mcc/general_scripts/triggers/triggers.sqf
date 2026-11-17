@@ -37,7 +37,7 @@ switch (_type) do
 		Mshape = (MCC_shapeMarker select (lbCurSel MCC_TRIGGERS_SHAPE));
 		Mcolor = "ColorOrange";
 		Mtype = "SOLID";
-		hint "Left click on and drag a box on the map to create a trigger";
+		["Left click on and drag a box on the map to create a trigger"] call MCCMK_fnc_hint;
 	};
 	
 	case 1:	//Generate
@@ -53,7 +53,7 @@ switch (_type) do
 		_stateCond	= (ctrlText (_dlg displayCtrl MCC_TRIGGERS_STAT_COND));
 		_stateDiac	= (ctrlText (_dlg displayCtrl MCC_TRIGGERS_STAT_DEACTIVE));
 		MCC_capture_var = "";
-		hint "Trigger created: capture MCC actions that you want to link to that trigger, press Stop Capturing to finish";
+		["Trigger created: capture MCC actions that you want to link to that trigger, press Stop Capturing to finish"] call MCCMK_fnc_hint;
 		waituntil {(!MCC_capture_state)};
 		mcc_safe = mcc_safe + FORMAT ['
 							MCC_capture_var = %7;
@@ -80,7 +80,7 @@ switch (_type) do
 	   
    case 2:	//Mapclick Move trigger
 	{
-		hint "Left click on the map to move a trigger";
+		["Left click on the map to move a trigger"] call MCCMK_fnc_hint;
 			onMapSingleClick  format[" 	hint 'Trigger moved.'; 
 								_nul=[3,_pos] execVM '%1mcc\general_scripts\triggers\triggers.sqf';
 								onMapSingleClick """";",MCC_path];

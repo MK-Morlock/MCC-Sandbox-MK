@@ -87,7 +87,7 @@ if (mcc_missionmaker == (name player)) then 	{
 				IedName = [format ["ied_%1", MCC_IEDCount]];
 				if ((lbCurSel MCC_TRAPS_OBJECT) == -1) exitWith {};
 				trapkind = [(_trapsArray select (lbCurSel MCC_TRAPS_OBJECT)) select 1];
-				hint "click on the map to place the trap";
+				["click on the map to place the trap"] call MCCMK_fnc_hint;
 				if (MCC_capture_state) then {
 					onMapSingleClick format ["_nul=[""%1"",_pos] call MCC_3D_PLACER;closeDialog 0;onMapSingleClick """";",(trapkind select 0)];
 					MCC3DRuning = true;
@@ -144,7 +144,7 @@ if (mcc_missionmaker == (name player)) then 	{
 				Mshape = "RECTANGLE";
 				Mcolor = "ColorRed";
 				Mtype = "GRID";
-				hint "Left click on and drag a box on the map to create a minefield";
+				["Left click on and drag a box on the map to create a minefield"] call MCCMK_fnc_hint;
 				waituntil {!MCC_drawMinefield};
 				if (MCC_capture_state) then {
 					MCC_capture_var=MCC_capture_var + FORMAT ['
@@ -164,7 +164,7 @@ if (mcc_missionmaker == (name player)) then 	{
 			{
 				IedName = [format ["Armed_Civilian_%1", MCC_IEDCount]];
 				trapkind = [(_trapsArray select (lbCurSel MCC_TRAPS_OBJECT)) select 1];
-				hint "click on the map to place the trap";
+				["click on the map to place the trap"] call MCCMK_fnc_hint;
 				if (MCC_capture_state) then	{
 					onMapSingleClick format ["_nul=[""%1"",_pos] call MCC_3D_PLACER;closeDialog 0;onMapSingleClick """";",(trapkind select 0)];
 					MCC3DRuning = true;
@@ -209,7 +209,7 @@ if (mcc_missionmaker == (name player)) then 	{
 			if (_IEDtype == 8) then	//if Suicide bomber
 			{
 				trapkind = [(_trapsArray select (lbCurSel MCC_TRAPS_OBJECT)) select 1];
-				hint "click on the map to place the trap";
+				["click on the map to place the trap"] call MCCMK_fnc_hint;
 				if (MCC_capture_state) then {
 						onMapSingleClick " 	hint ""trap captured."";
 								MCC_capture_var=MCC_capture_var + FORMAT ['
@@ -240,7 +240,7 @@ if (mcc_missionmaker == (name player)) then 	{
 				MCC_IEDisSpotter = 0;															//Not a spotter
 				IEDAmbushspawnname = GEN_INFANTRY select (lbCurSel MCC_TRAPS_AMBUSH) select 2; 		//Group
 			};
-		hint "click, hold and then drag the cursor to place the ambush group facing the desired direction";
+		["click, hold and then drag the cursor to place the ambush group facing the desired direction"] call MCCMK_fnc_hint;
 		MCC_ambushPlacing = true;
 		};
 	};

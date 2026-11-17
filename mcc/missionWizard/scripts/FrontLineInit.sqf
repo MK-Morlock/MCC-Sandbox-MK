@@ -70,5 +70,7 @@ if (count MCC_FLDirPoint == 0) exitWith {};
 
 //3. Build it on the server
 "Generating the front line - this can take a minute" call _say;
+missionNamespace setVariable ["MCC_MWDronesNext", (profileNamespace getVariable ["MCC_MWDronesIndex",1]) == 1];
+publicVariableServer "MCC_MWDronesNext";
 [_lineStart, _lineEnd, MCC_FLDirPoint, _faction, _opts, _attFaction, player] remoteExec ["MCC_fnc_FLGenerate", 2];
 ["INFO", "FrontLineInit", "front line requested: %1 -> %2, front %3, faction %4, attacker %5, options %6", [_lineStart, _lineEnd, MCC_FLDirPoint, _faction, _attFaction, _opts]] call MCC_fnc_log;

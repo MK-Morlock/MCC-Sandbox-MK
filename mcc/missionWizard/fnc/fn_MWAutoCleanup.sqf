@@ -37,7 +37,9 @@ while {true} do {
 	private _wait = (missionNamespace getVariable ["MCC_cleanupWait", 5]) * 60;
 	private _backstop = (missionNamespace getVariable ["MCC_cleanupBackstop", 60]) * 60;
 	private _removed = [0, 0];
-	private _objTargets = ((allMissionObjects "MCC_ModuleObjective_FCurator") apply {_x getVariable ["AttachObject_object", objNull]}) + (missionNamespace getVariable ["MCC_MWObjectiveItems", []]);
+	// (the objective modules from the list kept as they're created - no scan of every mission object)
+	MCCMK_objModules = (missionNamespace getVariable ["MCCMK_objModules", []]) select {!isNull _x};
+	private _objTargets = (MCCMK_objModules apply {_x getVariable ["AttachObject_object", objNull]}) + (missionNamespace getVariable ["MCC_MWObjectiveItems", []]);
 
 	{
 		private _id = _x;
@@ -46,11 +48,18 @@ while {true} do {
 			private _zones = _r getOrDefault ["zones", []];
 			{
 				private _g = _x;
-				if ((_g getVariable ["MCC_MWReinforcement", false]) && {(((_g getVariable ["GAIA_ZONE_INTEND", []]) param [0, ""]) in _zones)} && {((units _g) findIf {isPlayer _x}) < 0}) then {
+				if ((((_g getVariable ["MCC_MWReinforcement", false]) && {(((_g getVariable ["GAIA_ZONE_INTEND", []]) param [0, ""]) in _zones)}) || {((_g getVariable ["MCC_MWReinforceZone", ""]) in _zones)}) && {((units _g) findIf {isPlayer _x}) < 0}) then {
 					{_x setVariable ["MCC_MWid", _id]; if (vehicle _x != _x) then {(vehicle _x) setVariable ["MCC_MWid", _id]; (vehicle _x) setVariable ["MCC_hadCrew", true]}} forEach (units _g);
 					(_r get "groups") pushBackUnique _g;
 				};
 			} forEach allGroups;
+			// (MK) the mission's QRF vehicles, marked when they spawned - empty ones too (removed like the mission's own)
+			{
+				if (((_x getVariable ["MCC_MWReinforceZone", ""]) in _zones) && {(_x getVariable ["MCC_MWid", ""]) == ""} && {((crew _x) findIf {isPlayer _x}) < 0}) then {
+					_x setVariable ["MCC_MWid", _id];
+					_x setVariable ["MCC_hadCrew", true];
+				};
+			} forEach vehicles;
 		};
 	} forEach _reg;
 
@@ -149,4 +158,6 @@ while {true} do {
 	if ((_removed select 0) + (_removed select 1) > 0 && {missionNamespace getVariable ["MCC_debug", false]}) then {
 		["DEBUG", "MCC_fnc_MWAutoCleanup", "removed %1 bodies and %2 wrecks/empty vehicles", _removed] call MCC_fnc_log;
 	};
+	// nothing left to look after: stop (MCC_fnc_generatedMissions starts it again with the next mission)
+	if ((count (missionNamespace getVariable ["MCC_generatedMissions", createHashMap])) == 0) exitWith {MCC_autoCleanupRunning = nil};
 };

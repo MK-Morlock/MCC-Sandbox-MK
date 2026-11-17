@@ -75,8 +75,8 @@ if (!isnull MCC_Prev_Group) then
 	waituntil {group player == MCC_Prev_Group};
 	if (MCC_Prev_GroupIsLeader) then 
 	{
-		// Give the player back the lead of his own squad. In singleplayer this used to re-select the *hijacked*
-		// unit as leader of its group instead, so an AI squad mate kept the lead after "Back To Player".
+		// Give the player back the lead of his own squad (not the hijacked unit), so no AI squad mate keeps the lead after
+		// "Back To Player".
 		if (isMultiplayer) then
 		{
 			[group player, player] remoteExec ["selectLeader", 0, false];	// runs where the group is local

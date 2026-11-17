@@ -14,6 +14,7 @@ if (_show && {!isNull MCC_CONST_PLACEHOLDER}) then {
 		} else {
 			_o setDir (getDir _a);
 		};
+		if (((toLower (typeOf _o)) find "camonet") >= 0) then {[_o, _a, if (count _vdu == 2) then {_vdu} else {[[0, 1, 0], [0, 0, 1]]}, false] call MCCMK_fnc_rtsNetTilt};
 	} forEach _parts;
 } else {
 	_a setPosASL [0, 0, 5000];

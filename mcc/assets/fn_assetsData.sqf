@@ -1,7 +1,7 @@
 /*================================================================== MCC_fnc_assetsData ==================================================================
 	Asset presets for the console Assets page: which classes MCC uses for HVTs, destroy objectives and support aircraft.
 	Presets are saved per enemy faction in the profile (profileNamespace MCC_assetPresets), so choosing a faction again
-	brings its choices back. A slot with an empty list is Auto: MCC picks as before (faction, its mod, then default list).
+	brings its choices back. A slot with an empty list is Auto: MCC picks (faction, its mod, then default list).
 
 	Modes
 		["slots"]                         slot definitions: [id, label, variable, role, group]

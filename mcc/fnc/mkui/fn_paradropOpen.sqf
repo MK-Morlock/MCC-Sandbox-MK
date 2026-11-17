@@ -11,11 +11,12 @@ switch (_a) do {
 };
 private _vals = if (_w == 0) then {
 	private _dh = MCCMK_pdMem getOrDefault ["h", 300];
-	[-1] + ([50, 75, 100, 125, 150, 175, 200, 250, 300, 350, 400, 450] select {_x <= _dh - 25})
-} else {[75, 100, 125, 150, 175, 200]};
+	private _ok = [75, 100, 120, 150, 175, 200] select {_x <= _dh - 25};
+	[_ok, [75]] select (count _ok == 0)
+} else {[75, 100, 120, 150, 175, 200]};
 private _mode = MCCMK_pdMem getOrDefault ["openMode" + _key, 0];
-private _want = MCCMK_pdMem getOrDefault ["openH" + _key, [100, 150] select _w];
-if !(_want in _vals) then {_want = selectMax _vals};
+private _want = MCCMK_pdMem getOrDefault ["openH" + _key, 120];
+if !(_want in _vals) then {_want = if (120 in _vals) then {120} else {selectMax _vals}};
 MCCMK_pdMem set ["openH" + _key, _want];
 missionNamespace setVariable [["MCCMK_pdOpenPara", "MCCMK_pdOpenHalo"] select _w, [_mode, _want]];
 if (_a in [0, 1, 2]) then {["DEBUG", "paradrop", "%1 chute opening: %2%3", [["Paratrooper", "HALO"] select _w, ["Auto", "Manual"] select _mode, if (_mode == 1) then {format [" (AI open %1)", if (_want < 0) then {"on exit"} else {format ["at %1 m", _want]}]} else {""}]] call MCC_fnc_log};
@@ -27,5 +28,5 @@ private _c = _d displayCtrl (_ids select 1);
 lbClear _c;
 {private _i = _c lbAdd (if (_x < 0) then {"On exit"} else {format ["%1 m", _x]}); _c lbSetValue [_i, _x]} forEach _vals;
 _c lbSetCurSel ((_vals find _want) max 0);
-_c ctrlEnable (_mode == 1);
+_c ctrlEnable true;
 MCCMK_pdOpenBusy = false;

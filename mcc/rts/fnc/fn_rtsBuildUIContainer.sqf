@@ -53,7 +53,7 @@ _elec = getNumber (_cfg >> _constType >> "needelectricity");
 for "_i" from 0 to 11 do {
 	if (count _availableActions <= _i) then {_availableActions set [_i,""]};
 };
-_availableActions set [11, ["MCC_rts_rtsBuildUIContainerBack", "MCC_rts_rtsFortUIContainerBack"] select (toLower _var2 == "fortifications")];	//Exit Build Menu / Exit Fortifications Menu
+_availableActions set [11, ["MCC_rts_rtsBuildUIContainerBack", "MCC_rts_rtsFortUIContainerBack"] select ((toLower _var2) in ["fortifications", "helipads"])];	//Exit Build Menu / Exit Fortifications Menu
 
 //Populate actions
 _cfg = if (isClass(missionconfigFile >> _var3)) then {(missionconfigFile >> _var3)} else {(configFile >> _var3)};
